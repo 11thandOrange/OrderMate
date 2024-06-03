@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="@dimen/_10sdp"
-        android:outlineProvider="background"
+        android:background="#ddf1f9"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,10 +43,10 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/appIcon"
-            android:layout_width="@dimen/_22sdp"
-            android:layout_height="@dimen/_22sdp"
-            android:layout_margin="@dimen/_4sdp"
-            android:src="@drawable/ic_order"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginTop="@dimen/_5ssp"
+            android:src="@drawable/ic_order_new"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/menuBtn"
             app:layout_constraintTop_toTopOf="@id/dividerTop" />
@@ -56,7 +56,6 @@
             android:id="@+id/merchantName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/_5sdp"
             android:ellipsize="end"
             android:letterSpacing="0.08"
             android:maxWidth="@dimen/_150sdp"
@@ -74,7 +73,7 @@
             android:layout_margin="@dimen/_10sdp"
             android:alpha="0.8"
             android:text="@string/syncing"
-            android:textColor="#8a9194"
+            android:textColor="@color/darker_gray"
             android:textSize="@dimen/_8ssp"
             android:textStyle="bold|normal"
             android:visibility="gone"
@@ -88,7 +87,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_5sdp"
             android:src="@drawable/ic_search"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/searchBar"
             app:layout_constraintTop_toTopOf="parent" />
@@ -97,7 +96,7 @@
             android:id="@+id/searchBar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:visibility="visible"
             android:layout_marginStart="@dimen/_20sdp"
             android:background="@null"
             android:drawableStart="@null"
@@ -119,7 +118,7 @@
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="0dp"
             android:layout_height="1.5dp"
-            app:dividerColor="#e1e1e1"
+            app:dividerColor="@color/darker_gray"
             app:layout_constraintBottom_toBottomOf="@+id/searchBar"
             app:layout_constraintEnd_toEndOf="@+id/searchBar"
             app:layout_constraintStart_toStartOf="@+id/searchBar"
@@ -130,7 +129,7 @@
             android:id="@+id/syncButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:visibility="gone"
+            android:visibility="visible"
             android:paddingHorizontal="@dimen/_10sdp"
             android:paddingVertical="@dimen/_10sdp"
             android:src="@drawable/ic_refresh"
@@ -284,6 +283,7 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         layout="@layout/item_header_orders"
+        android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/filterLayout"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -291,7 +291,7 @@
         android:id="@+id/orderRecycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -319,34 +319,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBar" />
 
-    <androidx.drawerlayout.widget.DrawerLayout
-        android:id="@+id/drawerLayout"
-        android:layout_width="@dimen/_200sdp"
-        android:layout_height="match_parent"
-        android:background="@color/white"
-        android:fitsSystemWindows="true"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:openDrawer="start">
-
-        <include
-            layout="@layout/side_drawer_layout"
-            android:layout_width="@dimen/_200sdp"
-            android:layout_height="match_parent" />
-
-
-
-    </androidx.drawerlayout.widget.DrawerLayout>
-
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/progressLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@color/white"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

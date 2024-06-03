@@ -8,100 +8,131 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/orderTime"
         style="@style/orderListStyle"
-        android:ems="8"
-        android:padding="@dimen/_2sdp"
+        android:layout_marginHorizontal="@dimen/_5sdp"
+        android:ems="6"
         android:paddingStart="0dp"
+        android:paddingTop="@dimen/_2sdp"
         android:paddingEnd="0dp"
-        android:maxWidth="@dimen/_100sdp"
-        android:text="@string/dummy_time"
-        android:textColor="#2c3a3f"
-        android:textStyle="bold"
-        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:text="@string/date"
+        android:textColor="@color/black"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderDate"
+        style="@style/orderListStyle"
+        android:layout_marginBottom="@dimen/_2sdp"
+        android:ems="8"
+        android:padding="0dp"
+        android:paddingBottom="@dimen/_2sdp"
+        android:text="@string/dummy_time"
+        android:textAlignment="textStart"
+        android:textColor="@color/darker_gray"
+        android:textSize="@dimen/_7ssp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/orderTime"
+        app:layout_constraintTop_toBottomOf="@id/orderTime" />
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/orderPrice"
         style="@style/orderListStyle"
-        android:ems="8"
-        android:maxWidth="@dimen/_50sdp"
-        android:minWidth="@dimen/_60sdp"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:ems="6"
         android:text="@string/dummy_price"
         android:textAlignment="textStart"
-        android:layout_marginHorizontal="@dimen/_10sdp"
-        android:textColor="#2c3a3f"
-        android:textStyle="bold"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/orderTime"
-        app:layout_constraintTop_toTopOf="@+id/orderTime" />
-
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/orderPaymentTypes"
+        android:id="@+id/orderSource"
         style="@style/orderListStyle"
-        android:ems="10"
-        android:maxWidth="@dimen/_200sdp"
-        android:text="@string/dummy_name"
-        android:textColor="#bdc1c3"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:ems="6"
+        android:text="@string/hypen_text"
         android:textAlignment="textStart"
-        app:layout_constraintEnd_toStartOf="@id/orderStatus"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toEndOf="@+id/orderCustomerName"
         app:layout_constraintTop_toTopOf="parent" />
 
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/orderStatus"
+        android:id="@+id/orderType"
         style="@style/orderListStyle"
-        android:ems="8"
-        android:maxWidth="@dimen/_100sdp"
-        android:text="@string/dummy_status"
-        android:textAllCaps="true"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/orderPrice"
-        app:layout_constraintEnd_toStartOf="@+id/orderName"
-        app:layout_constraintTop_toTopOf="@+id/orderPrice" />
+        android:layout_marginBottom="@dimen/_2sdp"
+        android:ems="6"
+        android:padding="0dp"
+        android:paddingBottom="@dimen/_2sdp"
+        android:text="@string/hypen_text"
+        android:textAlignment="textStart"
+        android:textColor="@color/darker_gray"
+        android:textSize="@dimen/_7ssp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/orderSource"
+        app:layout_constraintTop_toBottomOf="@id/orderSource" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/orderName"
+        android:id="@+id/orderStatus"
         style="@style/orderListStyle"
         android:layout_marginHorizontal="@dimen/_10sdp"
-        android:ems="8"
-        android:maxWidth="@dimen/_200sdp"
-        android:text="@string/dummy_name"
-        android:textColor="#bdc1c3"
+        android:ems="10"
+        android:text="@string/hypen_text"
+        android:textAllCaps="true"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/orderId"
+        app:layout_constraintStart_toEndOf="@id/orderPrice"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderCustomerName"
+        style="@style/orderListStyle"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:ems="11"
+        android:paddingTop="@dimen/_2sdp"
+        android:text="@string/hypen_text"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toEndOf="@+id/orderStatus"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderEmployeeName"
+        style="@style/orderListStyle"
+        android:layout_marginBottom="@dimen/_2sdp"
+        android:ems="11"
+        android:paddingBottom="@dimen/_2sdp"
+        android:text="@string/hypen_text"
+        android:textAlignment="textStart"
+        android:textColor="@color/darker_gray"
+        android:textSize="@dimen/_7ssp"
+        app:layout_constraintStart_toStartOf="@id/orderCustomerName"
+        app:layout_constraintTop_toBottomOf="@id/orderCustomerName" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderNotes"
+        style="@style/orderListStyle"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:ems="11"
+        android:text="@string/hypen_text"
+        android:textAllCaps="true"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toEndOf="@id/orderSource"
         app:layout_constraintTop_toTopOf="parent" />
 
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/orderId"
         style="@style/orderListStyle"
-        android:ems="10"
-        android:gravity="start"
-        android:maxWidth="@dimen/_130sdp"
-        android:text="@string/dummy_id"
-        android:textAlignment="textStart"
-        android:textColor="#2c3a3f"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/orderStatus"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/orderStatus" />
+        android:ems="14"
+        android:paddingTop="@dimen/_2sdp"
+        android:text="@string/hypen_text"
+        android:textSize="@dimen/_7ssp"
+        android:textColor="@color/darker_gray"
+        app:layout_constraintStart_toStartOf="@id/orderNotes"
+        app:layout_constraintTop_toBottomOf="@id/orderNotes" />
 
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/orderDate"
-        style="@style/orderListStyle"
-        android:ems="8"
-        android:padding="0dp"
-        android:maxWidth="@dimen/_200sdp"
-        android:text="@string/date"
-        android:textAlignment="textStart"
-        android:textColor="#bdc1c3"
-        app:layout_constraintStart_toStartOf="@id/orderTime"
-        app:layout_constraintTop_toBottomOf="@id/orderTime" />
 
     <com.google.android.material.divider.MaterialDivider
         android:layout_width="match_parent"
@@ -110,5 +141,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="20dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

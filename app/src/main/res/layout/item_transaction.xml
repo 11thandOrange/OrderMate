@@ -80,7 +80,7 @@
         android:maxWidth="@dimen/_50sdp"
         android:paddingBottom="@dimen/_4sdp"
         android:text="@string/payment"
-        android:textColor="#bdc1c3"
+        android:textColor="@color/darker_gray"
         android:textStyle="bold"
         android:textSize="@dimen/_8ssp"
         app:layout_constraintEnd_toEndOf="@id/paymentAmount"
@@ -96,7 +96,7 @@
         android:maxWidth="@dimen/_50sdp"
         android:paddingBottom="@dimen/_4sdp"
         android:text="@string/dummy_date"
-        android:textColor="#bdc1c3"
+        android:textColor="@color/darker_gray"
         android:textSize="@dimen/_8ssp"
         app:layout_constraintStart_toStartOf="@+id/paymentTime"
         app:layout_constraintTop_toBottomOf="@+id/paymentTime" />

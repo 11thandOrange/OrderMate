@@ -1,4 +1,3 @@
-
 plugins {
     id("com.android.application")  // describe the this is an android application
     id("org.jetbrains.kotlin.android")
@@ -8,17 +7,17 @@ plugins {
 
 
 android {
-    namespace = "com.order.orderappclover"
-    compileSdk = 34  // for clover app we need to compile the app to max version that android supports
+    namespace = "com.specialOrderNew"
+    compileSdk =
+        34  // for clover app we need to compile the app to max version that android supports
 
     defaultConfig {
-        applicationId = "com.order.orderappclover"
+        applicationId = "com.specialOrderNew"
         minSdk = 17   // for clover apps we need to setup the minimum support sdk to 17
         //noinspection ExpiredTargetSdkVersion
         targetSdk = 22  // for clover app this is the max target version it supports.
-        versionCode = 2
+        versionCode = 5
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -31,7 +30,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-
         debug {
             multiDexEnabled = true
         }
@@ -50,8 +48,8 @@ android {
         resources.excludes.add("META-INF/kotlinx_coroutines_core.version")
         resources.excludes.add("META-INF/androidx.*")
         resources.excludes.add("META-INF/services/kotlinx.coroutines.*")
-        resources.excludes.add ("META-INF/com/android/build/gradle/app-metadata.properties")
-        resources.excludes.add ("META-INF/services/kotlinx.coroutines.*")
+        resources.excludes.add("META-INF/com/android/build/gradle/app-metadata.properties")
+        resources.excludes.add("META-INF/services/kotlinx.coroutines.*")
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -75,7 +73,6 @@ val cloverVersion = "304"
 val encryptedSharedPreferenceVersion = "1.1.0-alpha02"
 
 dependencies {
-
     implementation("androidx.core:core-ktx:${coreVersion}")
     implementation("androidx.appcompat:appcompat:${appCompactVersion}")
     implementation("com.google.android.material:material:${materialVersion}")

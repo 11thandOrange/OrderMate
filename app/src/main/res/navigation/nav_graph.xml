@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/customFieldsFragment"
-        android:name="com.order.orderappclover.fragment.customFields.CustomFieldsFragment"
+        android:name="com.specialOrderNew.fragment.customFields.CustomFieldsFragment"
         android:label="fragment_custom_fields"
         tools:layout="@layout/fragment_custom_fields">
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/orderHistoryFragment"
-        android:name="com.order.orderappclover.fragment.orderHistory.OrderHistoryFragment"
+        android:name="com.specialOrderNew.fragment.orderHistory.OrderHistoryFragment"
         android:label="fragment_order_history"
         tools:layout="@layout/fragment_order_history">
         <action
@@ -28,36 +28,15 @@
     </fragment>
     <fragment
         android:id="@+id/orderDetailFragment"
-        android:name="com.order.orderappclover.fragment.orderDetail.OrderDetailFragment"
+        android:name="com.specialOrderNew.fragment.orderDetail.OrderDetailFragment"
         android:label="fragment_order_detail"
         tools:layout="@layout/fragment_order_detail">
         <action
             android:id="@+id/action_orderDetailFragment_to_orderHistoryFragment"
             app:destination="@id/orderHistoryFragment" />
         <argument
-            android:name="order"
-            app:argType="string" />
-        <argument
-            android:name="employeeName"
-            app:argType="string" />
-        <argument
-            android:name="orderStatus"
-            app:argType="string" />
-        <argument
-            android:name="created"
-            app:argType="long" />
-        <argument
-            android:name="total"
-            app:argType="integer" />
-        <argument
-            android:name="curr"
-            app:argType="string" />
-        <argument
-            android:name="tax"
-            app:argType="integer" />
-        <argument
-            android:name="amount"
-            app:argType="integer" />
+            android:name="orderData"
+            app:argType="com.clover.sdk.v3.order.Order" />
 
     </fragment>
 

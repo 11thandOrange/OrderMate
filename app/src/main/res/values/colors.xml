@@ -7,4 +7,6 @@
     <color name="open_status_color">#eed013</color>
     <color name="paid_status_color">#3ccd79</color>
     <color name="other_order_payment_status">#ea2c2f</color>
+    <color name="header_blue">#ddf1f9</color>
+    <color name="darker_gray">#757575</color>
 </resources>
