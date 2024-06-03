@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderTime"
+        style="@style/orderListStyle"
+        android:ems="8"
+        android:padding="@dimen/_2sdp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        android:maxWidth="@dimen/_100sdp"
+        android:text="@string/dummy_time"
+        android:textColor="#2c3a3f"
+        android:textStyle="bold"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderPrice"
+        style="@style/orderListStyle"
+        android:ems="8"
+        android:maxWidth="@dimen/_50sdp"
+        android:minWidth="@dimen/_60sdp"
+        android:text="@string/dummy_price"
+        android:textAlignment="textStart"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:textColor="#2c3a3f"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/orderTime"
+        app:layout_constraintTop_toTopOf="@+id/orderTime" />
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderPaymentTypes"
+        style="@style/orderListStyle"
+        android:ems="10"
+        android:maxWidth="@dimen/_200sdp"
+        android:text="@string/dummy_name"
+        android:textColor="#bdc1c3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textAlignment="textStart"
+        app:layout_constraintEnd_toStartOf="@id/orderStatus"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderStatus"
+        style="@style/orderListStyle"
+        android:ems="8"
+        android:maxWidth="@dimen/_100sdp"
+        android:text="@string/dummy_status"
+        android:textAllCaps="true"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/orderPrice"
+        app:layout_constraintEnd_toStartOf="@+id/orderName"
+        app:layout_constraintTop_toTopOf="@+id/orderPrice" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderName"
+        style="@style/orderListStyle"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:ems="8"
+        android:maxWidth="@dimen/_200sdp"
+        android:text="@string/dummy_name"
+        android:textColor="#bdc1c3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/orderId"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderId"
+        style="@style/orderListStyle"
+        android:ems="10"
+        android:gravity="start"
+        android:maxWidth="@dimen/_130sdp"
+        android:text="@string/dummy_id"
+        android:textAlignment="textStart"
+        android:textColor="#2c3a3f"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/orderStatus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/orderStatus" />
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderDate"
+        style="@style/orderListStyle"
+        android:ems="8"
+        android:padding="0dp"
+        android:maxWidth="@dimen/_200sdp"
+        android:text="@string/date"
+        android:textAlignment="textStart"
+        android:textColor="#bdc1c3"
+        app:layout_constraintStart_toStartOf="@id/orderTime"
+        app:layout_constraintTop_toBottomOf="@id/orderTime" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="1.5dp"
+        app:dividerColor="#e1e1e1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

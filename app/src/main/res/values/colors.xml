@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="orange_bar">#fca468</color>
+    <color name="status_bar_color">#f2f2f2</color>
+    <color name="open_status_color">#eed013</color>
+    <color name="paid_status_color">#3ccd79</color>
+    <color name="other_order_payment_status">#ea2c2f</color>
+</resources>

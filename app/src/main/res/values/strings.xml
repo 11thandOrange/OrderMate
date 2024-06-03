@@ -1,0 +1,73 @@
+<resources>
+    <string name="app_name">Special Orders</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="please_check_internet">Please check Internet connection</string>
+    <string name="api_exception">Api Exception is there</string>
+    <string name="something_wrong">Something went wrong</string>
+    <string name="dummy_time">0:00 PM</string>
+    <string name="dummy_price">$0.00</string>
+    <string name="dummy_status">Open</string>
+    <string name="dummy_id">1234567DDFKHVDFJK</string>
+    <string name="dummy_date">5/8/24</string>
+    <string name="dummy_name">Tester</string>
+    <string name="dummy_heading">Order</string>
+    <string name="dummy_heading_dashboard">Orders (DEV)</string>
+    <string name="search_orders">Search Orders</string>
+    <string name="syncing">SYNCING</string>
+    <string name="nav_open">Open</string>
+    <string name="nav_close">Close</string>
+    <string name="add_payment">Add Payment</string>
+    <string name="re_open">Re-Open</string>
+    <string name="reissue_receipt">Reissue Receipt</string>
+    <string name="send_n_notification">Send \n Notification</string>
+    <string name="delete_order">Delete Order</string>
+    <string name="placed_at">Placed at</string>
+    <string name="statusString">Status</string>
+    <string name="employee_name">Employee</string>
+    <string name="order">Orders Items </string>
+    <string name="show_summary">Show Summary</string>
+    <string name="transaction">Transactions</string>
+    <string name="no_transaction">There is no transaction made for this order.</string>
+    <string name="total">Total</string>
+    <string name="subtotal">Subtotal</string>
+    <string name="tax">Taxes and fees</string>
+    <string name="no_order_match">No order match the current filter and/or search item.</string>
+    <string name="order_more_than_100">Order more than 100 days old will be viewed on the Web Dashboard or by searching for the first four(or more) characters of the Order id.</string>
+    <string name="cash">Cash</string>
+    <string name="payment">Payment</string>
+    <string name="order_time">Created On</string>
+    <string name="date">Date</string>
+    <string name="price">Price</string>
+    <string name="payment_mode">Payment Mode</string>
+    <string name="order_status">Order Status</string>
+    <string name="employee_name_header">Employee Name</string>
+    <string name="id">Order Id</string>
+    <string-array name="order_text_array">
+        <item>All Orders</item>
+        <item>Open</item>
+        <item>Paid</item>
+        <item>Partially Paid</item>
+        <item>Refunded</item>
+        <item>Partially Refunded</item>
+        <item>Manually Refunded</item>
+    </string-array>
+    <string-array name="order_name_array">
+        <item>Chicmic</item>
+        <item>Chicmic</item>
+        <item>Chicmic</item>
+    </string-array>
+
+    <string-array name="order_payment_array">
+        <item>All Tenders</item>
+        <item>Credit Card</item>
+        <item>Check</item>
+        <item>Cash</item>
+    </string-array>
+
+    <string-array name="order_booking_array">
+        <item>In Store orders</item>
+        <item>Online Orders</item>
+    </string-array>
+
+</resources>
