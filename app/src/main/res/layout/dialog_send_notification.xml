@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:minHeight="@dimen/_50sdp"
+    android:minWidth="@dimen/_200sdp">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/shareSms"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/darker_gray_light"
+        android:paddingVertical="@dimen/_5sdp"
+        android:text="@string/sms"
+        android:textAlignment="center"
+        android:textSize="@dimen/_8ssp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/shareEmail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/shareEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingVertical="@dimen/_5sdp"
+        android:text="@string/email"
+        android:textAlignment="center"
+        android:textSize="@dimen/_8ssp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/shareSms"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/customerEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_5sdp"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:layout_marginBottom="@dimen/_2sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/shareSms"
+        android:text="@string/customer_number"
+        android:textSize="@dimen/_7ssp"/>
+
+
+    <LinearLayout
+        android:id="@+id/llEditTex"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_5sdp"
+        android:focusable="true"
+        android:background="@drawable/custom_fields_border"
+        android:focusableInTouchMode="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/customerEmail">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/customerNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:inputType="phone"
+            android:paddingHorizontal="@dimen/_4sdp"
+            android:hint="@string/enter_the_customer_number"
+            android:paddingVertical="@dimen/_3sdp"
+            android:textSize="@dimen/_7ssp" />
+    </LinearLayout>
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/emailSubject"
+        android:layout_width="0dp"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_5sdp"
+        android:layout_marginTop="@dimen/_2sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llEditTex"
+        android:text="@string/subject"
+        android:textSize="@dimen/_7ssp"/>
+
+
+    <LinearLayout
+        android:id="@+id/llSubject"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_5sdp"
+        android:layout_marginVertical="@dimen/_1sdp"
+        android:background="@drawable/custom_fields_border"
+        android:focusable="true"
+        android:visibility="gone"
+        android:focusableInTouchMode="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emailSubject">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/subject"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:singleLine="true"
+            android:maxLength="100"
+            android:hint="@string/enter_the_subject"
+            android:paddingHorizontal="@dimen/_4sdp"
+            android:paddingVertical="@dimen/_3sdp"
+            android:textSize="@dimen/_7ssp" />
+    </LinearLayout>
+
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/emailData"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_5sdp"
+        android:layout_marginTop="@dimen/_2sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llSubject"
+        android:text="@string/message"
+        android:textSize="@dimen/_7ssp"/>
+
+    <LinearLayout
+        android:id="@+id/llNotes"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:maxHeight="@dimen/_100sdp"
+        android:orientation="vertical"
+        android:padding="@dimen/_1sdp"
+        android:layout_marginHorizontal="@dimen/_3sdp"
+        app:layout_constraintTop_toBottomOf="@+id/emailData"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/etNotesParent"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="@string/enter_your_notes_here"
+            android:maxEms="14"
+            android:minEms="14"
+            android:paddingHorizontal="@dimen/_1sdp"
+            android:textAlignment="textStart"
+            android:soundEffectsEnabled="true"
+            app:counterEnabled="true"
+            app:counterMaxLength="250"
+            app:endIconMode="none"
+            app:hintEnabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/custom_fields_border"
+                android:hint="@string/enter_your_notes_here"
+                android:imeOptions="actionNext"
+                android:paddingTop="0dp"
+                android:paddingStart="@dimen/_5sdp"
+                android:paddingEnd="0dp"
+                android:minLines="2"
+                android:inputType="textMultiLine"
+                android:textAlignment="textStart"
+                android:maxLength="250"
+                android:textSize="@dimen/_7ssp" />
+
+
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/sendButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_5sdp"
+        android:layout_marginEnd="@dimen/_1sdp"
+        android:background="@drawable/button_background"
+        android:text="@string/send"
+        android:gravity="center"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        android:paddingVertical="@dimen/_5sdp"
+        android:textSize="@dimen/_7ssp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llNotes"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/cancelButton"
+        />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/cancelButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_1sdp"
+        android:layout_marginEnd="@dimen/_5sdp"
+        android:layout_marginVertical="@dimen/_2sdp"
+        android:background="@drawable/button_background"
+        android:text="@string/cancel"
+        android:gravity="center"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        android:paddingVertical="@dimen/_5sdp"
+        android:textSize="@dimen/_7ssp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llNotes"
+        app:layout_constraintStart_toEndOf="@+id/sendButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,6 +3,11 @@
     android:layout_height="wrap_content"
     android:textAlignment="textStart"
     android:paddingVertical="@dimen/_2sdp"
+    android:maxLines="1"
+    android:layout_margin="@dimen/_3sdp"
+    android:padding="@dimen/_2sdp"
+    android:singleLine="true"
+    android:ellipsize="end"
     android:textColor="@color/black"
     android:textSize="@dimen/_8ssp" />
 

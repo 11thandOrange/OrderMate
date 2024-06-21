@@ -10,13 +10,28 @@
         <item name="android:textSize">@dimen/_8ssp</item>
     </style>
 
+
+    <style name="AlertDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="alertDialogStyle">@style/MyAlertDialogStyle</item>
+    </style>
+
+    <style name="MyAlertDialogStyle" parent="MaterialAlertDialog.MaterialComponents">
+        <item name="iconSize">50dp</item>
+        <item name="startIconMinSize">50dp</item>
+    </style>
+    <style name="MyDatePickerDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="subheaderColor">@color/white</item>
+    </style>
+
     <style name="orderListStyleHeader">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:ellipsize">end</item>
         <item name="maxLines">2</item>
-        <item name="android:paddingTop">@dimen/_5sdp</item>
-        <item name="android:paddingBottom">@dimen/_5sdp</item>
+        <item name="android:paddingTop">@dimen/_1sdp</item>
+        <item name="android:paddingBottom">3dp</item>
         <item name="android:textSize">@dimen/_8ssp</item>
     </style>
 

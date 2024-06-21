@@ -12,8 +12,8 @@
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="@dimen/_10sdp"
         android:background="#ddf1f9"
+        android:elevation="@dimen/_10sdp"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,7 +35,6 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="@dimen/_10sdp"
-            android:src="@drawable/ic_menu"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -89,53 +88,80 @@
             android:src="@drawable/ic_search"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/searchBar"
+            app:layout_constraintEnd_toStartOf="@id/llSearch"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/searchBar"
+
+        <LinearLayout
+            android:id="@+id/llSearch"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:visibility="visible"
-            android:layout_marginStart="@dimen/_20sdp"
-            android:background="@null"
-            android:drawableStart="@null"
-            android:hint="@string/search_orders"
-            android:imeOptions="actionDone"
-            android:maxWidth="@dimen/_200sdp"
-            android:maxLines="1"
-            android:minWidth="@dimen/_150sdp"
-            android:paddingHorizontal="@dimen/_5sdp"
-            android:paddingVertical="@dimen/_6sdp"
-            android:singleLine="true"
-            android:textSize="@dimen/_9ssp"
-
-            android:theme="@style/CustomEditTextStyle"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/syncButton"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/searchBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:drawableStart="@null"
+                android:hint="@string/search_orders"
+                android:imeOptions="actionDone"
+                android:maxWidth="@dimen/_200sdp"
+                android:maxLines="1"
+                android:textAllCaps="true"
+                android:minWidth="@dimen/_150sdp"
+                android:paddingHorizontal="@dimen/_5sdp"
+                android:paddingVertical="@dimen/_6sdp"
+                android:singleLine="true"
+                android:textSize="@dimen/_9ssp"
+                android:theme="@style/CustomEditTextStyle"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/syncButton"
+                app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
+
 
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="0dp"
             android:layout_height="1.5dp"
             app:dividerColor="@color/darker_gray"
-            app:layout_constraintBottom_toBottomOf="@+id/searchBar"
-            app:layout_constraintEnd_toEndOf="@+id/searchBar"
-            app:layout_constraintStart_toStartOf="@+id/searchBar"
-            app:layout_constraintTop_toBottomOf="@id/searchBar" />
+            app:layout_constraintBottom_toBottomOf="@+id/llSearch"
+            app:layout_constraintEnd_toEndOf="@+id/llSearch"
+            app:layout_constraintStart_toStartOf="@+id/llSearch"
+            app:layout_constraintTop_toBottomOf="@id/llSearch" />
 
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/syncButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/_10sdp"
+            android:paddingVertical="@dimen/_10sdp"
+            android:paddingStart="@dimen/_10sdp"
+            android:paddingEnd="@dimen/_4sdp"
+            android:src="@drawable/ic_refresh"
             android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/menuButton"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/menuButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
             android:paddingHorizontal="@dimen/_10sdp"
             android:paddingVertical="@dimen/_10sdp"
-            android:src="@drawable/ic_refresh"
+            android:src="@drawable/ic_more"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -150,15 +176,13 @@
         app:layout_constraintTop_toBottomOf="@id/topBar" />
 
 
-
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/filterLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#ddf1f9"
-        android:visibility="gone"
         android:maxHeight="@dimen/_35sdp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBar">
@@ -174,7 +198,7 @@
 
 
         <Spinner
-            android:id="@+id/orderTypeSpinner"
+            android:id="@+id/orderPaymentStatusSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_10sdp"
@@ -194,20 +218,22 @@
             android:layout_marginBottom="@dimen/_4sdp"
             app:dividerColor="#bdc6c9"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/orderTypeSpinner"
-            app:layout_constraintStart_toStartOf="@id/orderTypeSpinner"
-            app:layout_constraintTop_toBottomOf="@id/orderTypeSpinner" />
+            app:layout_constraintEnd_toEndOf="@id/orderPaymentStatusSpinner"
+            app:layout_constraintStart_toStartOf="@id/orderPaymentStatusSpinner"
+            app:layout_constraintTop_toBottomOf="@id/orderPaymentStatusSpinner" />
+
         <Spinner
-            android:id="@+id/orderNameSpinner"
+            android:id="@+id/orderEmployeeNameSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_14sdp"
             android:minWidth="@dimen/_90sdp"
             android:paddingVertical="@dimen/_2sdp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/orderTypeSpinner"
+            app:layout_constraintStart_toEndOf="@id/orderPaymentStatusSpinner"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.1" />
+
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="0dp"
             android:layout_height="1dp"
@@ -215,18 +241,19 @@
             android:layout_marginBottom="@dimen/_4sdp"
             app:dividerColor="#bdc6c9"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/orderNameSpinner"
-            app:layout_constraintStart_toStartOf="@id/orderNameSpinner"
-            app:layout_constraintTop_toBottomOf="@id/orderNameSpinner" />
+            app:layout_constraintEnd_toEndOf="@id/orderEmployeeNameSpinner"
+            app:layout_constraintStart_toStartOf="@id/orderEmployeeNameSpinner"
+            app:layout_constraintTop_toBottomOf="@id/orderEmployeeNameSpinner" />
+
         <Spinner
-            android:id="@+id/orderPaymentSpinner"
+            android:id="@+id/orderTenderSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_14sdp"
             android:minWidth="@dimen/_90sdp"
             android:paddingVertical="@dimen/_2sdp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/orderNameSpinner"
+            app:layout_constraintStart_toEndOf="@id/orderEmployeeNameSpinner"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.1"
 
@@ -239,9 +266,10 @@
             android:layout_marginBottom="@dimen/_4sdp"
             app:dividerColor="#bdc6c9"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/orderPaymentSpinner"
-            app:layout_constraintStart_toStartOf="@id/orderPaymentSpinner"
-            app:layout_constraintTop_toBottomOf="@id/orderPaymentSpinner" />
+            app:layout_constraintEnd_toEndOf="@id/orderTenderSpinner"
+            app:layout_constraintStart_toStartOf="@id/orderTenderSpinner"
+            app:layout_constraintTop_toBottomOf="@id/orderTenderSpinner" />
+
         <Spinner
             android:id="@+id/orderBookingTypeSpinner"
             android:layout_width="wrap_content"
@@ -250,7 +278,7 @@
             android:minWidth="@dimen/_90sdp"
             android:paddingVertical="@dimen/_2sdp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/orderPaymentSpinner"
+            app:layout_constraintStart_toEndOf="@id/orderTenderSpinner"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.1"
 
@@ -271,22 +299,25 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
+        android:id="@+id/bottomFilterLayout"
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:background="#bdc6c9"
-        app:layout_constraintTop_toBottomOf="@id/topBar"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterLayout" />
 
     <include
         android:id="@+id/recyclerHeader"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
         layout="@layout/item_header_orders"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/filterLayout"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/bottomFilterLayout" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/orderRecycler"
         android:layout_width="match_parent"
@@ -309,6 +340,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
@@ -329,7 +361,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintTop_toBottomOf="@id/recyclerHeader"
         app:layout_constraintVertical_bias="0.0">
 
 
@@ -341,10 +373,10 @@
             android:layout_marginStart="@dimen/_8sdp"
             android:layout_marginTop="@dimen/_10sdp"
             android:ellipsize="end"
-            android:visibility="gone"
             android:maxWidth="@dimen/_150sdp"
             android:text="@string/no_order_match"
             android:textSize="@dimen/_8ssp"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -356,10 +388,10 @@
             android:layout_marginHorizontal="@dimen/_8sdp"
             android:layout_marginTop="@dimen/_4sdp"
             android:ellipsize="end"
-            android:visibility="gone"
             android:maxWidth="@dimen/_150sdp"
             android:text="@string/order_more_than_100"
             android:textSize="@dimen/_8ssp"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/noTextFoundUpper" />

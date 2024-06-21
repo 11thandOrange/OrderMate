@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "862296565248",
+    "project_id": "ordermate-53077",
+    "storage_bucket": "ordermate-53077.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:862296565248:android:408430559e7bc2bd731ae5",
+        "android_client_info": {
+          "package_name": "com.specialOrder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZjXXJs_qTjKCb3kXh-vN6TDtyn0F2M08"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

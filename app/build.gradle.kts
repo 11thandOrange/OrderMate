@@ -3,20 +3,22 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")  // annotation processor
     id("androidx.navigation.safeargs.kotlin")  // plugin for the navigation
+    id("com.google.gms.google-services")  // firebase
+    id("com.google.firebase.crashlytics")   // crashlytics
+
 }
 
-
 android {
-    namespace = "com.specialOrderNew"
+    namespace = "com.specialOrder"
     compileSdk =
         34  // for clover app we need to compile the app to max version that android supports
 
     defaultConfig {
-        applicationId = "com.specialOrderNew"
+        applicationId = "com.specialOrder"
         minSdk = 17   // for clover apps we need to setup the minimum support sdk to 17
         //noinspection ExpiredTargetSdkVersion
-        targetSdk = 22  // for clover app this is the max target version it supports.
-        versionCode = 5
+        targetSdk = 25  // for clover app this is the max target version it supports.
+        versionCode = 7
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -94,4 +96,15 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:${navigationDependency}")
     implementation("androidx.navigation:navigation-ui-ktx:${navigationDependency}")
     implementation("com.clover.sdk:clover-android-sdk:${cloverVersion}")
+
+    // firebase
+    implementation(platform("com.google.firebase:firebase-bom:28.0.0"))
+    implementation("com.google.firebase:firebase-core")
+    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
+
+
+    // messaging Bird
+    implementation("com.messagebird:messagebird-api:6.1.7")
 }

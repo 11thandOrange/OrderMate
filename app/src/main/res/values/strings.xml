@@ -1,5 +1,5 @@
-<resources>
-    <string name="app_name">Special Order</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">OrderMate</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="please_check_internet">Please check Internet connection</string>
@@ -11,7 +11,7 @@
     <string name="dummy_id">1234567DDFKHVDFJK</string>
     <string name="dummy_date">5/8/24</string>
     <string name="dummy_name">Tester</string>
-    <string name="dummy_heading">Order</string>
+    <string name="orders_text">Order %1$s</string>
     <string name="dummy_heading_dashboard">Orders (DEV)</string>
     <string name="search_orders">Search Orders</string>
     <string name="syncing">SYNCING</string>
@@ -21,6 +21,7 @@
     <string name="re_open">Re-Open</string>
     <string name="reissue_receipt">Reissue Receipt</string>
     <string name="send_n_notification">Send \n Notification</string>
+    <string name="send_n_notification_without_newLine">Send Notification</string>
     <string name="delete_order">Delete Order</string>
     <string name="placed_at">Placed at</string>
     <string name="statusString">Status</string>
@@ -29,7 +30,7 @@
     <string name="no_number">No Number</string>
     <string name="customer_name">Customer</string>
     <string name="customer_number">Customer Number</string>
-    <string name="order">Orders Items </string>
+    <string name="order">Orders Items %1$d</string>
     <string name="show_summary">Show Summary</string>
     <string name="transaction">Transactions</string>
     <string name="no_transaction">There is no transaction made for this order.</string>
@@ -37,7 +38,7 @@
     <string name="subtotal">Subtotal</string>
     <string name="tax">Taxes and fees</string>
     <string name="no_order_match">No order match the current filter and/or search item.</string>
-    <string name="order_more_than_100">Order more than 100 days old will be viewed on the Web Dashboard or by searching for the first four(or more) characters of the Order id.</string>
+    <string name="order_more_than_100">Order more than 100 days old will be viewed on the Web Dashboard or by search the full order id in the search.</string>
     <string name="cash">Cash</string>
     <string name="payment">Payment</string>
     <string name="source">Source/Type</string>
@@ -49,6 +50,20 @@
     <string name="id">Notes/Id</string>
     <string name="notes">Notes</string>
     <string name="hypen_text">-</string>
+    <string name="add_note">Add Note to Item</string>
+    <string name="no_value">0</string>
+    <string name="pick_up_time">Pick Up Time</string>
+    <string name="enter_your_notes_here">Enter your Notes here</string>
+    <string name="update_order">Add note</string>
+    <string name="cancel">Cancel</string>
+    <string name="custom_menu">Custom Menu</string>
+    <string name="custom_order_menu">Set Custom Option</string>
+    <string name="save">Save</string>
+    <string name="category">Categories</string>
+    <string name="enabled">Enabled</string>
+    <string name="enter_the_value">Enter the Value</string>
+    <string name="add">Add</string>
+    <string name="enter_value">Enter value</string>
     <string-array name="order_text_array">
         <item>All Orders</item>
         <item>Open</item>
@@ -58,22 +73,89 @@
         <item>Partially Refunded</item>
         <item>Manually Refunded</item>
     </string-array>
+
+    <string-array name="order_type">
+        <item>Choose Order type</item>
+        <item>Pre_order</item>
+        <item>Dine-In</item>
+        <item>Takeout</item>
+        <item>Delivery</item>
+        <item>Catering</item>
+    </string-array>
+
+    <string-array name="order_progress">
+        <item>Choose Order progress</item>
+        <item>In-Progress</item>
+        <item>Hold</item>
+        <item>Done</item>
+    </string-array>
+
     <string-array name="order_name_array">
         <item>Chicmic</item>
         <item>Chicmic</item>
         <item>Chicmic</item>
     </string-array>
-
     <string-array name="order_payment_array">
         <item>All Tenders</item>
         <item>Credit Card</item>
         <item>Check</item>
         <item>Cash</item>
     </string-array>
-
     <string-array name="order_booking_array">
-        <item>In Store orders</item>
+        <item>All Orders</item>
+        <item>POS Order</item>
         <item>Online Orders</item>
     </string-array>
+    <string name="priceString">%1$s%2$s</string>
+    <string name="priceStringWithRefund">%1$s%2$s(%3$s%4$s)</string>
+    <string name="getFullName">%1$s %2$s</string>
+    <string name="itemCount">X%1$d</string>
+    <string name="getDateWithDot">%1$s . %2$s</string>
+    <string name="no_access">Notes are temporarily disabled by the admin. For assistance, please reach out to the admin.</string>
+    <string name="note_string">"<b>pickup-date</b>=%5$s//<b>progress</b>=<b>%4$s</b>//<b>category</b>=<b>%1$s</b>//<b>subcategory</b>=<b>%2$s</b>//<b>type</b>=<b>%3$s</b>//<b>description</b>=%6$s</string>
 
+    <string name="all_tenders">All Tenders</string>
+    <string name="all_orders">All Orders</string>
+    <string name="all_employee">All Employee</string>
+    <string name="all_type">All Type</string>
+    <string name="subItemCost">%1$d %2$s @ %3$s/%4$s</string>
+    <string name="key" >%1$s-%2$s-%3$s-%4$s-%5$s</string>
+    <string name="email">Email</string>
+    <string name="sms">SMS</string>
+    <string name="enter_the_customer_email_address">Enter the customer Email address</string>
+    <string name="enter_the_customer_number">Enter the customer number with country code</string>
+    <string name="enter_the_subject">Enter the Subject</string>
+    <string name="send">send</string>
+    <string name="choose_item_progress">Order Item Progress</string>
+    <string name="choose_item_type">Order Item Type</string>
+    <string name="choose_item_category">Category</string>
+    <string name="choose_item_subcategory">SubCategory</string>
+    <string name="choose_item_description">Description</string>
+    <string name="enter_pickup_date">PickUp Date</string>
+    <string name="do_you_want_to_save_the_changes">Do you want to save the changes?</string>
+    <string name="discard">Discard</string>
+    <string name="dash">-</string>
+    <string name="customer_email">Customer Email</string>
+    <string name="item_count">%1$s custom items </string>
+    <string name="item_count_single">%1$s custom item </string>
+
+    <!--please change the below in the constants file also-->
+    <string name="note_string_pickUp" >"pickup-date=%1$s//"</string>
+    <string name="note_string_progress">progress=%1$s//</string>
+    <string name="note_string_category">category=%1$s//</string>
+    <string name="note_string_Subcategory">subcategory=%1$s//</string>
+    <string name="note_string_type" >type=%1$s//</string>
+    <string name="note_string_description" >description=%1$s//</string>
+    <string name="subject">Subject</string>
+    <string name="message">Message</string>
+    <string name="please_fill_all_the_fields">Please fill all the fields</string>
+    <string name="enter_the_valid_email_id">Enter the valid email Id.</string>
+    <string name="enter_the_valid_mobile_number">please check the number.It should contain country code</string>
+    <string name="email_has_been_shared_successfully">Email has been Shared SuccessFully</string>
+    <string name="sms_has_been_shared_successfully">Sms has been Shared SuccessFully</string>
+    <string name="failed_to_share_the_email">"Failed to share the Email "</string>
+    <string name="fail_to_share_the_sms">Fail to share the SMS</string>
+    <string name="please_check_your_internet_connection">Please check your internet Connection</string>
+    <string name="please_check_your_internet_connection_1">Internet connection is Required to use this feature.</string>
+    <string name="there_is_issue_with_your_account">There is Issue with Your Account Please check the Clover Dashboard</string>
 </resources>

@@ -8,5 +8,8 @@
     <color name="paid_status_color">#3ccd79</color>
     <color name="other_order_payment_status">#ea2c2f</color>
     <color name="header_blue">#ddf1f9</color>
+    <color name="date_picker_color">#08A7E8</color>
     <color name="darker_gray">#757575</color>
+    <color name="darker_gray_light">#E1DEDE</color>
+    <color name="back">#03CDB8</color>
 </resources>

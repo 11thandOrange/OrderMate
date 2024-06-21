@@ -4,14 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="com.clover.sdk.permission.READ_ORDERS" />
-    <uses-permission android:name="com.clover.sdk.permission.ORDERS_R" />
-    <uses-permission android:name="com.clover.sdk.permission.MERCHANT_R"/>
-
-    <uses-permission android:name="com.clover.sdk.permission.WRITE_ORDERS" />
 
     <application
-        android:name="com.specialOrderNew.utils.MyApp"
+        android:name="com.specialOrder.utils.MyApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -22,7 +17,7 @@
         android:theme="@style/Theme.OrderAppClover"
         tools:targetApi="31">
         <activity
-            android:name="com.specialOrderNew.activities.MainActivity"
+            android:name="com.specialOrder.activities.MainActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:exported="true">
             <intent-filter>
