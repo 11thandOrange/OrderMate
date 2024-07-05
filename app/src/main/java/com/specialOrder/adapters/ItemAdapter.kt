@@ -14,6 +14,8 @@ import com.specialOrder.fragment.orderDetail.OrderDetailFragment
 import com.specialOrder.modals.ItemModal
 import com.specialOrder.utils.Constants
 import com.specialOrder.utils.convertToSymbol
+import com.specialOrder.utils.convertToTwoDecimal
+import com.specialOrder.utils.exceptionHandler
 import com.specialOrder.utils.hideView
 import com.specialOrder.utils.showView
 import com.specialOrder.utils.toDoubleFloatPoint
@@ -25,13 +27,17 @@ class ItemAdapter(
     RecyclerView.Adapter<ItemAdapter.MyViewBinder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemAdapter.MyViewBinder {
-        val binding =
-            ListitemOrderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ListitemOrderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MyViewBinder(binding)
     }
 
 
     override fun onBindViewHolder(holder: ItemAdapter.MyViewBinder, position: Int) {
+
+        if(data.isEmpty()){
+            return
+        }
+
         val item = data[position]
         holder.binding.apply {
             root.context.getString(R.string.itemCount, item?.itemCount)
@@ -42,16 +48,18 @@ class ItemAdapter(
             root.context.getString(
                 R.string.priceString, OrderDetailFragment.currencyName.convertToSymbol(),
                 item?.order?.price?.toDoubleFloatPoint()?.toDouble()?.times(item.itemCount)
-                    .toString()
+                    .toString().convertToTwoDecimal()
             )
                 .also {
                     orderPrice.text = it
                 }
 
-            item?.order?.colorCode?.let {
-                orderItemColor.setBackgroundColor(
-                    Color.parseColor(item.order.colorCode ?: Constants.defaultString)
-                )
+            exceptionHandler {
+                item?.order?.colorCode?.let {
+                    orderItemColor.setBackgroundColor(
+                        Color.parseColor(item.order.colorCode ?: Constants.defaultString)
+                    )
+                }
             }
             // means these item are unit wise eg kg etc
             if (item?.order?.hasUnitName() == true && item.order.hasUnitQty()) {
@@ -65,9 +73,9 @@ class ItemAdapter(
                 root.context.getString(
                     R.string.priceString, OrderDetailFragment.currencyName.convertToSymbol(),
                     item.order.price?.toDoubleFloatPoint()?.toDouble()?.times(item.itemCount)
-                        ?.times((item.order.unitQty / 1000))
+                        ?.times((item.order.unitQty ?:1000 )/ 1000)
                         ?.toDoubleFloatPoint()
-                        .toString()
+                        .toString().convertToTwoDecimal()
                 )
                     .also {
                         orderPrice.text = it
@@ -77,7 +85,7 @@ class ItemAdapter(
                 root.context.getString(
                     R.string.priceString, OrderDetailFragment.currencyName.convertToSymbol(),
                     item?.order?.price?.toDoubleFloatPoint()?.toDouble()?.times(item.itemCount)
-                        .toString()
+                        .toString().convertToTwoDecimal()
                 )
                     .also {
                         orderPrice.text = it
@@ -100,10 +108,7 @@ class ItemAdapter(
             editNote.isVisible = !btnVisibility
             addNotesButton.isVisible = btnVisibility
             orderNotes.isVisible = !btnVisibility
-            orderNotes.text =  item?.order?.note
-
-
-
+            orderNotes.text = item?.order?.note
 
             addNotesButton.setOnClickListener {
                 listener.onOrderItemClick(position, item?.order?.item?.id)

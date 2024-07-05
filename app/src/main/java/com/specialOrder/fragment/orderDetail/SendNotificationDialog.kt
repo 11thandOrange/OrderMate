@@ -216,7 +216,7 @@ class SendNotificationDialog(
             resultant.add(
                 Contact(
                     if (isSmsEnabled) Constants.phoneNumber else Constants.emailAddress,
-                    it
+                    if(isSmsEnabled && !it.contains("+" , true)) "+1$it" else it
                 )
             )
         }

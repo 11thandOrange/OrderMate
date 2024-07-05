@@ -4,18 +4,19 @@ import android.accounts.Account
 import android.app.Application
 import com.clover.sdk.util.CloverAccount
 import com.clover.sdk.v1.merchant.MerchantConnector
+import com.clover.sdk.v3.employees.EmployeeConnector
 import com.clover.sdk.v3.inventory.InventoryConnector
 import com.clover.sdk.v3.order.Order
 import com.clover.sdk.v3.order.OrderCalc
 import com.clover.sdk.v3.order.OrderV31Connector
 import com.google.firebase.FirebaseApp
-import com.specialOrder.modals.FilterData
 
 
 class MyApp : Application() {
     private var cloverAccount: Account? = null
     private var orderConnector: OrderV31Connector? = null
     private var inventoryConnector: InventoryConnector? = null
+    private var employeeConnector: EmployeeConnector? = null
     private var merchantConnector: MerchantConnector? = null
 
     companion object {
@@ -26,8 +27,9 @@ class MyApp : Application() {
           *  index 2 --> order employee name (name of employee who made the order)
           *  index 3 --> order tender type (cash , cheque)
           *  index 4 --> order made mode (online , pos)
+          * index 5 --> order notes (status , category )
           * */
-        val filterArray: MutableList<FilterData> = mutableListOf()
+        val filterArray: MutableMap<String, Int> = mutableMapOf()
 
         private var instance: MyApp? = null
 
@@ -56,6 +58,50 @@ class MyApp : Application() {
                 connectOrderConnector()
             }
         }
+
+    }
+
+    fun getEmployeeConnector(): EmployeeConnector {
+        return employeeConnector ?: synchronized(this) {
+            EmployeeConnector(applicationContext, getCloverAccount(), null).also {
+                employeeConnector = it
+                employeeOrderConnector()
+            }
+        }
+
+    }
+
+    fun getEmployeeName(employeeId : String? ) : String?{
+
+        if(employeeId == null || employeeId.trim().isEmpty()){
+            return null
+        }
+         val id = employeeConnector?.getEmployee(employeeId)?.name
+        return employeeConnector?.getEmployee(employeeId)?.name
+    }
+
+
+    private fun getMerchantConnector(): MerchantConnector {
+        return merchantConnector ?: synchronized(this) {
+            MerchantConnector(applicationContext, getCloverAccount(), null).also {
+                merchantConnector = it
+                merchantConnector()
+            }
+        }
+    }
+
+    private fun employeeOrderConnector() {
+        if (employeeConnector?.isConnected == true) {
+            return
+        }
+        employeeConnector?.connect()
+    }
+
+    private fun merchantConnector() {
+        if (merchantConnector?.isConnected == true) {
+            return
+        }
+        merchantConnector?.connect()
     }
 
     private fun connectOrderConnector() {
@@ -71,6 +117,11 @@ class MyApp : Application() {
         }
     }
 
+    fun getMerchantId(): String? {
+        val data = getMerchantConnector().merchant
+        return data.id
+    }
+
     fun orderTax(order: Order?): Long {
         return OrderCalc(order).tax
     }
@@ -80,20 +131,32 @@ class MyApp : Application() {
     }
 
     fun orderDiscount(order: Order?): Long {
-        return OrderCalc(order).getLineSubtotalWithoutDiscounts(order?.lineItems) - OrderCalc(order).getDiscountedSubtotal(order?.lineItems)
+        return OrderCalc(order).getLineSubtotalWithoutDiscounts(order?.lineItems) - OrderCalc(order).getDiscountedSubtotal(
+            order?.lineItems
+        )
     }
 
-    private fun disconnectConnectors() {
+    fun disconnectConnectors() {
         orderConnector?.disconnect()
         merchantConnector?.disconnect()
         inventoryConnector?.disconnect()
     }
 
+
+    /*
+    * The order of the below filterArray is important and change in the sequence lead to change in the sequence
+    * a Filter values for the notes.
+    * */
     private fun storeIntoPreference() {
-        filterArray.add(FilterData(0, FilterCategories.TenderType.name))
-        filterArray.add(FilterData(0, FilterCategories.PaymentStatus.name))
-        filterArray.add(FilterData(0, FilterCategories.EmployeeName.name))
-        filterArray.add(FilterData(0, FilterCategories.OrderBookingType.name))
+        filterArray[FilterCategories.TenderType.name] = 0
+        filterArray[FilterCategories.PaymentStatus.name] = 0
+        filterArray[FilterCategories.EmployeeName.name] = 0
+        filterArray[FilterCategories.OrderBookingType.name] = 0
+        filterArray[ModalDialogCategories.OrderProgress.name] = 0
+        filterArray[ModalDialogCategories.OrderType.name] = 0
+        filterArray[ModalDialogCategories.OrderCategories.name] = 0
+        filterArray[ModalDialogCategories.OrderSubCategories.name] = 0
+
     }
 
     override fun onTerminate() {

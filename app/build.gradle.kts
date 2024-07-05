@@ -5,7 +5,6 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")  // plugin for the navigation
     id("com.google.gms.google-services")  // firebase
     id("com.google.firebase.crashlytics")   // crashlytics
-
 }
 
 android {
@@ -18,7 +17,7 @@ android {
         minSdk = 17   // for clover apps we need to setup the minimum support sdk to 17
         //noinspection ExpiredTargetSdkVersion
         targetSdk = 25  // for clover app this is the max target version it supports.
-        versionCode = 7
+        versionCode = 19
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -103,7 +102,6 @@ dependencies {
     implementation("com.google.firebase:firebase-database")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
-
 
     // messaging Bird
     implementation("com.messagebird:messagebird-api:6.1.7")

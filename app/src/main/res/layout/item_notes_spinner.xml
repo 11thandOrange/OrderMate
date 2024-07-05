@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container"
+    android:focusable="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:background="@color/darkBlue"
+    >
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderType"
+        style="@style/orderListStyleHeader"
+        android:layout_marginHorizontal="@dimen/_6sdp"
+        android:ems="4"
+
+        android:paddingVertical="@dimen/_4sdp"
+        android:text="@string/type"
+        android:textAlignment="textStart"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/orderTypeSpinner"
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/orderType"
+        app:layout_constraintStart_toEndOf="@+id/orderType"
+        app:layout_constraintTop_toTopOf="@+id/orderType" />
+
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderCategory"
+        style="@style/orderListStyleHeader"
+        android:layout_marginHorizontal="@dimen/_6sdp"
+        android:ems="7"
+        android:text="@string/category"
+        android:textAlignment="textStart"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:paddingBottom="@dimen/_1sdp"
+        android:paddingVertical="@dimen/_4sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/orderStatus"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <Spinner
+        android:id="@+id/orderCategorySpinner"
+        android:layout_width="@dimen/_1sdp"
+        android:layout_marginEnd="@dimen/_5sdp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/orderCategory"
+        app:layout_constraintEnd_toEndOf="@+id/orderCategory"
+        app:layout_constraintTop_toTopOf="@+id/orderCategory"
+
+        />
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderStatus"
+        style="@style/orderListStyleHeader"
+        android:layout_marginHorizontal="@dimen/_6sdp"
+        android:ems="4"
+        android:maxWidth="@dimen/_130sdp"
+        android:text="@string/order_status"
+        android:paddingBottom="@dimen/_1sdp"
+        android:textAlignment="textStart"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:paddingVertical="@dimen/_4sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/orderType"
+        app:layout_constraintTop_toTopOf="parent" />
+    <Spinner
+        android:id="@+id/orderStatusSpinner"
+        android:layout_width="@dimen/_1sdp"
+        android:layout_marginStart="@dimen/_3sdp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/orderStatus"
+        app:layout_constraintStart_toEndOf="@+id/orderStatus"
+        app:layout_constraintTop_toTopOf="@+id/orderStatus" />
+
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderSubcategory"
+        style="@style/orderListStyleHeader"
+        android:layout_marginHorizontal="@dimen/_6sdp"
+        android:ems="7"
+        android:maxWidth="@dimen/_250sdp"
+        android:paddingBottom="@dimen/_1sdp"
+        android:text="@string/subcategories"
+        android:layout_marginStart="@dimen/_3sdp"
+
+        android:textAlignment="textStart"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textStyle="bold"
+        android:paddingVertical="@dimen/_4sdp"
+        app:layout_constraintStart_toEndOf="@+id/orderCategory"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/orderSubcategorySpinner"
+        android:layout_width="@dimen/_1sdp"
+        android:layout_marginStart="@dimen/_3sdp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/orderSubcategory"
+        app:layout_constraintStart_toEndOf="@id/orderSubcategory"
+        app:layout_constraintTop_toTopOf="@+id/orderSubcategory" />
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/clearButton"
+        style="@style/orderListStyleHeader"
+        android:layout_marginStart="@dimen/_1sdp"
+        android:layout_marginEnd="@dimen/_2sdp"
+        android:paddingVertical="@dimen/_2sdp"
+        android:paddingHorizontal="@dimen/_4sdp"
+        android:text="@string/clear_all"
+        android:background="@drawable/white_button_background"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/orderSubcategorySpinner"
+        app:layout_constraintEnd_toStartOf="@id/closeButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/closeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_cancel"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:layout_marginHorizontal="@dimen/_2sdp"
+        android:padding="@dimen/_2sdp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_1sdp"
+        android:paddingTop="@dimen/_2sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@color/darker_gray_light"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

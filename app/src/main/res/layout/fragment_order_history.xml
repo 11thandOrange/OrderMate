@@ -138,7 +138,7 @@
             android:id="@+id/syncButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginHorizontal="@dimen/_10sdp"
+
             android:paddingVertical="@dimen/_10sdp"
             android:paddingStart="@dimen/_10sdp"
             android:paddingEnd="@dimen/_4sdp"
@@ -153,10 +153,11 @@
             android:id="@+id/menuButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingHorizontal="@dimen/_10sdp"
+            android:paddingEnd="@dimen/_10sdp"
+            android:paddingStart="@dimen/_5sdp"
             android:paddingVertical="@dimen/_10sdp"
             android:src="@drawable/ic_more"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -308,6 +309,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/filterLayout" />
 
+
     <include
         android:id="@+id/recyclerHeader"
         layout="@layout/item_header_orders"
@@ -315,6 +317,7 @@
         android:layout_height="wrap_content"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bottomFilterLayout" />
 
@@ -327,7 +330,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerHeader"
+        app:layout_constraintTop_toBottomOf="@+id/notesSpinnerDialog"
         app:layout_constraintVertical_bias="1.0"
         tools:itemCount="5"
         tools:listitem="@layout/item_order" />
@@ -361,7 +364,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/recyclerHeader"
+        app:layout_constraintTop_toBottomOf="@id/notesSpinnerDialog"
         app:layout_constraintVertical_bias="0.0">
 
 
@@ -407,4 +410,39 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/progressLayoutNoData"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recyclerHeader"
+        app:layout_constraintVertical_bias="0.0">
+
+
+        <ProgressBar
+            android:id="@+id/progressLoader1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <include
+        android:id="@+id/notesSpinnerDialog"
+        layout="@layout/item_notes_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintTop_toBottomOf="@id/recyclerHeader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

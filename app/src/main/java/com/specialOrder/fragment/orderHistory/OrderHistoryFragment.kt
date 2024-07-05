@@ -12,31 +12,42 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.PopupMenu
 import android.widget.Spinner
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.clover.sdk.util.CloverAccount
+import com.clover.sdk.v3.billing.AppMeteredEvent
+import com.clover.sdk.v3.employees.Employee
 import com.clover.sdk.v3.order.LineItem
 import com.clover.sdk.v3.order.Order
 import com.clover.sdk.v3.payments.Payment
 import com.google.android.material.textview.MaterialTextView
+import com.google.gson.Gson
 import com.specialOrder.R
 import com.specialOrder.adapters.OrderAdapter
 import com.specialOrder.communicators.IOrderItemClickListener
 import com.specialOrder.communicators.InterCommunication
 import com.specialOrder.databinding.FragmentOrderHistoryBinding
-import com.specialOrder.modals.FilterData
+import com.specialOrder.modals.CustomItemJson
 import com.specialOrder.utils.Constants
+import com.specialOrder.utils.Constants.Companion.fbCategory
+import com.specialOrder.utils.Constants.Companion.fbStatus
+import com.specialOrder.utils.Constants.Companion.fbSubcategory
+import com.specialOrder.utils.Constants.Companion.fbType
 import com.specialOrder.utils.Constants.Companion.notImplementedLog
 import com.specialOrder.utils.FilterCategories
 import com.specialOrder.utils.FirebaseRealtimeDataBaseManager
+import com.specialOrder.utils.ModalDialogCategories
 import com.specialOrder.utils.MyApp
 import com.specialOrder.utils.MyApp.Companion.filterArray
 import com.specialOrder.utils.PreferenceManager
 import com.specialOrder.utils.debugSnackBar
 import com.specialOrder.utils.exceptionHandler
 import com.specialOrder.utils.exceptionHandlerWithReturn
+import com.specialOrder.utils.getCustomerContactDetails
 import com.specialOrder.utils.getOnlyFirstName
 import com.specialOrder.utils.hideView
 import com.specialOrder.utils.isInArray
@@ -47,18 +58,17 @@ import com.specialOrder.utils.runOnMainThread
 import com.specialOrder.utils.showView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 
 class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunication {
-
+    val data = AppMeteredEvent()
 
     companion object {
         // This Bit is used for the verifying that does the current used merchant has admin access.
         var isClicked: Boolean = true
-        private var isAdmin: Boolean = false
         private var instance: OrderHistoryFragment? = null
+
         fun getInstance(): OrderHistoryFragment {
             return instance ?: synchronized(this) {
                 OrderHistoryFragment().also {
@@ -67,6 +77,7 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
             }
         }
 
+        val notesFilter: HashMap<String, MutableList<String>> = hashMapOf()
     }
 
     /*
@@ -147,42 +158,53 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
     private fun setUpListeners() {
         binding.apply {
             searchBar.doAfterTextChanged {
-                if (this@OrderHistoryFragment::runnable.isInitialized)
-                    handler.removeCallbacks(runnable)
+                if (this@OrderHistoryFragment::runnable.isInitialized) handler.removeCallbacks(
+                    runnable
+                )
                 runnable = Runnable {
-                    searchTheData(it.toString().uppercase().trim())
+                    searchTheData(it.toString().trim())
                 }
-
                 handler.postDelayed(runnable, Constants.debouncingTime)
             }
+
+
             setUpListenerForSpinners(
-                recyclerHeader.orderPaymentStatusSpinner,
-                FilterCategories.PaymentStatus.name
+                recyclerHeader.orderPaymentStatusSpinner, FilterCategories.PaymentStatus.name
+            )
+
+            setUpListenerForSpinners(
+                recyclerHeader.orderEmployeeNameSpinner, FilterCategories.EmployeeName.name
             )
             setUpListenerForSpinners(
-                recyclerHeader.orderEmployeeNameSpinner,
-                FilterCategories.EmployeeName.name
+                recyclerHeader.orderTenderSpinner, FilterCategories.TenderType.name
             )
             setUpListenerForSpinners(
-                recyclerHeader.orderTenderSpinner,
-                FilterCategories.TenderType.name
+                recyclerHeader.orderBookingTypeSpinner, FilterCategories.OrderBookingType.name
             )
             setUpListenerForSpinners(
-                recyclerHeader.orderBookingTypeSpinner,
-                FilterCategories.OrderBookingType.name
+                notesSpinnerDialog.orderTypeSpinner, ModalDialogCategories.OrderType.name
             )
+            setUpListenerForSpinners(
+                notesSpinnerDialog.orderStatusSpinner, ModalDialogCategories.OrderProgress.name
+            )
+            setUpListenerForSpinners(
+                notesSpinnerDialog.orderCategorySpinner, ModalDialogCategories.OrderCategories.name
+            )
+            setUpListenerForSpinners(
+                notesSpinnerDialog.orderSubcategorySpinner,
+                ModalDialogCategories.OrderSubCategories.name
+            )
+
         }
     }
+
 
     private fun setUpListenerForSpinners(view: Spinner, filter: String) {
 
 
         view.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
-                p0: AdapterView<*>?,
-                p1: View?,
-                p2: Int,
-                p3: Long
+                p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long
             ) {
                 runOnBackgroundThread {
                     filterTheData(filter, p2)
@@ -204,13 +226,17 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
 
     private fun filterTheData(filter: String, p2: Int) {
         filterArray.forEach {
-            if (it.type == filter) {
-                it.index = p2
+            if (it.key == filter) {
+                filterArray[it.key] = p2
                 applyFilterToList()
                 return
             }
         }
-        filterArray.add(FilterData(p2, filter))
+        filterArray[filter] = p2
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 
     private fun getPaymentMode(payments: List<Payment>?): String {
@@ -222,86 +248,119 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
     }
 
     private fun applyFilterToList() {
-        val matchArray: MutableList<String> = mutableListOf()
-        val tenderIndex = filterArray[0].index
-        val bookingIndex = filterArray[3].index
-        val paymentStatusIndex = filterArray[1].index
-        val employeeIndex = filterArray[2].index
+        val matchArray: HashMap<String, String> = hashMapOf()
         exceptionHandler {
-            updateUI(matchArray, tenderIndex, bookingIndex, paymentStatusIndex, employeeIndex)
+            updateUI(
+                matchArray
+            )
         }
-
         val isFilterApplied = isAllZero(
-            tenderIndex,
-            bookingIndex,
-            paymentStatusIndex,
-            employeeIndex
+            filterArray
         )
         if (matchArray.isEmpty() || isFilterApplied) {
             return
         }
-
         updateTheFilterAppliedList(
-            tenderIndex,
-            bookingIndex,
-            paymentStatusIndex,
-            employeeIndex,
             matchArray
         )
-
     }
 
     private fun updateUI(
-        matchArray: MutableList<String>,
-        tenderIndex: Int?,
-        bookingIndex: Int?,
-        paymentStatusIndex: Int?,
-        employeeIndex: Int?
+        matchArray: HashMap<String, String>,
     ) {
-        tenderIndex?.also {
-            orderTenderType?.toList()?.get(it)
-                ?.let { it1 ->
-                    if (it != 0) {
-                        matchArray.add(it1)
+
+        filterArray.forEach {
+            when (it.key) {
+                FilterCategories.TenderType.name -> filterArray[FilterCategories.TenderType.name]?.also { value ->
+                    orderTenderType?.toList()?.get(value)?.let { it1 ->
+                        if (value != 0) {
+                            matchArray[FilterCategories.TenderType.name] = it1
+                        }
+                        updateTheFilterAppliedUi(binding.recyclerHeader.orderPriceFilter, it1)
                     }
-                    updateTheFilterAppliedUi(binding.recyclerHeader.orderPriceFilter, it1)
                 }
-        }
-        bookingIndex?.also {
-            orderBookingType?.toList()?.get(it)
-                ?.let { it1 ->
-                    if (it != 0) {
-                        matchArray.add(it1)
+
+                FilterCategories.OrderBookingType.name -> filterArray[FilterCategories.OrderBookingType.name]?.also { value ->
+                    orderBookingType?.toList()?.get(value)?.let { it1 ->
+                        if (value != 0) {
+                            matchArray[FilterCategories.OrderBookingType.name] = it1
+                        }
+                        updateTheFilterAppliedUi(binding.recyclerHeader.orderTypeFilter, it1)
                     }
-                    updateTheFilterAppliedUi(binding.recyclerHeader.orderTypeFilter, it1)
                 }
-        }
-        paymentStatusIndex?.also {
-            orderPaymentStatusType?.toList()?.get(it)
-                ?.let { it1 ->
-                    if (it != 0) {
-                        matchArray.add(it1)
+
+                FilterCategories.PaymentStatus.name -> filterArray[FilterCategories.PaymentStatus.name]?.also { value ->
+                    orderPaymentStatusType?.toList()?.get(value)?.let { it1 ->
+                        if (value != 0) {
+                            matchArray[FilterCategories.PaymentStatus.name] = it1
+                        }
+                        updateTheFilterAppliedUi(binding.recyclerHeader.orderStatusFilter, it1)
                     }
-                    updateTheFilterAppliedUi(binding.recyclerHeader.orderStatusFilter, it1)
                 }
-        }
-        employeeIndex?.also {
-            orderEmployeeType?.toList()?.get(it)
-                ?.let { it1 ->
-                    if (it != 0) {
-                        matchArray.add(it1)
+
+                FilterCategories.EmployeeName.name -> filterArray[FilterCategories.EmployeeName.name]?.also { value ->
+                    orderEmployeeType?.toList()?.get(value)?.let { it1 ->
+                        if (value != 0) {
+                            matchArray[FilterCategories.EmployeeName.name] = it1
+                        }
+                        updateTheFilterAppliedUi(binding.recyclerHeader.orderNameFilter, it1)
                     }
-                    updateTheFilterAppliedUi(binding.recyclerHeader.orderNameFilter, it1)
                 }
+
+                else -> parseTheNotesDataAndGenerateString(matchArray)
+
+            }
         }
     }
 
+    private fun parseTheNotesDataAndGenerateString(matchArray: HashMap<String, String>) {
+        var resultant = ""
+        filterArray.forEach {
+            when (it.key) {
+                ModalDialogCategories.OrderProgress.name -> filterArray[ModalDialogCategories.OrderProgress.name]?.also { value ->
+                    if (value != 0) {
+                        val required = notesFilter[fbStatus]?.get(value) ?: ""
+                        matchArray[ModalDialogCategories.OrderProgress.name] = required
+                        resultant += required + getString(R.string.commas)
+                    }
+                }
+
+                ModalDialogCategories.OrderType.name -> filterArray[ModalDialogCategories.OrderType.name]?.also { value ->
+                    if (value != 0) {
+                        val required = notesFilter[fbType]?.get(value) ?: ""
+                        matchArray[ModalDialogCategories.OrderType.name] = required
+                        resultant += required + getString(R.string.commas)
+                    }
+                }
+
+                ModalDialogCategories.OrderCategories.name -> filterArray[ModalDialogCategories.OrderCategories.name]?.also { value ->
+                    if (value != 0) {
+                        val required = notesFilter[fbCategory]?.get(value) ?: ""
+                        matchArray[ModalDialogCategories.OrderCategories.name] = required
+                        resultant += required + getString(R.string.commas)
+                    }
+                }
+
+                ModalDialogCategories.OrderSubCategories.name -> filterArray[ModalDialogCategories.OrderSubCategories.name]?.also { value ->
+                    if (value != 0) {
+                        val required = notesFilter[fbSubcategory]?.get(value) ?: ""
+                        matchArray[ModalDialogCategories.OrderSubCategories.name] = required
+                        resultant += required + getString(R.string.commas)
+                    }
+                }
+            }
+        }
+        resultant = if (resultant.isEmpty()) {
+            getString(R.string.all_orders)
+        } else {
+            if (resultant.length > 2) resultant.substring(0, resultant.length - 2) else resultant
+        }
+        updateTheFilterAppliedUi(binding.recyclerHeader.orderNotesFilterValue, resultant)
+    }
+
+
     private fun updateTheFilterAppliedList(
-        tenderIndex: Int?,
-        bookingIndex: Int?,
-        paymentStatusIndex: Int?,
-        employeeIndex: Int?,
-        matchArray: MutableList<String>
+        matchArray: HashMap<String, String>
     ) {
         orderItems.clear()
         filterData.clear()
@@ -313,13 +372,18 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
             }
             val booking = if (it?.isNotNullOnlineOrder == true) Constants.online else Constants.pos
             val paymentMode = getPaymentMode(it?.payments)
-
             // this  == 0  means that no filter is applied for this
             // so that for all filter the default case eg All Orders will work.
-            if ((paymentStatusIndex == 0 || matchArray.contains(it?.paymentState?.name))
-                && (employeeIndex == 0 || matchArray.contains(employeeName))
-                && (bookingIndex == 0 || matchArray.contains(booking))
-                && (tenderIndex == 0 || paymentMode.isInArray(matchArray))
+
+            if ((filterArray[FilterCategories.PaymentStatus.name] == 0 || matchArray.values.contains(
+                    it?.paymentState?.name
+                )) && (filterArray[FilterCategories.EmployeeName.name] == 0 || matchArray.values.contains(
+                    employeeName
+                )) && (filterArray[FilterCategories.OrderBookingType.name] == 0 || matchArray.values.contains(
+                    booking
+                )) && (filterArray[FilterCategories.TenderType.name] == 0 || paymentMode.isInArray(
+                    matchArray
+                )) && (isNoteDataMatched(matchArray, it?.lineItems))
             ) {
                 orderItems.add(it)
                 filterData.add(it)
@@ -328,19 +392,54 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
         notifyTheAdapter()
     }
 
+    // This function return true if the note contain the applied filter else false
+    private fun isNoteDataMatched(
+        matchArray: HashMap<String, String>, lineItems: MutableList<LineItem?>?
+    ): Boolean {
+
+
+        if (filterArray[ModalDialogCategories.OrderCategories.name] == 0 && filterArray[ModalDialogCategories.OrderSubCategories.name] == 0 && filterArray[ModalDialogCategories.OrderType.name] == 0 && filterArray[ModalDialogCategories.OrderProgress.name] == 0) {
+            return true
+        }
+
+        val categories = matchArray[ModalDialogCategories.OrderCategories.name]?.trim()
+            ?: Constants.defaultString
+        val subCategory = matchArray[ModalDialogCategories.OrderSubCategories.name]?.trim()
+            ?: Constants.defaultString
+        val type =
+            matchArray[ModalDialogCategories.OrderType.name]?.trim() ?: Constants.defaultString
+        val status =
+            matchArray[ModalDialogCategories.OrderProgress.name]?.trim() ?: Constants.defaultString
+
+
+        for (i in lineItems ?: emptyList()) {
+            // if the note is empty then do nothing
+            if (i?.note == null) {
+                continue
+            }
+            if ((i.note.contains(categories, true) && categories.trim()
+                    .isNotEmpty()) || (i.note.contains(subCategory, true) && subCategory.trim()
+                    .isNotEmpty()) || (i.note.contains(type, true) && type.trim()
+                    .isNotEmpty()) || (i.note.contains(status, true) && status.trim().isNotEmpty())
+            ) {
+                return true
+            }
+        }
+
+        return false
+    }
 
     // this will check whether user has applied any filter or not
     @SuppressLint("NotifyDataSetChanged")
     private fun isAllZero(
-        tenderIndex: Int?,
-        bookingIndex: Int?,
-        paymentStatusIndex: Int?,
-        employeeIndex: Int?
+        array: Map<String, Int>
     ): Boolean {
-        return if (tenderIndex == 0 && bookingIndex == 0 && paymentStatusIndex == 0 && employeeIndex == 0) {
+        return if (doesAllAreZero(array)) {
             orderItems.clear()
-            allItemList.forEach {
-                orderItems.add(it)
+            exceptionHandler {
+                for (it in allItemList) {
+                    orderItems.add(it)
+                }
             }
             runOnMainThread {
                 binding.progressLayout.hideView()
@@ -352,9 +451,17 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
     }
 
 
-    private fun searchTheData(p0: CharSequence?) {
-        // if search bar is empty
+    // if not filter is Applied then then all the index are positioned to zero
+    private fun doesAllAreZero(array: Map<String, Int>): Boolean {
+        array.forEach {
+            if (it.value != 0) return false
+        }
+        return true
+    }
 
+
+    private fun searchTheData(p0: String?) {
+        // if search bar is empty
 
         runOnBackgroundThread(Dispatchers.Default) {
             val isFilterApplied = isFilterNotApplied()
@@ -365,14 +472,15 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
                 // if filters are applied.
                 if (isFilterApplied) {
                     orderItems.clear()
-                    filterData.forEach {
-                        orderItems.add(it)
+                    exceptionHandler {
+                        filterData.forEach {
+                            orderItems.add(it)
+                        }
+                        notifyTheAdapter()
                     }
-                    notifyTheAdapter()
                     runOnMainThread {
                         binding.progressLayout.hideView()
                     }
-
                     return@runOnBackgroundThread
                 }
 
@@ -391,14 +499,15 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
             }
             notifyTheAdapter()
         }
+
+
     }
 
-    private fun searchIsNotEmpty(p0: CharSequence?, isFilterApplied: Boolean) {
+    private fun searchIsNotEmpty(p0: String?, isFilterApplied: Boolean) {
         orderItems.clear()
+        allItemList.forEach {}
         for (data in if (isFilterApplied) filterData else allItemList) {
-            if (p0?.toString()
-                    ?.let { matchWithData(data, it.lowercase()) } == true
-            ) {
+            if (p0?.let { matchWithData(data, it.lowercase()) } == true) {
                 orderItems.add(data)
             }
         }
@@ -419,7 +528,7 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
 
     private fun isFilterNotApplied(): Boolean {
         filterArray.forEach {
-            if (it.index != 0) {
+            if (it.value != 0) {
                 return true
             }
         }
@@ -430,26 +539,34 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
     * This will match the user search string in the array and provide you the result.
     * */
     private fun matchWithData(data: Order?, search: String): Boolean {
+        var employeeName: String? = ""
         val result = exceptionHandlerWithReturn {
+            var customerContact: Pair<String, String> = Pair(" ", "")
             val isPaymentStatusMatched = data?.paymentState?.name?.lowercase()
-            val employeeName =
-                data?.employee?.jsonObject?.get(Constants.name)?.toString()?.lowercase()
+            exceptionHandler {
+                employeeName =
+                    data?.employee?.jsonObject?.get(Constants.name)?.toString()?.lowercase()
+            }
             val orderId = data?.id?.lowercase()
-            val paymentCost = data?.total?.toString()
+            val paymentCost = data?.total?.toString()?.lowercase()
             val customer = if ((data?.customers?.size ?: Constants.defaultOffset) > 0) {
+                customerContact = getCustomerContactDetails(data?.customers?.get(0))
                 getString(
                     R.string.getFullName,
-                    data?.customers?.get(0)?.firstName,
-                    data?.customers?.get(0)?.lastName
-                )
+                    data?.customers?.get(0)?.firstName?.trim(),
+                    data?.customers?.get(0)?.lastName?.trim()
+                ).lowercase()
             } else ""
             val notes = getOrderNotes(data?.lineItems)
-            (customer.lowercase()
-                .contains(search) || isPaymentStatusMatched?.startsWith(search) == true) || (employeeName?.contains(
-                search
-            ) == true) || (orderId?.startsWith(search) == true) || (paymentCost?.startsWith(search) == true) || notes.contains(
-                search
-            )
+            (customer.contains(search, true) || isPaymentStatusMatched?.startsWith(
+                search, true
+            ) == true) || (employeeName?.contains(
+                search, true
+            ) == true) || (orderId?.startsWith(search, true) == true) || (paymentCost?.startsWith(
+                search, true
+            ) == true) || notes.contains(search, true) || customerContact.first.contains(
+                search, true
+            ) || customerContact.second.contains(search, true)
         }
         return result ?: Constants.defaultBoolean
     }
@@ -485,69 +602,36 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
 
     }
 
-    private fun setupSpinners() {
-        val orderStatusAdapter = ArrayAdapter(
-            requireContext(),
-            R.layout.item_spinner,
-            orderEmployeeType?.toMutableList() ?: emptyList()
-        )
+    private fun setupSpinners(spinner: Spinner, list: List<String>) {
+
+        if (list.isEmpty()) {
+            spinner.visibility = View.GONE
+            return
+        }
+        val orderStatusAdapter = ArrayAdapter(requireContext(), R.layout.item_spinner, list)
         orderStatusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.recyclerHeader.orderEmployeeNameSpinner.adapter = orderStatusAdapter
+        spinner.adapter = orderStatusAdapter
     }
-
-
-    private fun setupSpinnerBooking() {
-        val orderStatusAdapter = ArrayAdapter(
-            requireContext(),
-            R.layout.item_spinner,
-            orderBookingType?.toMutableList() ?: emptyList()
-        )
-        orderStatusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.recyclerHeader.orderBookingTypeSpinner.adapter = orderStatusAdapter
-    }
-
-    private fun setupSpinnerTender() {
-        val orderStatusAdapter =
-            ArrayAdapter(
-                requireContext(),
-                R.layout.item_spinner,
-                orderTenderType?.toMutableList() ?: emptyList()
-            )
-        orderStatusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.recyclerHeader.orderTenderSpinner.adapter = orderStatusAdapter
-    }
-
-    private fun setupSpinnerStatus() {
-        val orderStatusAdapter = ArrayAdapter(
-            requireContext(),
-            R.layout.item_spinner,
-            orderPaymentStatusType?.toMutableList() ?: emptyList()
-        )
-        orderStatusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.recyclerHeader.orderPaymentStatusSpinner.adapter = orderStatusAdapter
-    }
-
 
     override fun onStart() {
         super.onStart()
+
         // this isClicked helps in the filter preserve
         if (!isClicked) return
         getTheOrderData()
 
     }
 
+
     @SuppressLint("NotifyDataSetChanged")
-    private fun getTheOrderData() {
+    fun getTheOrderData() {
         runOnBackgroundThread {
-            val merchantName = myApp.getCloverAccount().name.split("|")[0]
+            getTheEmployeeDataForAdminRole()
             try {
                 val orderData = myApp.getOrderConnector().getOrders(mutableListOf())
                 orderItems.clear()
                 allItemList.clear()
                 orderData?.forEach {
-                    if (!isAdmin) {
-                        checkForAdminRole(it, merchantName)
-                    }
                     allItemList.add(it)
                     orderItems.add(it)
                 }
@@ -559,18 +643,35 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
                 binding.orderRecycler.adapter?.notifyDataSetChanged()
                 binding.syncingText.hideView()
             }
-
             CoroutineScope(Dispatchers.Default).launch {
-                updateTheFilterData()
+                runOnMainThread {
+                    binding.progressLayoutNoData.hideView()
+                    updateTheFilterData()
+                }
+
             }
         }
     }
 
+    private fun getTheEmployeeDataForAdminRole() {
+        val employeeData: Employee = myApp.getEmployeeConnector().employee
+        if (employeeData.role.name.equals(Constants.ADMIN, true)) {
+            runOnMainThread {
+                binding.menuButton.showView()
+            }
+        } else {
+            runOnMainThread {
+                binding.menuButton.hideView()
+            }
+        }
+    }
+
+
     // get the filters from the array and pass to the spinners so that user can
     // apply the filters. So filters are dynamic in nature if we have no data for a particular filter then
     // that filter will have only the default option of All.
-    private suspend fun updateTheFilterData() {
-        val job = CoroutineScope(Dispatchers.Default).async {
+
+    private  fun updateTheFilterData() {
             orderItems.forEach {
                 it?.paymentState?.name?.let { it1 ->
                     orderPaymentStatusType?.add(it1)
@@ -587,49 +688,63 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
                 if (employeeName != null) {
                     orderEmployeeType?.add(employeeName.toString())
                 }
+
+                exceptionHandler {
+                    val data = preferenceManager.getString(Constants.customMenuJson)
+                    val result = Gson().fromJson(data, CustomItemJson::class.java)
+                    addDataIntoNotesArray(result)
+                }
             }
-        }
-        job.await()
         runOnMainThread {
-            setupSpinnerBooking()
-            setupSpinners()
-            setupSpinnerTender()
-            setupSpinnerStatus()
+            setupSpinners(
+                binding.recyclerHeader.orderBookingTypeSpinner,
+                orderBookingType?.toMutableList() ?: emptyList()
+            )
+            setupSpinners(
+                binding.recyclerHeader.orderEmployeeNameSpinner,
+                orderEmployeeType?.toMutableList() ?: emptyList()
+            )
+            setupSpinners(
+                binding.recyclerHeader.orderTenderSpinner,
+                orderTenderType?.toMutableList() ?: emptyList()
+            )
+            setupSpinners(
+                binding.recyclerHeader.orderPaymentStatusSpinner,
+                orderPaymentStatusType?.toMutableList() ?: emptyList()
+            )
+            setupSpinners(
+                binding.notesSpinnerDialog.orderCategorySpinner,
+                notesFilter[fbCategory] ?: emptyList()
+            )
+            setupSpinners(
+                binding.notesSpinnerDialog.orderSubcategorySpinner,
+                notesFilter[fbSubcategory] ?: emptyList()
+            )
+            setupSpinners(
+                binding.notesSpinnerDialog.orderTypeSpinner, notesFilter[fbType] ?: emptyList()
+            )
+            setupSpinners(
+                binding.notesSpinnerDialog.orderStatusSpinner, notesFilter[fbStatus] ?: emptyList()
+            )
             setUpListeners()
         }
     }
 
-
-    /*
-    * This Checks that does any order contain the name of the merchant which is currently
-    * using the app so if we found the merchant name then we check the role of the merchant
-    * and that merchant with Admin Access will have the access of the Set Custom Menu option .
-    * Rest of all the role's cannot access the Set Custom Menu option.
-    * */
-    private fun checkForAdminRole(it: Order?, merchantName: String) {
-        try {
-            val name = it?.employee?.jsonObject?.get(Constants.name).toString()
-            if (name.trim() == merchantName.trim()) {
-                try {
-                    val role = it?.employee?.jsonObject?.get(Constants.role).toString()
-                    if (role.lowercase() == Constants.ADMIN.lowercase()) {
-                        runOnMainThread {
-                            isAdmin = !isAdmin
-                            binding.menuButton.showView()
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    runOnMainThread {
-                        binding.menuButton.hideView()
-                    }
-                }
+    private fun addDataIntoNotesArray(result: CustomItemJson?) {
+        notesFilter.clear()
+        notesFilter[getString(R.string.all_orders)] = mutableListOf()
+        for (it in result?.types ?: emptyList()) {
+            if (it.list.isEmpty()) {
+                continue
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+            val resultant: MutableList<String> = mutableListOf()
+            resultant.add(getString(R.string.all_orders))
+            it.list.forEach { key ->
+                resultant.add(key)
+            }
+            notesFilter[it.name.trim()] = resultant
         }
     }
-
 
     @SuppressLint("NotifyDataSetChanged")
     private fun notifyTheAdapter() {
@@ -652,17 +767,20 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
 
     private fun setUpClickListeners() {
         binding.apply {
+
+
             syncButton.setOnClickListener {
                 syncingText.showView()
+                binding.progressLayoutNoData.showView()
                 searchBar.text?.clear()
                 getTheOrderData()
-            }
-            /*
+            }/*
             * Every time from the firebase realtime database we will check that
             * */
             menuButton.setOnClickListener {
                 runOnBackgroundThread {
-                    FirebaseRealtimeDataBaseManager.getInstance().getData(requireContext())
+                    FirebaseRealtimeDataBaseManager.getInstance()
+                        .getData(requireContext(), myApp.getMerchantId()) {}
                 }
                 popupMenu?.show()
             }
@@ -671,7 +789,48 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
                 orderName.setOnClickListener { orderEmployeeNameSpinner.performClick() }
                 orderType.setOnClickListener { orderBookingTypeSpinner.performClick() }
                 orderPrice.setOnClickListener { orderTenderSpinner.performClick() }
+                orderId.setOnClickListener {
+                    changeColorOfNotesField(!notesSpinnerDialog.container.isVisible)
+                }
             }
+            notesSpinnerDialog.apply {
+                orderType.setOnClickListener { orderTypeSpinner.performClick() }
+                orderStatus.setOnClickListener { orderStatusSpinner.performClick() }
+                orderCategory.setOnClickListener { orderCategorySpinner.performClick() }
+                orderSubcategory.setOnClickListener { orderSubcategorySpinner.performClick() }
+                clearButton.setOnClickListener {
+                    removeFiltersForNote()
+                    searchBar.text?.clear()
+                    changeColorOfNotesField(false)
+                }
+                closeButton.setOnClickListener {
+                    changeColorOfNotesField(false)
+                }
+            }
+        }
+    }
+
+
+    private fun changeColorOfNotesField(isVisible: Boolean) {
+        binding.apply {
+            notesSpinnerDialog.container.isVisible = isVisible
+            recyclerHeader.orderIdParent.setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(), if (isVisible) R.color.darkBlue else R.color.header_blue
+                )
+            )
+        }
+    }
+
+
+    private fun removeFiltersForNote() {
+        filterArray[ModalDialogCategories.OrderCategories.name] = 0
+        filterArray[ModalDialogCategories.OrderProgress.name] = 0
+        filterArray[ModalDialogCategories.OrderType.name] = 0
+        filterArray[ModalDialogCategories.OrderSubCategories.name] = 0
+        binding.recyclerHeader.orderNotesFilterValue.text = getString(R.string.all_orders)
+        runOnBackgroundThread {
+            applyFilterToList()
         }
     }
 
@@ -700,6 +859,7 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
     override fun onPause() {
         super.onPause()
         isClicked = false
+        changeColorOfNotesField(false)
     }
 
 
@@ -719,12 +879,26 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
     }
 
     override fun communicate(orderItems: ArrayList<Order?>) {
-
         orderItems.forEach {
             this.orderItems.add(it)
         }
         val item = this.orderItems.isEmpty()
         isSearchItemVisibility(item, !item, item)
     }
+
+    fun updateTheSpinners(isSuccess: Boolean) {
+        if (isSuccess) {
+            Toast.makeText(
+                requireContext(),
+                if (isSuccess) "Data is Uploaded Successfully" else "Please try again! Failed to upload the Data",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+            updateTheFilterData()
+
+
+    }
+
+
 }
 

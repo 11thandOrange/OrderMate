@@ -15,14 +15,14 @@ import com.specialOrder.databinding.DialogUpdateLineItemsBinding
 import com.specialOrder.modals.CustomItemJson
 import com.specialOrder.modals.ModalData
 import com.specialOrder.utils.Constants
-import com.specialOrder.utils.DatePickerUtility
+import com.specialOrder.utils.CustomDatePickerFragment
 import com.specialOrder.utils.ModalDialogCategories
 import com.specialOrder.utils.MyApp
 import com.specialOrder.utils.PreferenceManager
+import com.specialOrder.utils.countElementsByUniqueKeys
 import com.specialOrder.utils.debugLog
 import com.specialOrder.utils.debugSnackBar
 import com.specialOrder.utils.disabledAndAlphaChange
-import com.specialOrder.utils.disabledAndinVisible
 import com.specialOrder.utils.hideKeyboard
 import com.specialOrder.utils.runOnBackgroundThread
 import com.specialOrder.utils.runOnMainThread
@@ -31,13 +31,14 @@ import com.specialOrder.utils.runOnMainThread
 class CustomModalDialog(
     private val lineItemId: String?,
     private val orderData: Order?,
+    private val orderId: String?,
     private val position: Int?,
     private val listener: ILineItemUpdateListener?,
 ) : DialogFragment(), IDateSelectedCommunicator {
 
 
     private var customForData: CustomItemJson? = null
-
+    private var populatedArray : MutableList<String> = mutableListOf()
     private val preferenceManager: PreferenceManager by lazy {
         PreferenceManager.getInstance(requireContext())
     }
@@ -46,9 +47,6 @@ class CustomModalDialog(
         DialogUpdateLineItemsBinding.inflate(layoutInflater)
     }
 
-    private val datePickerUtility: DatePickerUtility by lazy {
-        DatePickerUtility.getInstance()
-    }
 
     private val myApp: MyApp by lazy {
         MyApp.getInstance()
@@ -68,21 +66,23 @@ class CustomModalDialog(
             customForData = requiredData
         }
         dialog?.setCancelable(false)
+
         setUpDialog()
         setupClickListeners()
         getOrderCategory()
         prepopulateTheDialog()
-//        AppMeteredEvent().count = AppMeteredEvent()?.count + 1
     }
 
-
     private fun prepopulateTheDialog() {
+        //&& position == index
+        val data = countElementsByUniqueKeys(requireContext() , orderData?.lineItems?: emptyList())
         runOnBackgroundThread {
-            for (i in orderData?.lineItems ?: emptyList()) {
-                if (i.item?.id == lineItemId && i.note != null && i?.note?.trim()
-                        ?.isNotEmpty() == true
+            for ((index, i) in data.withIndex() ?: emptyList()) {
+                if (i.order?.item?.id == lineItemId && i.order?.note != null && i.order.note?.trim()?.isNotEmpty() == true &&
+                    position == index
                 ) {
-                    addTheDataToDialog(i.note)
+
+                    addTheDataToDialog(i.order?.note)
                     break
                 }
             }
@@ -96,19 +96,19 @@ class CustomModalDialog(
     * of key value pair. this made this logic dynamic as we just need to add the constant which will help in getting
     * the value and update the value in the dialog
     * */
-    private fun addTheDataToDialog(note: String) {
-        val array = note.split("//")
+    private fun addTheDataToDialog(note: String?) {
+        val array = note?.split("•")
         runOnMainThread {
             binding.apply {
-                array.forEach {
-                    val splitItem = it.split("=")
+                array?.forEach {
+                    val splitItem = it.split(":")
                     if (splitItem.size >= 2) {
-                        when (splitItem[0]) {
-                            Constants.pickUp -> {
+                        when (splitItem[0].trim().lowercase()) {
+                            Constants.pickUp.lowercase() -> {
                                 orderPickup.text = splitItem[1]
                             }
 
-                            Constants.progress -> {
+                            Constants.progress.lowercase() -> {
                                 orderProgress.setSelection(
                                     getIndex(
                                         splitItem[1],
@@ -137,6 +137,8 @@ class CustomModalDialog(
 
                             Constants.description -> {
                                 etNotes.setText(splitItem[1])
+
+
                             }
 
                             Constants.type -> {
@@ -160,7 +162,7 @@ class CustomModalDialog(
         customForData?.types?.forEach {
             if (it.type == orderType) {
                 for ((pos, i) in it.list.withIndex()) {
-                    if (i == type) {
+                    if (i.trim().equals(type?.trim(), true)) {
                         return pos + 1
                     }
                 }
@@ -182,16 +184,23 @@ class CustomModalDialog(
     private fun setupClickListeners() {
         binding.cancelDialog.setOnClickListener {
             hideKeyboard(binding.root)
+            listener?.dismissDialog()
             dismiss()
         }
         binding.orderPickup.setOnClickListener {
-            datePickerUtility.showDatePickerDialog(
-                requireContext(), this@CustomModalDialog
-            )
+            showDatePickerDialog()
         }
         binding.updateButton.setOnClickListener {
             updateTheLineItem()
         }
+    }
+
+    private fun showDatePickerDialog() {
+        val newFragment: DialogFragment = CustomDatePickerFragment({ _, year, month, day ->
+            val selectedDate = "$day/${month + 1}/$year"
+            provideCurrentSelectedDate(selectedDate)
+        }, this)
+        newFragment.show(parentFragmentManager, "datePicker")
     }
 
     private fun updateTheLineItem() {
@@ -200,25 +209,45 @@ class CustomModalDialog(
         var result = ""
         binding.apply {
 
-            if (orderPickup.text?.toString()?.trim()?.isNotEmpty() == true) {
-                result += getString(R.string.note_string_pickUp ,orderPickup.text?.toString()?.trim() )
+            if (orderPickup.text?.toString()?.trim()
+                    ?.isNotEmpty() == true && orderPickup.text?.toString()?.trim() != Constants.NA
+            ) {
+                result += getString(
+                    R.string.note_string_pickUp,
+                    orderPickup.text?.toString()?.trim()
+                ) + getString(R.string.bullet_symbol)
             }
             if (orderProgress.selectedItem?.toString()?.trim() != Constants.NA) {
-                result += getString(R.string.note_string_progress ,orderProgress.selectedItem?.toString()?.trim() )
+                result += getString(
+                    R.string.note_string_progress,
+                    orderProgress.selectedItem?.toString()?.trim()
+                ) + getString(R.string.bullet_symbol)
             }
             if (orderCategory.selectedItem?.toString()?.trim() != Constants.NA) {
-                result += getString(R.string.note_string_category ,orderCategory.selectedItem?.toString()?.trim() )
+                result += getString(
+                    R.string.note_string_category,
+                    orderCategory.selectedItem?.toString()?.trim()
+                ) + getString(R.string.bullet_symbol)
             }
             if (orderSubcategory.selectedItem?.toString()?.trim() != Constants.NA) {
-                result += getString(R.string.note_string_Subcategory ,orderSubcategory.selectedItem?.toString()?.trim() )
+                result += getString(
+                    R.string.note_string_Subcategory,
+                    orderSubcategory.selectedItem?.toString()?.trim()
+                ) + getString(R.string.bullet_symbol)
 
             }
             if (orderType.selectedItem?.toString()?.trim() != Constants.NA) {
-                result += getString(R.string.note_string_type ,orderType.selectedItem?.toString()?.trim() )
+                result += getString(
+                    R.string.note_string_type,
+                    orderType.selectedItem?.toString()?.trim()
+                ) + getString(R.string.bullet_symbol)
 
             }
             if (etNotes.text?.toString()?.trim()?.isNotEmpty() == true) {
-                result += getString(R.string.note_string_description ,etNotes.text?.toString()?.trim())
+                result += getString(
+                    R.string.note_string_description,
+                    etNotes.text?.toString()?.trim()
+                )
             }
         }
 
@@ -228,17 +257,15 @@ class CustomModalDialog(
             return
         }
 
-        // user does not fill any field
-        if(result.trim().isEmpty()){
-            dismiss()
-            return
+        if (result.length > 2) {
+            updateTheLineItemData(result.substring(0, result.length - 1))
+        } else {
+            updateTheLineItemData(result)
         }
-
-        updateTheLineItemData(result.substring(0, result.length - 2))
     }
 
     private fun setUpDialog() {
-        binding.etNotes.clearFocus()
+
         customForData?.types?.forEach {
             setupTheViews(it)
         }
@@ -246,7 +273,7 @@ class CustomModalDialog(
     }
 
     private fun setupTheViews(it: ModalData) {
-        when (it.type.name) {
+        when (it.type.name.trim()) {
             ModalDialogCategories.PickUpDate.toString() -> {
                 if (!it.isActive) {
                     binding.orderPickup.disabledAndAlphaChange()
@@ -258,7 +285,7 @@ class CustomModalDialog(
                 if (!it.isActive) {
                     binding.etNotes.disabledAndAlphaChange()
                     binding.orderDescriptionHeading.disabledAndAlphaChange()
-                    binding.etNotesParent.disabledAndinVisible()
+                    binding.etNotesParent.disabledAndAlphaChange()
                 }
             }
 
@@ -296,7 +323,6 @@ class CustomModalDialog(
                     binding.orderSubCategoryHeading.disabledAndAlphaChange()
                 }
                 setupSpinner(it, binding.orderSubcategory)
-
             }
 
             else -> "wrong option".debugLog(javaClass.simpleName)
@@ -329,19 +355,21 @@ class CustomModalDialog(
     }
 
     private fun updateTheLineItemData(
-        json: String
+        json: String?,
+        itemId:String = ""
     ) {
         runOnBackgroundThread {
+            val data = countElementsByUniqueKeys(requireContext(), orderData?.lineItems?: emptyList())
             val allLineItemsOfAnOrder = orderData?.lineItems
-
-            for (i in allLineItemsOfAnOrder ?: emptyList()) {
-                if (i?.item?.id == lineItemId) {
-                    i?.note = json
-                    myApp.getOrderConnector().updateLineItems(orderData?.id, allLineItemsOfAnOrder)
-                }
+                    for( it in allLineItemsOfAnOrder?: emptyList()){
+                        if(data[position?:0].lineItemDifferentId.contains(it.id) ){ // && it.id == itemId
+                            it.note = json?.trim()
+                            myApp.getOrderConnector().updateLineItems(orderId, allLineItemsOfAnOrder)
+                    }
             }
             position?.let { listener?.updateLineItem(lineItemId, json, position) }
         }
+        listener?.dismissDialog()
         dismiss()
     }
 }

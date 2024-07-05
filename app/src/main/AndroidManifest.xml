@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:name="com.specialOrder.utils.MyApp"
@@ -18,13 +19,38 @@
         tools:targetApi="31">
         <activity
             android:name="com.specialOrder.activities.MainActivity"
-            android:windowSoftInputMode="stateAlwaysHidden"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.OverlayActivity"
+            android:excludeFromRecents="true"
+            android:taskAffinity="your.unique.task.affinity"
+            android:theme="@style/AppTheme.Dialog" />
+
+        <receiver
+            android:name=".broadcast.LineItemAddedReceiver"
+            android:enabled="true"
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="com.clover.intent.action.LINE_ITEM_ADDED" />
+                <action android:name="com.clover.intent.action.LINE_ITEM_DELETED" />
+                <action android:name="clover.intent.action.V1_ORDER_BUILD_START" />
+                <action android:name="clover.intent.action.V1_ORDER_BUILD_STOP" />
+                <action android:name="com.clover.intent.action.ITEM_SELECT" />
+                <action android:name="com.clover.intent.action.ORDER_SAVED" />
+                <action android:name="com.clover.intent.action.ORDER_CREATED" />
+                <action android:name=" clover.intent.action.ACTIVE_REGISTER_ORDER"/>
+                <action android:name="com.clover.intent.action.PAYMENT_PROCESSED" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".fragment.FloatingWidgetService"/>
     </application>
 
 </manifest>

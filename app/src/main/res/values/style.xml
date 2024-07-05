@@ -23,6 +23,16 @@
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColor">@color/white</item>
         <item name="subheaderColor">@color/white</item>
+        <item name="android:negativeButtonText">Clear</item>
+    </style>
+
+
+    <style name="AppTheme.Dialog" parent="Theme.Material3.Light.Dialog">
+        <!-- Customize your theme here -->
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
     </style>
 
     <style name="orderListStyleHeader">

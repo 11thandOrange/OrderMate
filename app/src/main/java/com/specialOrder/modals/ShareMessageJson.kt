@@ -1,7 +1,5 @@
 package com.specialOrder.modals
 
-import com.google.gson.annotations.SerializedName
-
 
 data class ShareMessageJson(
     val body: Body?,

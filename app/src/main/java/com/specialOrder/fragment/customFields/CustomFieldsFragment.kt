@@ -12,14 +12,24 @@ import com.google.gson.Gson
 import com.specialOrder.R
 import com.specialOrder.adapters.MenuItemAdapter
 import com.specialOrder.databinding.FragmentCustomFieldsBinding
+import com.specialOrder.fragment.orderHistory.OrderHistoryFragment
 import com.specialOrder.modals.CustomItemJson
-import com.specialOrder.modals.ModalData
 import com.specialOrder.utils.Constants
 import com.specialOrder.utils.FirebaseRealtimeDataBaseManager
-import com.specialOrder.utils.ModalDialogCategories
+import com.specialOrder.utils.MyApp
 import com.specialOrder.utils.PreferenceManager
+import com.specialOrder.utils.defaultCustomDataForFirebase
+import com.specialOrder.utils.exceptionHandler
+import com.specialOrder.utils.hideKeyboard
+import com.specialOrder.utils.isAllFieldDisabled
+import com.specialOrder.utils.onBackPressed
 import com.specialOrder.utils.runOnBackgroundThread
 import com.specialOrder.utils.runOnMainThread
+import com.specialOrder.utils.showView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 
 class CustomFieldsFragment : Fragment() {
@@ -35,53 +45,13 @@ class CustomFieldsFragment : Fragment() {
     private val preferenceManager: PreferenceManager by lazy {
         PreferenceManager.getInstance(requireContext())
     }
+
+    private val myApplication: MyApp by lazy {
+        MyApp.getInstance()
+    }
+
     private var customData: CustomItemJson? = null
 
-    private val modalData: ArrayList<ModalData> = arrayListOf(
-        ModalData(
-            "Pick Up Date",
-            ModalDialogCategories.PickUpDate,
-            hasDropDown = false,
-            isActive = false,
-            list = mutableListOf()
-        ),
-        ModalData(
-            "Order Type",
-            ModalDialogCategories.OrderType,
-            hasDropDown = true,
-            isActive = false,
-            list = mutableListOf()
-        ),
-        ModalData(
-            "Order Progress",
-            ModalDialogCategories.OrderProgress,
-            hasDropDown = true,
-            isActive = false,
-            list = mutableListOf()
-        ),
-        ModalData(
-            "Category",
-            ModalDialogCategories.OrderCategories,
-            hasDropDown = true,
-            isActive = false,
-            list = mutableListOf()
-        ),
-        ModalData(
-            "Sub-Category",
-            ModalDialogCategories.OrderSubCategories,
-            hasDropDown = true,
-            isActive = true,
-            list = mutableListOf()
-        ),
-        ModalData(
-            "Description",
-            ModalDialogCategories.Description,
-            hasDropDown = false,
-            isActive = true,
-            list = mutableListOf()
-        )
-    )
-    val data = CustomItemJson(modalData)
 
     @Synchronized
     fun updateCustomData(value: CustomItemJson) {
@@ -89,6 +59,11 @@ class CustomFieldsFragment : Fragment() {
         runOnMainThread {
             setUpRecyclerView()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        exceptionHandler { hideKeyboard(binding.root) }
     }
 
     override fun onCreateView(
@@ -101,24 +76,27 @@ class CustomFieldsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpClickListener()
-
-        addElementsToArray()
+        setListener()
+        onBackPressed {
+            backPressesHandler()
+        }
         runOnBackgroundThread {
             val result = preferenceManager.getJsonString()
             if (result is CustomItemJson) {
                 updateCustomData(result)
             } else if (result == null) {
-                updateCustomData(data)
+                updateCustomData(defaultCustomDataForFirebase)
             }
-
         }
     }
 
-    private fun addElementsToArray() {
-        binding.apply {
-
-        }
+    private fun setListener() {
+        binding.menuEnableButton.isChecked =
+            preferenceManager.getBoolean(Constants.isMenuOptionEnabled)
+        binding.menuBasketButton.isChecked =
+            preferenceManager.getBoolean(Constants.isMenuBasketOptionEnabled)
     }
+
 
     private fun setUpRecyclerView() {
         binding.menuItemRecycler.layoutManager = LinearLayoutManager(requireContext())
@@ -129,32 +107,52 @@ class CustomFieldsFragment : Fragment() {
     private fun setUpClickListener() {
         binding.apply {
             backButton.setOnClickListener {
-                if (isDataSaved) {
-                    findNavController().popBackStack()
-                } else {
-                    showConfirmationDialog()
-                }
+                backPressesHandler()
             }
             saveLineItems.setOnClickListener {
                 isDataSaved = true
-                saveTheData()
-                findNavController().popBackStack()
+                binding.progressLayout.showView()
+                CoroutineScope(Dispatchers.Default).launch {
+                    saveTheData()
+                }
             }
         }
     }
 
-    private fun saveTheData() {
-        runOnBackgroundThread {
-            customData?.let { it1 ->
-                val list = Gson().toJson(it1)
-                FirebaseRealtimeDataBaseManager.getInstance().saveData(list)
-                preferenceManager.saveJsonString(
-                    Constants.customMenuJson,
-                    it1
-                )
-            }
+    private fun backPressesHandler() {
+        if (isDataSaved) {
+            findNavController().popBackStack()
+        } else {
+            showConfirmationDialog()
         }
     }
+
+    private suspend fun saveTheData() {
+        var isSuccess = false
+        customData?.let { it1 ->
+            isAllFieldDisabled(preferenceManager, it1)
+            val list = Gson().toJson(it1)
+          val result = CoroutineScope(Dispatchers.IO).async {
+              FirebaseRealtimeDataBaseManager.getInstance()
+                  .saveData(requireContext(),list, myApplication.getMerchantId()) {
+                       isSuccess = it
+                  }
+          }
+            result.await()
+            preferenceManager.saveJsonString(
+                Constants.customMenuJson,
+                it1
+            ) {
+                OrderHistoryFragment.getInstance().updateTheSpinners(isSuccess)
+                runOnMainThread {
+                    findNavController().popBackStack()
+
+                }
+            }
+
+        }
+    }
+
 
     private fun showConfirmationDialog() {
         val dialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
@@ -164,7 +162,10 @@ class CustomFieldsFragment : Fragment() {
             setTitle(R.string.app_name)
             setMessage(getString(R.string.do_you_want_to_save_the_changes))
             setPositiveButton(R.string.save) { dialog, _ ->
-                saveTheData()
+                binding.progressLayout.showView()
+                CoroutineScope(Dispatchers.IO).launch {
+                    saveTheData()
+                }
                 dialog.dismiss()
                 findNavController().popBackStack()
             }

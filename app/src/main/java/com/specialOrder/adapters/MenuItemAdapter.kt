@@ -46,6 +46,14 @@ class MenuItemAdapter(
             menuItemValueRecycler.adapter = gridLayoutManager
             setUpClickListener(this, position, manager)
             manageViews(value, this)
+            if(value.name.equals(Constants.isCustomModalShown , true)||
+                value.name.equals(Constants.isCustomModalBasket , true)
+                ){
+                container.setBackgroundColor(ContextCompat.getColor(root.context, R.color.darkBlue))
+            }
+            else{
+                container.setBackgroundColor(ContextCompat.getColor(root.context, R.color.white))
+            }
         }
     }
 

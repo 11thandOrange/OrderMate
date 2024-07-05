@@ -16,12 +16,18 @@ import com.specialOrder.R
 import com.specialOrder.communicators.IOrderItemClickListener
 import com.specialOrder.databinding.ItemOrderBinding
 import com.specialOrder.utils.Constants
+import com.specialOrder.utils.MyApp
 import com.specialOrder.utils.changeColorAsPerPaymentStatus
 import com.specialOrder.utils.convertToSymbol
 import com.specialOrder.utils.exceptionHandler
 import com.specialOrder.utils.formatMillisToDateTime
+import com.specialOrder.utils.generateString
+import com.specialOrder.utils.getThePaymentState
 import com.specialOrder.utils.toDoubleFloatPoint
 import com.specialOrder.utils.toDoubleFloatPointLatest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class OrderAdapter(
@@ -29,6 +35,10 @@ class OrderAdapter(
     private val listener: IOrderItemClickListener
 ) :
     RecyclerView.Adapter<OrderAdapter.MyViewBinder>() {
+
+    companion object {
+        var resultantPickupDate = ""
+    }
 
     // To prevent the unnecessary data read operations
 
@@ -40,10 +50,21 @@ class OrderAdapter(
 
     override fun onBindViewHolder(holder: OrderAdapter.MyViewBinder, position: Int) {
         holder.binding.apply {
+            if (position >= data.size) {
+                return
+            }
             val item = data[position]
-            exceptionHandler {
-                orderEmployeeName.text =
-                    item?.employee?.jsonObject?.get(Constants.name).toString()
+            exceptionHandler({
+                orderEmployeeName.text = item?.employee?.jsonObject?.get(Constants.name).toString()
+            }) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val value = MyApp.getInstance().getEmployeeName(item?.employee?.id)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        orderEmployeeName.text = value
+                            ?: root.context.getString(R.string.dash)
+                    }
+                }
+
             }
             orderType.text = if (item?.orderType?.label?.trim()?.isEmpty() == false) {
                 item.orderType.label
@@ -57,29 +78,33 @@ class OrderAdapter(
             orderTime.text = item?.createdTime?.formatMillisToDateTime(Constants.dateFormat)
 
 
-            orderStatus.text = item?.paymentState?.name
-            item?.paymentState?.name?.let { orderStatus.changeColorAsPerPaymentStatus(it) }
+            orderStatus.text = root.context.getThePaymentState(item)
+            orderStatus.changeColorAsPerPaymentStatus(item)
 
             orderId.text = item?.id
             setupPaymentValues(this, item)
 
-            root.context.getString(
-                R.string.getFullName,
-                item?.customers?.get(0)?.firstName,
-                item?.customers?.get(0)?.lastName
-            ).also {
-                if (it.trim().isEmpty() || item?.customers?.get(0)?.firstName?.trim()
-                        ?.isEmpty() == true
-                ) {
-                    orderCustomerName.text = root.context.getString(R.string.hypen_text)
-                } else {
-                    orderCustomerName.text =
-                        if (it.contains(Constants.nullValue)) root.context.getString(R.string.hypen_text) else it
+            if (item?.customers?.isNotEmpty() == true) {
+                root.context.getString(
+                    R.string.getFullName,
+                    item.customers?.get(0)?.firstName,
+                    item.customers?.get(0)?.lastName
+                ).also {
+                    if (it.trim().isEmpty() || item.customers?.get(0)?.firstName?.trim()
+                            ?.isEmpty() == true
+                    ) {
+                        orderCustomerName.text = root.context.getString(R.string.hypen_text)
+                    } else {
+                        orderCustomerName.text =
+                            if (it.contains(Constants.nullValue)) root.context.getString(R.string.hypen_text) else it
+                    }
                 }
+            } else {
+                orderCustomerName.text = root.context.getString(R.string.hypen_text)
             }
             val hasNotes = doesLineItemContainNotes(item?.lineItems, root.context)
             orderTenderTypes.text = getTenderTypes(item?.payments, root.context)
-            orderNotes.text = hasNotes.second
+            orderNotes.text = generateString(item?.lineItems ?: emptyList(), root.context, true)
             customOrdersCount.text =
                 if (hasNotes.first == 0) root.context.getString(R.string.dash) else root.context.getString(
                     if (hasNotes.first == 1) R.string.item_count_single else R.string.item_count,

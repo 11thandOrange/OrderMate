@@ -28,10 +28,11 @@ class PreferenceManager private constructor(context: Context) {
         editor = sharedPreferences?.edit()
     }
 
-
-    fun saveJsonString(key: String, value: Any) {
+    @Synchronized
+    fun saveJsonString(key: String, value: Any, task: () -> Unit) {
         val gson = Gson().toJson(value)
         editor?.putString(key, gson)?.apply()
+        task()
     }
 
 
@@ -50,6 +51,14 @@ class PreferenceManager private constructor(context: Context) {
 
     fun getString(key: String): String {
         return sharedPreferences?.getString(key, Constants.defaultString) ?: Constants.defaultString
+    }
+
+    fun saveBoolean(key: String, value: Boolean) {
+        editor?.putBoolean(key, value)?.apply()
+    }
+
+    fun getBoolean(key: String): Boolean {
+        return sharedPreferences?.getBoolean(key, true) ?: Constants.alwaysTrue
     }
 
 }

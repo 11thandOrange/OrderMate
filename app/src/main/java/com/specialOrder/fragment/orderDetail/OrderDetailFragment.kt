@@ -3,22 +3,23 @@ package com.specialOrder.fragment.orderDetail
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.clover.sdk.v1.Intents
 import com.clover.sdk.v1.Intents.EXTRA_ORDER_ID
-import com.clover.sdk.v3.customers.Customer
-import com.clover.sdk.v3.order.LineItem
+import com.clover.sdk.v3.apps.AppsConnector
+import com.clover.sdk.v3.order.Order
 import com.clover.sdk.v3.payments.Payment
 import com.clover.sdk.v3.payments.Refund
 import com.specialOrder.R
-import com.specialOrder.activities.MainActivity
 import com.specialOrder.adapters.ItemAdapter
 import com.specialOrder.adapters.RefundAdapter
 import com.specialOrder.adapters.TransactionAdapter
@@ -37,16 +38,24 @@ import com.specialOrder.utils.MyApp
 import com.specialOrder.utils.PreferenceManager
 import com.specialOrder.utils.changeColorAsPerPaymentStatus
 import com.specialOrder.utils.convertToSymbol
+import com.specialOrder.utils.countElementsByUniqueKeys
+import com.specialOrder.utils.createAndShowDialog
 import com.specialOrder.utils.debugSnackBar
 import com.specialOrder.utils.exceptionHandler
 import com.specialOrder.utils.formatMillisToDateTime
+import com.specialOrder.utils.getCustomerContactDetails
+import com.specialOrder.utils.getThePaymentState
 import com.specialOrder.utils.hideView
+import com.specialOrder.utils.onBackPressed
 import com.specialOrder.utils.runOnBackgroundThread
 import com.specialOrder.utils.runOnMainThread
 import com.specialOrder.utils.showSnackBar
 import com.specialOrder.utils.showView
 import com.specialOrder.utils.toDoubleFloatPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdateListener,
@@ -54,10 +63,14 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
 
     companion object {
         var currencyName: String = ""
+        var isPaymentBtnClicked = false
+        var isReOpenBtnClicked = false
+        var orderIdForReopen: String? = null
     }
 
     private var totalItemPriceSum: Long = 0L
     private var totalPriceFromApi: Long = 0L
+    private var data: OrderDetailFragmentArgs? = null
 
     private val binding: FragmentOrderDetailBinding by lazy {
         FragmentOrderDetailBinding.inflate(layoutInflater)
@@ -70,12 +83,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     private val myApp by lazy {
         MyApp.getInstance()
     }
-
+    private var appConnector: AppsConnector? = null
 
     private var lineItems: MutableList<ItemModal?> = mutableListOf()
     private var paymentItems: MutableList<Payment> = mutableListOf()
     private var refundItems: MutableList<Refund> = mutableListOf()
-    private var orderArguments: OrderDetailFragmentArgs? = null
+    private var orderArguments: Order? = null
     private lateinit var viewModel: OrderDetailViewModel
 
     override fun onCreateView(
@@ -88,33 +101,56 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        orderArguments = arguments?.let { OrderDetailFragmentArgs.fromBundle(it) }
+        data = arguments?.let { OrderDetailFragmentArgs.fromBundle(it) }
+        orderArguments = data?.orderData
         setUpTheClickListeners()
         setUpRecyclerView()
-        onBackPressed()
+        onBackPressed { findNavController().popBackStack() }
         setDataOnScreenWithArgs()
         viewModel = ViewModelProvider(this)[OrderDetailViewModel::class.java]
         setUpObserver()
+        runOnBackgroundThread {
+            appConnector = AppsConnector(requireContext(), myApp.getCloverAccount())
+        }
     }
+
 
     private fun setUpObserver() {
         viewModel.successResponse.observe(viewLifecycleOwner) {
             when (it.first) {
                 Constants.emailAddress -> {
+                    if (it.second) {
+                        runOnBackgroundThread {
+                            exceptionHandler {
+                                appConnector?.logMetered("WQFPE39Y84B4E", 1)
+                            }
+                        }
+                    }
                     debugSnackBar(
                         if (it.second) getString(R.string.email_has_been_shared_successfully) else getString(
                             R.string.failed_to_share_the_email
                         )
                     )
                 }
+
                 Constants.phoneNumber -> {
+                    if (it.second) {
+
+                        runOnBackgroundThread {
+                            exceptionHandler {
+                                appConnector?.logMetered("WQFPE39Y84B4E", 1)
+                            }
+
+                        }
+                    }
                     debugSnackBar(
                         if (it.second) getString(R.string.sms_has_been_shared_successfully) else getString(
                             R.string.fail_to_share_the_sms
                         )
                     )
                 }
-                Constants.noInternet ->{
+
+                Constants.noInternet -> {
                     debugSnackBar(getString(R.string.please_check_your_internet_connection))
                 }
             }
@@ -123,66 +159,87 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
 
 
     private fun setDataOnScreenWithArgs() {
-        orderArguments?.orderData?.apply {
-            totalPriceFromApi = total ?: Constants.defaultLong
-            currencyName = currency ?: Constants.defaultString
-            getString(
-                R.string.priceString,
-                currencyName.convertToSymbol(),
-                total?.toDoubleFloatPoint()
-            ).also {
-                binding.totalValue.text = it
-            }
-            getString(R.string.orders_text, id).also { binding.orderId.text = it }
-            val date = getString(
-                R.string.getDateWithDot, createdTime?.formatMillisToDateTime(
-                    Constants.yearFormatWithMonthName,
-                    true
-                ), createdTime?.formatMillisToDateTime(Constants.dateFormat)
-            )
-            binding.orderPlacedAtValue.text = date
-            binding.merchantName.text = preferenceManager.getString(Constants.merchantName)
-
-            binding.orderPlacedStatusValue.text = paymentState?.name
-            binding.orderPlacedStatusValue.changeColorAsPerPaymentStatus(
-                paymentState?.name ?: Constants.defaultString
-            )
-            exceptionHandler {
-                binding.orderPlacedEmployeeValue.text =
-                    employee?.jsonObject?.get(Constants.name)?.toString()
-                if (customers?.isNotEmpty() == true) {
-                    getString(
-                        R.string.getFullName,
-                        customers[0]?.firstName,
-                        customers[0]?.lastName
-                    ).also {
-                        binding.orderPlacedCustomerValue.text = it
-                    }
-                    val result = getMobileNumber(customers[0])
-                    binding.orderPlacedCustomerNumberValue.text = result.first
-                    binding.orderPlacedCustomerEmailValue.text = result.second
+        exceptionHandler {
+            orderArguments?.apply {
+                totalPriceFromApi = total ?: Constants.defaultLong
+                currencyName = currency ?: Constants.defaultString
+                getString(
+                    R.string.priceString,
+                    currencyName.convertToSymbol(),
+                    total?.toDoubleFloatPoint()
+                ).also {
+                    binding.totalValue.text = it
                 }
+                getString(R.string.orders_text, id).also { binding.orderId.text = it }
+
+                binding.orderPlacedAtValue.text =
+                    createdTime?.formatMillisToDateTime(Constants.yearFormat)
+                binding.merchantName.text = preferenceManager.getString(Constants.merchantName)
+
+                binding.orderPlacedStatusValue.text =
+                    requireContext().getThePaymentState(orderArguments)
+                binding.orderPlacedStatusValue.changeColorAsPerPaymentStatus(
+                    orderArguments
+                )
+                if (isStatusOpen()) {
+                    binding.reOpenButton.isVisible = true
+                    binding.deleteButton.isVisible = true
+                    binding.addPayment.isVisible = true
+                    binding.reIssueReceiptButton.isVisible = false
+                } else {
+                    binding.reOpenButton.isVisible = false
+                    binding.deleteButton.isVisible = false
+                    binding.addPayment.isVisible = false
+                    binding.reIssueReceiptButton.isVisible = true
+                }
+                exceptionHandler {
+
+                    if (customers?.isNotEmpty() == true) {
+                        getString(
+                            R.string.getFullName,
+                            customers[0]?.firstName,
+                            customers[0]?.lastName
+                        ).also {
+                            binding.orderPlacedCustomerValue.text = it
+                        }
+                        val result = getCustomerContactDetails(customers[0])
+                        binding.orderPlacedCustomerNumberValue.text = result.first
+                        binding.orderPlacedCustomerEmailValue.text = result.second
+
+                    }
+                }
+
+
+                exceptionHandler({
+                        binding.orderPlacedEmployeeValue.text =
+                            employee?.jsonObject?.get(Constants.name)?.toString()
+                })
+                {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val value = MyApp.getInstance().getEmployeeName(employee?.id)
+                        CoroutineScope(Dispatchers.Main).launch {
+                            binding.orderPlacedEmployeeValue.text = value
+                                ?: getString(R.string.dash)
+                        }
+                    }
+                }
+                setUpTheScreen()
             }
-            setUpTheScreen()
         }
     }
 
 
-    private fun getMobileNumber(customer: Customer?): Pair<String, String> {
-        var resultNumber = ""
-        var resultEmail = ""
+    private fun isStatusOpen(): Boolean {
+        return ((orderArguments?.paymentState?.name?.equals(
+            Constants.OPEN,
+            true
+        ) == true)
 
-        customer?.phoneNumbers?.forEach {
-            resultNumber += "${it?.phoneNumber}, "
-        }
-        customer?.emailAddresses?.forEach {
-            resultEmail += "${it?.emailAddress}, "
-        }
-        if (resultNumber.trim().isNotEmpty()) resultNumber =
-            resultNumber.substring(0, resultNumber.length - 2)
-        if (resultEmail.trim().isNotEmpty()) resultEmail =
-            resultEmail.substring(0, resultEmail.length - 2)
-        return Pair(resultNumber, resultEmail)
+                || (orderArguments?.state?.equals(
+            Constants.OPEN,
+            true
+        ) == true))
+
     }
 
 
@@ -202,6 +259,29 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+
+        // means don't non-required hit the API
+        if (isPaymentBtnClicked) {
+            CoroutineScope(Dispatchers.IO).launch {
+                refreshUI(true)
+            }
+        } else {
+            CoroutineScope(Dispatchers.IO).launch {
+                refreshUI()
+            }
+        }
+
+
+
+
+
+        orderIdForReopen = null
+    }
+
+
     private fun setUpTheScreen() {
         showLineItemOnScreen()
         showThePaymentData()
@@ -212,9 +292,9 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     @SuppressLint("NotifyDataSetChanged")
     private fun showThePaymentData() {
         val isPaymentMadeForOrder =
-            orderArguments?.orderData?.payments != null || orderArguments?.orderData?.payments?.isNotEmpty() == true
+            orderArguments?.payments != null || orderArguments?.payments?.isNotEmpty() == true
         val isRefundMadeForOrder =
-            orderArguments?.orderData?.refunds != null || orderArguments?.orderData?.refunds?.isNotEmpty() == true
+            orderArguments?.refunds != null || orderArguments?.refunds?.isNotEmpty() == true
 
         // if both payment and refund is not made for the order
         if (!isRefundMadeForOrder && !isPaymentMadeForOrder) {
@@ -229,7 +309,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             binding.transactionRecycler.hideView()
         } else {
             paymentItems.clear()
-            orderArguments?.orderData?.payments?.forEach {
+            orderArguments?.payments?.forEach {
                 paymentItems.add(it)
             }
             binding.transactionRecycler.adapter?.notifyDataSetChanged()
@@ -240,7 +320,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             binding.refundRecycler.hideView()
         } else {
             refundItems.clear()
-            orderArguments?.orderData?.refunds?.forEach {
+            orderArguments?.refunds?.forEach {
                 refundItems.add(it)
             }
             binding.refundRecycler.adapter?.notifyDataSetChanged()
@@ -254,33 +334,32 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     * */
     private fun showTheDiscountAndTaxData() {
         // case 1 if no discount is applied then there will be tax applied only.
-        if (orderArguments?.orderData?.discounts == null || orderArguments?.orderData?.discounts?.isEmpty() == true) {
+        if (orderArguments?.discounts == null || orderArguments?.discounts?.isEmpty() == true) {
             binding.discount.hideView()
             binding.discountValue.hideView()
         }
 
         "${currencyName.convertToSymbol()}${
-            myApp.orderTax(orderArguments?.orderData).toDoubleFloatPoint()
+            myApp.orderTax(orderArguments).toDoubleFloatPoint()
         }".also {
             binding.taxValue.text = it
         }
         "${currencyName.convertToSymbol()}${
-            myApp.orderLineItemTotal(orderArguments?.orderData).toDoubleFloatPoint()
+            myApp.orderLineItemTotal(orderArguments).toDoubleFloatPoint()
         }".also {
             binding.subtotalValue.text = it
         }
         "${currencyName.convertToSymbol()}${
-            myApp.orderDiscount(orderArguments?.orderData).toDoubleFloatPoint()
+            myApp.orderDiscount(orderArguments).toDoubleFloatPoint()
         }".also {
             binding.discountValue.text = it
         }
         exceptionHandler {
             val discountName =
-                orderArguments?.orderData?.discounts?.get(0)?.jsonObject?.get(Constants.name)
+                orderArguments?.discounts?.get(0)?.jsonObject?.get(Constants.name)
             binding.discount.text = discountName.toString()
         }
     }
-
 
 
     @SuppressLint("NotifyDataSetChanged")
@@ -288,7 +367,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         binding.syncingText.hideView()
         binding.apply {
             lineItems.clear()
-            val data = orderArguments?.orderData?.lineItems?.let { countElementsByUniqueKeys(it) }
+            val data = orderArguments?.lineItems?.let {
+                countElementsByUniqueKeys(
+                    requireContext(),
+                    it
+                )
+            }
             data?.forEach {
                 totalItemPriceSum += it.order?.price?.times(it.itemCount)
                     ?: Constants.defaultLong
@@ -302,7 +386,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             ).also {
                 subtotalValue.text = it
             }
-            getString(R.string.order, orderArguments?.orderData?.lineItems?.size).also {
+            getString(R.string.order, orderArguments?.lineItems?.size).also {
                 orderItemCountText.text = if (it == Constants.nullValue) {
                     itemRecycler.hideView()
                     getString(R.string.order)
@@ -315,75 +399,119 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
 
-    /*
-    * Clover provide us the data in the raw format
-    * eg if i have added 10 ice-cream then it will provide us 10 ice cream objects
-    * so we are clubbing the same items together and result in the item listing as per unique items
-    * this function generated key will help in distinguishing items
-    * */
-    private fun getTheUniqueOrderItemKey(lineItems: LineItem?): String {
-        var modificationString = ""
-        if (lineItems?.hasModifications() == true) {
-            lineItems.modifications?.forEach {
-                modificationString += " ${it.name}"
-            }
-        }
-        return getString(
-            R.string.key,
-            lineItems?.name.toString(),
-            lineItems?.price.toString(),
-            lineItems?.unitName,
-            lineItems?.unitQty.toString(),
-            modificationString
-        )
-    }
-
-    /*
-        * make provide the list of order line items with unique ness eg if a item is added 10 times
-        * then it will provide one item in list with item count 10
-        *
-        * */
-    private fun countElementsByUniqueKeys(lineItems: List<LineItem?>): MutableList<ItemModal> {
-        val elementCounts: MutableSet<ItemModal> = mutableSetOf()
-        var isMatched: Boolean
-        for (lineItem in lineItems) {
-            isMatched = false
-            val key = getTheUniqueOrderItemKey(lineItem)
-            val data = ItemModal(lineItem, key)
-
-            for (it in elementCounts) {
-                if (it.orderKey == key) {
-                    it.itemCount = it.itemCount + 1
-                    isMatched = true
-                    break
-                }
-            }
-            if (!isMatched) {
-                data.itemCount = 1
-                elementCounts.add(data)
-            }
-        }
-        return elementCounts.toMutableList()
-    }
-
-
     private fun setUpTheClickListeners() {
         binding.apply {
             backButton.setOnClickListener { findNavController().popBackStack() }
+            binding.progressLayout.setOnClickListener {
+                Constants.notImplementedLog
+            }
             reIssueReceiptButton.setOnClickListener {
                 val dror = Intent(Intents.ACTION_START_PRINT_RECEIPTS)
-                dror.putExtra(EXTRA_ORDER_ID, orderArguments?.orderData?.id)
+                dror.putExtra(EXTRA_ORDER_ID, orderArguments?.id)
                 startActivity(dror)
             }
-            sendNotificationButton.setOnClickListener {
-                if(ConnectionManager.getInstance().isNetworkConnected(requireContext())){
-                    debugSnackBar(getString(R.string.please_check_your_internet_connection_1))
-                   return@setOnClickListener
+
+            addPayment.setOnClickListener {
+                val dror = Intent(Intents.ACTION_CLOVER_PAY)
+                dror.putExtra(EXTRA_ORDER_ID, orderArguments?.id)
+                startActivity(dror)
+                isPaymentBtnClicked = true
+            }
+
+            reOpenButton.setOnClickListener {
+                val dror = Intent(Intents.ACTION_START_REGISTER)
+                dror.putExtra(EXTRA_ORDER_ID, orderArguments?.id)
+                startActivity(dror)
+                orderIdForReopen = orderArguments?.id
+                isReOpenBtnClicked = true
+            }
+
+            deleteButton.setOnClickListener {
+                createAndShowDialog(
+                    requireContext(),
+                    "Are you sure you want to delete this order?",
+                    "Delete Order",
+                    getString(R.string.delete_order),
+                    getString(R.string.cancel)
+                ) {
+                    runOnBackgroundThread {
+                        if (deleteTheOrder()) {
+                            runOnMainThread {
+                                findNavController().popBackStack()
+                            }
+                            exceptionHandler {
+                                // update the dashboard after the order is delay
+                                Handler(Looper.getMainLooper()).postDelayed(
+                                    { OrderHistoryFragment.getInstance().getTheOrderData() }, 1000
+                                )
+
+                            }
+                        }
+                    }
                 }
-                val obj = SendNotificationDialog(orderArguments?.orderData, this@OrderDetailFragment)
+            }
+
+
+            sendNotificationButton.setOnClickListener {
+                if (ConnectionManager.getInstance().isNetworkConnected(requireContext())) {
+                    debugSnackBar(getString(R.string.please_check_your_internet_connection_1))
+                    return@setOnClickListener
+                }
+                val obj =
+                    SendNotificationDialog(orderArguments, this@OrderDetailFragment)
                 obj.show(parentFragmentManager, "")
             }
+
+            syncButton.setOnClickListener {
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    refreshUI()
+                }
+            }
         }
+    }
+
+
+    private fun getTheRequiredData(data: List<Order>?): Order? {
+        if (data?.isNotEmpty() == true) {
+            data.forEach {
+                if (it.id == orderArguments?.id) {
+                    return it
+                }
+            }
+        }
+        return null
+    }
+
+
+    private suspend fun refreshUI(isFromResume: Boolean = false) {
+        runOnMainThread {
+            binding.progressLayout.showView()
+            binding.syncButton.isClickable = false
+            binding.syncingText.showView()
+        }
+        if (isFromResume) {
+            delay(8000)
+        }
+        val data = myApp.getOrderConnector().getOrders(mutableListOf())
+        orderArguments = getTheRequiredData(data)
+        runOnMainThread {
+            binding.syncingText.hideView()
+            data?.let {
+                setDataOnScreenWithArgs()
+                binding.syncButton.isClickable = true
+            }
+            isPaymentBtnClicked = false
+            isReOpenBtnClicked = false
+            binding.progressLayout.hideView()
+        }
+    }
+
+    private fun deleteTheOrder(): Boolean {
+        orderArguments?.id?.let {
+            return myApp.getOrderConnector().deleteOrder(it)
+        }
+        return false
     }
 
 
@@ -391,10 +519,13 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     // if all the options are disabled by admin then this will not work
     // if a single option is available then it will show
     override fun onOrderItemClick(orderPosition: Int, lineItemId: String?) {
+
+
         if (hasAddNoteAccess()) {
             CustomModalDialog(
                 lineItemId,
-                orderArguments?.orderData,
+                data?.orderData,
+                orderArguments?.id,
                 orderPosition,
                 this@OrderDetailFragment,
             ).show(
@@ -405,6 +536,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             binding.root.showSnackBar(getString(R.string.no_access))
         }
     }
+
 
     /*
     * @param : null
@@ -426,18 +558,6 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         return false
     }
 
-    private fun onBackPressed() {
-        val onBackPressedCallback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().popBackStack()
-            }
-        }
-        if (activity != null)
-            (activity as MainActivity).onBackPressedDispatcher.addCallback(
-                viewLifecycleOwner,
-                onBackPressedCallback
-            )
-    }
 
     /*
     * When user update the note for the item the callback come here
@@ -445,6 +565,10 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     override fun updateLineItem(id: String?, list: String?, position: Int) {
         if (list == null) return
         updateNoteInTheLineItemOfOrder(id, list, position)
+    }
+
+    override fun dismissDialog() {
+        Constants.notImplementedLog
     }
 
     private fun updateNoteInTheLineItemOfOrder(id: String?, list: String, position: Int) {
@@ -460,12 +584,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             // update the order in the order history screen
             // update all item quantity if the order so that
             // each quantity of line item has same note
-            for (i in orderArguments?.orderData?.lineItems ?: emptyList()) {
+            for (i in orderArguments?.lineItems ?: emptyList()) {
                 if (i?.item?.id == id) {
                     i?.note = list
                 }
             }
-            OrderHistoryFragment.getInstance().updateTheOrder(orderArguments?.orderData)
+            OrderHistoryFragment.getInstance().updateTheOrder(orderArguments)
         }
         runOnMainThread {
             binding.itemRecycler.adapter?.notifyItemChanged(position)

@@ -3,18 +3,19 @@ package com.specialOrder.utils
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
+import com.clover.sdk.v3.order.Order
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
-import com.google.gson.Gson
 import com.specialOrder.BuildConfig
 import com.specialOrder.R
+import com.specialOrder.activities.MainActivity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,16 +58,6 @@ fun Long.formatMillisToDateTime(format: String, isDate: Boolean = false): String
     return convertedDate
 }
 
-/*
-* @param --> context : context of the parent activity to which this toast will link
-* @param --> toastLength : length of the toast 0 for short length and 1 for the long length.
-* */
-fun String.debugToast(context: Context, toastLength: Int = 0) {
-    if (BuildConfig.DEBUG) {
-        Toast.makeText(context, this, toastLength).show()
-    }
-}
-
 
 /*
 * Hide the visibility of the view
@@ -93,6 +84,9 @@ inline fun Fragment.runOnMainThread(crossinline task: () -> Unit) {
     }
 }
 
+/*
+* Fragment is used here so that is can be used in any Fragment we does not need to import this
+* */
 inline fun Fragment.runOnBackgroundThread(
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
     crossinline task: () -> Unit
@@ -111,6 +105,16 @@ inline fun exceptionHandler(crossinline task: () -> Unit) {
     }
 }
 
+inline fun exceptionHandler(crossinline task: () -> Unit, crossinline catchTask: () -> Unit) {
+    try {
+        task()
+    } catch (e: Exception) {
+        exceptionHandler(catchTask)
+        e.printStackTrace()
+    }
+}
+
+
 inline fun <T> exceptionHandlerWithReturn(crossinline task: () -> T): T? {
     return try {
         task()
@@ -119,6 +123,7 @@ inline fun <T> exceptionHandlerWithReturn(crossinline task: () -> T): T? {
         null
     }
 }
+
 
 fun String.getOnlyFirstName(): String {
     try {
@@ -138,7 +143,24 @@ fun Int.toDoubleFloatPoint(): String {
 }
 
 fun Long.toDoubleFloatPoint(): String {
-    return "%.2f".format((this.toDouble()/ 100))
+    return "%.2f".format((this.toDouble() / 100))
+}
+
+fun String.convertToTwoDecimal(): String {
+    return try {
+        val decimalIndex = this.indexOfFirst { it == '.' }
+        if (decimalIndex == -1) {
+            "$this.00"
+        } else {
+            val wholePartStr = this.substring(0, decimalIndex)
+            val fractionalPartStr = this.substring(decimalIndex + 1)
+            val fractionalPart = fractionalPartStr.take(2)
+            "$wholePartStr.$fractionalPart"
+        }
+    } catch (e: NumberFormatException) {
+        e.printStackTrace()
+        ""
+    }
 }
 
 fun Double.toDoubleFloatPoint(): String {
@@ -156,32 +178,45 @@ fun String.convertToSymbol(): String {
 }
 
 
-
 fun MaterialTextView.changeColorAsPerPaymentStatus(
-    paymentState: String,
+    order: Order?,
     isRefunded: Boolean? = false
 ) {
     if (isRefunded == true) {
         this.setTextColor(ContextCompat.getColor(this.context, R.color.other_order_payment_status))
         return
     }
-    val color = when (paymentState.lowercase()) {
-        Constants.OPEN.lowercase(), Constants.PARTIALLY_PAID.lowercase() -> R.color.open_status_color
-        Constants.PAID.lowercase() -> R.color.paid_status_color
-        Constants.REFUNDED.lowercase() -> R.color.other_order_payment_status
-        else -> R.color.other_order_payment_status
+
+    val color = if (order?.paymentState?.name != null) {
+        when (order.paymentState?.name?.lowercase()) {
+            Constants.OPEN.lowercase(), Constants.PARTIALLY_PAID.lowercase() -> R.color.open_status_color
+            Constants.PAID.lowercase() -> R.color.paid_status_color
+            Constants.REFUNDED.lowercase() -> R.color.other_order_payment_status
+            else -> R.color.other_order_payment_status
+        }
+    } else {
+        when (order?.state?.lowercase()) {
+            Constants.OPEN.lowercase(), Constants.PARTIALLY_PAID.lowercase() -> R.color.open_status_color
+            Constants.PAID.lowercase() -> R.color.paid_status_color
+            Constants.REFUNDED.lowercase() -> R.color.other_order_payment_status
+            else -> R.color.other_order_payment_status
+        }
     }
+
+
     this.setTextColor(ContextCompat.getColor(this.context, color))
 }
 
 fun Fragment.navigate(action: Int) {
-    findNavController().navigate(action)
+    exceptionHandler {
+        findNavController().navigate(action)
+    }
 }
 
-fun String.isInArray(list: List<String>): Boolean {
+fun String.isInArray(list: HashMap<String, String>): Boolean {
     val newArr = this.split(",")
     newArr.forEach {
-        if (list.contains(it)) {
+        if (list.values.contains(it)) {
             return true
         }
     }
@@ -206,12 +241,6 @@ fun View.disabledAndAlphaChange() {
     this.alpha = 0.5f
     this.isEnabled = false
 }
-// if you want the ui in the custom menu dialog to be dynamic just change the below function to view gone
-// ui will start adjusting itself.so first test this if not work then made more changes
-fun View.disabledAndinVisible() {
-    this.alpha = 0.5f
-    this.isEnabled = false
-}
 
 
 fun View.showSnackBar(message: String) {
@@ -222,5 +251,17 @@ fun View.showSnackBar(message: String) {
     ).show()
 }
 
+fun Fragment.onBackPressed(task: () -> Unit) {
+    val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            task()
+        }
+    }
+    if (activity != null)
+        (activity as MainActivity).onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            onBackPressedCallback
+        )
+}
 
 

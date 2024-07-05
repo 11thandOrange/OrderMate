@@ -6,7 +6,9 @@ enum class ModalDialogCategories{
     OrderProgress,
     OrderCategories,
     OrderSubCategories,
-    PickUpDate
+    PickUpDate,
+    ModalShown,
+    BasketShown
 }
 
 enum class FilterCategories{
@@ -14,4 +16,5 @@ enum class FilterCategories{
     EmployeeName,
     TenderType,
     OrderBookingType,
+    Notes
 }

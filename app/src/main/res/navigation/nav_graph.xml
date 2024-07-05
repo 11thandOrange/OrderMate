@@ -44,6 +44,9 @@
         <argument
             android:name="orderData"
             app:argType="com.clover.sdk.v3.order.Order" />
+        <action
+            android:id="@+id/action_orderDetailFragment_self"
+            app:destination="@id/orderDetailFragment" />
 
     </fragment>
 
