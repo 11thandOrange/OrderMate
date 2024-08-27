@@ -20,6 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep public class com.specialOrder.modals.CustomItemJson {
+-keep public class com.orderMate.modals.CustomItemJson {
     public <init>();
 }

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/customFieldsFragment"
-        android:name="com.specialOrder.fragment.customFields.CustomFieldsFragment"
+        android:name="com.orderMate.fragment.customFields.CustomFieldsFragment"
         android:label="fragment_custom_fields"
         tools:layout="@layout/fragment_custom_fields">
         <action
@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/orderHistoryFragment"
-        android:name="com.specialOrder.fragment.orderHistory.OrderHistoryFragment"
+        android:name="com.orderMate.fragment.orderHistory.OrderHistoryFragment"
         android:label="fragment_order_history"
         tools:layout="@layout/fragment_order_history">
         <action
@@ -32,7 +32,7 @@
     </fragment>
     <fragment
         android:id="@+id/orderDetailFragment"
-        android:name="com.specialOrder.fragment.orderDetail.OrderDetailFragment"
+        android:name="com.orderMate.fragment.orderDetail.OrderDetailFragment"
         android:label="fragment_order_detail"
         tools:layout="@layout/fragment_order_detail">
         <action

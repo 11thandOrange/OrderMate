@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
-        android:name="com.specialOrder.utils.MyApp"
+        android:name="com.orderMate.utils.MyApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -18,7 +18,7 @@
         android:theme="@style/Theme.OrderAppClover"
         tools:targetApi="31">
         <activity
-            android:name="com.specialOrder.activities.MainActivity"
+            android:name="com.orderMate.activities.MainActivity"
             android:exported="true"
             android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
@@ -27,13 +27,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.OverlayActivity"
+            android:name="com.orderMate.activities.OverlayActivity"
             android:excludeFromRecents="true"
             android:taskAffinity="your.unique.task.affinity"
             android:theme="@style/AppTheme.Dialog" />
 
         <receiver
-            android:name=".broadcast.LineItemAddedReceiver"
+            android:name="com.orderMate.broadcast.LineItemAddedReceiver"
             android:enabled="true"
             android:exported="true"
             tools:ignore="ExportedReceiver">
@@ -50,7 +50,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".fragment.FloatingWidgetService"/>
+        <service android:name="com.orderMate.fragment.FloatingWidgetService"/>
     </application>
 
 </manifest>

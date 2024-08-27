@@ -8,17 +8,17 @@ plugins {
 }
 
 android {
-    namespace = "com.specialOrder"
-    compileSdk =
-        34  // for clover app we need to compile the app to max version that android supports
-
+//    alias : Cert
+//    password : 123456
+    namespace = "com.orderMate" // "com.orderMate"
+    compileSdk = 34  // for clover app we need to compile the app to max version that android supports
     defaultConfig {
-        applicationId = "com.specialOrder"
+        applicationId = "com.orderMate" // "com.orderMate"
         minSdk = 17   // for clover apps we need to setup the minimum support sdk to 17
         //noinspection ExpiredTargetSdkVersion
         targetSdk = 25  // for clover app this is the max target version it supports.
-        versionCode = 19
-        versionName = "1.0"
+        versionCode = 24
+        versionName = "1.0.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -102,6 +102,7 @@ dependencies {
     implementation("com.google.firebase:firebase-database")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
+
 
     // messaging Bird
     implementation("com.messagebird:messagebird-api:6.1.7")
