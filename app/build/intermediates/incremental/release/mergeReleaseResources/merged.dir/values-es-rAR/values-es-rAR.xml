@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="backToRegisterDescription">Gire a la derecha para que la pantalla quede orientada al comerciante</string>
+    <string name="returnToMerchant">Entregue el dispositivo al empleado</string>
+    <string name="returnToMerchantFontFamily">sans-serif-light</string>
+    <string name="returnToMerchantPaymentSuccessful">Gracias por su compra.\n Entregue el dispositivo al empleado</string>
+    <string name="returnToMerchantTitle">¡Listo!</string>
+    <string name="rotateInstructions">Gracias por su compra.\nPor favor, gire la pantalla a su posición original.</string>
+    <string name="title_activity_account_chooser">Cuentas de Clover</string>
+</resources>

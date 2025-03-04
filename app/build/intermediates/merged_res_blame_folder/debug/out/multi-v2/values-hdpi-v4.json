@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.orderMate.app-mergeDebugResources-53:/values-hdpi-v4/values-hdpi-v4.xml",
+            "map": [
+                {
+                    "source": "/Users/chicmic/.gradle/caches/transforms-3/f78a8135a1d2c56a982d366d1d05a147/transformed/appcompat-1.6.1/res/values-hdpi-v4/values-hdpi-v4.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "6",
+                        "endColumns": "13",
+                        "endOffsets": "327"
+                    }
+                }
+            ]
+        }
+    ]
+}

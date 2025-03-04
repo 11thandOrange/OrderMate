@@ -21,6 +21,7 @@ class MyApp : Application() {
     private var merchantConnector: MerchantConnector? = null
 
     companion object {
+         var latestAxis: Pair<Int?, Int?>? = Pair(700, 700)
 
         /*
           * We will basically apply the filters on the basis of indexing

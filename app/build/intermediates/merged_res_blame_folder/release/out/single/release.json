@@ -1,0 +1,670 @@
+[
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_cart.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_cart.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "com.orderMate.app-main-56:/mipmap-hdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.orderMate.app-main-56:/mipmap-xxxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_item_spinner_heading.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/item_spinner_heading.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_cancel.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_cancel.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_app_icon.png.flat",
+        "source": "com.orderMate.app-main-56:/drawable/app_icon.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_add.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_add.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_plus.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_plus.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_item_spinner.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/item_spinner.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_item_notes_spinner.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/item_notes_spinner.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_ic_tick.png.flat",
+        "source": "com.orderMate.app-main-56:/drawable/ic_tick.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_item_customer.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/item_customer.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_search.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_search.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_arrow_down.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_arrow_down.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_more.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_more.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_back.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_back.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_launcher_background.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_calender.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_calender.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_more.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_more.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_cart.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_cart.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_edit.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_edit.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_add_orange.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_add_orange.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_add.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_add.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_button_background_red.xml.flat",
+        "source": "com.orderMate.app-main-56:/drawable/button_background_red.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_cancel.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_cancel.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_back.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_back.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_up_arrow.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_up_arrow.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_add_orange.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_add_orange.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_back.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_back.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_button_background_border.xml.flat",
+        "source": "com.orderMate.app-main-56:/drawable/button_background_border.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_send.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_send.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_refresh.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_refresh.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_add_orange.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_add_orange.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_back.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_back.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_cancel.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_cancel.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_item_grid.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/item_grid.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_plus.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_plus.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_arrow_down.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_arrow_down.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_send.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_send.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_up_arrow.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_up_arrow.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_arrow_down.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_arrow_down.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_item_order_sub_items.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/item_order_sub_items.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_white_button_background.xml.flat",
+        "source": "com.orderMate.app-main-56:/drawable/white_button_background.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "com.orderMate.app-main-56:/mipmap-xhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_back.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_back.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_cancel.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_cancel.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_launcher_foreground.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_calender.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_calender.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_ic_order_big.png.flat",
+        "source": "com.orderMate.app-main-56:/drawable/ic_order_big.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_dialog_send_notification.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/dialog_send_notification.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_cancel.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_cancel.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_ic_cheque.png.flat",
+        "source": "com.orderMate.app-main-56:/drawable/ic_cheque.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_refresh.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_refresh.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_calender.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_calender.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_send.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_send.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_arrow_down.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_arrow_down.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_rounded_dialog_background.xml.flat",
+        "source": "com.orderMate.app-main-56:/drawable/rounded_dialog_background.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_cart.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_cart.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_add.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_add.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.orderMate.app-main-56:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_refresh.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_refresh.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_add.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_add.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_launcher_background.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_up_arrow.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_up_arrow.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_plus.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_plus.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/menu_custom_menu.xml.flat",
+        "source": "com.orderMate.app-main-56:/menu/custom_menu.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_send.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_send.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_item_custom_menu_items.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/item_custom_menu_items.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_button_background_orange.xml.flat",
+        "source": "com.orderMate.app-main-56:/drawable/button_background_orange.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_calender.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_calender.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_back.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_back.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_up_arrow.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_up_arrow.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_cart.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_cart.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_plus.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_plus.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_edit.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_edit.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/navigation_nav_graph.xml.flat",
+        "source": "com.orderMate.app-main-56:/navigation/nav_graph.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_refresh.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_refresh.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_add_orange.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_add_orange.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_add.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_add.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_edit.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_edit.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_search.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_search.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_up_arrow.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_up_arrow.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_cart.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_cart.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_ic_hypen.png.flat",
+        "source": "com.orderMate.app-main-56:/drawable/ic_hypen.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_add.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_add.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_activity_overlay.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/activity_overlay.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/xml_backup_rules.xml.flat",
+        "source": "com.orderMate.app-main-56:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_search.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_search.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_more.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_more.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_plus.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_plus.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_cart.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_cart.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_launcher_foreground.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_send.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_send.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_edit.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_edit.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_more.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_more.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.orderMate.app-main-56:/mipmap-xxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_custom_fields_border.xml.flat",
+        "source": "com.orderMate.app-main-56:/drawable/custom_fields_border.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_add_orange.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_add_orange.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_refresh.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_refresh.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_border_background_green.xml.flat",
+        "source": "com.orderMate.app-main-56:/drawable/border_background_green.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_back.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_back.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_search.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_search.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_ordermate_basket_layout.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/ordermate_basket_layout.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_edit.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_edit.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_ic_card.png.flat",
+        "source": "com.orderMate.app-main-56:/drawable/ic_card.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_refresh.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_refresh.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_fragment_custom_fields.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/fragment_custom_fields.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_spinner_item_click.xml.flat",
+        "source": "com.orderMate.app-main-56:/drawable/spinner_item_click.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_launcher_background.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_arrow_down.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_arrow_down.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_cancel.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_cancel.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_switch_thumb_states.xml.flat",
+        "source": "com.orderMate.app-main-56:/drawable/switch_thumb_states.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_cancel.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_cancel.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_add.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_add.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_listitem_order.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/listitem_order.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_fragment_order_history.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/fragment_order_history.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_calender.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_calender.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_up_arrow.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_up_arrow.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_ic_order.png.flat",
+        "source": "com.orderMate.app-main-56:/drawable/ic_order.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_item_header_orders.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/item_header_orders.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_calender.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_calender.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_launcher_foreground.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "com.orderMate.app-main-56:/mipmap-hdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_button_background.xml.flat",
+        "source": "com.orderMate.app-main-56:/drawable/button_background.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_send.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_send.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_add_orange.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_add_orange.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_launcher_background.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_launcher_background.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_launcher_background.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_search.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_search.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_more.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_more.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_launcher_background.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.orderMate.app-main-56:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "com.orderMate.app-main-56:/mipmap-xhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_arrow_down.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_arrow_down.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v21_ic_refresh.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v21/ic_refresh.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_search.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_search.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_item_transaction.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/item_transaction.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "com.orderMate.app-main-56:/mipmap-mdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_fragment_order_detail.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/fragment_order_detail.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "com.orderMate.app-main-56:/mipmap-xxxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_more.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_more.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_add_orange.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_add_orange.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_item_order.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/item_order.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_activity_main.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxxhdpi_ic_calender.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxxhdpi/ic_calender.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_plus.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_plus.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_launcher_background.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_arrow_down.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_arrow_down.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_edit.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_edit.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_more.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_more.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_plus.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_plus.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_spinner_background.xml.flat",
+        "source": "com.orderMate.app-main-56:/drawable/spinner_background.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-mdpi_ic_send.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-mdpi/ic_send.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/layout_dialog_update_line_items.xml.flat",
+        "source": "com.orderMate.app-main-56:/layout/dialog_update_line_items.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-hdpi_ic_search.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-hdpi/ic_search.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "com.orderMate.app-main-56:/mipmap-xxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_ic_cash.png.flat",
+        "source": "com.orderMate.app-main-56:/drawable/ic_cash.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xhdpi_ic_up_arrow.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xhdpi/ic_up_arrow.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/xml_data_extraction_rules.xml.flat",
+        "source": "com.orderMate.app-main-56:/xml/data_extraction_rules.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-ldpi_ic_edit.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-ldpi/ic_edit.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-anydpi-v24_ic_launcher_foreground.xml.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-anydpi-v24/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "com.orderMate.app-main-56:/mipmap-mdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable-xxhdpi_ic_cart.png.flat",
+        "source": "com.orderMate.app-pngs-50:/drawable-xxhdpi/ic_cart.png"
+    },
+    {
+        "merged": "com.orderMate.app-merged_res-55:/drawable_ic_order_new.png.flat",
+        "source": "com.orderMate.app-main-56:/drawable/ic_order_new.png"
+    }
+]

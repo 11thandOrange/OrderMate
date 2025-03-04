@@ -1,0 +1,749 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:2:1-56:12
+INJECTED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:2:1-56:12
+INJECTED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:2:1-56:12
+INJECTED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:2:1-56:12
+MERGED from [androidx.databinding:viewbinding:8.1.1] /Users/chicmic/.gradle/caches/transforms-3/d49ce2d7001911975b9b550fb012a7f5/transformed/viewbinding-8.1.1/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.navigation:navigation-common:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/e75b977ea3f13e420d1442c2b7d38482/transformed/navigation-common-2.7.7/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.navigation:navigation-common-ktx:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/450d147874dd4744a55eaa6a7a30bac0/transformed/navigation-common-ktx-2.7.7/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.navigation:navigation-ui:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/42e09ffa3c1b2e6767cf21b3096ce7d6/transformed/navigation-ui-2.7.7/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.navigation:navigation-runtime-ktx:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/7abec11de59108c9a33a3635e5550518/transformed/navigation-runtime-ktx-2.7.7/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.navigation:navigation-ui-ktx:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/73fe9d167f768ce483a8963609f67f8a/transformed/navigation-ui-ktx-2.7.7/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.navigation:navigation-fragment-ktx:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/18ec2c8213c641797315a0652fa74794/transformed/navigation-fragment-ktx-2.7.7/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.navigation:navigation-fragment:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/5b52d2369fd8d4e0202e02446a8fbbf3/transformed/navigation-fragment-2.7.7/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.navigation:navigation-runtime:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/5cc3a9cbc2f243eb6c06ad01e0162c3a/transformed/navigation-runtime-2.7.7/AndroidManifest.xml:17:1-22:12
+MERGED from [com.google.android.material:material:1.11.0] /Users/chicmic/.gradle/caches/transforms-3/14e04ca5bdd032ef07ac2eb3b0aba2ec/transformed/material-1.11.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/chicmic/.gradle/caches/transforms-3/bd0b84045b815a5e7b8fd3cb5c1004e8/transformed/constraintlayout-2.1.4/AndroidManifest.xml:2:1-11:12
+MERGED from [androidx.appcompat:appcompat-resources:1.6.1] /Users/chicmic/.gradle/caches/transforms-3/29ab635831de13e0d04d21d328226913/transformed/appcompat-resources-1.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.appcompat:appcompat:1.6.1] /Users/chicmic/.gradle/caches/transforms-3/f78a8135a1d2c56a982d366d1d05a147/transformed/appcompat-1.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/c27f9f5f5a9995eb3f1260624fe572e4/transformed/viewpager2-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:15:1-38:12
+MERGED from [com.google.firebase:firebase-core:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/0ade818e7ce829b704847875d7f8a6e8/transformed/firebase-core-19.0.0/AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.firebase:firebase-analytics:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/232b86131b76bc4d2d1f43a8372a68e3/transformed/firebase-analytics-19.0.0/AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:17:1-46:12
+MERGED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:17:1-36:12
+MERGED from [com.google.android.gms:play-services-measurement-sdk:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/1f0a2b82f94add1e6e4c7a84afa3ca48/transformed/play-services-measurement-sdk-19.0.0/AndroidManifest.xml:17:1-25:12
+MERGED from [com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:2:1-24:12
+MERGED from [com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:2:1-24:12
+MERGED from [com.google.firebase:firebase-installations-interop:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/4ef3089f59d121ef51b816a4dc89692c/transformed/firebase-installations-interop-17.0.0/AndroidManifest.xml:15:1-23:12
+MERGED from [com.google.firebase:firebase-appcheck-interop:16.0.0-beta01] /Users/chicmic/.gradle/caches/transforms-3/d926d0b53279409a840fbef377d3566a/transformed/firebase-appcheck-interop-16.0.0-beta01/AndroidManifest.xml:15:1-26:12
+MERGED from [com.google.firebase:firebase-auth-interop:19.0.2] /Users/chicmic/.gradle/caches/transforms-3/37f1ae1cf3437577c95b8c87fd739b1d/transformed/firebase-auth-interop-19.0.2/AndroidManifest.xml:2:1-10:12
+MERGED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:15:1-40:12
+MERGED from [com.google.firebase:firebase-database-collection:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed3bf5db92b06768db1cc88d12bc8610/transformed/firebase-database-collection-18.0.0/AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.android.gms:play-services-base:17.1.0] /Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0/AndroidManifest.xml:17:1-29:12
+MERGED from [com.google.android.gms:play-services-tasks:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/cae5b2b72fc863d67bbdfdb2b8f08f7f/transformed/play-services-tasks-17.0.0/AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.android.gms:play-services-measurement-impl:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0/AndroidManifest.xml:17:1-31:12
+MERGED from [com.google.android.gms:play-services-ads-identifier:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/7853f14ef1a4c6c2b590320e2c963d50/transformed/play-services-ads-identifier-17.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.gms:play-services-measurement-sdk-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/b5c25991cdbeaaa0bf084404ffb8619c/transformed/play-services-measurement-sdk-api-19.0.0/AndroidManifest.xml:17:1-27:12
+MERGED from [com.google.android.gms:play-services-measurement-base:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f272eaf23914e09564e06edb703e72d/transformed/play-services-measurement-base-19.0.0/AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.android.gms:play-services-stats:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/a3cf3c7c836872b0c74c29520ffaab9d/transformed/play-services-stats-17.0.0/AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.firebase:firebase-measurement-connector:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/58f329deb347fe00d7c6ec13968248a1/transformed/firebase-measurement-connector-19.0.0/AndroidManifest.xml:17:1-25:12
+MERGED from [com.google.android.gms:play-services-basement:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/b73dc83d3a80e324f500d6f71689816c/transformed/play-services-basement-17.0.0/AndroidManifest.xml:17:1-28:12
+MERGED from [androidx.fragment:fragment:1.6.2] /Users/chicmic/.gradle/caches/transforms-3/b993543dba58bf63c363490b9ff58d14/transformed/fragment-1.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.fragment:fragment-ktx:1.6.2] /Users/chicmic/.gradle/caches/transforms-3/ca42987ce35eca0bae4555a3df2a1689/transformed/fragment-ktx-1.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.activity:activity:1.8.0] /Users/chicmic/.gradle/caches/transforms-3/2e08e572a7c7c714001a67e07b2d52a7/transformed/activity-1.8.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.activity:activity-ktx:1.8.0] /Users/chicmic/.gradle/caches/transforms-3/350640a17d0346e9383f488854dec21f/transformed/activity-ktx-1.8.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] /Users/chicmic/.gradle/caches/transforms-3/01c7c9ae865cbbdfeeea010f545b092f/transformed/savedstate-ktx-1.2.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.savedstate:savedstate:1.2.1] /Users/chicmic/.gradle/caches/transforms-3/6df3cc817cd633e01901dad58bd79117/transformed/savedstate-1.2.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/0f0eee40b80e43e3eb69a710e8419773/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/5af2111e40b2d4afd12d2564e853c45b/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/f931f38b5d610d7797157dead68975e6/transformed/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/cc7a794a1ac020f0f28145ff5e4339ed/transformed/emoji2-views-helper-1.2.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/85ad9c60bc098c712f15e4975946a2ad/transformed/lifecycle-viewmodel-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/fa2e7b275f8651d5360f693b6b178ea2/transformed/lifecycle-livedata-core-ktx-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/4d658a4144f790f95e855a041e9dffb3/transformed/lifecycle-livedata-core-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/c359cea59e4afc77bb3280c7ee7178e9/transformed/lifecycle-livedata-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/c1e15b30a2f0f49224d00dc35d3f7295/transformed/lifecycle-viewmodel-savedstate-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core-ktx:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/9f06c59b6e9e1f48881973ed72c626e4/transformed/core-ktx-1.9.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/4b81646bd8b9258cae974a3703193df0/transformed/drawerlayout-1.1.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/7adef92afa91ea315ab4ade152aeae74/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/b0aea5706fdb1219e0292272022c40fc/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/db80b4a082d75e05fd11cc9bb1eb067a/transformed/vectordrawable-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/445b4090e20c07ff29d5a79dfe234137/transformed/recyclerview-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/8d1d7070f81b74b2c454ff335f52cfc4/transformed/slidingpanelayout-1.2.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/2595df58de045559d6f4b6eee9f1418b/transformed/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.customview:customview:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/77cb66da0f9676adac6dea632cc686f3/transformed/customview-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.transition:transition:1.4.1] /Users/chicmic/.gradle/caches/transforms-3/f475475fb392fa3d8c401e403aa3be73/transformed/transition-1.4.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:17:1-30:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/30f463133eaae243c4c40ce16af4a2cb/transformed/lifecycle-runtime-2.6.2/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/0c2a309922b128bef9064c55809f778f/transformed/lifecycle-viewmodel-ktx-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/2c33eae62c961d99b7acfeb31c17f5db/transformed/lifecycle-runtime-ktx-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-ktx:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/1862c47aa7b53124e9141b359051e712/transformed/lifecycle-livedata-ktx-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [com.intuit.sdp:sdp-android:1.0.6] /Users/chicmic/.gradle/caches/transforms-3/c3aafd94f0f1f34a04de7cd146dbeb42/transformed/sdp-android-1.0.6/AndroidManifest.xml:2:1-11:12
+MERGED from [com.intuit.ssp:ssp-android:1.0.6] /Users/chicmic/.gradle/caches/transforms-3/9c9105d05833c9d3f7ddd9d3448fbaa2/transformed/ssp-android-1.0.6/AndroidManifest.xml:2:1-11:12
+MERGED from [com.jakewharton.timber:timber:4.7.1] /Users/chicmic/.gradle/caches/transforms-3/93f9fa6dd3d8fbf369285c76bf158349/transformed/timber-4.7.1/AndroidManifest.xml:2:1-9:12
+MERGED from [com.clover.sdk:clover-android-sdk:304] /Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/AndroidManifest.xml:17:1-29:12
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:15:1-38:12
+MERGED from [com.google.firebase:firebase-encoders-json:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/369b7169a898cd34f97222e955479167/transformed/firebase-encoders-json-18.0.0/AndroidManifest.xml:15:1-23:12
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/aecab1aa62d19be17ae3c176777d7a6f/transformed/cursoradapter-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.cardview:cardview:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb728632fe06b3f1329f20dfcf90e932/transformed/cardview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:15:1-41:12
+MERGED from [com.google.android.datatransport:transport-api:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/5d4938dcbceb788521af039cc53f88fa/transformed/transport-api-3.0.0/AndroidManifest.xml:15:1-22:12
+MERGED from [com.google.firebase:firebase-components:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/3996814285557507b1ac48e064c767e9/transformed/firebase-components-17.0.0/AndroidManifest.xml:15:1-23:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/90423f8a08fef1aac76eb72d7c623b45/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:17:1-55:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/e7815bb338a32b1a748569bab23457be/transformed/startup-runtime-1.1.1/AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/cca6793e549903a727436796a3d7bfe0/transformed/tracing-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/e75b51804934e4a2bdfcc2435411e30e/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.documentfile:documentfile:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/58bf8cd8ba29d64d1ccc9f8c6bb22bfe/transformed/documentfile-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/79283d44d469ef0b6346b528f01eae45/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.print:print:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/8f79376522ede7ed62c99b50223484a4/transformed/print-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /Users/chicmic/.gradle/caches/transforms-3/cc5496e85877be32bac8691456241511/transformed/core-runtime-2.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.annotation:annotation-experimental:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/bd9e4213ed831da72b758fd798ad8f5c/transformed/annotation-experimental-1.3.0/AndroidManifest.xml:17:1-22:12
+	package
+		INJECTED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml
+	xmlns:tools
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:3:5-51
+	android:versionCode
+		INJECTED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:2:11-69
+uses-permission#android.permission.INTERNET
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:5:5-67
+MERGED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:26:5-67
+MERGED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:26:5-67
+MERGED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:23:5-67
+MERGED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:23:5-67
+MERGED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:22:5-67
+MERGED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:22:5-67
+MERGED from [com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:10:5-67
+MERGED from [com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:10:5-67
+MERGED from [com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:11:5-67
+MERGED from [com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:11:5-67
+MERGED from [com.google.android.gms:play-services-measurement-impl:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0/AndroidManifest.xml:23:5-67
+MERGED from [com.google.android.gms:play-services-measurement-impl:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0/AndroidManifest.xml:23:5-67
+MERGED from [com.google.android.gms:play-services-measurement-sdk-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/b5c25991cdbeaaa0bf084404ffb8619c/transformed/play-services-measurement-sdk-api-19.0.0/AndroidManifest.xml:23:5-67
+MERGED from [com.google.android.gms:play-services-measurement-sdk-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/b5c25991cdbeaaa0bf084404ffb8619c/transformed/play-services-measurement-sdk-api-19.0.0/AndroidManifest.xml:23:5-67
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:26:5-67
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:26:5-67
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:5:22-64
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:6:5-79
+MERGED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:25:5-79
+MERGED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:25:5-79
+MERGED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:24:5-79
+MERGED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:24:5-79
+MERGED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:23:5-79
+MERGED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:23:5-79
+MERGED from [com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:10:5-79
+MERGED from [com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:10:5-79
+MERGED from [com.google.android.gms:play-services-measurement-impl:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0/AndroidManifest.xml:24:5-79
+MERGED from [com.google.android.gms:play-services-measurement-impl:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0/AndroidManifest.xml:24:5-79
+MERGED from [com.google.android.gms:play-services-measurement-sdk-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/b5c25991cdbeaaa0bf084404ffb8619c/transformed/play-services-measurement-sdk-api-19.0.0/AndroidManifest.xml:24:5-79
+MERGED from [com.google.android.gms:play-services-measurement-sdk-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/b5c25991cdbeaaa0bf084404ffb8619c/transformed/play-services-measurement-sdk-api-19.0.0/AndroidManifest.xml:24:5-79
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:25:5-79
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:25:5-79
+MERGED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:22:5-79
+MERGED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:22:5-79
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:6:22-76
+uses-permission#android.permission.SYSTEM_ALERT_WINDOW
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:7:5-78
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:7:22-75
+application
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:9:5-54:19
+INJECTED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:9:5-54:19
+MERGED from [com.google.android.material:material:1.11.0] /Users/chicmic/.gradle/caches/transforms-3/14e04ca5bdd032ef07ac2eb3b0aba2ec/transformed/material-1.11.0/AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.material:material:1.11.0] /Users/chicmic/.gradle/caches/transforms-3/14e04ca5bdd032ef07ac2eb3b0aba2ec/transformed/material-1.11.0/AndroidManifest.xml:22:5-20
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/chicmic/.gradle/caches/transforms-3/bd0b84045b815a5e7b8fd3cb5c1004e8/transformed/constraintlayout-2.1.4/AndroidManifest.xml:9:5-20
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/chicmic/.gradle/caches/transforms-3/bd0b84045b815a5e7b8fd3cb5c1004e8/transformed/constraintlayout-2.1.4/AndroidManifest.xml:9:5-20
+MERGED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:28:5-36:19
+MERGED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:28:5-36:19
+MERGED from [com.google.firebase:firebase-core:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/0ade818e7ce829b704847875d7f8a6e8/transformed/firebase-core-19.0.0/AndroidManifest.xml:7:5-20
+MERGED from [com.google.firebase:firebase-core:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/0ade818e7ce829b704847875d7f8a6e8/transformed/firebase-core-19.0.0/AndroidManifest.xml:7:5-20
+MERGED from [com.google.firebase:firebase-analytics:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/232b86131b76bc4d2d1f43a8372a68e3/transformed/firebase-analytics-19.0.0/AndroidManifest.xml:7:5-20
+MERGED from [com.google.firebase:firebase-analytics:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/232b86131b76bc4d2d1f43a8372a68e3/transformed/firebase-analytics-19.0.0/AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:28:5-44:19
+MERGED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:28:5-44:19
+MERGED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:26:5-34:19
+MERGED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:26:5-34:19
+MERGED from [com.google.android.gms:play-services-measurement-sdk:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/1f0a2b82f94add1e6e4c7a84afa3ca48/transformed/play-services-measurement-sdk-19.0.0/AndroidManifest.xml:22:5-23:19
+MERGED from [com.google.android.gms:play-services-measurement-sdk:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/1f0a2b82f94add1e6e4c7a84afa3ca48/transformed/play-services-measurement-sdk-19.0.0/AndroidManifest.xml:22:5-23:19
+MERGED from [com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:14:5-22:19
+MERGED from [com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:14:5-22:19
+MERGED from [com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:14:5-22:19
+MERGED from [com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:14:5-22:19
+MERGED from [com.google.firebase:firebase-appcheck-interop:16.0.0-beta01] /Users/chicmic/.gradle/caches/transforms-3/d926d0b53279409a840fbef377d3566a/transformed/firebase-appcheck-interop-16.0.0-beta01/AndroidManifest.xml:24:5-20
+MERGED from [com.google.firebase:firebase-appcheck-interop:16.0.0-beta01] /Users/chicmic/.gradle/caches/transforms-3/d926d0b53279409a840fbef377d3566a/transformed/firebase-appcheck-interop-16.0.0-beta01/AndroidManifest.xml:24:5-20
+MERGED from [com.google.firebase:firebase-auth-interop:19.0.2] /Users/chicmic/.gradle/caches/transforms-3/37f1ae1cf3437577c95b8c87fd739b1d/transformed/firebase-auth-interop-19.0.2/AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.firebase:firebase-auth-interop:19.0.2] /Users/chicmic/.gradle/caches/transforms-3/37f1ae1cf3437577c95b8c87fd739b1d/transformed/firebase-auth-interop-19.0.2/AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:25:5-38:19
+MERGED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:25:5-38:19
+MERGED from [com.google.android.gms:play-services-base:17.1.0] /Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0/AndroidManifest.xml:22:5-27:19
+MERGED from [com.google.android.gms:play-services-base:17.1.0] /Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0/AndroidManifest.xml:22:5-27:19
+MERGED from [com.google.android.gms:play-services-tasks:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/cae5b2b72fc863d67bbdfdb2b8f08f7f/transformed/play-services-tasks-17.0.0/AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-tasks:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/cae5b2b72fc863d67bbdfdb2b8f08f7f/transformed/play-services-tasks-17.0.0/AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-measurement-impl:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0/AndroidManifest.xml:28:5-29:19
+MERGED from [com.google.android.gms:play-services-measurement-impl:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0/AndroidManifest.xml:28:5-29:19
+MERGED from [com.google.android.gms:play-services-ads-identifier:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/7853f14ef1a4c6c2b590320e2c963d50/transformed/play-services-ads-identifier-17.0.0/AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.gms:play-services-ads-identifier:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/7853f14ef1a4c6c2b590320e2c963d50/transformed/play-services-ads-identifier-17.0.0/AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.gms:play-services-measurement-base:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f272eaf23914e09564e06edb703e72d/transformed/play-services-measurement-base-19.0.0/AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-measurement-base:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f272eaf23914e09564e06edb703e72d/transformed/play-services-measurement-base-19.0.0/AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-stats:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/a3cf3c7c836872b0c74c29520ffaab9d/transformed/play-services-stats-17.0.0/AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-stats:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/a3cf3c7c836872b0c74c29520ffaab9d/transformed/play-services-stats-17.0.0/AndroidManifest.xml:7:5-20
+MERGED from [com.google.firebase:firebase-measurement-connector:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/58f329deb347fe00d7c6ec13968248a1/transformed/firebase-measurement-connector-19.0.0/AndroidManifest.xml:22:5-23:19
+MERGED from [com.google.firebase:firebase-measurement-connector:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/58f329deb347fe00d7c6ec13968248a1/transformed/firebase-measurement-connector-19.0.0/AndroidManifest.xml:22:5-23:19
+MERGED from [com.google.android.gms:play-services-basement:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/b73dc83d3a80e324f500d6f71689816c/transformed/play-services-basement-17.0.0/AndroidManifest.xml:22:5-26:19
+MERGED from [com.google.android.gms:play-services-basement:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/b73dc83d3a80e324f500d6f71689816c/transformed/play-services-basement-17.0.0/AndroidManifest.xml:22:5-26:19
+MERGED from [androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:24:5-31:19
+MERGED from [androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:24:5-31:19
+MERGED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:28:5-89
+MERGED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:28:5-89
+MERGED from [com.jakewharton.timber:timber:4.7.1] /Users/chicmic/.gradle/caches/transforms-3/93f9fa6dd3d8fbf369285c76bf158349/transformed/timber-4.7.1/AndroidManifest.xml:7:5-20
+MERGED from [com.jakewharton.timber:timber:4.7.1] /Users/chicmic/.gradle/caches/transforms-3/93f9fa6dd3d8fbf369285c76bf158349/transformed/timber-4.7.1/AndroidManifest.xml:7:5-20
+MERGED from [com.clover.sdk:clover-android-sdk:304] /Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/AndroidManifest.xml:27:5-20
+MERGED from [com.clover.sdk:clover-android-sdk:304] /Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/AndroidManifest.xml:27:5-20
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:28:5-36:19
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:28:5-36:19
+MERGED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:25:5-39:19
+MERGED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:25:5-39:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/90423f8a08fef1aac76eb72d7c623b45/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/90423f8a08fef1aac76eb72d7c623b45/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/e7815bb338a32b1a748569bab23457be/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/e7815bb338a32b1a748569bab23457be/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+	android:extractNativeLibs
+		INJECTED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:28:18-86
+	android:supportsRtl
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:17:9-35
+	android:label
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:15:9-41
+	android:fullBackupContent
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:13:9-54
+	android:roundIcon
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:16:9-47
+	tools:targetApi
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:19:9-29
+	android:icon
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:14:9-42
+	android:allowBackup
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:11:9-35
+	android:theme
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:18:9-52
+	android:dataExtractionRules
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:12:9-65
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:10:9-49
+activity#com.orderMate.activities.MainActivity
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:20:9-28:20
+	android:windowSoftInputMode
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:23:13-60
+	android:exported
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:22:13-36
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:21:13-65
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:24:13-27:29
+action#android.intent.action.MAIN
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:25:17-69
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:25:25-66
+category#android.intent.category.LAUNCHER
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:26:17-77
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:26:27-74
+activity#com.orderMate.activities.OverlayActivity
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:29:9-33:54
+	android:excludeFromRecents
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:31:13-46
+	android:theme
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:33:13-51
+	android:taskAffinity
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:32:13-61
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:30:13-68
+receiver#com.orderMate.broadcast.LineItemAddedReceiver
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:35:9-51:20
+	android:enabled
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:38:13-36
+	tools:ignore
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:39:13-44
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:36:13-73
+intent-filter#action:name: clover.intent.action.ACTIVE_REGISTER_ORDER+action:name:clover.intent.action.V1_ORDER_BUILD_START+action:name:clover.intent.action.V1_ORDER_BUILD_STOP+action:name:com.clover.intent.action.ITEM_SELECT+action:name:com.clover.intent.action.LINE_ITEM_ADDED+action:name:com.clover.intent.action.LINE_ITEM_DELETED+action:name:com.clover.intent.action.ORDER_CREATED+action:name:com.clover.intent.action.ORDER_SAVED+action:name:com.clover.intent.action.PAYMENT_PROCESSED
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:40:13-50:29
+action#com.clover.intent.action.LINE_ITEM_ADDED
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:41:17-83
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:41:25-80
+action#com.clover.intent.action.LINE_ITEM_DELETED
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:42:17-85
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:42:25-82
+action#clover.intent.action.V1_ORDER_BUILD_START
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:43:17-84
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:43:25-81
+action#clover.intent.action.V1_ORDER_BUILD_STOP
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:44:17-83
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:44:25-80
+action#com.clover.intent.action.ITEM_SELECT
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:45:17-79
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:45:25-76
+action#com.clover.intent.action.ORDER_SAVED
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:46:17-79
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:46:25-76
+action#com.clover.intent.action.ORDER_CREATED
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:47:17-81
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:47:25-78
+action# clover.intent.action.ACTIVE_REGISTER_ORDER
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:48:17-85
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:48:25-83
+action#com.clover.intent.action.PAYMENT_PROCESSED
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:49:17-85
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:49:25-82
+service#com.orderMate.fragment.FloatingWidgetService
+ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:53:9-79
+	android:name
+		ADDED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:53:18-77
+uses-sdk
+INJECTED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml
+INJECTED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml
+MERGED from [androidx.databinding:viewbinding:8.1.1] /Users/chicmic/.gradle/caches/transforms-3/d49ce2d7001911975b9b550fb012a7f5/transformed/viewbinding-8.1.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.databinding:viewbinding:8.1.1] /Users/chicmic/.gradle/caches/transforms-3/d49ce2d7001911975b9b550fb012a7f5/transformed/viewbinding-8.1.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-common:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/e75b977ea3f13e420d1442c2b7d38482/transformed/navigation-common-2.7.7/AndroidManifest.xml:20:5-44
+MERGED from [androidx.navigation:navigation-common:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/e75b977ea3f13e420d1442c2b7d38482/transformed/navigation-common-2.7.7/AndroidManifest.xml:20:5-44
+MERGED from [androidx.navigation:navigation-common-ktx:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/450d147874dd4744a55eaa6a7a30bac0/transformed/navigation-common-ktx-2.7.7/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-common-ktx:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/450d147874dd4744a55eaa6a7a30bac0/transformed/navigation-common-ktx-2.7.7/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-ui:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/42e09ffa3c1b2e6767cf21b3096ce7d6/transformed/navigation-ui-2.7.7/AndroidManifest.xml:20:5-44
+MERGED from [androidx.navigation:navigation-ui:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/42e09ffa3c1b2e6767cf21b3096ce7d6/transformed/navigation-ui-2.7.7/AndroidManifest.xml:20:5-44
+MERGED from [androidx.navigation:navigation-runtime-ktx:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/7abec11de59108c9a33a3635e5550518/transformed/navigation-runtime-ktx-2.7.7/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-runtime-ktx:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/7abec11de59108c9a33a3635e5550518/transformed/navigation-runtime-ktx-2.7.7/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-ui-ktx:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/73fe9d167f768ce483a8963609f67f8a/transformed/navigation-ui-ktx-2.7.7/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-ui-ktx:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/73fe9d167f768ce483a8963609f67f8a/transformed/navigation-ui-ktx-2.7.7/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-fragment-ktx:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/18ec2c8213c641797315a0652fa74794/transformed/navigation-fragment-ktx-2.7.7/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-fragment-ktx:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/18ec2c8213c641797315a0652fa74794/transformed/navigation-fragment-ktx-2.7.7/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-fragment:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/5b52d2369fd8d4e0202e02446a8fbbf3/transformed/navigation-fragment-2.7.7/AndroidManifest.xml:20:5-44
+MERGED from [androidx.navigation:navigation-fragment:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/5b52d2369fd8d4e0202e02446a8fbbf3/transformed/navigation-fragment-2.7.7/AndroidManifest.xml:20:5-44
+MERGED from [androidx.navigation:navigation-runtime:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/5cc3a9cbc2f243eb6c06ad01e0162c3a/transformed/navigation-runtime-2.7.7/AndroidManifest.xml:20:5-44
+MERGED from [androidx.navigation:navigation-runtime:2.7.7] /Users/chicmic/.gradle/caches/transforms-3/5cc3a9cbc2f243eb6c06ad01e0162c3a/transformed/navigation-runtime-2.7.7/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.material:material:1.11.0] /Users/chicmic/.gradle/caches/transforms-3/14e04ca5bdd032ef07ac2eb3b0aba2ec/transformed/material-1.11.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.material:material:1.11.0] /Users/chicmic/.gradle/caches/transforms-3/14e04ca5bdd032ef07ac2eb3b0aba2ec/transformed/material-1.11.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/chicmic/.gradle/caches/transforms-3/bd0b84045b815a5e7b8fd3cb5c1004e8/transformed/constraintlayout-2.1.4/AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/chicmic/.gradle/caches/transforms-3/bd0b84045b815a5e7b8fd3cb5c1004e8/transformed/constraintlayout-2.1.4/AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.appcompat:appcompat-resources:1.6.1] /Users/chicmic/.gradle/caches/transforms-3/29ab635831de13e0d04d21d328226913/transformed/appcompat-resources-1.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat-resources:1.6.1] /Users/chicmic/.gradle/caches/transforms-3/29ab635831de13e0d04d21d328226913/transformed/appcompat-resources-1.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat:1.6.1] /Users/chicmic/.gradle/caches/transforms-3/f78a8135a1d2c56a982d366d1d05a147/transformed/appcompat-1.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat:1.6.1] /Users/chicmic/.gradle/caches/transforms-3/f78a8135a1d2c56a982d366d1d05a147/transformed/appcompat-1.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/c27f9f5f5a9995eb3f1260624fe572e4/transformed/viewpager2-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/c27f9f5f5a9995eb3f1260624fe572e4/transformed/viewpager2-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:19:5-21:41
+MERGED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:19:5-21:41
+MERGED from [com.google.firebase:firebase-core:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/0ade818e7ce829b704847875d7f8a6e8/transformed/firebase-core-19.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-core:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/0ade818e7ce829b704847875d7f8a6e8/transformed/firebase-core-19.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-analytics:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/232b86131b76bc4d2d1f43a8372a68e3/transformed/firebase-analytics-19.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-analytics:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/232b86131b76bc4d2d1f43a8372a68e3/transformed/firebase-analytics-19.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-measurement-sdk:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/1f0a2b82f94add1e6e4c7a84afa3ca48/transformed/play-services-measurement-sdk-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-measurement-sdk:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/1f0a2b82f94add1e6e4c7a84afa3ca48/transformed/play-services-measurement-sdk-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:6:5-8:41
+MERGED from [com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:6:5-8:41
+MERGED from [com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:6:5-8:41
+MERGED from [com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:6:5-8:41
+MERGED from [com.google.firebase:firebase-installations-interop:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/4ef3089f59d121ef51b816a4dc89692c/transformed/firebase-installations-interop-17.0.0/AndroidManifest.xml:19:5-21:41
+MERGED from [com.google.firebase:firebase-installations-interop:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/4ef3089f59d121ef51b816a4dc89692c/transformed/firebase-installations-interop-17.0.0/AndroidManifest.xml:19:5-21:41
+MERGED from [com.google.firebase:firebase-appcheck-interop:16.0.0-beta01] /Users/chicmic/.gradle/caches/transforms-3/d926d0b53279409a840fbef377d3566a/transformed/firebase-appcheck-interop-16.0.0-beta01/AndroidManifest.xml:19:5-21:41
+MERGED from [com.google.firebase:firebase-appcheck-interop:16.0.0-beta01] /Users/chicmic/.gradle/caches/transforms-3/d926d0b53279409a840fbef377d3566a/transformed/firebase-appcheck-interop-16.0.0-beta01/AndroidManifest.xml:19:5-21:41
+MERGED from [com.google.firebase:firebase-auth-interop:19.0.2] /Users/chicmic/.gradle/caches/transforms-3/37f1ae1cf3437577c95b8c87fd739b1d/transformed/firebase-auth-interop-19.0.2/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-auth-interop:19.0.2] /Users/chicmic/.gradle/caches/transforms-3/37f1ae1cf3437577c95b8c87fd739b1d/transformed/firebase-auth-interop-19.0.2/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.firebase:firebase-database-collection:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed3bf5db92b06768db1cc88d12bc8610/transformed/firebase-database-collection-18.0.0/AndroidManifest.xml:5:5-7:41
+MERGED from [com.google.firebase:firebase-database-collection:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed3bf5db92b06768db1cc88d12bc8610/transformed/firebase-database-collection-18.0.0/AndroidManifest.xml:5:5-7:41
+MERGED from [com.google.android.gms:play-services-base:17.1.0] /Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-base:17.1.0] /Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-tasks:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/cae5b2b72fc863d67bbdfdb2b8f08f7f/transformed/play-services-tasks-17.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-tasks:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/cae5b2b72fc863d67bbdfdb2b8f08f7f/transformed/play-services-tasks-17.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-measurement-impl:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-measurement-impl:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-ads-identifier:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/7853f14ef1a4c6c2b590320e2c963d50/transformed/play-services-ads-identifier-17.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-ads-identifier:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/7853f14ef1a4c6c2b590320e2c963d50/transformed/play-services-ads-identifier-17.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-measurement-sdk-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/b5c25991cdbeaaa0bf084404ffb8619c/transformed/play-services-measurement-sdk-api-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-measurement-sdk-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/b5c25991cdbeaaa0bf084404ffb8619c/transformed/play-services-measurement-sdk-api-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-measurement-base:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f272eaf23914e09564e06edb703e72d/transformed/play-services-measurement-base-19.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-measurement-base:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f272eaf23914e09564e06edb703e72d/transformed/play-services-measurement-base-19.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-stats:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/a3cf3c7c836872b0c74c29520ffaab9d/transformed/play-services-stats-17.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-stats:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/a3cf3c7c836872b0c74c29520ffaab9d/transformed/play-services-stats-17.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-measurement-connector:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/58f329deb347fe00d7c6ec13968248a1/transformed/firebase-measurement-connector-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.firebase:firebase-measurement-connector:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/58f329deb347fe00d7c6ec13968248a1/transformed/firebase-measurement-connector-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-basement:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/b73dc83d3a80e324f500d6f71689816c/transformed/play-services-basement-17.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-basement:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/b73dc83d3a80e324f500d6f71689816c/transformed/play-services-basement-17.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.fragment:fragment:1.6.2] /Users/chicmic/.gradle/caches/transforms-3/b993543dba58bf63c363490b9ff58d14/transformed/fragment-1.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.fragment:fragment:1.6.2] /Users/chicmic/.gradle/caches/transforms-3/b993543dba58bf63c363490b9ff58d14/transformed/fragment-1.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.fragment:fragment-ktx:1.6.2] /Users/chicmic/.gradle/caches/transforms-3/ca42987ce35eca0bae4555a3df2a1689/transformed/fragment-ktx-1.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.fragment:fragment-ktx:1.6.2] /Users/chicmic/.gradle/caches/transforms-3/ca42987ce35eca0bae4555a3df2a1689/transformed/fragment-ktx-1.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.8.0] /Users/chicmic/.gradle/caches/transforms-3/2e08e572a7c7c714001a67e07b2d52a7/transformed/activity-1.8.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.8.0] /Users/chicmic/.gradle/caches/transforms-3/2e08e572a7c7c714001a67e07b2d52a7/transformed/activity-1.8.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity-ktx:1.8.0] /Users/chicmic/.gradle/caches/transforms-3/350640a17d0346e9383f488854dec21f/transformed/activity-ktx-1.8.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-ktx:1.8.0] /Users/chicmic/.gradle/caches/transforms-3/350640a17d0346e9383f488854dec21f/transformed/activity-ktx-1.8.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] /Users/chicmic/.gradle/caches/transforms-3/01c7c9ae865cbbdfeeea010f545b092f/transformed/savedstate-ktx-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] /Users/chicmic/.gradle/caches/transforms-3/01c7c9ae865cbbdfeeea010f545b092f/transformed/savedstate-ktx-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] /Users/chicmic/.gradle/caches/transforms-3/6df3cc817cd633e01901dad58bd79117/transformed/savedstate-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] /Users/chicmic/.gradle/caches/transforms-3/6df3cc817cd633e01901dad58bd79117/transformed/savedstate-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/0f0eee40b80e43e3eb69a710e8419773/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/0f0eee40b80e43e3eb69a710e8419773/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/5af2111e40b2d4afd12d2564e853c45b/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/5af2111e40b2d4afd12d2564e853c45b/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/f931f38b5d610d7797157dead68975e6/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/f931f38b5d610d7797157dead68975e6/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/cc7a794a1ac020f0f28145ff5e4339ed/transformed/emoji2-views-helper-1.2.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/cc7a794a1ac020f0f28145ff5e4339ed/transformed/emoji2-views-helper-1.2.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/85ad9c60bc098c712f15e4975946a2ad/transformed/lifecycle-viewmodel-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/85ad9c60bc098c712f15e4975946a2ad/transformed/lifecycle-viewmodel-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/fa2e7b275f8651d5360f693b6b178ea2/transformed/lifecycle-livedata-core-ktx-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/fa2e7b275f8651d5360f693b6b178ea2/transformed/lifecycle-livedata-core-ktx-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/4d658a4144f790f95e855a041e9dffb3/transformed/lifecycle-livedata-core-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/4d658a4144f790f95e855a041e9dffb3/transformed/lifecycle-livedata-core-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/c359cea59e4afc77bb3280c7ee7178e9/transformed/lifecycle-livedata-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/c359cea59e4afc77bb3280c7ee7178e9/transformed/lifecycle-livedata-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/c1e15b30a2f0f49224d00dc35d3f7295/transformed/lifecycle-viewmodel-savedstate-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/c1e15b30a2f0f49224d00dc35d3f7295/transformed/lifecycle-viewmodel-savedstate-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core-ktx:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/9f06c59b6e9e1f48881973ed72c626e4/transformed/core-ktx-1.9.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/9f06c59b6e9e1f48881973ed72c626e4/transformed/core-ktx-1.9.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/4b81646bd8b9258cae974a3703193df0/transformed/drawerlayout-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/4b81646bd8b9258cae974a3703193df0/transformed/drawerlayout-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/7adef92afa91ea315ab4ade152aeae74/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/7adef92afa91ea315ab4ade152aeae74/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/b0aea5706fdb1219e0292272022c40fc/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/b0aea5706fdb1219e0292272022c40fc/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/db80b4a082d75e05fd11cc9bb1eb067a/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/db80b4a082d75e05fd11cc9bb1eb067a/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/445b4090e20c07ff29d5a79dfe234137/transformed/recyclerview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/445b4090e20c07ff29d5a79dfe234137/transformed/recyclerview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/8d1d7070f81b74b2c454ff335f52cfc4/transformed/slidingpanelayout-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/8d1d7070f81b74b2c454ff335f52cfc4/transformed/slidingpanelayout-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager:viewpager:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/2595df58de045559d6f4b6eee9f1418b/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/2595df58de045559d6f4b6eee9f1418b/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/77cb66da0f9676adac6dea632cc686f3/transformed/customview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.customview:customview:1.1.0] /Users/chicmic/.gradle/caches/transforms-3/77cb66da0f9676adac6dea632cc686f3/transformed/customview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.transition:transition:1.4.1] /Users/chicmic/.gradle/caches/transforms-3/f475475fb392fa3d8c401e403aa3be73/transformed/transition-1.4.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.transition:transition:1.4.1] /Users/chicmic/.gradle/caches/transforms-3/f475475fb392fa3d8c401e403aa3be73/transformed/transition-1.4.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/30f463133eaae243c4c40ce16af4a2cb/transformed/lifecycle-runtime-2.6.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/30f463133eaae243c4c40ce16af4a2cb/transformed/lifecycle-runtime-2.6.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/0c2a309922b128bef9064c55809f778f/transformed/lifecycle-viewmodel-ktx-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/0c2a309922b128bef9064c55809f778f/transformed/lifecycle-viewmodel-ktx-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/2c33eae62c961d99b7acfeb31c17f5db/transformed/lifecycle-runtime-ktx-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/2c33eae62c961d99b7acfeb31c17f5db/transformed/lifecycle-runtime-ktx-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-ktx:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/1862c47aa7b53124e9141b359051e712/transformed/lifecycle-livedata-ktx-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-ktx:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/1862c47aa7b53124e9141b359051e712/transformed/lifecycle-livedata-ktx-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [com.intuit.sdp:sdp-android:1.0.6] /Users/chicmic/.gradle/caches/transforms-3/c3aafd94f0f1f34a04de7cd146dbeb42/transformed/sdp-android-1.0.6/AndroidManifest.xml:7:5-9:41
+MERGED from [com.intuit.sdp:sdp-android:1.0.6] /Users/chicmic/.gradle/caches/transforms-3/c3aafd94f0f1f34a04de7cd146dbeb42/transformed/sdp-android-1.0.6/AndroidManifest.xml:7:5-9:41
+MERGED from [com.intuit.ssp:ssp-android:1.0.6] /Users/chicmic/.gradle/caches/transforms-3/9c9105d05833c9d3f7ddd9d3448fbaa2/transformed/ssp-android-1.0.6/AndroidManifest.xml:7:5-9:41
+MERGED from [com.intuit.ssp:ssp-android:1.0.6] /Users/chicmic/.gradle/caches/transforms-3/9c9105d05833c9d3f7ddd9d3448fbaa2/transformed/ssp-android-1.0.6/AndroidManifest.xml:7:5-9:41
+MERGED from [com.jakewharton.timber:timber:4.7.1] /Users/chicmic/.gradle/caches/transforms-3/93f9fa6dd3d8fbf369285c76bf158349/transformed/timber-4.7.1/AndroidManifest.xml:5:5-43
+MERGED from [com.jakewharton.timber:timber:4.7.1] /Users/chicmic/.gradle/caches/transforms-3/93f9fa6dd3d8fbf369285c76bf158349/transformed/timber-4.7.1/AndroidManifest.xml:5:5-43
+MERGED from [com.clover.sdk:clover-android-sdk:304] /Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/AndroidManifest.xml:23:5-25:41
+MERGED from [com.clover.sdk:clover-android-sdk:304] /Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/AndroidManifest.xml:23:5-25:41
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:19:5-21:41
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:19:5-21:41
+MERGED from [com.google.firebase:firebase-encoders-json:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/369b7169a898cd34f97222e955479167/transformed/firebase-encoders-json-18.0.0/AndroidManifest.xml:19:5-21:41
+MERGED from [com.google.firebase:firebase-encoders-json:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/369b7169a898cd34f97222e955479167/transformed/firebase-encoders-json-18.0.0/AndroidManifest.xml:19:5-21:41
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/aecab1aa62d19be17ae3c176777d7a6f/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/aecab1aa62d19be17ae3c176777d7a6f/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cardview:cardview:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb728632fe06b3f1329f20dfcf90e932/transformed/cardview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cardview:cardview:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb728632fe06b3f1329f20dfcf90e932/transformed/cardview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:18:5-20:41
+MERGED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:18:5-20:41
+MERGED from [com.google.android.datatransport:transport-api:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/5d4938dcbceb788521af039cc53f88fa/transformed/transport-api-3.0.0/AndroidManifest.xml:18:5-20:41
+MERGED from [com.google.android.datatransport:transport-api:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/5d4938dcbceb788521af039cc53f88fa/transformed/transport-api-3.0.0/AndroidManifest.xml:18:5-20:41
+MERGED from [com.google.firebase:firebase-components:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/3996814285557507b1ac48e064c767e9/transformed/firebase-components-17.0.0/AndroidManifest.xml:19:5-21:41
+MERGED from [com.google.firebase:firebase-components:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/3996814285557507b1ac48e064c767e9/transformed/firebase-components-17.0.0/AndroidManifest.xml:19:5-21:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/90423f8a08fef1aac76eb72d7c623b45/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/90423f8a08fef1aac76eb72d7c623b45/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/e7815bb338a32b1a748569bab23457be/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/e7815bb338a32b1a748569bab23457be/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/cca6793e549903a727436796a3d7bfe0/transformed/tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.tracing:tracing:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/cca6793e549903a727436796a3d7bfe0/transformed/tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/e75b51804934e4a2bdfcc2435411e30e/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/e75b51804934e4a2bdfcc2435411e30e/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/58bf8cd8ba29d64d1ccc9f8c6bb22bfe/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/58bf8cd8ba29d64d1ccc9f8c6bb22bfe/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/79283d44d469ef0b6346b528f01eae45/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/79283d44d469ef0b6346b528f01eae45/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/8f79376522ede7ed62c99b50223484a4/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/8f79376522ede7ed62c99b50223484a4/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /Users/chicmic/.gradle/caches/transforms-3/cc5496e85877be32bac8691456241511/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /Users/chicmic/.gradle/caches/transforms-3/cc5496e85877be32bac8691456241511/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/bd9e4213ed831da72b758fd798ad8f5c/transformed/annotation-experimental-1.3.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/bd9e4213ed831da72b758fd798ad8f5c/transformed/annotation-experimental-1.3.0/AndroidManifest.xml:20:5-44
+	android:targetSdkVersion
+		INJECTED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml
+service#com.google.firebase.components.ComponentDiscoveryService
+ADDED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:29:9-35:19
+MERGED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:27:9-33:19
+MERGED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:27:9-33:19
+MERGED from [com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:15:9-21:19
+MERGED from [com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:15:9-21:19
+MERGED from [com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:15:9-21:19
+MERGED from [com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:15:9-21:19
+MERGED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:33:9-37:35
+MERGED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:33:9-37:35
+	android:exported
+		ADDED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:31:13-37
+	tools:targetApi
+		ADDED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:37:13-32
+	android:directBootAware
+		ADDED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:35:13-43
+	android:name
+		ADDED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:30:13-84
+meta-data#com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar
+ADDED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:32:13-34:85
+	android:value
+		ADDED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:34:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:33:17-109
+uses-permission#android.permission.WAKE_LOCK
+ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:25:5-68
+MERGED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:24:5-68
+MERGED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:24:5-68
+MERGED from [com.google.android.gms:play-services-measurement-impl:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0/AndroidManifest.xml:25:5-68
+MERGED from [com.google.android.gms:play-services-measurement-impl:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0/AndroidManifest.xml:25:5-68
+MERGED from [com.google.android.gms:play-services-measurement-sdk-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/b5c25991cdbeaaa0bf084404ffb8619c/transformed/play-services-measurement-sdk-api-19.0.0/AndroidManifest.xml:25:5-68
+MERGED from [com.google.android.gms:play-services-measurement-sdk-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/b5c25991cdbeaaa0bf084404ffb8619c/transformed/play-services-measurement-sdk-api-19.0.0/AndroidManifest.xml:25:5-68
+	android:name
+		ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:25:22-65
+uses-permission#com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE
+ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:26:5-110
+MERGED from [com.google.android.gms:play-services-measurement-impl:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0/AndroidManifest.xml:26:5-110
+MERGED from [com.google.android.gms:play-services-measurement-impl:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0/AndroidManifest.xml:26:5-110
+	android:name
+		ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:26:22-107
+receiver#com.google.android.gms.measurement.AppMeasurementReceiver
+ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:29:9-33:20
+	android:enabled
+		ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:31:13-35
+	android:exported
+		ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:32:13-37
+	android:name
+		ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:30:13-85
+service#com.google.android.gms.measurement.AppMeasurementService
+ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:35:9-38:40
+	android:enabled
+		ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:38:13-37
+	android:name
+		ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:36:13-84
+service#com.google.android.gms.measurement.AppMeasurementJobService
+ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:39:9-43:72
+	android:enabled
+		ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:41:13-35
+	android:exported
+		ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:42:13-37
+	android:permission
+		ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:43:13-69
+	android:name
+		ADDED from [com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:40:13-87
+meta-data#com.google.firebase.components:com.google.firebase.analytics.connector.internal.AnalyticsConnectorRegistrar
+ADDED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:30:13-32:85
+	android:value
+		ADDED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:32:17-82
+	android:name
+		ADDED from [com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:31:17-139
+meta-data#com.google.firebase.components:com.google.firebase.crashlytics.CrashlyticsRegistrar
+ADDED from [com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:18:13-20:85
+	android:value
+		ADDED from [com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:20:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:19:17-115
+meta-data#com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar
+ADDED from [com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:18:13-20:85
+	android:value
+		ADDED from [com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:20:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:19:17-127
+provider#com.google.firebase.provider.FirebaseInitProvider
+ADDED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:26:9-31:39
+	android:authorities
+		ADDED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:28:13-72
+	android:exported
+		ADDED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:30:13-37
+	android:directBootAware
+		ADDED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:29:13-43
+	android:initOrder
+		ADDED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:31:13-36
+	android:name
+		ADDED from [com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:27:13-77
+activity#com.google.android.gms.common.api.GoogleApiActivity
+ADDED from [com.google.android.gms:play-services-base:17.1.0] /Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0/AndroidManifest.xml:23:9-26:75
+	android:exported
+		ADDED from [com.google.android.gms:play-services-base:17.1.0] /Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0/AndroidManifest.xml:25:13-37
+	android:theme
+		ADDED from [com.google.android.gms:play-services-base:17.1.0] /Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0/AndroidManifest.xml:26:13-72
+	android:name
+		ADDED from [com.google.android.gms:play-services-base:17.1.0] /Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0/AndroidManifest.xml:24:13-79
+meta-data#com.google.android.gms.version
+ADDED from [com.google.android.gms:play-services-basement:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/b73dc83d3a80e324f500d6f71689816c/transformed/play-services-basement-17.0.0/AndroidManifest.xml:23:9-25:69
+	android:value
+		ADDED from [com.google.android.gms:play-services-basement:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/b73dc83d3a80e324f500d6f71689816c/transformed/play-services-basement-17.0.0/AndroidManifest.xml:25:13-66
+	android:name
+		ADDED from [com.google.android.gms:play-services-basement:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/b73dc83d3a80e324f500d6f71689816c/transformed/play-services-basement-17.0.0/AndroidManifest.xml:24:13-58
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/e7815bb338a32b1a748569bab23457be/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/chicmic/.gradle/caches/transforms-3/e7815bb338a32b1a748569bab23457be/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:28:13-31
+	android:authorities
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:26:13-68
+	android:exported
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:27:13-37
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:25:13-67
+meta-data#androidx.emoji2.text.EmojiCompatInitializer
+ADDED from [androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:30:17-75
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:30:17-78
+uses-library#androidx.window.extensions
+ADDED from [androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:25:9-27:40
+	android:required
+		ADDED from [androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:27:13-37
+	android:name
+		ADDED from [androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:26:13-54
+uses-library#androidx.window.sidecar
+ADDED from [androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:28:9-30:40
+	android:required
+		ADDED from [androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:30:13-37
+	android:name
+		ADDED from [androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:29:13-51
+permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
+permission#com.orderMate.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
+uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+uses-permission#com.orderMate.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+service#com.google.android.datatransport.runtime.backends.TransportBackendDiscovery
+ADDED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:29:9-35:19
+MERGED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:36:9-38:40
+MERGED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:36:9-38:40
+	android:exported
+		ADDED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:31:13-37
+	android:name
+		ADDED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:30:13-103
+meta-data#backend:com.google.android.datatransport.cct.CctBackendFactory
+ADDED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:32:13-34:39
+	android:value
+		ADDED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:34:17-36
+	android:name
+		ADDED from [com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:33:17-94
+service#com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService
+ADDED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:26:9-30:19
+	android:exported
+		ADDED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:28:13-37
+	android:permission
+		ADDED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:29:13-69
+	android:name
+		ADDED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:27:13-117
+receiver#com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver
+ADDED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:32:9-34:40
+	android:exported
+		ADDED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:34:13-37
+	android:name
+		ADDED from [com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:33:13-132
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:25-92

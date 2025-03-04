@@ -1,0 +1,6 @@
+com.orderShubham.test.app-annotation-experimental-1.3.0-0 /Users/chicmic/.gradle/caches/transforms-3/bd9e4213ed831da72b758fd798ad8f5c/transformed/annotation-experimental-1.3.0/res
+com.orderShubham.test.app-core-1.5.0-1 /Users/chicmic/.gradle/caches/transforms-3/e33bf01f3c3ac7a35b080a4eb40739ae/transformed/core-1.5.0/res
+com.orderShubham.test.app-androidTest-2 /Users/chicmic/SHUBHAM/Special_orders/app/build/generated/res/resValues/androidTest/debug
+com.orderShubham.test.app-mergeDebugAndroidTestResources-3 /Users/chicmic/SHUBHAM/Special_orders/app/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/merged.dir
+com.orderShubham.test.app-mergeDebugAndroidTestResources-4 /Users/chicmic/SHUBHAM/Special_orders/app/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/stripped.dir
+com.orderShubham.test.app-merged_res-5 /Users/chicmic/SHUBHAM/Special_orders/app/build/intermediates/merged_res/debugAndroidTest

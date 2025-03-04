@@ -42,7 +42,6 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
 
     private lateinit var windowManager: WindowManager
     private var params: WindowManager.LayoutParams? = null
-    private var latestAxis: Pair<Int?, Int?>? = Pair(700, 700)
     private var lineItems: MutableList<ItemModal?> = mutableListOf()
     private val binding: OrdermateBasketLayoutBinding? by lazy {
         OrdermateBasketLayoutBinding.inflate(LayoutInflater.from(this))
@@ -80,8 +79,8 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
-                        initialX = params?.x ?: 0
-                        initialY = params?.y ?: 0
+                        initialX =params?.x ?: (MyApp.latestAxis!!.first?:0)
+                        initialY = params?.y ?: (MyApp.latestAxis!!.second ?:0)
                         initialTouchX = event.rawX
                         initialTouchY = event.rawY
                         return false
@@ -90,7 +89,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                     MotionEvent.ACTION_MOVE -> {
                         params?.x = initialX + (event.rawX - initialTouchX).toInt()
                         params?.y = initialY + (event.rawY - initialTouchY).toInt()
-                        latestAxis = Pair(params?.x, params?.y)
+                        MyApp.latestAxis = Pair(params?.x, params?.y)
                         windowManager.updateViewLayout(binding?.root, params)
                         return false
                     }
@@ -214,8 +213,8 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             setTheWindowParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                latestAxis?.first,
-                latestAxis?.second
+                MyApp.latestAxis?.first,
+                MyApp.latestAxis?.second
             )
         )
         binding?.container?.hideView()
@@ -285,8 +284,8 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT
         )
-        params?.x = xAxis
-        params?.y = yAxis
+        params?.x = MyApp.latestAxis?.first ?: xAxis
+        params?.y = MyApp.latestAxis?.second ?: yAxis
         return params
     }
 

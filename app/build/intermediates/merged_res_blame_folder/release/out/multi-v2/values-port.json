@@ -1,0 +1,36 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.orderMate.app-mergeReleaseResources-53:/values-port/values-port.xml",
+            "map": [
+                {
+                    "source": "/Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/res/values-port/values-port.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "55,121,187,257,324,390,478",
+                        "endColumns": "65,65,69,66,65,87,135",
+                        "endOffsets": "116,182,252,319,385,473,609"
+                    },
+                    "to": {
+                        "startLines": "3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "111,177,243,313,380,446,534",
+                        "endColumns": "65,65,69,66,65,87,135",
+                        "endOffsets": "172,238,308,375,441,529,665"
+                    }
+                },
+                {
+                    "source": "/Users/chicmic/.gradle/caches/transforms-3/f78a8135a1d2c56a982d366d1d05a147/transformed/appcompat-1.6.1/res/values-port/values-port.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "55",
+                        "endOffsets": "106"
+                    }
+                }
+            ]
+        }
+    ]
+}

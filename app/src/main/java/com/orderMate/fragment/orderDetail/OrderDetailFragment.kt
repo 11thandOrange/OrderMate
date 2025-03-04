@@ -266,16 +266,13 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         // means don't non-required hit the API
         if (isPaymentBtnClicked) {
             CoroutineScope(Dispatchers.IO).launch {
-                refreshUI(true)
+                updateTheTransaction()
             }
         } else {
             CoroutineScope(Dispatchers.IO).launch {
                 refreshUI()
             }
         }
-
-
-
 
 
         orderIdForReopen = null
@@ -312,6 +309,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             orderArguments?.payments?.forEach {
                 paymentItems.add(it)
             }
+            binding.transactionRecycler.showView()
+            binding.noTransactionText.hideView()
             binding.transactionRecycler.adapter?.notifyDataSetChanged()
         }
 
@@ -398,6 +397,19 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         }
     }
 
+    suspend fun updateTheTransaction(){
+        exceptionHandler {
+            // update the dashboard after the order is delay
+            val orderData = myApp.getOrderConnector().getOrder(orderArguments?.id)
+            orderArguments = orderData
+
+        }
+        CoroutineScope(Dispatchers.Main).launch {
+            showThePaymentData()
+        }
+        refreshUI(true)
+    }
+
 
     private fun setUpTheClickListeners() {
         binding.apply {
@@ -412,10 +424,15 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             }
 
             addPayment.setOnClickListener {
-                val dror = Intent(Intents.ACTION_CLOVER_PAY)
-                dror.putExtra(EXTRA_ORDER_ID, orderArguments?.id)
-                startActivity(dror)
-                isPaymentBtnClicked = true
+                try{
+                    val dror = Intent(Intents.ACTION_CLOVER_PAY)
+                    dror.putExtra(EXTRA_ORDER_ID, orderArguments?.id)
+                    startActivity(dror)
+                    isPaymentBtnClicked = true
+                }catch (e:Exception){
+                    e.printStackTrace()
+                }
+
             }
 
             reOpenButton.setOnClickListener {

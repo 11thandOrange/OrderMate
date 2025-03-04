@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.orderMate.app-mergeReleaseResources-53:/values-nl-rNL-port/values-nl-rNL-port.xml",
+            "map": [
+                {
+                    "source": "/Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/res/values-nl-rNL-port/values-nl-rNL-port.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,145",
+                        "endColumns": "89,133",
+                        "endOffsets": "140,274"
+                    }
+                }
+            ]
+        }
+    ]
+}

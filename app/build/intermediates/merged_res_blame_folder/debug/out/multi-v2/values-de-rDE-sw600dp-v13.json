@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.orderMate.app-mergeDebugResources-53:/values-de-rDE-sw600dp-v13/values-de-rDE-sw600dp-v13.xml",
+            "map": [
+                {
+                    "source": "/Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/res/values-de-rDE-sw600dp-v13/values-de-rDE-sw600dp-v13.xml",
+                    "from": {
+                        "startLines": "2,3,4",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,154,220",
+                        "endColumns": "98,65,146",
+                        "endOffsets": "149,215,362"
+                    }
+                }
+            ]
+        }
+    ]
+}

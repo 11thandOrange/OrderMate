@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="returnToMerchant">Bitte geben Sie dieses Gerät\neinem Mitarbeiter zurück</string>
+    <string name="returnToMerchantPaymentSuccessful">Vielen Dank für Ihren Einkauf.\nBitte geben Sie dieses Gerät\neinem Mitarbeiter zurück</string>
+</resources>

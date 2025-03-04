@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.orderMate.app-mergeDebugResources-53:/values-fr-rCA-port/values-fr-rCA-port.xml",
+            "map": [
+                {
+                    "source": "/Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/res/values-fr-rCA-port/values-fr-rCA-port.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,144",
+                        "endColumns": "88,131",
+                        "endOffsets": "139,271"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="returnToMerchant">Bitte geben Sie dieses Gerät einem Mitarbeiter zurück</string>
+    <string name="returnToMerchantFontFamily">sans-serif</string>
+    <string name="returnToMerchantPaymentSuccessful">Vielen Dank für Ihren Einkauf. Bitte geben Sie dieses Gerät einem Mitarbeiter zurück</string>
+</resources>

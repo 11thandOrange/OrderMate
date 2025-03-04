@@ -78,6 +78,8 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
         }
 
         val notesFilter: HashMap<String, MutableList<String>> = hashMapOf()
+        var userSelectedPostion: Int = 0
+        var userClikcedData : Order? = null
     }
 
     /*
@@ -653,6 +655,7 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
 
             }
         }
+
     }
 
     private fun getTheEmployeeDataForAdminRole() {
@@ -843,6 +846,7 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
 
 
     override fun onOrderItemClick(orderPosition: Int, lineItemId: String?) {
+        userSelectedPostion = orderPosition
         val direction = orderItems[orderPosition]?.let {
             OrderHistoryFragmentDirections.actionOrderHistoryFragmentToOrderDetailFragment(
                 it

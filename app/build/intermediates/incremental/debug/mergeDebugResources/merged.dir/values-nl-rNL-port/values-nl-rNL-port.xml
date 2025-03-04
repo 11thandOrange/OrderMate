@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="returnToMerchant">Geef dit apparaat\n terug aan een medewerker</string>
+    <string name="returnToMerchantPaymentSuccessful">Bedankt voor uw aankoop.\n Geef dit apparaat\n terug aan een medewerker</string>
+</resources>

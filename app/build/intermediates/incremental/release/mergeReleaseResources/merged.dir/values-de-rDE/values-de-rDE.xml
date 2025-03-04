@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="backToRegisterDescription">Nach rechts zurück zum Händler drehen</string>
+    <string name="returnToMerchant">Bitte geben Sie dieses Gerät einem Mitarbeiter zurück</string>
+    <string name="returnToMerchantFontFamily">sans-serif-light</string>
+    <string name="returnToMerchantPaymentSuccessful">Vielen Dank für Ihren Einkauf.\nBitte geben Sie dieses Gerät einem Mitarbeiter zurück</string>
+    <string name="returnToMerchantTitle">Fertig!</string>
+    <string name="rotateInstructions">Vielen Dank für Ihren Einkauf.\nBitte drehen Sie den Bildschirm zurück.</string>
+    <string name="title_activity_account_chooser">Clover-Konten</string>
+</resources>

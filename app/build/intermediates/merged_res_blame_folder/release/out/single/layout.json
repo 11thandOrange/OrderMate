@@ -1,0 +1,78 @@
+[
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/activity_overlay.xml",
+        "source": "com.orderMate.app-main-56:/layout/activity_overlay.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/item_spinner_heading.xml",
+        "source": "com.orderMate.app-main-56:/layout/item_spinner_heading.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/item_customer.xml",
+        "source": "com.orderMate.app-main-56:/layout/item_customer.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/item_grid.xml",
+        "source": "com.orderMate.app-main-56:/layout/item_grid.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/item_order_sub_items.xml",
+        "source": "com.orderMate.app-main-56:/layout/item_order_sub_items.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/item_header_orders.xml",
+        "source": "com.orderMate.app-main-56:/layout/item_header_orders.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/fragment_order_history.xml",
+        "source": "com.orderMate.app-main-56:/layout/fragment_order_history.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/fragment_order_detail.xml",
+        "source": "com.orderMate.app-main-56:/layout/fragment_order_detail.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/ordermate_basket_layout.xml",
+        "source": "com.orderMate.app-main-56:/layout/ordermate_basket_layout.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/dialog_send_notification.xml",
+        "source": "com.orderMate.app-main-56:/layout/dialog_send_notification.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/activity_main.xml",
+        "source": "com.orderMate.app-main-56:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/dialog_update_line_items.xml",
+        "source": "com.orderMate.app-main-56:/layout/dialog_update_line_items.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/item_order.xml",
+        "source": "com.orderMate.app-main-56:/layout/item_order.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/fragment_custom_fields.xml",
+        "source": "com.orderMate.app-main-56:/layout/fragment_custom_fields.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/item_custom_menu_items.xml",
+        "source": "com.orderMate.app-main-56:/layout/item_custom_menu_items.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/item_spinner.xml",
+        "source": "com.orderMate.app-main-56:/layout/item_spinner.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/listitem_order.xml",
+        "source": "com.orderMate.app-main-56:/layout/listitem_order.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/item_transaction.xml",
+        "source": "com.orderMate.app-main-56:/layout/item_transaction.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeReleaseResources-54:/layout/item_notes_spinner.xml",
+        "source": "com.orderMate.app-main-56:/layout/item_notes_spinner.xml"
+    }
+]

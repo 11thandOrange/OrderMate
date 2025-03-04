@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="backToRegisterDescription">Draai naar rechts terug naar de verkoper</string>
+    <string name="print_label">Afdrukken</string>
+    <string name="register_uri">URI registreren</string>
+    <string name="returnToMerchant">Geef dit apparaat terug aan een medewerker</string>
+    <string name="returnToMerchantFontFamily">sans-serif-light</string>
+    <string name="returnToMerchantPaymentSuccessful">Bedankt voor uw aankoop.\n Geef dit apparaat terug aan een medewerker</string>
+    <string name="returnToMerchantTitle">Helemaal klaar!</string>
+    <string name="rotateInstructions">Bedankt voor uw aankoop.\nDraai het scherm terug.</string>
+    <string name="title_activity_account_chooser">Clover-accounts</string>
+</resources>
