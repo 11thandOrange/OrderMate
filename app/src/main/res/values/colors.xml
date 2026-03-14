@@ -15,4 +15,5 @@
     <color name="darker_gray_light">#E1DEDE</color>
     <color name="darkBlue">#abf1f9</color>
     <color name="back">#03CDB8</color>
+    <color name="closed_status_color">#7367F0</color>
 </resources>

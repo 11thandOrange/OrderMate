@@ -175,4 +175,17 @@
     <string name="show_modal_basket">Trigger modal from basket</string>
     <string name="cart_is_empty">Cart is Empty</string>
 
+    <!-- New List Tab strings -->
+    <string name="customer">Customer</string>
+    <string name="employee">Employee</string>
+    <string name="payment_type">Payment</string>
+    <string name="custom_notes">Custom Notes</string>
+    <string name="open">Open</string>
+    <string name="closed">Closed</string>
+    <string name="paid">Paid</string>
+    <string name="unpaid">Unpaid</string>
+    <string name="refunded">Refunded</string>
+    <string name="partially_refunded">Partial Refund</string>
+    <string name="partially_paid">Partial</string>
+
 </resources>
