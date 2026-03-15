@@ -4472,9 +4472,11 @@
                 const eventMinutes = event.date.getMinutes();
                 const top = eventHour * 60 + eventMinutes;
                 const height = 50;
-                html += `<div class="timeline-event" style="top: ${top}px; height: ${height}px; background: ${event.color}20; border-left: 3px solid ${event.color};">
+                const typeColors = { pickup: '#3ccd79', delivery: '#7367F0', preorder: '#FF9F43' };
+                const eventColor = typeColors[event.type] || '#667eea';
+                html += `<div class="timeline-event" style="top: ${top}px; height: ${height}px; background: ${eventColor}20; border-left: 3px solid ${eventColor};">
                     <div class="event-time">${formatTime(event.date)}</div>
-                    <div class="event-title">${event.title}</div>
+                    <div class="event-title">${event.customer}</div>
                 </div>`;
             });
             
@@ -4531,14 +4533,16 @@
                 
                 // Events for this date
                 const dayEvents = getEventsForDate(date);
+                const typeColors = { pickup: '#3ccd79', delivery: '#7367F0', preorder: '#FF9F43' };
                 dayEvents.forEach(event => {
                     const eventHour = event.date.getHours();
                     const eventMinutes = event.date.getMinutes();
                     const top = eventHour * 60 + eventMinutes;
                     const height = 50;
-                    html += `<div class="timeline-event" style="top: ${top}px; height: ${height}px; background: ${event.color}20; border-left: 3px solid ${event.color};">
+                    const eventColor = typeColors[event.type] || '#667eea';
+                    html += `<div class="timeline-event" style="top: ${top}px; height: ${height}px; background: ${eventColor}20; border-left: 3px solid ${eventColor};">
                         <div class="event-time">${formatTime(event.date)}</div>
-                        <div class="event-title">${event.title}</div>
+                        <div class="event-title">${event.customer}</div>
                     </div>`;
                 });
                 
