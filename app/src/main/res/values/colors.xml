@@ -7,6 +7,7 @@
     <color name="status_bar_color">#f2f2f2</color>
     <color name="open_status_color">#eed013</color>
     <color name="paid_status_color">#3ccd79</color>
+    <color name="unpaid_status_color">#ea2c2f</color>
     <color name="other_order_payment_status">#ea2c2f</color>
     <color name="header_blue">#ddf1f9</color>
     <color name="header_blue_dark">#ebf7fc</color>
@@ -25,13 +26,37 @@
     <color name="card_background">#F2FFFFFF</color>
     <color name="text_light">#E6FFFFFF</color>
     <color name="text_muted">#99FFFFFF</color>
+    <color name="text_primary">#1a1a2e</color>
+    <color name="text_secondary">#6c757d</color>
     <color name="orange_accent">#FF9F43</color>
     <color name="item_row_background">#33000000</color>
+    <color name="side_nav_background">#33000000</color>
+    <color name="nav_border">#1AFFFFFF</color>
+    
+    <!-- Tag/Pill colors -->
+    <color name="tag_category_bg">#33FF9F43</color>
+    <color name="tag_category_text">#FF9F43</color>
+    <color name="tag_pill_bg">#337367F0</color>
+    <color name="tag_pill_text">#7367F0</color>
     <color name="tag_rush">#FF6B6B</color>
     <color name="tag_pickup">#4ECDC4</color>
     <color name="tag_custom">#A78BFA</color>
     <color name="tag_bakery">#F59E0B</color>
     <color name="tag_dessert">#EC4899</color>
+    
+    <!-- Button colors -->
     <color name="delete_red">#EF4444</color>
+    <color name="delete_red_hover">#c92428</color>
     <color name="button_gray">#6B7280</color>
+    <color name="orange_accent_hover">#e68a2e</color>
+    
+    <!-- Status badge backgrounds -->
+    <color name="status_open_bg">#33eed013</color>
+    <color name="status_paid_bg">#333ccd79</color>
+    <color name="status_unpaid_bg">#33ea2c2f</color>
+    <color name="status_closed_bg">#337367F0</color>
+    
+    <!-- Card/Modal backgrounds -->
+    <color name="modal_overlay">#99000000</color>
+    <color name="card_border">#1AFFFFFF</color>
 </resources>

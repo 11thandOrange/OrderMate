@@ -47,7 +47,32 @@
         <action
             android:id="@+id/action_orderDetailFragment_self"
             app:destination="@id/orderDetailFragment" />
-
     </fragment>
+
+    <!-- Calendar Fragment (#80 requirement) -->
+    <fragment
+        android:id="@+id/calendarFragment"
+        android:name="com.orderMate.fragment.CalendarFragment"
+        android:label="calendar"
+        tools:layout="@layout/fragment_calendar_redesign">
+        <action
+            android:id="@+id/action_calendarFragment_to_orderDetailFragment"
+            app:destination="@id/orderDetailFragment"
+            app:launchSingleTop="true" />
+    </fragment>
+
+    <!-- Settings Fragment (#80 requirement) -->
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.orderMate.fragment.SettingsFragment"
+        android:label="settings"
+        tools:layout="@layout/fragment_settings_redesign" />
+
+    <!-- Profile Settings Fragment (#80 requirement) -->
+    <fragment
+        android:id="@+id/profileSettingsFragment"
+        android:name="com.orderMate.fragment.ProfileSettingsFragment"
+        android:label="profile"
+        tools:layout="@layout/fragment_profile_settings" />
 
 </navigation>

@@ -106,4 +106,10 @@ dependencies {
 
     // messaging Bird
     implementation("com.messagebird:messagebird-api:6.1.7")
+    
+    // FlexboxLayout for iOS-style chip layouts (#80 requirement)
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
+    
+    // CardView for card-based layouts
+    implementation("androidx.cardview:cardview:1.0.0")
 }

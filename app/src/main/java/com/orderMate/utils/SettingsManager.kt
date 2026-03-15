@@ -181,6 +181,32 @@ class SettingsManager(private val context: Context) {
         prefs.edit { putString(KEY_NOTIFICATION_TEMPLATE, trimmed) }
     }
 
+    // ==================== iOS-style Redesign Settings (#80 requirement) ====================
+
+    fun getNotificationsEnabled(): Boolean {
+        return prefs.getBoolean(KEY_NOTIFICATIONS_ENABLED, true)
+    }
+
+    fun setNotificationsEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean(KEY_NOTIFICATIONS_ENABLED, enabled) }
+    }
+
+    fun getAutoSyncEnabled(): Boolean {
+        return prefs.getBoolean(KEY_AUTO_SYNC_ENABLED, true)
+    }
+
+    fun setAutoSyncEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean(KEY_AUTO_SYNC_ENABLED, enabled) }
+    }
+
+    fun getThemeColor(): Int {
+        return prefs.getInt(KEY_THEME_COLOR, DEFAULT_THEME_COLOR)
+    }
+
+    fun setThemeColor(color: Int) {
+        prefs.edit { putInt(KEY_THEME_COLOR, color) }
+    }
+
     // ==================== Reset ====================
 
     fun resetToDefaults() {
@@ -193,6 +219,9 @@ class SettingsManager(private val context: Context) {
             putString(KEY_RECEIPT_UNIT, DEFAULT_RECEIPT_UNIT)
             putString(KEY_SMS_NUMBER, "")
             putString(KEY_NOTIFICATION_TEMPLATE, DEFAULT_TEMPLATE)
+            putBoolean(KEY_NOTIFICATIONS_ENABLED, true)
+            putBoolean(KEY_AUTO_SYNC_ENABLED, true)
+            putInt(KEY_THEME_COLOR, DEFAULT_THEME_COLOR)
         }
     }
 
@@ -208,12 +237,16 @@ class SettingsManager(private val context: Context) {
         private const val KEY_RECEIPT_UNIT = "receipt_unit"
         private const val KEY_SMS_NUMBER = "sms_number"
         private const val KEY_NOTIFICATION_TEMPLATE = "notification_template"
+        private const val KEY_NOTIFICATIONS_ENABLED = "notifications_enabled"
+        private const val KEY_AUTO_SYNC_ENABLED = "auto_sync_enabled"
+        private const val KEY_THEME_COLOR = "theme_color"
 
         // Defaults
         private const val DEFAULT_NOTIFICATION_DAYS = 3
         private const val DEFAULT_RECEIPT_TIME = 60
         private const val DEFAULT_RECEIPT_UNIT = "minutes"
         private const val DEFAULT_TEMPLATE = "Your order from {{merchant_name}} is ready for pickup!"
+        private const val DEFAULT_THEME_COLOR = 0xFFFF9F43.toInt() // Orange accent
         
         const val MAX_WIDGETS = 7
         const val MAX_TEMPLATE_LENGTH = 250

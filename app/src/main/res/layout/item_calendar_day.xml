@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Calendar day item -->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:padding="2dp">
+
+    <LinearLayout
+        android:id="@+id/dayContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="4dp"
+        android:background="@drawable/bg_calendar_day"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- Day Number -->
+        <TextView
+            android:id="@+id/dayNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="15"/>
+
+        <!-- Event Indicator (small dot) -->
+        <View
+            android:id="@+id/eventIndicator"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_event_dot"
+            android:visibility="gone"/>
+
+        <!-- Event Preview -->
+        <TextView
+            android:id="@+id/eventPreview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/bg_calendar_event"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:padding="2dp"
+            android:textColor="@color/white"
+            android:textSize="8sp"
+            android:visibility="gone"
+            tools:text="Wedding Cake"
+            tools:visibility="visible"/>
+
+    </LinearLayout>
+
+</FrameLayout>

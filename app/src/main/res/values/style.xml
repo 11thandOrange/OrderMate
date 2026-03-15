@@ -45,4 +45,78 @@
         <item name="android:textSize">@dimen/_8ssp</item>
     </style>
 
+    <!-- iOS-style redesign styles (#80 requirement) -->
+    <style name="GlassCard">
+        <item name="cardBackgroundColor">@color/card_background</item>
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">0dp</item>
+    </style>
+
+    <style name="GlassButton">
+        <item name="android:background">@drawable/bg_glass_button</item>
+        <item name="android:textColor">@color/text_light</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="StatusBadge">
+        <item name="android:paddingHorizontal">10dp</item>
+        <item name="android:paddingVertical">4dp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="StatusBadge.Open">
+        <item name="android:background">@drawable/bg_badge_open</item>
+        <item name="android:textColor">@color/open_status_color</item>
+    </style>
+
+    <style name="StatusBadge.Paid">
+        <item name="android:background">@drawable/bg_badge_paid</item>
+        <item name="android:textColor">@color/paid_status_color</item>
+    </style>
+
+    <style name="StatusBadge.Unpaid">
+        <item name="android:background">@drawable/bg_badge_unpaid</item>
+        <item name="android:textColor">@color/unpaid_status_color</item>
+    </style>
+
+    <style name="StatusBadge.Closed">
+        <item name="android:background">@drawable/bg_badge_closed</item>
+        <item name="android:textColor">@color/closed_status_color</item>
+    </style>
+
+    <style name="NotePill.Category">
+        <item name="android:background">@drawable/bg_note_chip_category</item>
+        <item name="android:textColor">@color/tag_category_text</item>
+        <item name="android:paddingHorizontal">8dp</item>
+        <item name="android:paddingVertical">2dp</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="NotePill.Tag">
+        <item name="android:background">@drawable/bg_note_chip_tag</item>
+        <item name="android:textColor">@color/tag_pill_text</item>
+        <item name="android:paddingHorizontal">8dp</item>
+        <item name="android:paddingVertical">2dp</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ActionButton.Orange">
+        <item name="android:background">@drawable/bg_button_orange</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="ActionButton.Delete">
+        <item name="android:background">@drawable/bg_button_delete</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
 </resources>
