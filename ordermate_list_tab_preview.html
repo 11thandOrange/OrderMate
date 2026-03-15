@@ -2221,9 +2221,10 @@
             position: absolute;
             left: 4px;
             right: 4px;
-            border-radius: 6px;
-            padding: 6px 8px;
+            border-radius: 4px;
+            padding: 4px 8px;
             font-size: 11px;
+            font-weight: 500;
             cursor: pointer;
             overflow: hidden;
             transition: var(--transition-smooth);
@@ -2236,18 +2237,21 @@
         }
 
         .timeline-event.pickup {
-            background: rgba(76, 175, 80, 0.9);
-            color: #fff;
+            background: rgba(76, 175, 80, 0.2);
+            color: #81c784;
+            border-left: 3px solid #4caf50;
         }
 
         .timeline-event.delivery {
-            background: rgba(33, 150, 243, 0.9);
-            color: #fff;
+            background: rgba(33, 150, 243, 0.2);
+            color: #64b5f6;
+            border-left: 3px solid #2196f3;
         }
 
         .timeline-event.preorder {
-            background: rgba(156, 39, 176, 0.9);
-            color: #fff;
+            background: rgba(156, 39, 176, 0.2);
+            color: #ce93d8;
+            border-left: 3px solid #9c27b0;
         }
 
         .timeline-event-time {
@@ -4400,6 +4404,7 @@
                 // Render multiple days side by side
                 console.log('Rendering multiple days view');
                 monthYear.textContent = `${searchedDates.length} Selected Dates`;
+                updateViewButtonStates('day');
                 renderMultipleDaysView(daysContainer, weekdaysContainer, calendarGrid, today, searchedDates, dayNamesShort);
                 return; // Exit after rendering
             } else if (searchedDates.length === 1) {
@@ -4407,10 +4412,12 @@
                 console.log('Rendering single searched day view');
                 const searchedDate = searchedDates[0];
                 monthYear.textContent = `${dayNames[searchedDate.getDay()]}, ${monthNames[searchedDate.getMonth()]} ${searchedDate.getDate()}, ${searchedDate.getFullYear()}`;
+                updateViewButtonStates('day');
                 renderSingleSearchedDay(daysContainer, weekdaysContainer, calendarGrid, today, searchedDate, dayNamesShort);
                 return; // Exit after rendering
             } else if (calendarViewMode === 'day') {
                 monthYear.textContent = `${dayNames[currentDate.getDay()]}, ${monthNames[month]} ${day}, ${year}`;
+                updateViewButtonStates('day');
                 renderDayView(daysContainer, weekdaysContainer, calendarGrid, today, dayNames);
                 return; // Exit after rendering
             } else if (calendarViewMode === 'week') {
@@ -4419,9 +4426,11 @@
                 const endOfWeek = new Date(startOfWeek);
                 endOfWeek.setDate(startOfWeek.getDate() + 6);
                 monthYear.textContent = `${monthNames[startOfWeek.getMonth()]} ${startOfWeek.getDate()} - ${endOfWeek.getDate()}, ${year}`;
+                updateViewButtonStates('week');
                 renderWeekView(daysContainer, weekdaysContainer, calendarGrid, today, startOfWeek, dayNamesShort);
             } else {
                 monthYear.textContent = `${monthNames[month]} ${year}`;
+                updateViewButtonStates('month');
                 renderMonthView(daysContainer, weekdaysContainer, calendarGrid, today, year, month, dayNamesShort);
             }
         }
@@ -4472,11 +4481,9 @@
                 const eventMinutes = event.date.getMinutes();
                 const top = eventHour * 60 + eventMinutes;
                 const height = 50;
-                const typeColors = { pickup: '#3ccd79', delivery: '#7367F0', preorder: '#FF9F43' };
-                const eventColor = typeColors[event.type] || '#667eea';
-                html += `<div class="timeline-event" style="top: ${top}px; height: ${height}px; background: ${eventColor}20; border-left: 3px solid ${eventColor};">
-                    <div class="event-time">${formatTime(event.date)}</div>
-                    <div class="event-title">${event.customer}</div>
+                html += `<div class="timeline-event ${event.type}" style="top: ${top}px; height: ${height}px;" onclick="showEventPreview(${event.id})">
+                    <div class="timeline-event-time">${formatTime(event.date)}</div>
+                    <div class="timeline-event-title">${event.customer}</div>
                 </div>`;
             });
             
@@ -4533,16 +4540,14 @@
                 
                 // Events for this date
                 const dayEvents = getEventsForDate(date);
-                const typeColors = { pickup: '#3ccd79', delivery: '#7367F0', preorder: '#FF9F43' };
                 dayEvents.forEach(event => {
                     const eventHour = event.date.getHours();
                     const eventMinutes = event.date.getMinutes();
                     const top = eventHour * 60 + eventMinutes;
                     const height = 50;
-                    const eventColor = typeColors[event.type] || '#667eea';
-                    html += `<div class="timeline-event" style="top: ${top}px; height: ${height}px; background: ${eventColor}20; border-left: 3px solid ${eventColor};">
-                        <div class="event-time">${formatTime(event.date)}</div>
-                        <div class="event-title">${event.customer}</div>
+                    html += `<div class="timeline-event ${event.type}" style="top: ${top}px; height: ${height}px;" onclick="showEventPreview(${event.id})">
+                        <div class="timeline-event-time">${formatTime(event.date)}</div>
+                        <div class="timeline-event-title">${event.customer}</div>
                     </div>`;
                 });
                 
@@ -4827,12 +4832,16 @@
 
         function setCalendarView(mode) {
             calendarViewMode = mode;
-            // Update button states
+            renderCalendar();
+        }
+        
+        function updateViewButtonStates(activeMode) {
             document.querySelectorAll('.calendar-view-btn').forEach(btn => {
                 btn.classList.remove('active');
+                if (btn.textContent.toLowerCase() === activeMode) {
+                    btn.classList.add('active');
+                }
             });
-            event.currentTarget.classList.add('active');
-            renderCalendar();
         }
 
         function navigateCalendar(direction) {
