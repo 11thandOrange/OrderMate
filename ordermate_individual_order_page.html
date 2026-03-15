@@ -226,6 +226,8 @@
             flex: 1;
             overflow: hidden;
             padding: 24px;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Order Page Grid */
@@ -235,14 +237,15 @@
             gap: 24px;
             max-width: 1400px;
             margin: 0 auto;
-            height: 100%;
+            flex: 1;
+            min-height: 0;
         }
 
         /* Main Column */
         .main-column {
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            min-height: 0;
         }
 
         /* Sidebar */
@@ -250,6 +253,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            min-height: 0;
             overflow-y: auto;
         }
 
