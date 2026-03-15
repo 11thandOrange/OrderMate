@@ -3504,14 +3504,9 @@
         // Search functionality
         document.getElementById('searchInput').addEventListener('input', (e) => {
             currentFilters.searchQuery = e.target.value;
-            // Debounce (300ms like in OrderHistoryFragment)
-            clearTimeout(window.searchTimeout);
-            window.searchTimeout = setTimeout(() => {
-                renderFilterPills();
-                renderOrders();
-                // Also render calendar (it will check for date searches)
-                renderCalendar();
-            }, 300);
+            renderFilterPills();
+            renderOrders();
+            renderCalendar();
         });
 
         // Filter modal functions
@@ -3738,11 +3733,8 @@
                 currentFilters.orderDates.push(dateValue);
                 tempOrderDates = [...currentFilters.orderDates];
                 this.value = '';
-                // Clear any pending search timeout to prevent race condition
-                clearTimeout(window.searchTimeout);
                 renderFilterPills();
                 renderOrders();
-                // Update calendar to show selected dates
                 console.log('Calling renderCalendar with orderDates:', currentFilters.orderDates);
                 renderCalendar();
             }
