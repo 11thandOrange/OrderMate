@@ -16,4 +16,22 @@
     <color name="darkBlue">#abf1f9</color>
     <color name="back">#03CDB8</color>
     <color name="closed_status_color">#7367F0</color>
+    
+    <!-- iOS-style redesign colors (#80 requirement) -->
+    <color name="gradient_start">#667eea</color>
+    <color name="gradient_end">#764ba2</color>
+    <color name="glass_background">#26FFFFFF</color>
+    <color name="glass_background_hover">#40FFFFFF</color>
+    <color name="card_background">#F2FFFFFF</color>
+    <color name="text_light">#E6FFFFFF</color>
+    <color name="text_muted">#99FFFFFF</color>
+    <color name="orange_accent">#FF9F43</color>
+    <color name="item_row_background">#33000000</color>
+    <color name="tag_rush">#FF6B6B</color>
+    <color name="tag_pickup">#4ECDC4</color>
+    <color name="tag_custom">#A78BFA</color>
+    <color name="tag_bakery">#F59E0B</color>
+    <color name="tag_dessert">#EC4899</color>
+    <color name="delete_red">#EF4444</color>
+    <color name="button_gray">#6B7280</color>
 </resources>

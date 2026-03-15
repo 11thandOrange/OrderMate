@@ -188,4 +188,24 @@
     <string name="partially_refunded">Partial Refund</string>
     <string name="partially_paid">Partial</string>
 
+    <!-- Individual Order Page (#87) strings -->
+    <string name="back">Back</string>
+    <string name="items">Items</string>
+    <string name="order_details">Order Details</string>
+    <string name="order_date">Order Date</string>
+    <string name="due_date">Due Date</string>
+    <string name="order_tags">Order Tags</string>
+    <string name="description">Description</string>
+    <string name="view_customer">View customer details</string>
+    <string name="order_history">Order History</string>
+    <string name="view_all">View All</string>
+    <string name="reminder_sent">Reminder Sent</string>
+    <string name="sample_date_time">March 15, 2026 • 9:00 AM</string>
+    <string name="sms_reminder_sent">SMS reminder sent to customer</string>
+    <string name="notification">Notification</string>
+    <string name="send_notification">Send Notification</string>
+    <string name="discount">Discount</string>
+    <string name="rush">Rush</string>
+    <string name="pickup">Pickup</string>
+
 </resources>
