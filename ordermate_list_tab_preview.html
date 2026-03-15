@@ -2419,6 +2419,10 @@
             font-weight: 500;
         }
 
+        .event-items-wrapper {
+            position: relative;
+        }
+
         .event-items-list {
             display: flex;
             flex-direction: column;
@@ -2426,6 +2430,21 @@
             max-height: 180px;
             overflow-y: auto;
             padding-top: 10px;
+        }
+
+        .event-items-scroll-indicator {
+            display: flex;
+            justify-content: center;
+            padding: 8px 0 4px;
+            color: var(--text-muted);
+            font-size: 12px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .event-items-scroll-indicator.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
         .event-item {
@@ -3058,8 +3077,13 @@
                 </div>
             </div>
             <!-- Item List Section -->
-            <div class="event-items-list" id="eventItemsList">
-                <!-- Items will be populated dynamically -->
+            <div class="event-items-wrapper">
+                <div class="event-items-list" id="eventItemsList">
+                    <!-- Items will be populated dynamically -->
+                </div>
+                <div class="event-items-scroll-indicator" id="eventItemsScrollIndicator">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -5152,7 +5176,25 @@
             itemsList.innerHTML = itemsHtml;
             
             modal.classList.add('active');
+            
+            // Check if scroll indicator should be shown
+            setTimeout(() => {
+                updateScrollIndicator();
+            }, 50);
         }
+        
+        function updateScrollIndicator() {
+            const itemsList = document.getElementById('eventItemsList');
+            const indicator = document.getElementById('eventItemsScrollIndicator');
+            if (itemsList && indicator) {
+                const hasMoreContent = itemsList.scrollHeight > itemsList.clientHeight;
+                const isAtBottom = itemsList.scrollTop + itemsList.clientHeight >= itemsList.scrollHeight - 5;
+                indicator.classList.toggle('hidden', !hasMoreContent || isAtBottom);
+            }
+        }
+        
+        // Listen for scroll on items list
+        document.getElementById('eventItemsList')?.addEventListener('scroll', updateScrollIndicator);
 
         function closeEventPreview() {
             document.getElementById('eventPreviewModal').classList.remove('active');
