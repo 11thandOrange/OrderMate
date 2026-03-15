@@ -3733,13 +3733,17 @@
         // Search bar calendar date selection
         document.getElementById('searchDateInput').addEventListener('change', function() {
             const dateValue = this.value;
+            console.log('Date picker change:', dateValue, 'Current orderDates:', currentFilters.orderDates);
             if (dateValue && !currentFilters.orderDates.includes(dateValue)) {
                 currentFilters.orderDates.push(dateValue);
                 tempOrderDates = [...currentFilters.orderDates];
                 this.value = '';
+                // Clear any pending search timeout to prevent race condition
+                clearTimeout(window.searchTimeout);
                 renderFilterPills();
                 renderOrders();
                 // Update calendar to show selected dates
+                console.log('Calling renderCalendar with orderDates:', currentFilters.orderDates);
                 renderCalendar();
             }
         });
@@ -4375,15 +4379,22 @@
             const searchQuery = currentFilters.searchQuery || '';
             let searchedDates = parseSearchDates(searchQuery);
             
+            console.log('renderCalendar - searchQuery:', searchQuery);
+            console.log('renderCalendar - orderDates:', currentFilters.orderDates);
+            console.log('renderCalendar - searchedDates from query:', searchedDates.length);
+            
             // Also include dates from the date picker (orderDates filter)
             if (currentFilters.orderDates && currentFilters.orderDates.length > 0) {
                 currentFilters.orderDates.forEach(dateStr => {
+                    console.log('Processing orderDate:', dateStr);
                     const date = new Date(dateStr + 'T00:00:00');
+                    console.log('Parsed date:', date, 'Valid:', !isNaN(date.getTime()));
                     if (!isNaN(date.getTime())) {
                         // Check if this date is already in searchedDates
                         const exists = searchedDates.some(d => d.toDateString() === date.toDateString());
                         if (!exists) {
                             searchedDates.push(date);
+                            console.log('Added date to searchedDates');
                         }
                     }
                 });
@@ -4391,18 +4402,25 @@
                 searchedDates.sort((a, b) => a - b);
             }
             
+            console.log('Final searchedDates count:', searchedDates.length);
+            
             if (searchedDates.length > 1) {
                 // Render multiple days side by side
+                console.log('Rendering multiple days view');
                 monthYear.textContent = `${searchedDates.length} Selected Dates`;
                 renderMultipleDaysView(daysContainer, weekdaysContainer, calendarGrid, today, searchedDates, dayNamesShort);
+                return; // Exit after rendering
             } else if (searchedDates.length === 1) {
                 // Single date search - show that date in day view
+                console.log('Rendering single searched day view');
                 const searchedDate = searchedDates[0];
                 monthYear.textContent = `${dayNames[searchedDate.getDay()]}, ${monthNames[searchedDate.getMonth()]} ${searchedDate.getDate()}, ${searchedDate.getFullYear()}`;
                 renderSingleSearchedDay(daysContainer, weekdaysContainer, calendarGrid, today, searchedDate, dayNamesShort);
+                return; // Exit after rendering
             } else if (calendarViewMode === 'day') {
                 monthYear.textContent = `${dayNames[currentDate.getDay()]}, ${monthNames[month]} ${day}, ${year}`;
                 renderDayView(daysContainer, weekdaysContainer, calendarGrid, today, dayNames);
+                return; // Exit after rendering
             } else if (calendarViewMode === 'week') {
                 const startOfWeek = new Date(currentDate);
                 startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
