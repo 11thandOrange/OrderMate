@@ -2420,35 +2420,51 @@
         }
 
         .event-items-section {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            padding: 12px;
             margin-bottom: 16px;
-            max-height: 200px;
-            overflow-y: auto;
         }
 
         .event-items-header {
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: var(--text-muted);
-            font-size: 12px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
+            gap: 10px;
+            padding: 10px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        .event-items-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+
+        .event-items-info {
+            flex: 1;
+        }
+
+        .event-items-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
         .event-items-count {
+            font-size: 14px;
             color: var(--text-light);
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .event-items-list {
             display: flex;
             flex-direction: column;
             gap: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+            padding-top: 10px;
         }
 
         .event-item {
@@ -3074,9 +3090,13 @@
             <!-- Item List Section -->
             <div class="event-items-section">
                 <div class="event-items-header">
-                    <i class="fas fa-list"></i>
-                    <span>Items</span>
-                    <span class="event-items-count" id="eventItemsCount">(3)</span>
+                    <div class="event-items-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="event-items-info">
+                        <div class="event-items-label">Items</div>
+                        <div class="event-items-count" id="eventItemsCount">3 items</div>
+                    </div>
                 </div>
                 <div class="event-items-list" id="eventItemsList">
                     <!-- Items will be populated dynamically -->
@@ -5133,7 +5153,7 @@
             
             // Update items list with custom notes as pills
             const itemCount = event.itemList ? event.itemList.length : 0;
-            itemsCount.textContent = `(${itemCount})`;
+            itemsCount.textContent = `${itemCount} item${itemCount !== 1 ? 's' : ''}`;
             
             let itemsHtml = '';
             if (event.itemList && event.itemList.length > 0) {
