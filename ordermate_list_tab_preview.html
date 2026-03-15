@@ -4420,6 +4420,9 @@
             weekdaysContainer.style.display = 'none';
             calendarGrid.classList.add('day-view');
             calendarGrid.classList.remove('week-view');
+            daysContainer.style.gridTemplateColumns = '';  // Clear month view grid
+            daysContainer.style.display = 'flex';
+            daysContainer.style.flexDirection = 'column';
             
             const isToday = searchedDate.toDateString() === today.toDateString();
             
@@ -4475,6 +4478,9 @@
             weekdaysContainer.style.display = 'none';
             calendarGrid.classList.add('day-view');
             calendarGrid.classList.remove('week-view');
+            daysContainer.style.gridTemplateColumns = '';  // Clear month view grid
+            daysContainer.style.display = 'flex';
+            daysContainer.style.flexDirection = 'column';
             
             let html = `<div class="timeline-view">`;
             
@@ -4538,6 +4544,9 @@
             weekdaysContainer.style.display = 'none';
             calendarGrid.classList.add('day-view');
             calendarGrid.classList.remove('week-view');
+            daysContainer.style.gridTemplateColumns = '';  // Clear month view grid
+            daysContainer.style.display = 'flex';
+            daysContainer.style.flexDirection = 'column';
             
             const isToday = currentDate.toDateString() === today.toDateString();
             const dayNamesShort = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
@@ -4603,6 +4612,9 @@
             weekdaysContainer.style.display = 'none';
             calendarGrid.classList.add('week-view');
             calendarGrid.classList.remove('day-view');
+            daysContainer.style.gridTemplateColumns = '';  // Clear month view grid
+            daysContainer.style.display = 'flex';
+            daysContainer.style.flexDirection = 'column';
             
             let html = `<div class="timeline-view">`;
             
@@ -4680,6 +4692,8 @@
             // Show weekdays header
             weekdaysContainer.style.display = 'grid';
             calendarGrid.classList.remove('day-view', 'week-view');
+            daysContainer.style.display = 'grid';  // Reset to grid for month view
+            daysContainer.style.flexDirection = '';  // Clear flex direction
             daysContainer.style.gridTemplateColumns = 'repeat(7, 1fr)';
             
             // Reset weekdays header
