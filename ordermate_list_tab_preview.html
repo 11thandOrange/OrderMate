@@ -2419,45 +2419,6 @@
             font-weight: 500;
         }
 
-        .event-items-section {
-            margin-bottom: 16px;
-        }
-
-        .event-items-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .event-items-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-        }
-
-        .event-items-info {
-            flex: 1;
-        }
-
-        .event-items-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .event-items-count {
-            font-size: 14px;
-            color: var(--text-light);
-            font-weight: 500;
-        }
-
         .event-items-list {
             display: flex;
             flex-direction: column;
@@ -3086,21 +3047,19 @@
                         <div class="event-detail-value" id="eventTotal">$125.00</div>
                     </div>
                 </div>
-            </div>
-            <!-- Item List Section -->
-            <div class="event-items-section">
-                <div class="event-items-header">
-                    <div class="event-items-icon">
+                <div class="event-detail-row">
+                    <div class="event-detail-icon">
                         <i class="fas fa-box"></i>
                     </div>
-                    <div class="event-items-info">
-                        <div class="event-items-label">Items</div>
-                        <div class="event-items-count" id="eventItemsCount">3 items</div>
+                    <div class="event-detail-info">
+                        <div class="event-detail-label">Items</div>
+                        <div class="event-detail-value" id="eventItemsCount">3 items</div>
                     </div>
                 </div>
-                <div class="event-items-list" id="eventItemsList">
-                    <!-- Items will be populated dynamically -->
-                </div>
+            </div>
+            <!-- Item List Section -->
+            <div class="event-items-list" id="eventItemsList">
+                <!-- Items will be populated dynamically -->
             </div>
         </div>
     </div>
