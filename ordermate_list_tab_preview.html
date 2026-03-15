@@ -2331,8 +2331,15 @@
         .event-preview-header {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 12px;
             margin-bottom: 16px;
+        }
+
+        .event-preview-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .event-type-badge {
@@ -2362,15 +2369,11 @@
             font-size: 18px;
             font-weight: 600;
             color: var(--text-light);
-            flex: 1;
         }
 
-        .event-preview-close {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 18px;
+        .event-action-btn.compact {
+            padding: 8px 12px;
+            font-size: 12px;
         }
 
         .event-preview-details {
@@ -2414,12 +2417,6 @@
             font-size: 14px;
             color: var(--text-light);
             font-weight: 500;
-        }
-
-        .event-order-notes {
-            font-style: italic;
-            color: var(--text-muted);
-            font-weight: 400;
         }
 
         .event-items-section {
@@ -2495,26 +2492,17 @@
             border-left: 2px solid #FF9F43;
         }
 
-        .event-preview-actions {
-            display: flex;
-            gap: 10px;
-        }
-
         .event-action-btn {
-            flex: 1;
-            padding: 12px;
+            padding: 12px 16px;
             border-radius: 10px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition-smooth);
             text-align: center;
-        }
-
-        .event-action-btn.secondary {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--text-light);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .event-action-btn.primary {
@@ -3026,10 +3014,12 @@
     <div class="event-preview-modal" id="eventPreviewModal" onclick="if(event.target===this)closeEventPreview()">
         <div class="event-preview-content">
             <div class="event-preview-header">
-                <span class="event-type-badge pickup" id="eventTypeBadge">Pickup</span>
-                <span class="event-preview-title" id="eventPreviewTitle">Order #1234</span>
-                <button class="event-preview-close" onclick="closeEventPreview()">
-                    <i class="fas fa-times"></i>
+                <div class="event-preview-header-left">
+                    <span class="event-type-badge pickup" id="eventTypeBadge">Pickup</span>
+                    <span class="event-preview-title" id="eventPreviewTitle">Order #1234</span>
+                </div>
+                <button class="event-action-btn primary compact" onclick="viewFullOrderDetails()">
+                    <i class="fas fa-external-link-alt"></i> Full Details
                 </button>
             </div>
             <div class="event-preview-details">
@@ -3060,16 +3050,6 @@
                         <div class="event-detail-value" id="eventTotal">$125.00</div>
                     </div>
                 </div>
-                <!-- Order Notes Section -->
-                <div class="event-detail-row" id="eventOrderNotesRow" style="display: none;">
-                    <div class="event-detail-icon">
-                        <i class="fas fa-sticky-note"></i>
-                    </div>
-                    <div class="event-detail-info">
-                        <div class="event-detail-label">Order Notes</div>
-                        <div class="event-detail-value event-order-notes" id="eventOrderNotes"></div>
-                    </div>
-                </div>
             </div>
             <!-- Item List Section -->
             <div class="event-items-section">
@@ -3081,12 +3061,6 @@
                 <div class="event-items-list" id="eventItemsList">
                     <!-- Items will be populated dynamically -->
                 </div>
-            </div>
-            <div class="event-preview-actions">
-                <button class="event-action-btn secondary" onclick="closeEventPreview()">Close</button>
-                <button class="event-action-btn primary" onclick="viewFullOrderDetails()">
-                    <i class="fas fa-eye"></i> See Full Order Details
-                </button>
             </div>
         </div>
     </div>
@@ -4398,7 +4372,6 @@
             { 
                 id: 1, orderId: '1234', customer: 'Sarah Johnson', type: 'pickup', 
                 date: new Date(2026, 2, 15, 14, 0), total: 125.00,
-                orderNotes: 'Customer prefers contactless pickup. Call when ready.',
                 itemList: [
                     { name: 'Classic Burger', qty: 2, price: 24.00, notes: 'No onions, extra pickles' },
                     { name: 'Caesar Salad', qty: 1, price: 12.00, notes: 'Dressing on the side' },
@@ -4408,7 +4381,6 @@
             { 
                 id: 2, orderId: '1235', customer: 'Mike Chen', type: 'delivery', 
                 date: new Date(2026, 2, 15, 16, 30), total: 89.50,
-                orderNotes: 'Leave at door. Ring doorbell twice.',
                 itemList: [
                     { name: 'Margherita Pizza', qty: 1, price: 18.00, notes: 'Well done, cut into 8 slices' },
                     { name: 'Garlic Knots', qty: 2, price: 6.00, notes: 'Extra marinara sauce' }
@@ -4417,7 +4389,6 @@
             { 
                 id: 3, orderId: '1236', customer: 'Emily Davis', type: 'preorder', 
                 date: new Date(2026, 2, 18, 10, 0), total: 250.00,
-                orderNotes: 'Birthday party order. Please include candles and plates.',
                 itemList: [
                     { name: 'Birthday Cake (Large)', qty: 1, price: 85.00, notes: 'Write "Happy 30th Emily!" in pink' },
                     { name: 'Cupcakes Assorted', qty: 24, price: 72.00, notes: 'Mix of chocolate and vanilla' },
@@ -4429,7 +4400,6 @@
             { 
                 id: 4, orderId: '1237', customer: 'Alex Rivera', type: 'pickup', 
                 date: new Date(2026, 2, 20, 12, 0), total: 45.00,
-                orderNotes: '',
                 itemList: [
                     { name: 'Chicken Wrap', qty: 1, price: 14.00, notes: 'Gluten-free wrap' }
                 ]
@@ -4437,7 +4407,6 @@
             { 
                 id: 5, orderId: '1238', customer: 'Jessica Wong', type: 'delivery', 
                 date: new Date(2026, 2, 22, 18, 0), total: 175.00,
-                orderNotes: 'Apartment 4B. Buzzer code is 1234.',
                 itemList: [
                     { name: 'Sushi Platter', qty: 1, price: 65.00, notes: 'Extra wasabi and ginger' },
                     { name: 'Miso Soup', qty: 4, price: 16.00, notes: '' },
@@ -4448,7 +4417,6 @@
             { 
                 id: 6, orderId: '1239', customer: 'David Miller', type: 'pickup', 
                 date: new Date(2026, 2, 25, 11, 0), total: 62.00,
-                orderNotes: 'Will pick up at back entrance.',
                 itemList: [
                     { name: 'Breakfast Burrito', qty: 2, price: 22.00, notes: 'One without eggs (vegan)' },
                     { name: 'Fresh Orange Juice', qty: 2, price: 10.00, notes: 'No pulp' }
@@ -4457,7 +4425,6 @@
             { 
                 id: 7, orderId: '1240', customer: 'Lisa Park', type: 'preorder', 
                 date: new Date(2026, 3, 1, 14, 0), total: 320.00,
-                orderNotes: 'Corporate catering order. Need serving utensils included.',
                 itemList: [
                     { name: 'Sandwich Platter', qty: 2, price: 90.00, notes: 'Half vegetarian options' },
                     { name: 'Pasta Salad (Large)', qty: 1, price: 35.00, notes: 'Nut-free' },
@@ -4472,7 +4439,6 @@
             { 
                 id: 8, orderId: '1241', customer: 'Tom Brown', type: 'delivery', 
                 date: new Date(2026, 2, 15, 9, 0), total: 55.00,
-                orderNotes: 'Morning delivery - please call 5 min before arrival.',
                 itemList: [
                     { name: 'Pancake Stack', qty: 1, price: 15.00, notes: 'Extra maple syrup' },
                     { name: 'Bacon & Eggs', qty: 1, price: 14.00, notes: 'Eggs scrambled, bacon crispy' }
@@ -5074,8 +5040,6 @@
             const customer = document.getElementById('eventCustomer');
             const dueDate = document.getElementById('eventDueDate');
             const total = document.getElementById('eventTotal');
-            const orderNotesRow = document.getElementById('eventOrderNotesRow');
-            const orderNotes = document.getElementById('eventOrderNotes');
             const itemsCount = document.getElementById('eventItemsCount');
             const itemsList = document.getElementById('eventItemsList');
             
@@ -5092,15 +5056,7 @@
             });
             total.textContent = `$${event.total.toFixed(2)}`;
             
-            // Update order notes
-            if (event.orderNotes && event.orderNotes.trim()) {
-                orderNotes.textContent = event.orderNotes;
-                orderNotesRow.style.display = 'flex';
-            } else {
-                orderNotesRow.style.display = 'none';
-            }
-            
-            // Update items list
+            // Update items list with item notes (order notes)
             const itemCount = event.itemList ? event.itemList.length : 0;
             itemsCount.textContent = `(${itemCount})`;
             
