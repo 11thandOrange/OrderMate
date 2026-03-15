@@ -4400,6 +4400,13 @@
             
             console.log('Final searchedDates count:', searchedDates.length);
             
+            // Hide/show nav buttons based on whether we have searched dates
+            const navButtons = document.querySelectorAll('.calendar-nav-btn');
+            const hasSearchedDates = searchedDates.length > 0;
+            navButtons.forEach(btn => {
+                btn.style.visibility = hasSearchedDates ? 'hidden' : 'visible';
+            });
+            
             if (searchedDates.length > 1) {
                 // Render multiple days side by side
                 console.log('Rendering multiple days view');
