@@ -224,8 +224,10 @@
         /* Content Area */
         .content-area {
             flex: 1;
-            overflow-y: auto;
+            overflow: hidden;
             padding: 24px;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Order Page Grid */
@@ -235,6 +237,25 @@
             gap: 24px;
             max-width: 1400px;
             margin: 0 auto;
+            height: 100%;
+            min-height: 0;
+        }
+
+        /* Main Column */
+        .main-column {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            height: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+            overflow-y: auto;
         }
 
         /* Card Styles */
@@ -567,11 +588,50 @@
             color: var(--text-light);
         }
 
+        /* Items Card - Flexible height */
+        .items-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .items-card .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+
         /* Items Section */
         .items-list {
             display: flex;
             flex-direction: column;
             gap: 12px;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+            padding-right: 8px;
+        }
+
+        .items-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .items-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+        }
+
+        .items-list::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+        }
+
+        .items-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.3);
         }
 
         .item-row {
@@ -727,13 +787,6 @@
 
         .summary-value {
             color: var(--text-light);
-        }
-
-        /* Sidebar */
-        .sidebar-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
         }
 
         /* Modals */
@@ -1041,7 +1094,7 @@
                     <!-- Main Column -->
                     <div class="main-column">
                         <!-- Items Card -->
-                        <div class="card" style="margin-bottom: 20px;">
+                        <div class="card items-card">
                             <div class="card-header">
                                 <div class="card-title">
                                     <i class="fas fa-box"></i>
