@@ -238,6 +238,23 @@
             height: 100%;
         }
 
+        .main-column {
+            height: 100%;
+        }
+
+        .main-column > .card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-column > .card > .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
         /* Card Styles */
         .card {
             background: var(--bg-glass);
@@ -573,7 +590,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            max-height: calc(100vh - 380px);
+            flex: 1;
             overflow-y: auto;
         }
 
@@ -1058,11 +1075,11 @@
                     <!-- Main Column -->
                     <div class="main-column">
                         <!-- Items Card -->
-                        <div class="card" style="margin-bottom: 20px;">
+                        <div class="card">
                             <div class="card-header">
                                 <div class="card-title">
                                     <i class="fas fa-box"></i>
-                                    Items (3)
+                                    Items (10)
                                 </div>
                             </div>
                             <div class="card-body">
@@ -1108,6 +1125,101 @@
                                         </div>
                                         <div class="item-qty">x2</div>
                                         <div class="item-price">$45.00</div>
+                                    </div>
+                                    <div class="item-row">
+                                        <div class="item-image">
+                                            <i class="fas fa-bread-slice"></i>
+                                        </div>
+                                        <div class="item-details">
+                                            <div class="item-name">Artisan Bread Loaf</div>
+                                            <div class="item-notes">
+                                                <span class="item-note-pill category">Bakery</span>
+                                                <span class="item-note-pill tag">Sourdough</span>
+                                            </div>
+                                        </div>
+                                        <div class="item-qty">x3</div>
+                                        <div class="item-price">$24.00</div>
+                                    </div>
+                                    <div class="item-row">
+                                        <div class="item-image">
+                                            <i class="fas fa-cheese"></i>
+                                        </div>
+                                        <div class="item-details">
+                                            <div class="item-name">Cheese Platter Deluxe</div>
+                                            <div class="item-notes">
+                                                <span class="item-note-pill category">Appetizer</span>
+                                            </div>
+                                        </div>
+                                        <div class="item-qty">x1</div>
+                                        <div class="item-price">$65.00</div>
+                                    </div>
+                                    <div class="item-row">
+                                        <div class="item-image">
+                                            <i class="fas fa-wine-bottle"></i>
+                                        </div>
+                                        <div class="item-details">
+                                            <div class="item-name">Sparkling Cider</div>
+                                            <div class="item-notes">
+                                                <span class="item-note-pill tag">Non-Alcoholic</span>
+                                            </div>
+                                        </div>
+                                        <div class="item-qty">x6</div>
+                                        <div class="item-price">$42.00</div>
+                                    </div>
+                                    <div class="item-row">
+                                        <div class="item-image">
+                                            <i class="fas fa-ice-cream"></i>
+                                        </div>
+                                        <div class="item-details">
+                                            <div class="item-name">Ice Cream Cake</div>
+                                            <div class="item-notes">
+                                                <span class="item-note-pill category">Dessert</span>
+                                                <span class="item-note-pill tag">Chocolate</span>
+                                            </div>
+                                        </div>
+                                        <div class="item-qty">x1</div>
+                                        <div class="item-price">$55.00</div>
+                                    </div>
+                                    <div class="item-row">
+                                        <div class="item-image">
+                                            <i class="fas fa-drumstick-bite"></i>
+                                        </div>
+                                        <div class="item-details">
+                                            <div class="item-name">Chicken Wings</div>
+                                            <div class="item-notes">
+                                                <span class="item-note-pill category">Appetizer</span>
+                                                <span class="item-note-pill tag">Spicy</span>
+                                            </div>
+                                        </div>
+                                        <div class="item-qty">x50</div>
+                                        <div class="item-price">$75.00</div>
+                                    </div>
+                                    <div class="item-row">
+                                        <div class="item-image">
+                                            <i class="fas fa-carrot"></i>
+                                        </div>
+                                        <div class="item-details">
+                                            <div class="item-name">Veggie Tray</div>
+                                            <div class="item-notes">
+                                                <span class="item-note-pill tag">Organic</span>
+                                            </div>
+                                        </div>
+                                        <div class="item-qty">x2</div>
+                                        <div class="item-price">$35.00</div>
+                                    </div>
+                                    <div class="item-row">
+                                        <div class="item-image">
+                                            <i class="fas fa-pizza-slice"></i>
+                                        </div>
+                                        <div class="item-details">
+                                            <div class="item-name">Party Pizza (XL)</div>
+                                            <div class="item-notes">
+                                                <span class="item-note-pill category">Main</span>
+                                                <span class="item-note-pill tag">Pepperoni</span>
+                                            </div>
+                                        </div>
+                                        <div class="item-qty">x4</div>
+                                        <div class="item-price">$88.00</div>
                                     </div>
                                 </div>
 
