@@ -1452,7 +1452,8 @@
 
         /* Pop Up Editor */
         .popup-preview {
-            background: rgba(0, 0, 0, 0.3);
+            background: var(--bg-glass);
+            backdrop-filter: var(--backdrop-blur);
             border-radius: var(--border-radius-md);
             padding: 16px;
             min-height: 300px;
@@ -1476,6 +1477,9 @@
 
         .widget-list {
             min-height: 200px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--border-radius-md);
+            padding: 12px;
         }
 
         .widget-item {
