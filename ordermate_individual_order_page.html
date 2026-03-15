@@ -226,8 +226,6 @@
             flex: 1;
             overflow: hidden;
             padding: 24px;
-            display: flex;
-            flex-direction: column;
         }
 
         /* Order Page Grid */
@@ -238,15 +236,13 @@
             max-width: 1400px;
             margin: 0 auto;
             height: 100%;
-            min-height: 0;
         }
 
         /* Main Column */
         .main-column {
             display: flex;
             flex-direction: column;
-            min-height: 0;
-            height: 100%;
+            overflow: hidden;
         }
 
         /* Sidebar */
@@ -254,7 +250,6 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            height: 100%;
             overflow-y: auto;
         }
 
@@ -588,32 +583,31 @@
             color: var(--text-light);
         }
 
-        /* Items Card - Flexible height */
+        /* Items Card - Flexible height with scroll */
         .items-card {
             flex: 1;
             display: flex;
             flex-direction: column;
-            min-height: 0;
             overflow: hidden;
+            min-height: 0;
         }
 
         .items-card .card-body {
             flex: 1;
             display: flex;
             flex-direction: column;
-            min-height: 0;
             overflow: hidden;
+            min-height: 0;
         }
 
         /* Items Section */
         .items-list {
+            flex: 1;
             display: flex;
             flex-direction: column;
             gap: 12px;
             overflow-y: auto;
-            flex: 1;
             min-height: 0;
-            padding-right: 8px;
         }
 
         .items-list::-webkit-scrollbar {
@@ -763,6 +757,7 @@
             margin-top: 16px;
             padding-top: 16px;
             border-top: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
         }
 
         .summary-row {
