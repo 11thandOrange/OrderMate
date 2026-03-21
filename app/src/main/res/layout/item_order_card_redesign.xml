@@ -254,8 +254,6 @@
                     app:flexDirection="row"/>
             </LinearLayout>
 
-        </LinearLayout>
-
     </LinearLayout>
 
 </LinearLayout>
