@@ -93,6 +93,8 @@ class FilterDialogFragment : DialogFragment() {
             requestFeature(Window.FEATURE_NO_TITLE)
             setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         }
+        // Close on outside click
+        dialog.setCanceledOnTouchOutside(true)
         return dialog
     }
 
@@ -140,7 +142,6 @@ class FilterDialogFragment : DialogFragment() {
 
         setupDateInputs()
         setupFilterOptions()
-        setupButtons()
     }
 
     private fun setupDateInputs() {
@@ -178,6 +179,8 @@ class FilterDialogFragment : DialogFragment() {
                     }
                 }
                 updateDateChips()
+                // Apply filters immediately
+                applyFiltersImmediately()
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -202,6 +205,8 @@ class FilterDialogFragment : DialogFragment() {
                 if (selectedOrderDates.isEmpty()) {
                     binding.orderDateInput.text?.clear()
                 }
+                // Apply filters immediately
+                applyFiltersImmediately()
             }
             binding.orderDateChips.addView(chip)
         }
@@ -215,6 +220,8 @@ class FilterDialogFragment : DialogFragment() {
                 if (selectedPickupDates.isEmpty()) {
                     binding.pickupDateInput.text?.clear()
                 }
+                // Apply filters immediately
+                applyFiltersImmediately()
             }
             binding.pickupDateChips.addView(chip)
         }
@@ -318,9 +325,24 @@ class FilterDialogFragment : DialogFragment() {
                 // Select this one
                 updateChipState(chip, true)
                 onSelect(value)
+                // Apply filters immediately
+                applyFiltersImmediately()
             }
             container.addView(chip)
         }
+    }
+
+    private fun applyFiltersImmediately() {
+        val filterState = FilterState(
+            paymentStatus = selectedPaymentStatus,
+            orderStatus = selectedOrderStatus,
+            paymentType = selectedPaymentType,
+            category = selectedCategory,
+            employee = selectedEmployee,
+            orderDates = selectedOrderDates.toList(),
+            pickupDates = selectedPickupDates.toList()
+        )
+        listener?.onFiltersApplied(filterState)
     }
 
     private fun createFilterChip(label: String, value: String, isSelected: Boolean): TextView {
@@ -352,49 +374,6 @@ class FilterDialogFragment : DialogFragment() {
             chip.setBackgroundResource(R.drawable.bg_filter_option)
             chip.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_light))
         }
-    }
-
-    private fun setupButtons() {
-        binding.btnClearAll.setOnClickListener {
-            clearAllFilters()
-        }
-
-        binding.btnApply.setOnClickListener {
-            applyFilters()
-        }
-    }
-
-    private fun clearAllFilters() {
-        selectedPaymentStatus = "all"
-        selectedOrderStatus = "all"
-        selectedPaymentType = "all"
-        selectedCategory = "all"
-        selectedEmployee = "all"
-        selectedOrderDates.clear()
-        selectedPickupDates.clear()
-
-        // Reset UI
-        binding.orderDateInput.text?.clear()
-        binding.pickupDateInput.text?.clear()
-        setupFilterOptions()
-        updateDateChips()
-
-        listener?.onFilterCleared()
-        dismiss()
-    }
-
-    private fun applyFilters() {
-        val filterState = FilterState(
-            paymentStatus = selectedPaymentStatus,
-            orderStatus = selectedOrderStatus,
-            paymentType = selectedPaymentType,
-            category = selectedCategory,
-            employee = selectedEmployee,
-            orderDates = selectedOrderDates.toList(),
-            pickupDates = selectedPickupDates.toList()
-        )
-        listener?.onFiltersApplied(filterState)
-        dismiss()
     }
 
     private fun dpToPx(dp: Int): Int {
