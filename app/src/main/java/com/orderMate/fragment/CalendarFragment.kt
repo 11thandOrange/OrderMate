@@ -332,20 +332,30 @@ class CalendarFragment : Fragment() {
         return OrderSearchFilter.matchesSearch(order, query)
     }
 
-    // ==================== Date Picker (same as List tab) ====================
+    // ==================== Date Picker (matches HTML - multiple dates with pills) ====================
     
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
-        selectedDateFilter?.let { calendar.time = it }
+        // Use last selected date or current date
+        val existingDates = currentFilterState.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE]
+        existingDates?.lastOrNull()?.let { calendar.time = it }
 
         DatePickerDialog(
             requireContext(),
             R.style.Theme_OrderMate_Dialog,
             { _, year, month, day ->
-                calendar.set(year, month, day)
-                selectedDateFilter = calendar.time
+                calendar.set(year, month, day, 0, 0, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val selectedDate = calendar.time
+                
+                // Add date to filter state (supports multiple dates like HTML)
+                addDateToFilterState(selectedDate)
+                
+                // Navigate calendar to this date
                 currentDate.set(year, month, day)
-                filterByDate(calendar.time)
+                
+                // Apply filters and update pills
+                applyDialogFilters(currentFilterState)
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -353,7 +363,30 @@ class CalendarFragment : Fragment() {
         ).show()
     }
     
+    /**
+     * Add a date to the current filter state (matches HTML behavior)
+     * Creates a pill for the date in the filter pills row
+     */
+    private fun addDateToFilterState(date: Date) {
+        val newDateSelections = currentFilterState.dateSelections.toMutableMap()
+        val categoryId = FilterCategoryBuilder.CLOVER_ORDER_DATE
+        
+        val existingDates = newDateSelections[categoryId]?.toMutableList() ?: mutableListOf()
+        
+        // Check if date already exists (compare by day only)
+        val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+        val newDateStr = dateFormat.format(date)
+        val alreadyExists = existingDates.any { dateFormat.format(it) == newDateStr }
+        
+        if (!alreadyExists) {
+            existingDates.add(date)
+            newDateSelections[categoryId] = existingDates
+            currentFilterState = currentFilterState.copy(dateSelections = newDateSelections)
+        }
+    }
+    
     private fun filterByDate(date: Date) {
+        // Deprecated - now using addDateToFilterState + applyDialogFilters for consistency
         runOnBackgroundThread {
             val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
             val targetDate = dateFormat.format(date)
@@ -538,11 +571,15 @@ class CalendarFragment : Fragment() {
             }
         }
         
-        // Add date filter pills
+        // Add date filter pills (with "Order Date:" label like HTML)
         for ((categoryId, dates) in filters.dateSelections) {
+            val label = when (categoryId) {
+                FilterCategoryBuilder.CLOVER_ORDER_DATE -> "Order"
+                else -> "Date"
+            }
             dates.forEachIndexed { index, date ->
                 hasPills = true
-                val pill = createFilterPillWithClose(dateFormat.format(date)) {
+                val pill = createFilterPillWithClose("$label: ${dateFormat.format(date)}") {
                     removeDateFilter(categoryId, index)
                 }
                 filterPillsContainer?.addView(pill)

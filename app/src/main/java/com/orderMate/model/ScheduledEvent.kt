@@ -31,8 +31,23 @@ data class ScheduledEvent(
 data class LineItemPreview(
     val name: String,
     val price: Double,
-    val quantity: Int = 1
+    val quantity: Int = 1,
+    val customNotes: List<CustomNote> = emptyList()
 )
+
+/**
+ * Custom note for line item (matches HTML structure)
+ * Types: "select" (category), "multiselect" (tags), "text" (description)
+ */
+data class CustomNote(
+    val type: String,  // "select", "multiselect", "text"
+    val value: Any     // String for select/text, List<String> for multiselect
+) {
+    fun getStringValue(): String? = value as? String
+    
+    @Suppress("UNCHECKED_CAST")
+    fun getListValue(): List<String> = (value as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+}
 
 /**
  * Event type enum for calendar events

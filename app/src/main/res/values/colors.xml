@@ -89,11 +89,23 @@
     <!-- Calendar colors -->
     <color name="calendar_weekday_bg">#33000000</color>
     <color name="calendar_today_bg">#1AFF9F43</color>
-    <color name="event_pickup">#4CAF50</color>
+    <color name="event_pickup">#81c784</color>
     <color name="event_pickup_bg">#334CAF50</color>
-    <color name="event_delivery">#2196F3</color>
+    <color name="event_delivery">#64b5f6</color>
     <color name="event_delivery_bg">#332196F3</color>
-    <color name="event_preorder">#9C27B0</color>
+    <color name="event_preorder">#ce93d8</color>
     <color name="event_preorder_bg">#339C27B0</color>
     <color name="today_highlight_bg">#1AFF9F43</color>
+    
+    <!-- Event preview note pill colors (matches HTML) -->
+    <color name="note_pill_category_bg">#337B1FA2</color>
+    <color name="note_pill_category_text">#ce93d8</color>
+    <color name="note_pill_tag_bg">#33388E3C</color>
+    <color name="note_pill_tag_text">#81c784</color>
+    <color name="note_pill_text_bg">#33F57C00</color>
+    <color name="note_pill_text_text">#ffb74d</color>
+    
+    <!-- Glassmorphism event preview -->
+    <color name="event_preview_bg">#26FFFFFF</color>
+    <color name="event_preview_border">#1AFFFFFF</color>
 </resources>

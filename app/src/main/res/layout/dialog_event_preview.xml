@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Event Preview Modal for Calendar Tab (#82 CAL-4) - Shows order details -->
-<androidx.cardview.widget.CardView
+<!-- Event Preview Modal for Calendar Tab (#82 CAL-4) - Glassmorphism style (matches HTML) -->
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="24dp"
-    app:cardCornerRadius="16dp"
-    app:cardBackgroundColor="@color/card_background"
-    app:cardElevation="8dp">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_event_preview_glass">
 
         <!-- Header: Type Badge + Order Title + Full Details Button -->
         <LinearLayout
@@ -290,15 +283,40 @@
 
         </LinearLayout>
 
-        <!-- Items List (scrollable) - matching HTML styling -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/itemsList"
+        <!-- Items List wrapper with scroll indicator (matches HTML) -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxHeight="200dp"
-            android:layout_marginTop="12dp"
-            android:clipToPadding="false"
-            android:nestedScrollingEnabled="true"/>
+            android:layout_marginTop="10dp">
 
-    </LinearLayout>
-</androidx.cardview.widget.CardView>
+            <!-- Items List (scrollable) - matching HTML styling -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/itemsList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxHeight="180dp"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="true"
+                android:paddingBottom="24dp"/>
+
+            <!-- Scroll indicator (chevron-down icon) -->
+            <LinearLayout
+                android:id="@+id/scrollIndicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="4dp"
+                android:visibility="gone"
+                android:background="@drawable/bg_scroll_indicator_gradient">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_chevron_down"
+                    app:tint="@color/text_muted"/>
+            </LinearLayout>
+        </FrameLayout>
+
+</LinearLayout>

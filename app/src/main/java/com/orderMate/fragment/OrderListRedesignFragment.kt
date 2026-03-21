@@ -344,24 +344,54 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
-        selectedDateFilter?.let { calendar.time = it }
+        // Use last selected date or current date
+        val existingDates = currentFilterState.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE]
+        existingDates?.lastOrNull()?.let { calendar.time = it }
 
         DatePickerDialog(
             requireContext(),
             R.style.Theme_OrderMate_Dialog,
             { _, year, month, day ->
-                calendar.set(year, month, day)
-                selectedDateFilter = calendar.time
-                filterByDate(calendar.time)
-                updateDateFilterUI()
+                calendar.set(year, month, day, 0, 0, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val selectedDate = calendar.time
+                
+                // Add date to filter state (supports multiple dates like HTML)
+                addDateToFilterState(selectedDate)
+                
+                // Apply filters and update pills
+                applyDialogFilters(currentFilterState)
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         ).show()
     }
+    
+    /**
+     * Add a date to the current filter state (matches HTML behavior)
+     * Creates a pill for the date in the filter pills row
+     */
+    private fun addDateToFilterState(date: Date) {
+        val newDateSelections = currentFilterState.dateSelections.toMutableMap()
+        val categoryId = FilterCategoryBuilder.CLOVER_ORDER_DATE
+        
+        val existingDates = newDateSelections[categoryId]?.toMutableList() ?: mutableListOf()
+        
+        // Check if date already exists (compare by day only)
+        val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+        val newDateStr = dateFormat.format(date)
+        val alreadyExists = existingDates.any { dateFormat.format(it) == newDateStr }
+        
+        if (!alreadyExists) {
+            existingDates.add(date)
+            newDateSelections[categoryId] = existingDates
+            currentFilterState = currentFilterState.copy(dateSelections = newDateSelections)
+        }
+    }
 
     private fun filterByDate(date: Date) {
+        // Deprecated - now using addDateToFilterState + applyDialogFilters for consistency
         runOnBackgroundThread {
             val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
             val targetDate = dateFormat.format(date)
@@ -387,7 +417,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun updateDateFilterUI() {
-        // Could show a pill indicating date filter is active
+        // Deprecated - now using pills instead
         selectedDateFilter?.let {
             val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
             binding.searchInput.hint = "Filtering: ${dateFormat.format(it)}"

@@ -8,12 +8,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.flexbox.FlexboxLayout
 import com.orderMate.R
+import com.orderMate.model.CustomNote
 import com.orderMate.model.EventType
 import com.orderMate.model.LineItemPreview
 import com.orderMate.model.ScheduledEvent
@@ -92,11 +95,14 @@ class EventPreviewDialog : DialogFragment() {
         orderTotal.text = "$${String.format("%.2f", currentEvent.total)}"
         itemCount.text = "${currentEvent.itemCount} items"
 
-        // Items list
+        // Items list (no limit - show all items like HTML)
         if (currentEvent.lineItems.isNotEmpty()) {
             itemsList.visibility = View.VISIBLE
             itemsList.layoutManager = LinearLayoutManager(requireContext())
             itemsList.adapter = LineItemAdapter(currentEvent.lineItems)
+            
+            // Setup scroll indicator
+            setupScrollIndicator(view, itemsList)
         } else {
             itemsList.visibility = View.GONE
         }
@@ -107,11 +113,38 @@ class EventPreviewDialog : DialogFragment() {
             dismiss()
         }
     }
+    
+    private fun setupScrollIndicator(view: View, recyclerView: RecyclerView) {
+        val scrollIndicator = view.findViewById<View>(R.id.scrollIndicator)
+        scrollIndicator?.let { indicator ->
+            recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                    updateScrollIndicator(rv, indicator)
+                }
+            })
+            // Initial check
+            recyclerView.post { updateScrollIndicator(recyclerView, indicator) }
+        }
+    }
+    
+    private fun updateScrollIndicator(recyclerView: RecyclerView, indicator: View) {
+        val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
+        val lastVisibleItem = layoutManager.findLastCompletelyVisibleItemPosition()
+        val itemCount = recyclerView.adapter?.itemCount ?: 0
+        val hasMoreContent = lastVisibleItem < itemCount - 1
+        indicator.visibility = if (hasMoreContent) View.VISIBLE else View.GONE
+    }
 
     override fun onStart() {
         super.onStart()
+        // Set max width to 400dp (matches HTML max-width: 400px)
+        val displayMetrics = resources.displayMetrics
+        val maxWidthPx = (400 * displayMetrics.density).toInt()
+        val screenWidth = displayMetrics.widthPixels
+        val targetWidth = minOf((screenWidth * 0.9).toInt(), maxWidthPx)
+        
         dialog?.window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
+            targetWidth,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
     }
@@ -138,17 +171,86 @@ class EventPreviewDialog : DialogFragment() {
             holder.bind(items[position])
         }
 
-        override fun getItemCount(): Int = minOf(items.size, 5)
+        // No limit - show all items (matches HTML behavior)
+        override fun getItemCount(): Int = items.size
 
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             private val itemName: TextView = itemView.findViewById(R.id.itemName)
             private val itemPrice: TextView = itemView.findViewById(R.id.itemPrice)
             private val itemQuantity: TextView = itemView.findViewById(R.id.itemQuantity)
+            private val notesPillsContainer: FlexboxLayout = itemView.findViewById(R.id.notesPillsContainer)
 
             fun bind(item: LineItemPreview) {
                 itemName.text = item.name
                 itemPrice.text = "$${String.format("%.2f", item.price)}"
                 itemQuantity.text = "x${item.quantity}"
+                
+                // Render custom notes as pills (matches HTML)
+                renderNotePills(item.customNotes)
+            }
+            
+            private fun renderNotePills(customNotes: List<CustomNote>) {
+                notesPillsContainer.removeAllViews()
+                
+                if (customNotes.isEmpty()) {
+                    notesPillsContainer.visibility = View.GONE
+                    return
+                }
+                
+                notesPillsContainer.visibility = View.VISIBLE
+                
+                customNotes.forEach { note ->
+                    when (note.type) {
+                        "select" -> {
+                            // Category style pill (purple)
+                            note.getStringValue()?.let { value ->
+                                addPill(value, R.drawable.bg_note_pill_category, R.color.note_pill_category_text)
+                            }
+                        }
+                        "multiselect" -> {
+                            // Multiple tag pills (green)
+                            note.getListValue().forEach { tag ->
+                                addPill(tag, R.drawable.bg_note_pill_tag, R.color.note_pill_tag_text)
+                            }
+                        }
+                        "text" -> {
+                            // Text description pill (orange) - truncate if >30 chars
+                            note.getStringValue()?.let { value ->
+                                if (value.isNotBlank()) {
+                                    val displayText = if (value.length > 30) {
+                                        value.take(30) + "..."
+                                    } else {
+                                        value
+                                    }
+                                    addPill(displayText, R.drawable.bg_note_pill_text, R.color.note_pill_text_text)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            private fun addPill(text: String, backgroundRes: Int, textColorRes: Int) {
+                val context = itemView.context
+                val pill = TextView(context).apply {
+                    this.text = text
+                    setBackgroundResource(backgroundRes)
+                    setTextColor(ContextCompat.getColor(context, textColorRes))
+                    textSize = 10f
+                    setPadding(dpToPx(8), dpToPx(2), dpToPx(8), dpToPx(2))
+                    
+                    val lp = FlexboxLayout.LayoutParams(
+                        FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                        FlexboxLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    lp.setMargins(0, 0, dpToPx(4), dpToPx(4))
+                    layoutParams = lp
+                }
+                notesPillsContainer.addView(pill)
+            }
+            
+            private fun dpToPx(dp: Int): Int {
+                return (dp * itemView.resources.displayMetrics.density).toInt()
             }
         }
     }
