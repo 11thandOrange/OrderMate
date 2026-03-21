@@ -1022,13 +1022,17 @@ class CalendarFragment : Fragment() {
     }
     
     fun viewFullOrderDetails(orderId: String) {
-        // Navigate to order details using existing infrastructure
+        // Navigate to order details using nav controller
         try {
             val order = allOrders.find { it?.id == orderId }
             if (order != null) {
                 OrderListRedesignFragment.userClickedData = order
-                // Trigger navigation to detail view
-                (activity as? com.orderMate.communicators.IOrderItemClickListener)?.onItemClick(order, 0)
+                
+                val navController = androidx.navigation.Navigation.findNavController(requireView())
+                val bundle = Bundle().apply {
+                    putParcelable("orderData", order)
+                }
+                navController.navigate(R.id.action_calendarFragment_to_orderDetailFragment, bundle)
             }
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Unable to open order details", Toast.LENGTH_SHORT).show()
