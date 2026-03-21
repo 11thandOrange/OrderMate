@@ -4,7 +4,12 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
 import com.google.gson.Gson
-import com.orderMate.modals.*
+import com.orderMate.modals.LegacyCustomItemJson
+import com.orderMate.modals.MerchantMeta
+import com.orderMate.modals.PopupSettings
+import com.orderMate.modals.WidgetConfig
+import com.orderMate.modals.WidgetOption
+import com.orderMate.modals.WidgetType
 
 /**
  * Firebase CRUD operations for new schema structure
