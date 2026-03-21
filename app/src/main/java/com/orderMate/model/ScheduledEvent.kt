@@ -17,7 +17,8 @@ data class ScheduledEvent(
     val itemCount: Int,
     val note: String? = null,
     val gmailEventId: String? = null,
-    val notificationScheduled: Boolean = false
+    val notificationScheduled: Boolean = false,
+    val lineItemNames: List<String> = emptyList()
 )
 
 /**

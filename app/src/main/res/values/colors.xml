@@ -95,4 +95,5 @@
     <color name="event_delivery_bg">#332196F3</color>
     <color name="event_preorder">#9C27B0</color>
     <color name="event_preorder_bg">#339C27B0</color>
+    <color name="today_highlight_bg">#1AFF9F43</color>
 </resources>

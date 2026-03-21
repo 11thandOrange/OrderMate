@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
@@ -22,16 +21,17 @@ import java.util.*
 
 /**
  * Event Preview Dialog (#82 CAL-4)
- * 
- * Shows scheduled events for a selected day.
- * Allows tapping an event to view full order details.
+ *
+ * Shows order details for a scheduled event.
+ * Matches HTML preview layout with:
+ * - Type badge + Order title + Full Details button
+ * - Customer, Due Date, Total, Items rows
+ * - Optional items list
  */
 class EventPreviewDialog : DialogFragment() {
 
-    private var events: List<ScheduledEvent> = emptyList()
-    private var selectedDate: Date = Date()
-    private var onEventClick: ((ScheduledEvent) -> Unit)? = null
-    private var onViewAllClick: (() -> Unit)? = null
+    private var event: ScheduledEvent? = null
+    private var onFullDetailsClick: ((ScheduledEvent) -> Unit)? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -50,39 +50,69 @@ class EventPreviewDialog : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val currentEvent = event ?: return
+
+        // Header
+        val eventTypeBadge = view.findViewById<TextView>(R.id.eventTypeBadge)
+        val orderTitle = view.findViewById<TextView>(R.id.orderTitle)
+        val btnFullDetails = view.findViewById<TextView>(R.id.btnFullDetails)
+        val btnClose = view.findViewById<TextView>(R.id.btnClose)
         
-        val eventDate = view.findViewById<TextView>(R.id.eventDate)
-        val eventCount = view.findViewById<TextView>(R.id.eventCount)
-        val btnClose = view.findViewById<ImageView>(R.id.btnClose)
-        val eventsList = view.findViewById<RecyclerView>(R.id.eventsList)
-        val btnViewAll = view.findViewById<TextView>(R.id.btnViewAll)
+        // Details
+        val customerName = view.findViewById<TextView>(R.id.customerName)
+        val dueDate = view.findViewById<TextView>(R.id.dueDate)
+        val orderTotal = view.findViewById<TextView>(R.id.orderTotal)
+        val itemCount = view.findViewById<TextView>(R.id.itemCount)
+        val itemsList = view.findViewById<RecyclerView>(R.id.itemsList)
 
-        // Set date
-        val dateFormat = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
-        eventDate.text = dateFormat.format(selectedDate)
+        // Set type badge
+        eventTypeBadge.text = currentEvent.type.getDisplayName().uppercase()
+        when (currentEvent.type) {
+            EventType.PICKUP -> {
+                eventTypeBadge.setTextColor(ContextCompat.getColor(requireContext(), R.color.event_pickup))
+                eventTypeBadge.setBackgroundResource(R.drawable.bg_event_badge_pickup)
+            }
+            EventType.DELIVERY -> {
+                eventTypeBadge.setTextColor(ContextCompat.getColor(requireContext(), R.color.event_delivery))
+                eventTypeBadge.setBackgroundResource(R.drawable.bg_event_badge_delivery)
+            }
+            EventType.PREORDER -> {
+                eventTypeBadge.setTextColor(ContextCompat.getColor(requireContext(), R.color.event_preorder))
+                eventTypeBadge.setBackgroundResource(R.drawable.bg_event_badge_preorder)
+            }
+        }
 
-        // Set event count
-        val countText = if (events.size == 1) "1 scheduled order" else "${events.size} scheduled orders"
-        eventCount.text = countText
+        // Set order title (truncate ID for display)
+        val shortId = currentEvent.orderId.takeLast(8).uppercase()
+        orderTitle.text = "Order #$shortId"
 
-        // Setup close button
-        btnClose.setOnClickListener { dismiss() }
+        // Set details
+        customerName.text = currentEvent.customerName
+        
+        val dateTimeFormat = SimpleDateFormat("MMMM d, yyyy 'at' h:mm a", Locale.getDefault())
+        dueDate.text = dateTimeFormat.format(currentEvent.dueDate)
+        
+        orderTotal.text = "$${String.format("%.2f", currentEvent.total)}"
+        itemCount.text = "${currentEvent.itemCount} items"
 
-        // Setup events list
-        eventsList.layoutManager = LinearLayoutManager(requireContext())
-        eventsList.adapter = EventPreviewAdapter(events) { event ->
-            onEventClick?.invoke(event)
+        // Items list (optional - show if we have line item names)
+        if (currentEvent.lineItemNames.isNotEmpty()) {
+            itemsList.visibility = View.VISIBLE
+            itemsList.layoutManager = LinearLayoutManager(requireContext())
+            itemsList.adapter = LineItemAdapter(currentEvent.lineItemNames)
+        } else {
+            itemsList.visibility = View.GONE
+        }
+
+        // Full Details button
+        btnFullDetails.setOnClickListener {
+            onFullDetailsClick?.invoke(currentEvent)
             dismiss()
         }
 
-        // Show "View All" if more than 5 events
-        if (events.size > 5) {
-            btnViewAll.visibility = View.VISIBLE
-            btnViewAll.setOnClickListener {
-                onViewAllClick?.invoke()
-                dismiss()
-            }
-        }
+        // Close button
+        btnClose.setOnClickListener { dismiss() }
     }
 
     override fun onStart() {
@@ -93,64 +123,38 @@ class EventPreviewDialog : DialogFragment() {
         )
     }
 
-    fun setEvents(events: List<ScheduledEvent>, date: Date) {
-        this.events = events
-        this.selectedDate = date
+    fun setEvent(event: ScheduledEvent) {
+        this.event = event
     }
 
     fun setOnEventClickListener(listener: (ScheduledEvent) -> Unit) {
-        this.onEventClick = listener
-    }
-
-    fun setOnViewAllClickListener(listener: () -> Unit) {
-        this.onViewAllClick = listener
+        this.onFullDetailsClick = listener
     }
 
     /**
-     * Adapter for events in the preview modal
+     * Simple adapter for line items
      */
-    inner class EventPreviewAdapter(
-        private val events: List<ScheduledEvent>,
-        private val onClick: (ScheduledEvent) -> Unit
-    ) : RecyclerView.Adapter<EventPreviewAdapter.ViewHolder>() {
+    inner class LineItemAdapter(
+        private val items: List<String>
+    ) : RecyclerView.Adapter<LineItemAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_event_preview, parent, false)
+                .inflate(R.layout.item_event_line_item, parent, false)
             return ViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(events[position])
+            holder.bind(items[position])
         }
 
-        override fun getItemCount(): Int = minOf(events.size, 5)
+        override fun getItemCount(): Int = minOf(items.size, 5)
 
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            private val eventTypeIndicator: View = itemView.findViewById(R.id.eventTypeIndicator)
-            private val customerName: TextView = itemView.findViewById(R.id.customerName)
-            private val eventType: TextView = itemView.findViewById(R.id.eventType)
-            private val itemCount: TextView = itemView.findViewById(R.id.itemCount)
-            private val orderTotal: TextView = itemView.findViewById(R.id.orderTotal)
+            private val itemName: TextView = itemView.findViewById(R.id.itemName)
 
-            fun bind(event: ScheduledEvent) {
-                val context = itemView.context
-
-                customerName.text = event.customerName
-                eventType.text = event.type.getDisplayName()
-                itemCount.text = "${event.itemCount} items"
-                orderTotal.text = "$${String.format("%.2f", event.total)}"
-
-                // Set colors based on event type
-                val color = when (event.type) {
-                    EventType.PICKUP -> ContextCompat.getColor(context, R.color.event_pickup)
-                    EventType.DELIVERY -> ContextCompat.getColor(context, R.color.event_delivery)
-                    EventType.PREORDER -> ContextCompat.getColor(context, R.color.event_preorder)
-                }
-                eventTypeIndicator.setBackgroundColor(color)
-                eventType.setTextColor(color)
-
-                itemView.setOnClickListener { onClick(event) }
+            fun bind(name: String) {
+                itemName.text = name
             }
         }
     }
@@ -158,9 +162,18 @@ class EventPreviewDialog : DialogFragment() {
     companion object {
         const val TAG = "EventPreviewDialog"
 
+        fun newInstance(event: ScheduledEvent): EventPreviewDialog {
+            return EventPreviewDialog().apply {
+                setEvent(event)
+            }
+        }
+        
+        // For backwards compatibility - shows first event
         fun newInstance(events: List<ScheduledEvent>, date: Date): EventPreviewDialog {
             return EventPreviewDialog().apply {
-                setEvents(events, date)
+                if (events.isNotEmpty()) {
+                    setEvent(events.first())
+                }
             }
         }
     }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Line item in event preview dialog -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="8dp"
+    android:paddingHorizontal="4dp">
+
+    <View
+        android:layout_width="4dp"
+        android:layout_height="4dp"
+        android:background="@drawable/bg_dot"/>
+
+    <TextView
+        android:id="@+id/itemName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Item Name"
+        android:textColor="@color/text_light"
+        android:textSize="13sp"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+</LinearLayout>

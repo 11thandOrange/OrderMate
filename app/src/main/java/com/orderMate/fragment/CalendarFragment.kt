@@ -247,6 +247,11 @@ class CalendarFragment : Fragment() {
                 order.lineItems?.size ?: 0
             } catch (e: Exception) { 0 }
             
+            // Get line item names for preview
+            val lineItemNames = try {
+                order.lineItems?.mapNotNull { it?.name }?.take(5) ?: emptyList()
+            } catch (e: Exception) { emptyList() }
+            
             // Determine event type based on order data
             val eventType = determineEventType(order)
             
@@ -258,7 +263,8 @@ class CalendarFragment : Fragment() {
                 dueDate = dueDate,
                 total = total,
                 itemCount = itemCount,
-                note = null
+                note = null,
+                lineItemNames = lineItemNames
             )
         }
     }
@@ -795,7 +801,7 @@ class CalendarFragment : Fragment() {
         }
         headerRow.addView(gutter)
         
-        // Day headers
+        // Day headers - single line format "SAT - 21" (matching HTML)
         for (i in 0 until numDays) {
             val dayCalendar = Calendar.getInstance().apply {
                 time = startDate.time
@@ -805,37 +811,24 @@ class CalendarFragment : Fragment() {
             val isToday = dayCalendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                          dayCalendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
             
-            val dayHeader = LinearLayout(context).apply {
-                orientation = LinearLayout.VERTICAL
-                gravity = android.view.Gravity.CENTER
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-            }
-            
-            val dayNameView = TextView(context).apply {
-                text = dayNamesShort[dayCalendar.get(Calendar.DAY_OF_WEEK) - 1]
+            // Single line header: "SAT - 21"
+            val dayHeader = TextView(context).apply {
+                val dayName = dayNamesShort[dayCalendar.get(Calendar.DAY_OF_WEEK) - 1]
+                val dayNum = dayCalendar.get(Calendar.DAY_OF_MONTH)
+                text = "$dayName - $dayNum"
                 textSize = 11f
-                setTextColor(ContextCompat.getColor(context, R.color.text_muted))
                 gravity = android.view.Gravity.CENTER
-            }
-            dayHeader.addView(dayNameView)
-            
-            val dayNumberView = TextView(context).apply {
-                text = dayCalendar.get(Calendar.DAY_OF_MONTH).toString()
-                textSize = 14f
-                gravity = android.view.Gravity.CENTER
-                val size = (28 * density).toInt()
-                layoutParams = LinearLayout.LayoutParams(size, size).apply {
-                    topMargin = (4 * density).toInt()
-                }
+                setPadding((12 * density).toInt(), (12 * density).toInt(), (12 * density).toInt(), (12 * density).toInt())
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                letterSpacing = 0.05f
                 
                 if (isToday) {
-                    setBackgroundResource(R.drawable.bg_day_header_today)
-                    setTextColor(ContextCompat.getColor(context, R.color.text_primary))
+                    setBackgroundColor(ContextCompat.getColor(context, R.color.today_highlight_bg))
+                    setTextColor(ContextCompat.getColor(context, R.color.accent_orange))
                 } else {
-                    setTextColor(ContextCompat.getColor(context, R.color.text_light))
+                    setTextColor(ContextCompat.getColor(context, R.color.text_muted))
                 }
             }
-            dayHeader.addView(dayNumberView)
             
             headerRow.addView(dayHeader)
         }
@@ -1339,16 +1332,20 @@ class CalendarFragment : Fragment() {
                     eventsContainer.visibility = View.VISIBLE
                     eventIndicator.visibility = View.GONE
                     
-                    // Show first event
+                    val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
+                    
+                    // Show first event with time: "9:30 AM - John Smith"
                     val firstEvent = day.events[0]
-                    event1.text = firstEvent.customerName
+                    val time1 = timeFormat.format(firstEvent.dueDate)
+                    event1.text = "$time1 - ${firstEvent.customerName}"
                     event1.visibility = View.VISIBLE
                     setEventStyle(event1, firstEvent.type)
                     
                     // Show second event if exists
                     if (day.events.size > 1) {
                         val secondEvent = day.events[1]
-                        event2.text = secondEvent.customerName
+                        val time2 = timeFormat.format(secondEvent.dueDate)
+                        event2.text = "$time2 - ${secondEvent.customerName}"
                         event2.visibility = View.VISIBLE
                         setEventStyle(event2, secondEvent.type)
                     } else {
