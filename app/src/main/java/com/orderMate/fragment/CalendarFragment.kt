@@ -82,6 +82,7 @@ class CalendarFragment : Fragment() {
     // Calendar Views
     private var monthYearTitle: TextView? = null
     private var calendarGrid: RecyclerView? = null
+    private var weekdayHeaders: LinearLayout? = null
     private var btnPrev: View? = null
     private var btnNext: View? = null
     private var btnDay: TextView? = null
@@ -123,6 +124,7 @@ class CalendarFragment : Fragment() {
         // Calendar views
         monthYearTitle = view.findViewById(R.id.monthYearTitle)
         calendarGrid = view.findViewById(R.id.calendarGrid)
+        weekdayHeaders = view.findViewById(R.id.weekdayHeaders)
         btnPrev = view.findViewById(R.id.btnPrev)
         btnNext = view.findViewById(R.id.btnNext)
         btnDay = view.findViewById(R.id.btnDay)
@@ -687,6 +689,11 @@ class CalendarFragment : Fragment() {
         val dateFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
         monthYearTitle?.text = dateFormat.format(currentDate.time)
         
+        // Hide timeline, show grid
+        view?.findViewById<LinearLayout>(R.id.timelineContainer)?.visibility = View.GONE
+        calendarGrid?.visibility = View.VISIBLE
+        weekdayHeaders?.visibility = View.VISIBLE
+        
         val monthEvents = filteredEvents.filter { event ->
             val eventCal = Calendar.getInstance()
             eventCal.time = event.dueDate
@@ -707,8 +714,6 @@ class CalendarFragment : Fragment() {
     
     private fun renderWeekView() {
         val year = currentDate.get(Calendar.YEAR)
-        val month = currentDate.get(Calendar.MONTH)
-        val day = currentDate.get(Calendar.DAY_OF_MONTH)
         
         // Get week start (Sunday)
         val weekStart = Calendar.getInstance().apply {
@@ -723,16 +728,178 @@ class CalendarFragment : Fragment() {
         }
         monthYearTitle?.text = "${dateFormat.format(weekStart.time)} - ${dateFormat.format(weekEnd.time)}, ${year}"
         
-        // Generate week days with events
-        val weekDays = mutableListOf<WeekDay>()
-        val dayNames = arrayOf("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
+        // Hide the grid and show timeline
+        calendarGrid?.visibility = View.GONE
+        weekdayHeaders?.visibility = View.GONE
         
-        for (i in 0..6) {
+        // Show timeline view
+        renderTimelineView(weekStart, 7)
+    }
+    
+    private fun renderDayView() {
+        val dateFormat = SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault())
+        monthYearTitle?.text = dateFormat.format(currentDate.time)
+        
+        // Hide the grid and show timeline
+        calendarGrid?.visibility = View.GONE
+        weekdayHeaders?.visibility = View.GONE
+        
+        // Show timeline view
+        renderTimelineView(currentDate, 1)
+    }
+    
+    /**
+     * Renders the timeline view with hours on the left and day columns
+     * Used for both Day (1 column) and Week (7 columns) views
+     */
+    private fun renderTimelineView(startDate: Calendar, numDays: Int) {
+        val context = requireContext()
+        val today = Calendar.getInstance()
+        val dayNamesShort = arrayOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
+        val hourHeight = 60 // dp per hour
+        val density = resources.displayMetrics.density
+        val hourHeightPx = (hourHeight * density).toInt()
+        
+        // Get or create timeline container
+        val timelineContainer = view?.findViewById<LinearLayout>(R.id.timelineContainer) 
+            ?: run {
+                // Create timeline container dynamically if not in XML
+                val container = LinearLayout(context).apply {
+                    id = R.id.timelineContainer
+                    orientation = LinearLayout.VERTICAL
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT
+                    )
+                }
+                
+                // Add to parent (after weekday header)
+                val parent = calendarGrid?.parent as? ViewGroup
+                parent?.addView(container)
+                container
+            }
+        
+        timelineContainer.visibility = View.VISIBLE
+        timelineContainer.removeAllViews()
+        
+        // Create day header row
+        val headerRow = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setBackgroundResource(R.drawable.bg_calendar_weekday_header)
+            setPadding(0, (12 * density).toInt(), 0, (12 * density).toInt())
+        }
+        
+        // Gutter space for hour labels
+        val gutter = View(context).apply {
+            layoutParams = LinearLayout.LayoutParams((50 * density).toInt(), 1)
+        }
+        headerRow.addView(gutter)
+        
+        // Day headers
+        for (i in 0 until numDays) {
             val dayCalendar = Calendar.getInstance().apply {
-                time = weekStart.time
+                time = startDate.time
                 add(Calendar.DAY_OF_MONTH, i)
             }
             
+            val isToday = dayCalendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                         dayCalendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
+            
+            val dayHeader = LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = android.view.Gravity.CENTER
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            }
+            
+            val dayNameView = TextView(context).apply {
+                text = dayNamesShort[dayCalendar.get(Calendar.DAY_OF_WEEK) - 1]
+                textSize = 11f
+                setTextColor(ContextCompat.getColor(context, R.color.text_muted))
+                gravity = android.view.Gravity.CENTER
+            }
+            dayHeader.addView(dayNameView)
+            
+            val dayNumberView = TextView(context).apply {
+                text = dayCalendar.get(Calendar.DAY_OF_MONTH).toString()
+                textSize = 14f
+                gravity = android.view.Gravity.CENTER
+                val size = (28 * density).toInt()
+                layoutParams = LinearLayout.LayoutParams(size, size).apply {
+                    topMargin = (4 * density).toInt()
+                }
+                
+                if (isToday) {
+                    setBackgroundResource(R.drawable.bg_day_header_today)
+                    setTextColor(ContextCompat.getColor(context, R.color.text_primary))
+                } else {
+                    setTextColor(ContextCompat.getColor(context, R.color.text_light))
+                }
+            }
+            dayHeader.addView(dayNumberView)
+            
+            headerRow.addView(dayHeader)
+        }
+        
+        timelineContainer.addView(headerRow)
+        
+        // Scrollable timeline body
+        val scrollView = android.widget.ScrollView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
+        }
+        
+        val bodyRow = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+        
+        // Hour labels column
+        val hoursColumn = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams((50 * density).toInt(), LinearLayout.LayoutParams.WRAP_CONTENT)
+        }
+        
+        for (hour in 0..23) {
+            val label = when {
+                hour == 0 -> "12 AM"
+                hour < 12 -> "$hour AM"
+                hour == 12 -> "12 PM"
+                else -> "${hour - 12} PM"
+            }
+            
+            val hourLabel = TextView(context).apply {
+                text = label
+                textSize = 11f
+                setTextColor(ContextCompat.getColor(context, R.color.text_muted))
+                gravity = android.view.Gravity.END or android.view.Gravity.TOP
+                setPadding(0, (2 * density).toInt(), (8 * density).toInt(), 0)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    hourHeightPx
+                )
+            }
+            hoursColumn.addView(hourLabel)
+        }
+        
+        bodyRow.addView(hoursColumn)
+        
+        // Day columns container
+        val columnsContainer = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        }
+        
+        for (i in 0 until numDays) {
+            val dayCalendar = Calendar.getInstance().apply {
+                time = startDate.time
+                add(Calendar.DAY_OF_MONTH, i)
+            }
+            
+            val isToday = dayCalendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                         dayCalendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
+            
+            // Get events for this day
             val dayEvents = filteredEvents.filter { event ->
                 val eventCal = Calendar.getInstance()
                 eventCal.time = event.dueDate
@@ -740,49 +907,110 @@ class CalendarFragment : Fragment() {
                 eventCal.get(Calendar.DAY_OF_YEAR) == dayCalendar.get(Calendar.DAY_OF_YEAR)
             }
             
-            val today = Calendar.getInstance()
-            val isToday = dayCalendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
-                         dayCalendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
+            val column = android.widget.FrameLayout(context).apply {
+                layoutParams = LinearLayout.LayoutParams(0, 24 * hourHeightPx, 1f)
+                if (isToday) {
+                    setBackgroundResource(R.drawable.bg_timeline_column_today)
+                } else {
+                    setBackgroundResource(R.drawable.bg_timeline_column)
+                }
+            }
             
-            weekDays.add(WeekDay(
-                dayName = dayNames[i],
-                dayNumber = dayCalendar.get(Calendar.DAY_OF_MONTH),
-                date = dayCalendar.time,
-                events = dayEvents,
-                isToday = isToday
-            ))
+            // Hour row dividers
+            val rowsContainer = LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+            }
+            for (hour in 0..23) {
+                val row = View(context).apply {
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        hourHeightPx
+                    )
+                    setBackgroundResource(R.drawable.bg_timeline_row)
+                }
+                rowsContainer.addView(row)
+            }
+            column.addView(rowsContainer)
+            
+            // Events overlay
+            dayEvents.forEach { event ->
+                val eventCal = Calendar.getInstance()
+                eventCal.time = event.dueDate
+                val eventHour = eventCal.get(Calendar.HOUR_OF_DAY)
+                val eventMinute = eventCal.get(Calendar.MINUTE)
+                val topPx = ((eventHour * 60 + eventMinute) * density).toInt()
+                val heightPx = (50 * density).toInt()
+                
+                val eventView = createTimelineEventView(context, event)
+                eventView.layoutParams = android.widget.FrameLayout.LayoutParams(
+                    android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+                    heightPx
+                ).apply {
+                    topMargin = topPx
+                    marginStart = (4 * density).toInt()
+                    marginEnd = (4 * density).toInt()
+                }
+                
+                column.addView(eventView)
+            }
+            
+            columnsContainer.addView(column)
         }
         
-        // Use linear layout for week view
-        calendarGrid?.layoutManager = LinearLayoutManager(requireContext())
-        calendarGrid?.adapter = WeekDayAdapter(weekDays) { weekDay ->
-            if (weekDay.events.isNotEmpty()) {
-                val dialog = EventPreviewDialog.newInstance(weekDay.events, weekDay.date)
-                dialog.setOnEventClickListener { event ->
-                    viewFullOrderDetails(event.orderId)
-                }
-                dialog.show(childFragmentManager, EventPreviewDialog.TAG)
-            }
+        bodyRow.addView(columnsContainer)
+        scrollView.addView(bodyRow)
+        timelineContainer.addView(scrollView)
+        
+        // Scroll to current time if viewing today
+        val nowHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        scrollView.post {
+            scrollView.scrollTo(0, ((nowHour - 1).coerceAtLeast(0) * hourHeightPx))
         }
     }
     
-    private fun renderDayView() {
-        val dateFormat = SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault())
-        monthYearTitle?.text = dateFormat.format(currentDate.time)
+    private fun createTimelineEventView(context: android.content.Context, event: ScheduledEvent): View {
+        val density = resources.displayMetrics.density
         
-        // Get events for current day
-        val dayEvents = filteredEvents.filter { event ->
-            val eventCal = Calendar.getInstance()
-            eventCal.time = event.dueDate
-            eventCal.get(Calendar.YEAR) == currentDate.get(Calendar.YEAR) &&
-            eventCal.get(Calendar.DAY_OF_YEAR) == currentDate.get(Calendar.DAY_OF_YEAR)
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding((6 * density).toInt(), (4 * density).toInt(), (6 * density).toInt(), (4 * density).toInt())
+            
+            val bgRes = when (event.type) {
+                EventType.PICKUP -> R.drawable.bg_timeline_event_pickup
+                EventType.DELIVERY -> R.drawable.bg_timeline_event_delivery
+                EventType.PREORDER -> R.drawable.bg_timeline_event_preorder
+            }
+            setBackgroundResource(bgRes)
+            
+            setOnClickListener { viewFullOrderDetails(event.orderId) }
         }
         
-        // Use linear layout for day view
-        calendarGrid?.layoutManager = LinearLayoutManager(requireContext())
-        calendarGrid?.adapter = DayEventAdapter(dayEvents) { event ->
-            viewFullOrderDetails(event.orderId)
+        val textColor = when (event.type) {
+            EventType.PICKUP -> ContextCompat.getColor(context, R.color.event_pickup)
+            EventType.DELIVERY -> ContextCompat.getColor(context, R.color.event_delivery)
+            EventType.PREORDER -> ContextCompat.getColor(context, R.color.event_preorder)
         }
+        
+        // Time label
+        val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
+        val timeView = TextView(context).apply {
+            text = timeFormat.format(event.dueDate)
+            textSize = 10f
+            setTextColor(textColor)
+        }
+        container.addView(timeView)
+        
+        // Customer name
+        val nameView = TextView(context).apply {
+            text = event.customerName
+            textSize = 11f
+            setTextColor(textColor)
+            maxLines = 1
+            ellipsize = android.text.TextUtils.TruncateAt.END
+        }
+        container.addView(nameView)
+        
+        return container
     }
     
     data class WeekDay(
