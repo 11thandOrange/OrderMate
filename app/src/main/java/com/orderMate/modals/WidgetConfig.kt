@@ -68,8 +68,10 @@ enum class WidgetType(val displayName: String) {
     CALENDAR("Calendar");
     
     companion object {
+        @JvmStatic
         fun fromString(value: String?): WidgetType {
-            return values().find { it.name == value } ?: TEXT_BOX
+            if (value == null) return TEXT_BOX
+            return WidgetType.values().firstOrNull { it.name == value } ?: TEXT_BOX
         }
     }
 }
