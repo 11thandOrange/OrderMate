@@ -240,6 +240,10 @@ class CalendarFragment : Fragment() {
                 (order.total ?: 0L) / 100.0
             } catch (e: Exception) { 0.0 }
             
+            val itemCount = try {
+                order.lineItems?.size ?: 0
+            } catch (e: Exception) { 0 }
+            
             // Determine event type based on order data
             val eventType = determineEventType(order)
             
@@ -247,9 +251,10 @@ class CalendarFragment : Fragment() {
                 id = order.id?.hashCode()?.toLong() ?: System.currentTimeMillis(),
                 orderId = order.id ?: "",
                 customerName = customerName,
-                dueDate = dueDate,
                 type = eventType,
+                dueDate = dueDate,
                 total = total,
+                itemCount = itemCount,
                 note = null
             )
         }
