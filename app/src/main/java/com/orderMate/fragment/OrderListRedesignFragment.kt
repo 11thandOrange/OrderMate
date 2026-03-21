@@ -111,9 +111,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     
     // Widget manager for dynamic filters
     private var widgetManager: WidgetManager? = null
-    
-    // Current search query (for pill display)
-    private var currentSearchQuery: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -188,7 +185,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         filterArray.keys.forEach { filterArray[it] = 0 }
         selectedDateFilter = null
         currentFilterState = FilterDialogFragment.FilterState()
-        currentSearchQuery = ""
         binding.searchInput.text?.clear()
         binding.searchInput.hint = getString(R.string.search_orders)
         
@@ -217,18 +213,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 searchOrders(text.toString().trim())
             }
             handler.postDelayed(searchRunnable, Constants.debouncingTime)
-        }
-        
-        // Create search pill when focus is lost
-        binding.searchInput.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                val query = binding.searchInput.text.toString().trim()
-                if (query.isNotEmpty()) {
-                    currentSearchQuery = query
-                    binding.searchInput.text?.clear()
-                    updateAllPills()
-                }
-            }
         }
     }
 
@@ -612,28 +596,13 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun updateFilterPills(filters: FilterDialogFragment.FilterState) {
-        updateAllPills()
-    }
-    
-    private fun updateAllPills() {
         binding.filterPillsContainer.removeAllViews()
 
         val dateFormat = java.text.SimpleDateFormat("MMM d", java.util.Locale.getDefault())
         var hasPills = false
         
-        // Add search query as pill (first)
-        if (currentSearchQuery.isNotEmpty()) {
-            hasPills = true
-            val pill = createFilterPillWithClose("\"$currentSearchQuery\"") {
-                currentSearchQuery = ""
-                searchOrders("")
-                updateAllPills()
-            }
-            binding.filterPillsContainer.addView(pill)
-        }
-        
         // Add selection filters as pills
-        currentFilterState.selections.forEach { (categoryId, values) ->
+        filters.selections.forEach { (categoryId, values) ->
             values.forEach { value ->
                 hasPills = true
                 val displayValue = when (categoryId) {
@@ -649,7 +618,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         }
         
         // Add date filters as pills
-        currentFilterState.dateSelections.forEach { (categoryId, dates) ->
+        filters.dateSelections.forEach { (categoryId, dates) ->
             val label = when {
                 categoryId == FilterCategoryBuilder.CLOVER_ORDER_DATE -> "Order Date"
                 FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
