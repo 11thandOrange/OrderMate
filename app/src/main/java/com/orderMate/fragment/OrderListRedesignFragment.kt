@@ -103,6 +103,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     private var isSyncing = false
 
+    // Current filter state for dialog
+    private var currentFilterState = FilterDialogFragment.FilterState()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         instance = this
@@ -174,6 +177,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         // Clear all filters
         filterArray.keys.forEach { filterArray[it] = 0 }
         selectedDateFilter = null
+        currentFilterState = FilterDialogFragment.FilterState()
         binding.searchInput.text?.clear()
         binding.searchInput.hint = getString(R.string.search_orders)
         
@@ -416,8 +420,167 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     // ==================== Filters ====================
 
     private fun showFilterDialog() {
-        // TODO: Implement FilterDialogFragment
-        Toast.makeText(requireContext(), "Filter dialog coming soon", Toast.LENGTH_SHORT).show()
+        val employeeList = orderEmployeeType.filter { it != Constants.all_employee }.toList()
+        
+        val dialog = FilterDialogFragment.newInstance(
+            currentFilters = currentFilterState,
+            employees = employeeList
+        )
+        
+        dialog.setFilterListener(object : FilterDialogFragment.FilterListener {
+            override fun onFiltersApplied(filters: FilterDialogFragment.FilterState) {
+                currentFilterState = filters
+                applyDialogFilters(filters)
+            }
+
+            override fun onFilterCleared() {
+                currentFilterState = FilterDialogFragment.FilterState()
+                resetFilters()
+            }
+        })
+        
+        dialog.show(childFragmentManager, FilterDialogFragment.TAG)
+    }
+
+    private fun applyDialogFilters(filters: FilterDialogFragment.FilterState) {
+        runOnBackgroundThread {
+            orderItems.clear()
+            filterData.clear()
+
+            allItemList.forEach { order ->
+                if (orderMatchesFilters(order, filters)) {
+                    orderItems.add(order)
+                    filterData.add(order)
+                }
+            }
+
+            runOnMainThread {
+                updateResultsInfo()
+                notifyAdapter()
+                updateEmptyState()
+                updateFilterPills(filters)
+            }
+        }
+    }
+
+    private fun orderMatchesFilters(order: Order?, filters: FilterDialogFragment.FilterState): Boolean {
+        if (order == null) return false
+
+        // Payment status filter
+        if (filters.paymentStatus != "all") {
+            val orderPayment = order.paymentState?.name?.lowercase() ?: ""
+            val filterValue = when (filters.paymentStatus) {
+                "paid" -> "paid"
+                "unpaid" -> "not_paid"
+                "refunded" -> "refunded"
+                "partial" -> "partially_paid"
+                else -> filters.paymentStatus
+            }
+            if (!orderPayment.contains(filterValue)) return false
+        }
+
+        // Order status filter
+        if (filters.orderStatus != "all") {
+            val orderState = order.state?.toString()?.lowercase() ?: ""
+            if (!orderState.contains(filters.orderStatus)) return false
+        }
+
+        // Payment type filter
+        if (filters.paymentType != "all") {
+            val paymentModes = getPaymentMode(order.payments).lowercase()
+            if (!paymentModes.contains(filters.paymentType)) return false
+        }
+
+        // Booking type filter
+        if (filters.bookingType != "all") {
+            val isOnline = order.isNotNullOnlineOrder == true
+            when (filters.bookingType) {
+                "pickup" -> {
+                    // Check notes for pickup indicator
+                    val hasPickup = order.lineItems?.any { 
+                        it?.note?.lowercase()?.contains("pickup") == true 
+                    } ?: false
+                    if (!hasPickup && !isOnline) return false
+                }
+                "delivery" -> {
+                    val hasDelivery = order.lineItems?.any { 
+                        it?.note?.lowercase()?.contains("delivery") == true 
+                    } ?: false
+                    if (!hasDelivery) return false
+                }
+                "preorder" -> {
+                    val hasPreorder = order.lineItems?.any { 
+                        it?.note?.lowercase()?.contains("preorder") == true ||
+                        it?.note?.lowercase()?.contains("pre-order") == true
+                    } ?: false
+                    if (!hasPreorder) return false
+                }
+            }
+        }
+
+        // Employee filter
+        if (filters.employee != "all") {
+            val employeeName = try {
+                order.employee?.jsonObject?.get(Constants.name)?.toString() ?: ""
+            } catch (e: Exception) { "" }
+            if (employeeName != filters.employee) return false
+        }
+
+        return true
+    }
+
+    private fun updateFilterPills(filters: FilterDialogFragment.FilterState) {
+        binding.filterPillsContainer.removeAllViews()
+
+        val activeFilters = mutableListOf<Pair<String, String>>()
+        
+        if (filters.paymentStatus != "all") {
+            activeFilters.add("Payment" to filters.paymentStatus.replaceFirstChar { it.uppercase() })
+        }
+        if (filters.orderStatus != "all") {
+            activeFilters.add("Status" to filters.orderStatus.replaceFirstChar { it.uppercase() })
+        }
+        if (filters.paymentType != "all") {
+            activeFilters.add("Type" to filters.paymentType.replaceFirstChar { it.uppercase() })
+        }
+        if (filters.bookingType != "all") {
+            activeFilters.add("Booking" to filters.bookingType.replaceFirstChar { it.uppercase() })
+        }
+        if (filters.employee != "all") {
+            activeFilters.add("Employee" to filters.employee)
+        }
+
+        if (activeFilters.isEmpty()) {
+            binding.filterPillsScroll.visibility = View.GONE
+            return
+        }
+
+        binding.filterPillsScroll.visibility = View.VISIBLE
+
+        activeFilters.forEach { (category, value) ->
+            val pill = createFilterPill("$category: $value")
+            binding.filterPillsContainer.addView(pill)
+        }
+    }
+
+    private fun createFilterPill(text: String): View {
+        return android.widget.TextView(requireContext()).apply {
+            this.text = text
+            textSize = 12f
+            setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.orange_accent))
+            setBackgroundResource(R.drawable.bg_filter_pill)
+            setPadding(dpToPx(12), dpToPx(6), dpToPx(12), dpToPx(6))
+            val lp = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            lp.marginEnd = dpToPx(8)
+            layoutParams = lp
+        }
+    }
+
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
     }
 
     private fun isFilterActive(): Boolean {
