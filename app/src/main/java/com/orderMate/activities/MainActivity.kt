@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
         // Listen for navigation changes to update side nav state
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.orderHistoryFragment -> updateNavState(R.id.navList)
+                R.id.orderListRedesignFragment, R.id.orderHistoryFragment -> updateNavState(R.id.navList)
                 R.id.calendarFragment -> updateNavState(R.id.navCalendar)
                 R.id.settingsFragment -> updateNavState(R.id.navSettings)
                 R.id.profileSettingsFragment -> updateNavState(R.id.navProfile)
@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
         
         when (itemId) {
             R.id.navList -> {
-                navController.navigate(R.id.orderHistoryFragment)
+                navController.navigate(R.id.orderListRedesignFragment)
             }
             R.id.navCalendar -> {
                 navController.navigate(R.id.calendarFragment)

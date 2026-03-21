@@ -64,4 +64,10 @@
     <color name="background_primary">#F5F5F7</color>
     <color name="divider_color">#E5E5EA</color>
     <color name="text_primary_dark">#1C1C1E</color>
+    
+    <!-- Note chip colors -->
+    <color name="category_chip_bg">#26FF9F43</color>
+    <color name="tag_chip_bg">#267367F0</color>
+    <color name="text_chip_bg">#266c757d</color>
+    <color name="bg_glass">#26FFFFFF</color>
 </resources>

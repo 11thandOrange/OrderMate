@@ -3,7 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/orderHistoryFragment">
+    app:startDestination="@id/orderListRedesignFragment">
+
+    <!-- New Redesigned Order List Fragment (#80, #81) -->
+    <fragment
+        android:id="@+id/orderListRedesignFragment"
+        android:name="com.orderMate.fragment.OrderListRedesignFragment"
+        android:label="orders"
+        tools:layout="@layout/fragment_order_list_redesign">
+        <action
+            android:id="@+id/action_orderListRedesignFragment_to_orderDetailFragment"
+            app:destination="@id/orderDetailFragment"
+            app:launchSingleTop="true" />
+        <action
+            android:id="@+id/action_orderListRedesignFragment_to_customFieldsFragment"
+            app:destination="@id/customFieldsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/customFieldsFragment"
@@ -11,12 +26,20 @@
         android:label="fragment_custom_fields"
         tools:layout="@layout/fragment_custom_fields">
         <action
+            android:id="@+id/action_customFieldsFragment_to_orderListRedesignFragment"
+            app:destination="@id/orderListRedesignFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/customFieldsFragment"
+            app:popUpToInclusive="true" />
+        <action
             android:id="@+id/action_customFieldsFragment_to_orderHistoryFragment"
             app:destination="@id/orderHistoryFragment"
             app:launchSingleTop="true"
             app:popUpTo="@id/customFieldsFragment"
             app:popUpToInclusive="true" />
     </fragment>
+
+    <!-- Legacy Order History Fragment (kept for compatibility) -->
     <fragment
         android:id="@+id/orderHistoryFragment"
         android:name="com.orderMate.fragment.orderHistory.OrderHistoryFragment"
@@ -35,6 +58,12 @@
         android:name="com.orderMate.fragment.orderDetail.OrderDetailFragment"
         android:label="fragment_order_detail"
         tools:layout="@layout/fragment_order_detail">
+        <action
+            android:id="@+id/action_orderDetailFragment_to_orderListRedesignFragment"
+            app:destination="@id/orderListRedesignFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/orderListRedesignFragment"
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_orderDetailFragment_to_orderHistoryFragment"
             app:destination="@id/orderHistoryFragment"
