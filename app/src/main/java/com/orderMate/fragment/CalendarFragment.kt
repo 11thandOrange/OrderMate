@@ -23,6 +23,7 @@ import com.clover.sdk.v3.order.Order
 import com.orderMate.R
 import com.orderMate.model.ScheduledEvent
 import com.orderMate.model.EventType
+import com.orderMate.model.LineItemPreview
 import com.orderMate.utils.CalendarManager
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FilterCategoryBuilder
@@ -247,9 +248,17 @@ class CalendarFragment : Fragment() {
                 order.lineItems?.size ?: 0
             } catch (e: Exception) { 0 }
             
-            // Get line item names for preview
-            val lineItemNames = try {
-                order.lineItems?.mapNotNull { it?.name }?.take(5) ?: emptyList()
+            // Get line items for preview
+            val lineItems = try {
+                order.lineItems?.mapNotNull { lineItem ->
+                    lineItem?.let {
+                        LineItemPreview(
+                            name = it.name ?: "Unknown",
+                            price = (it.price ?: 0L) / 100.0,
+                            quantity = it.unitQty?.toInt() ?: 1
+                        )
+                    }
+                }?.take(5) ?: emptyList()
             } catch (e: Exception) { emptyList() }
             
             // Determine event type based on order data
@@ -264,7 +273,7 @@ class CalendarFragment : Fragment() {
                 total = total,
                 itemCount = itemCount,
                 note = null,
-                lineItemNames = lineItemNames
+                lineItems = lineItems
             )
         }
     }

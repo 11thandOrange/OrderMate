@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="24dp"
-    app:cardCornerRadius="20dp"
+    app:cardCornerRadius="16dp"
     app:cardBackgroundColor="@color/card_background"
     app:cardElevation="8dp">
 
@@ -21,60 +21,64 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <!-- Event Type Badge -->
-                <TextView
-                    android:id="@+id/eventTypeBadge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp"
-                    android:text="PICKUP"
-                    android:textColor="@color/event_pickup"
-                    android:textSize="11sp"
-                    android:textAllCaps="true"
-                    android:fontFamily="sans-serif-medium"
-                    android:letterSpacing="0.05"
-                    android:background="@drawable/bg_event_badge_pickup"/>
-
-                <!-- Order Title -->
-                <TextView
-                    android:id="@+id/orderTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="Order #1234"
-                    android:textColor="@color/text_light"
-                    android:textSize="18sp"
-                    android:fontFamily="sans-serif-medium"/>
-
-            </LinearLayout>
-
-            <!-- Full Details Button -->
+            <!-- Event Type Badge -->
             <TextView
-                android:id="@+id/btnFullDetails"
+                android:id="@+id/eventTypeBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="12dp"
-                android:paddingVertical="8dp"
-                android:text="Full Details"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                android:fontFamily="sans-serif-medium"
+                android:paddingVertical="6dp"
+                android:text="PICKUP"
+                android:textColor="@color/event_pickup"
+                android:textSize="10sp"
+                android:textAllCaps="true"
+                android:fontFamily="sans-serif-bold"
+                android:letterSpacing="0.05"
+                android:background="@drawable/bg_event_badge_pickup"/>
+
+            <!-- Order Title -->
+            <TextView
+                android:id="@+id/orderTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:text="Order #1234"
+                android:textColor="@color/text_light"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif-medium"/>
+
+            <!-- Full Details Button -->
+            <LinearLayout
+                android:id="@+id/btnFullDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp"
                 android:background="@drawable/bg_button_primary"
-                android:drawableEnd="@drawable/ic_external_link"
-                android:drawablePadding="6dp"
-                android:drawableTint="@color/white"
                 android:clickable="true"
-                android:focusable="true"/>
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_external_link"
+                    app:tint="@color/white"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="Full Details"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"/>
+            </LinearLayout>
 
         </LinearLayout>
 

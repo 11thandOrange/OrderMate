@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.orderMate.R
 import com.orderMate.model.EventType
+import com.orderMate.model.LineItemPreview
 import com.orderMate.model.ScheduledEvent
 import java.text.SimpleDateFormat
 import java.util.*
@@ -26,7 +27,7 @@ import java.util.*
  * Matches HTML preview layout with:
  * - Type badge + Order title + Full Details button
  * - Customer, Due Date, Total, Items rows
- * - Optional items list
+ * - Line items list with price and quantity
  */
 class EventPreviewDialog : DialogFragment() {
 
@@ -56,7 +57,7 @@ class EventPreviewDialog : DialogFragment() {
         // Header
         val eventTypeBadge = view.findViewById<TextView>(R.id.eventTypeBadge)
         val orderTitle = view.findViewById<TextView>(R.id.orderTitle)
-        val btnFullDetails = view.findViewById<TextView>(R.id.btnFullDetails)
+        val btnFullDetails = view.findViewById<View>(R.id.btnFullDetails)
         val btnClose = view.findViewById<TextView>(R.id.btnClose)
         
         // Details
@@ -84,7 +85,7 @@ class EventPreviewDialog : DialogFragment() {
         }
 
         // Set order title (truncate ID for display)
-        val shortId = currentEvent.orderId.takeLast(8).uppercase()
+        val shortId = currentEvent.orderId.takeLast(4).uppercase()
         orderTitle.text = "Order #$shortId"
 
         // Set details
@@ -96,11 +97,11 @@ class EventPreviewDialog : DialogFragment() {
         orderTotal.text = "$${String.format("%.2f", currentEvent.total)}"
         itemCount.text = "${currentEvent.itemCount} items"
 
-        // Items list (optional - show if we have line item names)
-        if (currentEvent.lineItemNames.isNotEmpty()) {
+        // Items list
+        if (currentEvent.lineItems.isNotEmpty()) {
             itemsList.visibility = View.VISIBLE
             itemsList.layoutManager = LinearLayoutManager(requireContext())
-            itemsList.adapter = LineItemAdapter(currentEvent.lineItemNames)
+            itemsList.adapter = LineItemAdapter(currentEvent.lineItems)
         } else {
             itemsList.visibility = View.GONE
         }
@@ -132,10 +133,10 @@ class EventPreviewDialog : DialogFragment() {
     }
 
     /**
-     * Simple adapter for line items
+     * Adapter for line items with price and quantity
      */
     inner class LineItemAdapter(
-        private val items: List<String>
+        private val items: List<LineItemPreview>
     ) : RecyclerView.Adapter<LineItemAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -152,9 +153,13 @@ class EventPreviewDialog : DialogFragment() {
 
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             private val itemName: TextView = itemView.findViewById(R.id.itemName)
+            private val itemPrice: TextView = itemView.findViewById(R.id.itemPrice)
+            private val itemQuantity: TextView = itemView.findViewById(R.id.itemQuantity)
 
-            fun bind(name: String) {
-                itemName.text = name
+            fun bind(item: LineItemPreview) {
+                itemName.text = item.name
+                itemPrice.text = "$${String.format("%.2f", item.price)}"
+                itemQuantity.text = "x${item.quantity}"
             }
         }
     }

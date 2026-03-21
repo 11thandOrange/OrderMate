@@ -18,7 +18,20 @@ data class ScheduledEvent(
     val note: String? = null,
     val gmailEventId: String? = null,
     val notificationScheduled: Boolean = false,
-    val lineItemNames: List<String> = emptyList()
+    val lineItems: List<LineItemPreview> = emptyList()
+) {
+    // For backwards compatibility
+    val lineItemNames: List<String>
+        get() = lineItems.map { it.name }
+}
+
+/**
+ * Line item preview for event dialog
+ */
+data class LineItemPreview(
+    val name: String,
+    val price: Double,
+    val quantity: Int = 1
 )
 
 /**
