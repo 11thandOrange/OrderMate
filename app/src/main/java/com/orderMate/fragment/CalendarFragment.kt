@@ -291,11 +291,30 @@ class CalendarFragment : Fragment() {
         return EventType.PICKUP
     }
 
-    // ==================== Search (same as List tab) ====================
+    // ==================== Search (matches HTML - includes date parsing) ====================
+    
+    // Dates parsed from search query (matches HTML searchedDates)
+    private var searchedDates: List<Date> = emptyList()
     
     private fun searchOrders(query: String?) {
         runOnBackgroundThread {
             val isFilterApplied = currentFilterState.hasActiveFilters()
+            
+            // Parse dates from search query (matches HTML parseSearchDates)
+            searchedDates = if (!query.isNullOrEmpty()) {
+                OrderSearchFilter.parseSearchDates(query, currentDate.get(Calendar.YEAR))
+            } else {
+                emptyList()
+            }
+            
+            // Also include dates from filter state (matches HTML behavior)
+            val filterDates = currentFilterState.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE] ?: emptyList()
+            if (filterDates.isNotEmpty()) {
+                val combined = (searchedDates + filterDates).distinctBy { 
+                    SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(it)
+                }.sortedBy { it.time }
+                searchedDates = combined
+            }
 
             if (query.isNullOrEmpty()) {
                 filteredOrders.clear()
@@ -331,6 +350,12 @@ class CalendarFragment : Fragment() {
         // Use shared search logic
         return OrderSearchFilter.matchesSearch(order, query)
     }
+    
+    /**
+     * Get dates to highlight/filter on calendar
+     * Combines dates from search query and filter state (matches HTML)
+     */
+    fun getSearchedDates(): List<Date> = searchedDates
 
     // ==================== Date Picker (matches HTML - multiple dates with pills) ====================
     
@@ -540,6 +565,7 @@ class CalendarFragment : Fragment() {
         currentFilterState = FilterDialogFragment.FilterState()
         currentSearchQuery = ""
         selectedDateFilter = null
+        searchedDates = emptyList()  // Clear searched dates
         searchInput?.text?.clear()
         searchInput?.hint = getString(R.string.search_orders)
         
@@ -696,11 +722,207 @@ class CalendarFragment : Fragment() {
     // ==================== Calendar Rendering ====================
     
     fun renderCalendar() {
-        when (currentViewMode) {
-            "day" -> renderDayView()
-            "week" -> renderWeekView()
-            else -> renderMonthView()
+        // Check if we have searched dates (matches HTML behavior)
+        // When dates are searched/filtered, show those specific dates
+        val hasSearchedDates = searchedDates.isNotEmpty()
+        
+        // Update nav button visibility (matches HTML: hide when searching dates)
+        val navPrev = view?.findViewById<View>(R.id.btnPrevMonth)
+        val navNext = view?.findViewById<View>(R.id.btnNextMonth)
+        val navVisibility = if (hasSearchedDates) View.INVISIBLE else View.VISIBLE
+        navPrev?.visibility = navVisibility
+        navNext?.visibility = navVisibility
+        
+        when {
+            searchedDates.size > 1 -> {
+                // Multiple dates searched - show side-by-side view (matches HTML renderMultipleDaysView)
+                monthYearTitle?.text = "${searchedDates.size} Selected Dates"
+                renderSearchedDatesView()
+            }
+            searchedDates.size == 1 -> {
+                // Single date searched - show day view for that date (matches HTML renderSingleSearchedDay)
+                val searchedDate = searchedDates.first()
+                currentDate.time = searchedDate
+                val dateFormat = SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault())
+                monthYearTitle?.text = dateFormat.format(searchedDate)
+                renderDayView()
+            }
+            else -> {
+                // No searched dates - normal view mode
+                when (currentViewMode) {
+                    "day" -> renderDayView()
+                    "week" -> renderWeekView()
+                    else -> renderMonthView()
+                }
+            }
         }
+    }
+    
+    /**
+     * Render multiple searched dates side by side (matches HTML renderMultipleDaysView)
+     */
+    private fun renderSearchedDatesView() {
+        // Hide the grid and show timeline
+        calendarGrid?.visibility = View.GONE
+        weekdayHeaders?.visibility = View.GONE
+        
+        // Use the first searched date as the start
+        val startDate = Calendar.getInstance().apply {
+            time = searchedDates.first()
+        }
+        
+        // Render timeline with searched dates
+        renderTimelineViewForDates(searchedDates)
+    }
+    
+    /**
+     * Render timeline view for specific dates (used for searched dates)
+     */
+    private fun renderTimelineViewForDates(dates: List<Date>) {
+        val context = requireContext()
+        val today = Calendar.getInstance()
+        val dayNamesShort = arrayOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
+        val hourHeight = 60
+        val density = resources.displayMetrics.density
+        val hourHeightPx = (hourHeight * density).toInt()
+        
+        val timelineContainer = view?.findViewById<LinearLayout>(R.id.timelineContainer)
+            ?: return
+        
+        timelineContainer.visibility = View.VISIBLE
+        timelineContainer.removeAllViews()
+        
+        // Day headers row
+        val dayHeadersRow = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        
+        // Spacer for time column
+        dayHeadersRow.addView(View(context).apply {
+            layoutParams = LinearLayout.LayoutParams((50 * density).toInt(), 1)
+        })
+        
+        val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
+        dates.forEach { date ->
+            val cal = Calendar.getInstance().apply { time = date }
+            val dayOfWeek = cal.get(Calendar.DAY_OF_WEEK) - 1
+            val isToday = cal.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                          cal.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
+            
+            val headerView = TextView(context).apply {
+                text = "${dayNamesShort[dayOfWeek]}\n${dateFormat.format(date)}"
+                gravity = android.view.Gravity.CENTER
+                textSize = 12f
+                setTextColor(if (isToday) 
+                    ContextCompat.getColor(context, R.color.orange_accent) 
+                    else ContextCompat.getColor(context, R.color.text_light))
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                setPadding(0, (8 * density).toInt(), 0, (8 * density).toInt())
+            }
+            dayHeadersRow.addView(headerView)
+        }
+        timelineContainer.addView(dayHeadersRow)
+        
+        // Timeline scroll container with hours and events
+        val scrollView = android.widget.ScrollView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
+        }
+        
+        val timelineContent = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        
+        // Hours column
+        val hoursColumn = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams((50 * density).toInt(), LinearLayout.LayoutParams.WRAP_CONTENT)
+        }
+        
+        for (hour in 0..23) {
+            val hourView = TextView(context).apply {
+                text = if (hour == 0) "12 AM" else if (hour < 12) "$hour AM" else if (hour == 12) "12 PM" else "${hour - 12} PM"
+                textSize = 10f
+                setTextColor(ContextCompat.getColor(context, R.color.text_muted))
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    hourHeightPx
+                )
+                gravity = android.view.Gravity.TOP or android.view.Gravity.END
+                setPadding(0, 0, (8 * density).toInt(), 0)
+            }
+            hoursColumn.addView(hourView)
+        }
+        timelineContent.addView(hoursColumn)
+        
+        // Day columns with events
+        dates.forEach { date ->
+            val cal = Calendar.getInstance().apply { time = date }
+            val dayEvents = filteredEvents.filter { event ->
+                val eventCal = Calendar.getInstance().apply { time = event.dueDate }
+                eventCal.get(Calendar.YEAR) == cal.get(Calendar.YEAR) &&
+                eventCal.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR)
+            }
+            
+            val dayColumn = android.widget.FrameLayout(context).apply {
+                layoutParams = LinearLayout.LayoutParams(0, 24 * hourHeightPx, 1f)
+                setBackgroundResource(R.drawable.bg_timeline_column)
+            }
+            
+            // Add events to this day column
+            dayEvents.forEach { event ->
+                val eventCal = Calendar.getInstance().apply { time = event.dueDate }
+                val hour = eventCal.get(Calendar.HOUR_OF_DAY)
+                val minute = eventCal.get(Calendar.MINUTE)
+                val topPx = (hour * hourHeightPx + minute * hourHeightPx / 60)
+                val eventHeight = (hourHeightPx * 0.8).toInt()
+                
+                val eventView = TextView(context).apply {
+                    text = "${event.customerName}\n${event.type.getDisplayName()}"
+                    textSize = 10f
+                    setTextColor(ContextCompat.getColor(context, R.color.text_light))
+                    setPadding((4 * density).toInt(), (2 * density).toInt(), (4 * density).toInt(), (2 * density).toInt())
+                    maxLines = 2
+                    ellipsize = android.text.TextUtils.TruncateAt.END
+                    
+                    val bgRes = when (event.type) {
+                        EventType.PICKUP -> R.drawable.bg_calendar_event_pickup
+                        EventType.DELIVERY -> R.drawable.bg_calendar_event_delivery
+                        EventType.PREORDER -> R.drawable.bg_calendar_event_preorder
+                    }
+                    setBackgroundResource(bgRes)
+                    
+                    layoutParams = android.widget.FrameLayout.LayoutParams(
+                        android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+                        eventHeight
+                    ).apply {
+                        topMargin = topPx
+                        marginStart = (2 * density).toInt()
+                        marginEnd = (2 * density).toInt()
+                    }
+                    
+                    setOnClickListener {
+                        showEventPreview(event)
+                    }
+                }
+                dayColumn.addView(eventView)
+            }
+            
+            timelineContent.addView(dayColumn)
+        }
+        
+        scrollView.addView(timelineContent)
+        timelineContainer.addView(scrollView)
     }
     
     private fun renderMonthView() {
