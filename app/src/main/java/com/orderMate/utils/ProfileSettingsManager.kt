@@ -3,6 +3,7 @@ package com.orderMate.utils
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.net.Uri
 import androidx.core.content.edit
 
 /**
@@ -72,6 +73,80 @@ class ProfileSettingsManager(private val context: Context) {
         }
     }
 
+    /**
+     * Get the avatar emoji (alias for getAvatar)
+     */
+    fun getAvatarEmoji(): String? {
+        val emoji = prefs.getString(KEY_AVATAR, null)
+        return if (emoji == DEFAULT_AVATAR) null else emoji
+    }
+
+    /**
+     * Set avatar emoji
+     */
+    fun setAvatarEmoji(emoji: String) {
+        prefs.edit { putString(KEY_AVATAR, emoji) }
+    }
+
+    /**
+     * Get custom avatar URI
+     */
+    fun getCustomAvatarUri(): Uri? {
+        val uriString = prefs.getString(KEY_CUSTOM_AVATAR_URI, null)
+        return uriString?.let { Uri.parse(it) }
+    }
+
+    /**
+     * Set custom avatar URI
+     */
+    fun setCustomAvatarUri(uri: Uri) {
+        prefs.edit { putString(KEY_CUSTOM_AVATAR_URI, uri.toString()) }
+    }
+
+    /**
+     * Clear custom avatar URI
+     */
+    fun clearCustomAvatarUri() {
+        prefs.edit { remove(KEY_CUSTOM_AVATAR_URI) }
+    }
+
+    // ==================== Color Scheme ====================
+
+    /**
+     * Get current color scheme ID
+     */
+    fun getColorScheme(): String {
+        return prefs.getString(KEY_COLOR_SCHEME, DEFAULT_COLOR_SCHEME) ?: DEFAULT_COLOR_SCHEME
+    }
+
+    /**
+     * Set color scheme ID
+     */
+    fun setColorScheme(schemeId: String) {
+        prefs.edit { putString(KEY_COLOR_SCHEME, schemeId) }
+    }
+
+    /**
+     * Check if a theme target is enabled
+     */
+    fun isThemeTargetEnabled(target: String): Boolean {
+        return prefs.getBoolean("${KEY_THEME_TARGET_PREFIX}$target", true)
+    }
+
+    /**
+     * Set theme target enabled state
+     */
+    fun setThemeTargetEnabled(target: String, enabled: Boolean) {
+        prefs.edit { putBoolean("${KEY_THEME_TARGET_PREFIX}$target", enabled) }
+    }
+
+    /**
+     * Commit/save changes (no-op since edit{} auto-applies)
+     */
+    fun commit() {
+        // SharedPreferences with edit{} already applies changes
+    }
+
     // ==================== Utility Methods ====================
 
     /**
@@ -108,6 +183,8 @@ class ProfileSettingsManager(private val context: Context) {
         prefs.edit {
             putString(KEY_THEME_COLOR, DEFAULT_THEME_COLOR)
             putString(KEY_AVATAR, DEFAULT_AVATAR)
+            remove(KEY_CUSTOM_AVATAR_URI)
+            putString(KEY_COLOR_SCHEME, DEFAULT_COLOR_SCHEME)
         }
     }
 
@@ -143,10 +220,14 @@ class ProfileSettingsManager(private val context: Context) {
         // Keys
         private const val KEY_THEME_COLOR = "theme_color"
         private const val KEY_AVATAR = "avatar"
+        private const val KEY_CUSTOM_AVATAR_URI = "custom_avatar_uri"
+        private const val KEY_COLOR_SCHEME = "color_scheme"
+        private const val KEY_THEME_TARGET_PREFIX = "theme_target_"
 
         // Defaults
         private const val DEFAULT_THEME_COLOR = "#667eea"
         private const val DEFAULT_AVATAR = "😊"
+        private const val DEFAULT_COLOR_SCHEME = "purple"
 
         // Emoji categories for picker
         val EMOJI_PEOPLE = listOf(
