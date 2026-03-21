@@ -51,7 +51,7 @@
                 android:textSize="18sp"
                 android:fontFamily="sans-serif-medium"/>
 
-            <!-- Full Details Button -->
+            <!-- Full Details Button - icon BEFORE text like HTML -->
             <LinearLayout
                 android:id="@+id/btnFullDetails"
                 android:layout_width="wrap_content"
@@ -60,7 +60,7 @@
                 android:gravity="center_vertical"
                 android:paddingHorizontal="14dp"
                 android:paddingVertical="10dp"
-                android:background="@drawable/bg_button_primary"
+                android:background="@drawable/bg_button_primary_rounded"
                 android:clickable="true"
                 android:focusable="true">
 
@@ -68,14 +68,14 @@
                     android:layout_width="14dp"
                     android:layout_height="14dp"
                     android:src="@drawable/ic_external_link"
-                    app:tint="@color/white"/>
+                    app:tint="@color/text_primary"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:text="Full Details"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_primary"
                     android:textSize="13sp"
                     android:fontFamily="sans-serif-medium"/>
             </LinearLayout>
@@ -290,30 +290,15 @@
 
         </LinearLayout>
 
-        <!-- Items List (scrollable) -->
+        <!-- Items List (scrollable) - matching HTML styling -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/itemsList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxHeight="180dp"
-            android:layout_marginTop="8dp"
+            android:maxHeight="200dp"
+            android:layout_marginTop="12dp"
+            android:clipToPadding="false"
             android:nestedScrollingEnabled="true"/>
-
-        <!-- Close Button -->
-        <TextView
-            android:id="@+id/btnClose"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:paddingVertical="12dp"
-            android:gravity="center"
-            android:text="Close"
-            android:textColor="@color/text_muted"
-            android:textSize="14sp"
-            android:fontFamily="sans-serif-medium"
-            android:background="@drawable/bg_header_button_outline"
-            android:clickable="true"
-            android:focusable="true"/>
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

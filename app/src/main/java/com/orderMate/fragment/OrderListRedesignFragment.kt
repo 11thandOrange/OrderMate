@@ -27,6 +27,7 @@ import com.orderMate.utils.FilterCategories
 import com.orderMate.utils.FilterCategoryBuilder
 import com.orderMate.utils.ModalDialogCategories
 import com.orderMate.utils.MyApp
+import com.orderMate.utils.OrderSearchFilter
 import com.orderMate.utils.MyApp.Companion.filterArray
 import com.orderMate.utils.PreferenceManager
 import com.orderMate.utils.WidgetManager
@@ -336,47 +337,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun matchesSearch(order: Order?, query: String): Boolean {
-        if (order == null) return false
-        
-        return exceptionHandlerWithReturn {
-            // Order number/ID
-            val orderId = order.id?.lowercase() ?: ""
-            
-            // Customer name
-            val customerName = try {
-                val customer = order.customers?.firstOrNull()
-                "${customer?.firstName ?: ""} ${customer?.lastName ?: ""}".lowercase()
-            } catch (e: Exception) { "" }
-            
-            // Employee name
-            val employeeName = try {
-                order.employee?.jsonObject?.get(Constants.name)?.toString()?.lowercase() ?: ""
-            } catch (e: Exception) { "" }
-            
-            val paymentStatus = order.paymentState?.name?.lowercase() ?: ""
-            
-            // Customer contact info
-            val customerContact = try {
-                getCustomerContactDetails(order.customers?.firstOrNull())
-            } catch (e: Exception) { Pair("", "") }
-
-            // Widget data from line item notes (includes labels, values, descriptions)
-            val widgetDataMatch = order.lineItems?.any { lineItem ->
-                val note = lineItem?.note?.lowercase() ?: ""
-                val itemName = lineItem?.name?.lowercase() ?: ""
-                note.contains(query) || itemName.contains(query)
-            } ?: false
-
-            orderId.contains(query) ||
-            customerName.contains(query) ||
-            employeeName.contains(query) ||
-            paymentStatus.contains(query) ||
-            customerContact.first.lowercase().contains(query) ||
-            customerContact.second.lowercase().contains(query) ||
-            widgetDataMatch
-        } ?: false
+        // Use shared search logic
+        return OrderSearchFilter.matchesSearch(order, query)
     }
-
     // ==================== Date Filter ====================
 
     private fun showDatePicker() {

@@ -29,6 +29,7 @@ import com.orderMate.utils.Constants
 import com.orderMate.utils.FilterCategoryBuilder
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.WidgetManager
+import com.orderMate.utils.OrderSearchFilter
 import com.orderMate.utils.exceptionHandlerWithReturn
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.migrations.SchemaMigrator
@@ -327,40 +328,8 @@ class CalendarFragment : Fragment() {
      * Search matching logic (same as List tab)
      */
     private fun matchesSearch(order: Order?, query: String): Boolean {
-        if (order == null) return false
-        
-        return exceptionHandlerWithReturn {
-            val orderId = order.id?.lowercase() ?: ""
-            
-            val customerName = try {
-                val customer = order.customers?.firstOrNull()
-                "${customer?.firstName ?: ""} ${customer?.lastName ?: ""}".lowercase()
-            } catch (e: Exception) { "" }
-            
-            val employeeName = try {
-                order.employee?.jsonObject?.get(Constants.name)?.toString()?.lowercase() ?: ""
-            } catch (e: Exception) { "" }
-            
-            val paymentStatus = order.paymentState?.name?.lowercase() ?: ""
-            
-            val customerContact = try {
-                getCustomerContactDetails(order.customers?.firstOrNull())
-            } catch (e: Exception) { Pair("", "") }
-
-            val widgetDataMatch = order.lineItems?.any { lineItem ->
-                val note = lineItem?.note?.lowercase() ?: ""
-                val itemName = lineItem?.name?.lowercase() ?: ""
-                note.contains(query) || itemName.contains(query)
-            } ?: false
-
-            orderId.contains(query) ||
-            customerName.contains(query) ||
-            employeeName.contains(query) ||
-            paymentStatus.contains(query) ||
-            customerContact.first.lowercase().contains(query) ||
-            customerContact.second.lowercase().contains(query) ||
-            widgetDataMatch
-        } ?: false
+        // Use shared search logic
+        return OrderSearchFilter.matchesSearch(order, query)
     }
 
     // ==================== Date Picker (same as List tab) ====================

@@ -22,12 +22,7 @@ import java.util.*
 
 /**
  * Event Preview Dialog (#82 CAL-4)
- *
- * Shows order details for a scheduled event.
- * Matches HTML preview layout with:
- * - Type badge + Order title + Full Details button
- * - Customer, Due Date, Total, Items rows
- * - Line items list with price and quantity
+ * Matches HTML preview - dismissible by clicking outside
  */
 class EventPreviewDialog : DialogFragment() {
 
@@ -38,6 +33,7 @@ class EventPreviewDialog : DialogFragment() {
         val dialog = super.onCreateDialog(savedInstanceState)
         dialog.window?.requestFeature(Window.FEATURE_NO_TITLE)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCanceledOnTouchOutside(true) // Click outside to dismiss like HTML
         return dialog
     }
 
@@ -58,7 +54,6 @@ class EventPreviewDialog : DialogFragment() {
         val eventTypeBadge = view.findViewById<TextView>(R.id.eventTypeBadge)
         val orderTitle = view.findViewById<TextView>(R.id.orderTitle)
         val btnFullDetails = view.findViewById<View>(R.id.btnFullDetails)
-        val btnClose = view.findViewById<TextView>(R.id.btnClose)
         
         // Details
         val customerName = view.findViewById<TextView>(R.id.customerName)
@@ -84,12 +79,12 @@ class EventPreviewDialog : DialogFragment() {
             }
         }
 
-        // Set order title (truncate ID for display)
+        // Set order title
         val shortId = currentEvent.orderId.takeLast(4).uppercase()
         orderTitle.text = "Order #$shortId"
 
         // Set details
-        customerName.text = currentEvent.customerName
+        customerName.text = if (currentEvent.customerName.isBlank()) "-" else currentEvent.customerName
         
         val dateTimeFormat = SimpleDateFormat("MMMM d, yyyy 'at' h:mm a", Locale.getDefault())
         dueDate.text = dateTimeFormat.format(currentEvent.dueDate)
@@ -111,9 +106,6 @@ class EventPreviewDialog : DialogFragment() {
             onFullDetailsClick?.invoke(currentEvent)
             dismiss()
         }
-
-        // Close button
-        btnClose.setOnClickListener { dismiss() }
     }
 
     override fun onStart() {
@@ -132,9 +124,6 @@ class EventPreviewDialog : DialogFragment() {
         this.onFullDetailsClick = listener
     }
 
-    /**
-     * Adapter for line items with price and quantity
-     */
     inner class LineItemAdapter(
         private val items: List<LineItemPreview>
     ) : RecyclerView.Adapter<LineItemAdapter.ViewHolder>() {
@@ -173,7 +162,6 @@ class EventPreviewDialog : DialogFragment() {
             }
         }
         
-        // For backwards compatibility - shows first event
         fun newInstance(events: List<ScheduledEvent>, date: Date): EventPreviewDialog {
             return EventPreviewDialog().apply {
                 if (events.isNotEmpty()) {
