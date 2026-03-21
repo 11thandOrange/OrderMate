@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * iOS-style Calendar Tab Fragment (#80, #82 requirement)
+ * iOS-style Calendar Tab Fragment (#82 requirement)
  * 
  * Displays scheduled orders as calendar events for:
  * - Pickup orders
@@ -25,16 +25,20 @@ import java.util.*
  * - Preorders
  * 
  * Features:
- * - Monthly calendar grid view
- * - Event preview on click
- * - Day/Week/Month toggle
+ * - Monthly calendar grid view (default)
+ * - Day/Week view modes
+ * - Event preview modal on click
+ * - Today button - jump to current date
+ * - Next Fulfillment button - jump to next scheduled order
  * - Previous/Next navigation
  */
 class CalendarFragment : Fragment() {
 
     private lateinit var calendarManager: CalendarManager
     private var currentDate: Calendar = Calendar.getInstance()
+    private var currentViewMode: String = "month"
     
+    // Views
     private var monthYearTitle: TextView? = null
     private var calendarGrid: RecyclerView? = null
     private var btnPrev: View? = null
@@ -42,6 +46,8 @@ class CalendarFragment : Fragment() {
     private var btnDay: TextView? = null
     private var btnWeek: TextView? = null
     private var btnMonth: TextView? = null
+    private var btnToday: TextView? = null
+    private var btnNextFulfillment: TextView? = null
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,6 +63,7 @@ class CalendarFragment : Fragment() {
         initViews(view)
         setupCalendarNavigation()
         setupViewToggle()
+        setupActionButtons()
         renderCalendar()
     }
     
@@ -68,6 +75,8 @@ class CalendarFragment : Fragment() {
         btnDay = view.findViewById(R.id.btnDay)
         btnWeek = view.findViewById(R.id.btnWeek)
         btnMonth = view.findViewById(R.id.btnMonth)
+        btnToday = view.findViewById(R.id.btnToday)
+        btnNextFulfillment = view.findViewById(R.id.btnNextFulfillment)
         
         // Setup grid layout manager
         calendarGrid?.layoutManager = GridLayoutManager(requireContext(), 7)
@@ -84,7 +93,14 @@ class CalendarFragment : Fragment() {
         btnMonth?.setOnClickListener { setViewMode("month") }
     }
     
+    private fun setupActionButtons() {
+        btnToday?.setOnClickListener { goToToday() }
+        btnNextFulfillment?.setOnClickListener { goToNextFulfillment() }
+    }
+    
     private fun setViewMode(mode: String) {
+        currentViewMode = mode
+        
         // Reset all buttons
         val inactiveColor = ContextCompat.getColor(requireContext(), R.color.text_muted)
         btnDay?.setBackgroundResource(0)
@@ -94,22 +110,25 @@ class CalendarFragment : Fragment() {
         btnMonth?.setBackgroundResource(0)
         btnMonth?.setTextColor(inactiveColor)
         
-        // Set active button
-        val activeColor = ContextCompat.getColor(requireContext(), R.color.text_light)
+        // Set active button (orange background, dark text)
+        val activeColor = ContextCompat.getColor(requireContext(), R.color.text_primary)
         when (mode) {
             "day" -> {
-                btnDay?.setBackgroundResource(R.drawable.bg_toggle_active)
+                btnDay?.setBackgroundResource(R.drawable.bg_view_mode_active)
                 btnDay?.setTextColor(activeColor)
             }
             "week" -> {
-                btnWeek?.setBackgroundResource(R.drawable.bg_toggle_active)
+                btnWeek?.setBackgroundResource(R.drawable.bg_view_mode_active)
                 btnWeek?.setTextColor(activeColor)
             }
             "month" -> {
-                btnMonth?.setBackgroundResource(R.drawable.bg_toggle_active)
+                btnMonth?.setBackgroundResource(R.drawable.bg_view_mode_active)
                 btnMonth?.setTextColor(activeColor)
             }
         }
+        
+        // Re-render calendar with new view mode
+        renderCalendar()
     }
     
     fun renderCalendar() {

@@ -1,53 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- iOS-style Calendar Fragment (#80 requirement) -->
-<androidx.constraintlayout.widget.ConstraintLayout
+<!-- iOS-style Calendar Fragment (#82 requirement) -->
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/transparent"
-    android:padding="20dp">
+    android:orientation="vertical"
+    android:background="@android:color/transparent">
 
-    <!-- Header -->
+    <!-- Calendar Subheader -->
     <LinearLayout
-        android:id="@+id/header"
+        android:id="@+id/calendarSubheader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="12dp">
 
-        <!-- Month/Year Title -->
-        <TextView
-            android:id="@+id/monthYearTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@color/text_light"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            tools:text="March 2024"/>
-
-        <!-- View Toggle Buttons -->
+        <!-- Navigation: Prev / Month-Year / Next -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@drawable/bg_glass_card"
+            android:gravity="center_vertical">
+
+            <FrameLayout
+                android:id="@+id/btnPrev"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_glass_button_round"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_chevron_left"
+                    app:tint="@color/text_light"/>
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/monthYearTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:minWidth="150dp"
+                android:gravity="center"
+                android:textColor="@color/text_light"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="March 2026"/>
+
+            <FrameLayout
+                android:id="@+id/btnNext"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_glass_button_round"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/text_light"/>
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <!-- Spacer -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <!-- View Mode Toggle: Day / Week / Month -->
+        <LinearLayout
+            android:id="@+id/viewModeContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/bg_glass_pill"
             android:padding="4dp">
 
             <TextView
                 android:id="@+id/btnDay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="6dp"
                 android:text="Day"
                 android:textColor="@color/text_muted"
                 android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
                 android:clickable="true"
                 android:focusable="true"/>
 
@@ -55,11 +104,12 @@
                 android:id="@+id/btnWeek"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="6dp"
                 android:text="Week"
                 android:textColor="@color/text_muted"
                 android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
                 android:clickable="true"
                 android:focusable="true"/>
 
@@ -67,72 +117,85 @@
                 android:id="@+id/btnMonth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
-                android:background="@drawable/bg_toggle_active"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="6dp"
+                android:background="@drawable/bg_view_mode_active"
                 android:text="Month"
-                android:textColor="@color/text_light"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
                 android:clickable="true"
                 android:focusable="true"/>
 
         </LinearLayout>
 
-        <!-- Navigation Buttons -->
-        <FrameLayout
-            android:id="@+id/btnPrev"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginStart="12dp"
-            android:background="@drawable/bg_glass_button"
-            android:clickable="true"
-            android:focusable="true">
+        <!-- Spacer -->
+        <View
+            android:layout_width="16dp"
+            android:layout_height="0dp"/>
 
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_chevron_left"
-                app:tint="@color/text_light"/>
-        </FrameLayout>
+        <!-- Action Buttons: Today / Next Fulfillment -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <FrameLayout
-            android:id="@+id/btnNext"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/bg_glass_button"
-            android:clickable="true"
-            android:focusable="true">
+            <TextView
+                android:id="@+id/btnToday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:background="@drawable/bg_calendar_btn_today"
+                android:drawableStart="@drawable/ic_calendar_today"
+                android:drawablePadding="6dp"
+                android:text="Today"
+                android:textColor="@color/text_light"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:clickable="true"
+                android:focusable="true"/>
 
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_chevron_right"
-                app:tint="@color/text_light"/>
-        </FrameLayout>
+            <TextView
+                android:id="@+id/btnNextFulfillment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:background="@drawable/bg_calendar_btn_next"
+                android:drawableStart="@drawable/ic_arrow_right"
+                android:drawablePadding="6dp"
+                android:text="Next Fulfillment"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:clickable="true"
+                android:focusable="true"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
-    <!-- Calendar Card -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/calendarCard"
+    <!-- Calendar Content -->
+    <FrameLayout
+        android:id="@+id/calendarContent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="20dp"
-        app:cardBackgroundColor="@color/card_background"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="0dp"
-        app:layout_constraintTop_toBottomOf="@id/header"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:layout_weight="1"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="20dp">
 
+        <!-- Calendar Grid Container -->
         <LinearLayout
+            android:id="@+id/calendarGridContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:background="@drawable/bg_calendar_grid"
+            android:clipChildren="false"
+            android:clipToPadding="false">
 
             <!-- Weekday Headers -->
             <LinearLayout
@@ -140,83 +203,101 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:background="@color/calendar_weekday_bg"
+                android:paddingVertical="12dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Sun"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"/>
+                    android:text="SUN"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"/>
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Mon"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"/>
+                    android:text="MON"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"/>
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Tue"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"/>
+                    android:text="TUE"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"/>
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Wed"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"/>
+                    android:text="WED"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"/>
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Thu"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"/>
+                    android:text="THU"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"/>
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Fri"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"/>
+                    android:text="FRI"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"/>
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Sat"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"/>
+                    android:text="SAT"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"/>
+
             </LinearLayout>
 
-            <!-- Calendar Grid -->
+            <!-- Calendar Days Grid -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/calendarGrid"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:overScrollMode="never"
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                 app:spanCount="7"
                 tools:listitem="@layout/item_calendar_day"/>
 
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+
+</LinearLayout>

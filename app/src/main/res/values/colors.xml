@@ -85,4 +85,14 @@
     <color name="input_bg">#1AFFFFFF</color>
     <color name="input_border">#33FFFFFF</color>
     <color name="accent_orange">#FF9F43</color>
+    
+    <!-- Calendar colors -->
+    <color name="calendar_weekday_bg">#33000000</color>
+    <color name="calendar_today_bg">#1AFF9F43</color>
+    <color name="event_pickup">#4CAF50</color>
+    <color name="event_pickup_bg">#334CAF50</color>
+    <color name="event_delivery">#2196F3</color>
+    <color name="event_delivery_bg">#332196F3</color>
+    <color name="event_preorder">#9C27B0</color>
+    <color name="event_preorder_bg">#339C27B0</color>
 </resources>
