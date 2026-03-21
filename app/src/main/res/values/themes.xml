@@ -34,8 +34,6 @@
         <item name="buttonBarPositiveButtonStyle">@style/Widget.OrderMate.DatePicker.Button</item>
         <item name="buttonBarNegativeButtonStyle">@style/Widget.OrderMate.DatePicker.Button</item>
         <item name="buttonBarNeutralButtonStyle">@style/Widget.OrderMate.DatePicker.Button</item>
-        <!-- Calendar header -->
-        <item name="android:datePickerStyle">@style/Widget.OrderMate.DatePickerStyle</item>
     </style>
     
     <!-- DatePicker button style - orange text -->
@@ -43,15 +41,5 @@
         <item name="android:textColor">@color/orange_accent</item>
     </style>
     
-    <!-- DatePicker calendar style -->
-    <style name="Widget.OrderMate.DatePickerStyle" parent="@android:style/Widget.Material.DatePicker">
-        <item name="android:headerBackground">@color/bg_dark</item>
-        <item name="android:headerTextColor">@color/text_light</item>
-        <item name="android:dayOfWeekBackground">@color/bg_dark</item>
-        <item name="android:dayOfWeekTextAppearance">@style/TextAppearance.OrderMate.DatePicker.DayOfWeek</item>
-    </style>
-    
-    <style name="TextAppearance.OrderMate.DatePicker.DayOfWeek" parent="android:TextAppearance">
-        <item name="android:textColor">@color/text_muted</item>
-    </style>
+
 </resources>
