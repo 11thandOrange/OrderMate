@@ -162,7 +162,7 @@ class FilterDialogFragment : DialogFragment() {
 
         DatePickerDialog(
             requireContext(),
-            R.style.Theme_OrderMate_Dialog,
+            R.style.Theme_OrderMate_DatePicker,
             { _, year, month, day ->
                 calendar.set(year, month, day)
                 val date = calendar.time

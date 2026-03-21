@@ -585,7 +585,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         return android.widget.TextView(requireContext()).apply {
             this.text = text
             textSize = 12f
-            setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.orange_accent))
+            typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
+            setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.text_primary))
             setBackgroundResource(R.drawable.bg_filter_pill)
             setPadding(dpToPx(12), dpToPx(6), dpToPx(12), dpToPx(6))
             val lp = android.widget.LinearLayout.LayoutParams(
@@ -593,6 +594,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
             )
             lp.marginEnd = dpToPx(8)
+            lp.bottomMargin = dpToPx(4)
             layoutParams = lp
         }
     }

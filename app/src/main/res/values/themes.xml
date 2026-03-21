@@ -17,4 +17,26 @@
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.6</item>
     </style>
+    
+    <!-- DatePicker dialog theme -->
+    <style name="Theme.OrderMate.DatePicker" parent="Theme.Material3.DayNight.Dialog">
+        <item name="colorPrimary">@color/orange_accent</item>
+        <item name="colorOnPrimary">@color/text_primary</item>
+        <item name="colorSurface">@color/bg_dark</item>
+        <item name="colorOnSurface">@color/text_light</item>
+        <item name="android:textColorPrimary">@color/text_light</item>
+        <item name="android:textColorSecondary">@color/text_muted</item>
+        <item name="android:windowBackground">@color/bg_dark</item>
+        <item name="android:datePickerStyle">@style/OrderMate.DatePicker</item>
+    </style>
+    
+    <style name="OrderMate.DatePicker" parent="android:Widget.Material.DatePicker">
+        <item name="android:headerBackground">@color/orange_accent</item>
+        <item name="android:dayOfWeekBackground">@color/bg_dark</item>
+        <item name="android:dayOfWeekTextAppearance">@style/OrderMate.DatePicker.DayOfWeek</item>
+    </style>
+    
+    <style name="OrderMate.DatePicker.DayOfWeek" parent="android:TextAppearance.Material.Widget.Calendar.DayOfWeek">
+        <item name="android:textColor">@color/text_light</item>
+    </style>
 </resources>
