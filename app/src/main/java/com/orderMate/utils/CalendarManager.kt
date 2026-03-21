@@ -19,6 +19,13 @@ class CalendarManager(private val context: Context) {
     private val scheduledEvents = mutableListOf<ScheduledEvent>()
     
     /**
+     * Get all scheduled events
+     */
+    fun getAllEvents(): List<ScheduledEvent> {
+        return scheduledEvents.sortedBy { it.dueDate }
+    }
+    
+    /**
      * Get all events for a specific month
      */
     fun getEventsForMonth(year: Int, month: Int): List<ScheduledEvent> {

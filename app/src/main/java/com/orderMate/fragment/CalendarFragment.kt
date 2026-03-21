@@ -1,18 +1,28 @@
 package com.orderMate.fragment
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.HorizontalScrollView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.orderMate.R
 import com.orderMate.model.ScheduledEvent
+import com.orderMate.model.EventType
 import com.orderMate.utils.CalendarManager
+import com.orderMate.utils.Constants
+import com.orderMate.filter.FilterCategoryBuilder
+import com.orderMate.filter.FilterDialogFragment
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,6 +41,7 @@ import java.util.*
  * - Today button - jump to current date
  * - Next Fulfillment button - jump to next scheduled order
  * - Previous/Next navigation
+ * - Search and filter (same as List tab)
  */
 class CalendarFragment : Fragment() {
 
@@ -38,7 +49,19 @@ class CalendarFragment : Fragment() {
     private var currentDate: Calendar = Calendar.getInstance()
     private var currentViewMode: String = "month"
     
-    // Views
+    // All events and filtered events
+    private var allEvents: List<ScheduledEvent> = emptyList()
+    private var filteredEvents: List<ScheduledEvent> = emptyList()
+    
+    // Filter state
+    private var currentFilterState = FilterDialogFragment.FilterState()
+    private var currentSearchQuery: String = ""
+    
+    // Handler for search debouncing
+    private val handler = Handler(Looper.getMainLooper())
+    private lateinit var searchRunnable: Runnable
+    
+    // Calendar Views
     private var monthYearTitle: TextView? = null
     private var calendarGrid: RecyclerView? = null
     private var btnPrev: View? = null
@@ -48,6 +71,13 @@ class CalendarFragment : Fragment() {
     private var btnMonth: TextView? = null
     private var btnToday: TextView? = null
     private var btnNextFulfillment: TextView? = null
+    
+    // Header Views
+    private var searchInput: EditText? = null
+    private var filterButton: View? = null
+    private var resetButton: View? = null
+    private var filterPillsScroll: HorizontalScrollView? = null
+    private var filterPillsContainer: LinearLayout? = null
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,13 +91,16 @@ class CalendarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
+        setupHeaderActions()
+        setupSearchListener()
         setupCalendarNavigation()
         setupViewToggle()
         setupActionButtons()
-        renderCalendar()
+        loadEvents()
     }
     
     private fun initViews(view: View) {
+        // Calendar views
         monthYearTitle = view.findViewById(R.id.monthYearTitle)
         calendarGrid = view.findViewById(R.id.calendarGrid)
         btnPrev = view.findViewById(R.id.btnPrev)
@@ -78,8 +111,33 @@ class CalendarFragment : Fragment() {
         btnToday = view.findViewById(R.id.btnToday)
         btnNextFulfillment = view.findViewById(R.id.btnNextFulfillment)
         
+        // Header views
+        searchInput = view.findViewById(R.id.searchInput)
+        filterButton = view.findViewById(R.id.filterButton)
+        resetButton = view.findViewById(R.id.resetButton)
+        filterPillsScroll = view.findViewById(R.id.filterPillsScroll)
+        filterPillsContainer = view.findViewById(R.id.filterPillsContainer)
+        
         // Setup grid layout manager
         calendarGrid?.layoutManager = GridLayoutManager(requireContext(), 7)
+    }
+    
+    private fun setupHeaderActions() {
+        filterButton?.setOnClickListener { showFilterDialog() }
+        resetButton?.setOnClickListener { resetFilters() }
+    }
+    
+    private fun setupSearchListener() {
+        searchInput?.doAfterTextChanged { text ->
+            if (this::searchRunnable.isInitialized) {
+                handler.removeCallbacks(searchRunnable)
+            }
+            searchRunnable = Runnable {
+                currentSearchQuery = text.toString().trim()
+                applyFilters()
+            }
+            handler.postDelayed(searchRunnable, Constants.debouncingTime)
+        }
     }
     
     private fun setupCalendarNavigation() {
@@ -96,6 +154,206 @@ class CalendarFragment : Fragment() {
     private fun setupActionButtons() {
         btnToday?.setOnClickListener { goToToday() }
         btnNextFulfillment?.setOnClickListener { goToNextFulfillment() }
+    }
+    
+    private fun loadEvents() {
+        // Load all events from calendar manager
+        allEvents = calendarManager.getAllEvents()
+        filteredEvents = allEvents
+        renderCalendar()
+    }
+    
+    private fun showFilterDialog() {
+        val categories = buildCalendarFilterCategories()
+        
+        val dialog = FilterDialogFragment.newInstance(categories, currentFilterState)
+        dialog.setOnFiltersAppliedListener { filterState ->
+            currentFilterState = filterState
+            applyFilters()
+            updateFilterPills()
+        }
+        dialog.show(parentFragmentManager, "CalendarFilterDialog")
+    }
+    
+    private fun buildCalendarFilterCategories(): List<FilterDialogFragment.FilterCategory> {
+        val categories = mutableListOf<FilterDialogFragment.FilterCategory>()
+        
+        // Event Type filter
+        categories.add(FilterDialogFragment.FilterCategory(
+            id = "event_type",
+            title = "Event Type",
+            type = FilterDialogFragment.FilterType.MULTI_SELECT,
+            options = listOf("Pickup", "Delivery", "Preorder")
+        ))
+        
+        // Date filter
+        categories.add(FilterDialogFragment.FilterCategory(
+            id = FilterCategoryBuilder.CLOVER_ORDER_DATE,
+            title = "Due Date",
+            type = FilterDialogFragment.FilterType.DATE,
+            options = emptyList()
+        ))
+        
+        return categories
+    }
+    
+    private fun applyFilters() {
+        filteredEvents = allEvents.filter { event ->
+            matchesSearch(event) && matchesFilters(event)
+        }
+        renderCalendar()
+    }
+    
+    private fun matchesSearch(event: ScheduledEvent): Boolean {
+        if (currentSearchQuery.isEmpty()) return true
+        
+        val query = currentSearchQuery.lowercase()
+        return event.customerName.lowercase().contains(query) ||
+               event.orderId.lowercase().contains(query) ||
+               event.type.getDisplayName().lowercase().contains(query) ||
+               (event.note?.lowercase()?.contains(query) == true)
+    }
+    
+    private fun matchesFilters(event: ScheduledEvent): Boolean {
+        // Check event type filter
+        val eventTypeSelections = currentFilterState.selections["event_type"]
+        if (!eventTypeSelections.isNullOrEmpty()) {
+            val eventTypeName = event.type.getDisplayName()
+            if (!eventTypeSelections.any { it.equals(eventTypeName, ignoreCase = true) }) {
+                return false
+            }
+        }
+        
+        // Check date filter
+        val dateSelections = currentFilterState.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE]
+        if (!dateSelections.isNullOrEmpty()) {
+            val matchesAnyDate = dateSelections.any { selectedDate ->
+                isSameDay(event.dueDate, selectedDate)
+            }
+            if (!matchesAnyDate) return false
+        }
+        
+        return true
+    }
+    
+    private fun isSameDay(date1: Date, date2: Date): Boolean {
+        val cal1 = Calendar.getInstance().apply { time = date1 }
+        val cal2 = Calendar.getInstance().apply { time = date2 }
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+               cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+    }
+    
+    private fun resetFilters() {
+        currentFilterState = FilterDialogFragment.FilterState()
+        currentSearchQuery = ""
+        searchInput?.text?.clear()
+        filteredEvents = allEvents
+        updateFilterPills()
+        renderCalendar()
+        Toast.makeText(requireContext(), "Filters cleared", Toast.LENGTH_SHORT).show()
+    }
+    
+    private fun updateFilterPills() {
+        filterPillsContainer?.removeAllViews()
+        
+        val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
+        var hasPills = false
+        
+        // Add event type filter pills
+        currentFilterState.selections["event_type"]?.forEach { value ->
+            hasPills = true
+            val pill = createFilterPillWithClose(value) {
+                removeSelectionFilter("event_type", value)
+            }
+            filterPillsContainer?.addView(pill)
+        }
+        
+        // Add date filter pills
+        currentFilterState.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE]?.forEachIndexed { index, date ->
+            hasPills = true
+            val pill = createFilterPillWithClose("Due: ${dateFormat.format(date)}") {
+                removeDateFilter(FilterCategoryBuilder.CLOVER_ORDER_DATE, index)
+            }
+            filterPillsContainer?.addView(pill)
+        }
+        
+        filterPillsScroll?.visibility = if (hasPills) View.VISIBLE else View.GONE
+    }
+    
+    private fun removeSelectionFilter(categoryId: String, value: String) {
+        val newSelections = currentFilterState.selections.toMutableMap()
+        newSelections[categoryId]?.let { values ->
+            val newValues = values.toMutableSet()
+            newValues.remove(value)
+            if (newValues.isEmpty()) {
+                newSelections.remove(categoryId)
+            } else {
+                newSelections[categoryId] = newValues
+            }
+        }
+        currentFilterState = currentFilterState.copy(selections = newSelections)
+        applyFilters()
+        updateFilterPills()
+    }
+    
+    private fun removeDateFilter(categoryId: String, index: Int) {
+        val newDateSelections = currentFilterState.dateSelections.toMutableMap()
+        newDateSelections[categoryId]?.let { dates ->
+            val newDates = dates.toMutableList()
+            if (index < newDates.size) {
+                newDates.removeAt(index)
+            }
+            if (newDates.isEmpty()) {
+                newDateSelections.remove(categoryId)
+            } else {
+                newDateSelections[categoryId] = newDates
+            }
+        }
+        currentFilterState = currentFilterState.copy(dateSelections = newDateSelections)
+        applyFilters()
+        updateFilterPills()
+    }
+    
+    private fun createFilterPillWithClose(text: String, onClose: () -> Unit): View {
+        return LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            setBackgroundResource(R.drawable.bg_filter_pill)
+            setPadding(dpToPx(12), dpToPx(6), dpToPx(8), dpToPx(6))
+            
+            val lp = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            lp.marginEnd = dpToPx(8)
+            lp.bottomMargin = dpToPx(4)
+            layoutParams = lp
+            
+            // Text label
+            val textView = TextView(context).apply {
+                this.text = text
+                textSize = 12f
+                typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
+                setTextColor(ContextCompat.getColor(context, R.color.text_primary))
+            }
+            addView(textView)
+            
+            // Close button
+            val closeBtn = android.widget.ImageView(context).apply {
+                setImageResource(R.drawable.ic_close)
+                setColorFilter(ContextCompat.getColor(context, R.color.text_primary))
+                val size = dpToPx(16)
+                val closeLp = LinearLayout.LayoutParams(size, size)
+                closeLp.marginStart = dpToPx(6)
+                layoutParams = closeLp
+                setOnClickListener { onClose() }
+            }
+            addView(closeBtn)
+        }
+    }
+    
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
     }
     
     private fun setViewMode(mode: String) {
@@ -139,11 +397,15 @@ class CalendarFragment : Fragment() {
         val dateFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
         monthYearTitle?.text = dateFormat.format(currentDate.time)
         
-        // Get events for the current month
-        val events = calendarManager.getEventsForMonth(year, month)
+        // Get filtered events for the current month
+        val monthEvents = filteredEvents.filter { event ->
+            val eventCal = Calendar.getInstance()
+            eventCal.time = event.dueDate
+            eventCal.get(Calendar.YEAR) == year && eventCal.get(Calendar.MONTH) == month
+        }
         
         // Generate calendar days
-        val days = generateCalendarDays(year, month, events)
+        val days = generateCalendarDays(year, month, monthEvents)
         
         // Set adapter
         calendarGrid?.adapter = CalendarDayAdapter(days) { day ->
