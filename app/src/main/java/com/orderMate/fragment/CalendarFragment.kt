@@ -21,8 +21,9 @@ import com.orderMate.model.ScheduledEvent
 import com.orderMate.model.EventType
 import com.orderMate.utils.CalendarManager
 import com.orderMate.utils.Constants
-import com.orderMate.filter.FilterCategoryBuilder
-import com.orderMate.filter.FilterDialogFragment
+import com.orderMate.utils.FilterCategoryBuilder
+import com.orderMate.utils.FilterCategoryBuilder.FilterCategory
+import com.orderMate.utils.FilterCategoryBuilder.FilterType
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -167,30 +168,36 @@ class CalendarFragment : Fragment() {
         val categories = buildCalendarFilterCategories()
         
         val dialog = FilterDialogFragment.newInstance(categories, currentFilterState)
-        dialog.setOnFiltersAppliedListener { filterState ->
-            currentFilterState = filterState
-            applyFilters()
-            updateFilterPills()
-        }
+        dialog.setFilterListener(object : FilterDialogFragment.FilterListener {
+            override fun onFiltersApplied(filterState: FilterDialogFragment.FilterState) {
+                currentFilterState = filterState
+                applyFilters()
+                updateFilterPills()
+            }
+            
+            override fun onFiltersCleared() {
+                resetFilters()
+            }
+        })
         dialog.show(parentFragmentManager, "CalendarFilterDialog")
     }
     
-    private fun buildCalendarFilterCategories(): List<FilterDialogFragment.FilterCategory> {
-        val categories = mutableListOf<FilterDialogFragment.FilterCategory>()
+    private fun buildCalendarFilterCategories(): List<FilterCategory> {
+        val categories = mutableListOf<FilterCategory>()
         
         // Event Type filter
-        categories.add(FilterDialogFragment.FilterCategory(
+        categories.add(FilterCategory(
             id = "event_type",
             title = "Event Type",
-            type = FilterDialogFragment.FilterType.MULTI_SELECT,
+            type = FilterType.MULTI_SELECT,
             options = listOf("Pickup", "Delivery", "Preorder")
         ))
         
         // Date filter
-        categories.add(FilterDialogFragment.FilterCategory(
+        categories.add(FilterCategory(
             id = FilterCategoryBuilder.CLOVER_ORDER_DATE,
             title = "Due Date",
-            type = FilterDialogFragment.FilterType.DATE,
+            type = FilterType.DATE_PICKER,
             options = emptyList()
         ))
         
