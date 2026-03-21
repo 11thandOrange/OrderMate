@@ -9,6 +9,140 @@
     android:orientation="vertical"
     android:background="@android:color/transparent">
 
+    <!-- Header with Search (same as List Tab) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="20dp"
+        android:paddingHorizontal="30dp"
+        android:background="@color/header_background">
+
+        <!-- Header Top Row: Search + Filter + Reset -->
+        <LinearLayout
+            android:id="@+id/headerTopRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical|start"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Search Container -->
+            <LinearLayout
+                android:id="@+id/searchContainer"
+                android:layout_width="400dp"
+                android:layout_height="48dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="20dp"
+                android:background="@drawable/bg_search_bar">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_search"
+                    android:contentDescription="Search"
+                    app:tint="@color/text_muted"/>
+
+                <EditText
+                    android:id="@+id/searchInput"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:background="@null"
+                    android:hint="Search scheduled orders..."
+                    android:textColorHint="@color/text_muted"
+                    android:textColor="@color/text_light"
+                    android:textSize="14sp"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1"/>
+            </LinearLayout>
+
+            <!-- Filter Button -->
+            <LinearLayout
+                android:id="@+id/filterButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_header_button"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_filter"
+                    app:tint="@color/text_light"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Filters"
+                    android:textColor="@color/text_light"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <!-- Reset Button -->
+            <LinearLayout
+                android:id="@+id/resetButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_header_button_outline"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_refresh"
+                    app:tint="@color/text_light"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Reset"
+                    android:textColor="@color/text_light"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Filter Pills Row -->
+        <HorizontalScrollView
+            android:id="@+id/filterPillsScroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:scrollbars="none"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@id/headerTopRow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:id="@+id/filterPillsContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"/>
+
+        </HorizontalScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <!-- Calendar Subheader -->
     <LinearLayout
         android:id="@+id/calendarSubheader"
