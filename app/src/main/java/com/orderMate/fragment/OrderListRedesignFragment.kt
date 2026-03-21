@@ -24,15 +24,18 @@ import com.orderMate.databinding.FragmentOrderListRedesignBinding
 import com.orderMate.modals.CustomItemJson
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FilterCategories
+import com.orderMate.utils.FilterCategoryBuilder
 import com.orderMate.utils.ModalDialogCategories
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.MyApp.Companion.filterArray
 import com.orderMate.utils.PreferenceManager
+import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.debugSnackBar
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.exceptionHandlerWithReturn
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.hideView
+import com.orderMate.utils.migrations.SchemaMigrator
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
 import com.orderMate.utils.showView
@@ -105,6 +108,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     // Current filter state for dialog
     private var currentFilterState = FilterDialogFragment.FilterState()
+    
+    // Widget manager for dynamic filters
+    private var widgetManager: WidgetManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -125,6 +131,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         initializeRecyclerView()
         setupClickListeners()
         setupSearchListener()
+        initWidgetManager()
     }
 
     override fun onStart() {
@@ -420,13 +427,13 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     // ==================== Filters ====================
 
     private fun showFilterDialog() {
-        val employeeList = orderEmployeeType.filter { it != Constants.all_employee }.toList()
-        val categoryList = notesFilter.keys.filter { it != getString(R.string.all_orders) }.toList()
+        // Build dynamic filter categories from Clover orders + OrderMate widgets
+        val filterableWidgets = widgetManager?.filterableWidgets ?: emptyList()
+        val categories = FilterCategoryBuilder.buildCategories(allItemList, filterableWidgets)
         
         val dialog = FilterDialogFragment.newInstance(
-            currentFilters = currentFilterState,
-            employees = employeeList,
-            categories = categoryList
+            categories = categories,
+            currentFilters = currentFilterState
         )
         
         dialog.setFilterListener(object : FilterDialogFragment.FilterListener {
@@ -442,6 +449,25 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         })
         
         dialog.show(childFragmentManager, FilterDialogFragment.TAG)
+    }
+    
+    /**
+     * Initialize widget manager for dynamic filters
+     */
+    private fun initWidgetManager() {
+        val merchantId = myApp.getMerchantId() ?: return
+        
+        // First run migration if needed
+        SchemaMigrator.migrateIfNeeded(merchantId) { success ->
+            if (success) {
+                widgetManager = WidgetManager(merchantId)
+                widgetManager?.load { loaded ->
+                    if (loaded) {
+                        android.util.Log.d("OrderList", "Widget manager loaded: ${widgetManager?.getWidgetCount()} widgets")
+                    }
+                }
+            }
+        }
     }
 
     private fun applyDialogFilters(filters: FilterDialogFragment.FilterState) {
@@ -468,78 +494,79 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     private fun orderMatchesFilters(order: Order?, filters: FilterDialogFragment.FilterState): Boolean {
         if (order == null) return false
 
-        // Payment status filter (multi-select - match ANY)
-        if (filters.paymentStatuses.isNotEmpty()) {
-            val orderPayment = order.paymentState?.name?.lowercase() ?: ""
-            val matchesAny = filters.paymentStatuses.any { filterValue ->
-                val mappedValue = when (filterValue) {
-                    "paid" -> "paid"
-                    "unpaid" -> "not_paid"
-                    "refunded" -> "refunded"
-                    "partial" -> "partially_paid"
-                    else -> filterValue
+        // Check each category in selections
+        for ((categoryId, selectedValues) in filters.selections) {
+            if (selectedValues.isEmpty()) continue
+            
+            when {
+                // Clover filters
+                categoryId == FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> {
+                    val orderPayment = order.paymentState?.name ?: ""
+                    if (!selectedValues.contains(orderPayment)) return false
                 }
-                orderPayment.contains(mappedValue)
+                categoryId == FilterCategoryBuilder.CLOVER_ORDER_STATUS -> {
+                    val orderState = order.state ?: ""
+                    if (!selectedValues.contains(orderState)) return false
+                }
+                categoryId == FilterCategoryBuilder.CLOVER_PAYMENT_TYPE -> {
+                    val paymentTypes = order.payments?.mapNotNull { it?.tender?.label } ?: emptyList()
+                    if (!paymentTypes.any { it in selectedValues }) return false
+                }
+                categoryId == FilterCategoryBuilder.CLOVER_EMPLOYEE -> {
+                    val employeeName = try {
+                        order.employee?.jsonObject?.getString("name") ?: ""
+                    } catch (e: Exception) { "" }
+                    if (!selectedValues.contains(employeeName)) return false
+                }
+                // OrderMate widget filters
+                FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
+                    val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
+                    val widget = widgetManager?.getWidgetById(widgetId ?: "") ?: continue
+                    val orderValues = extractWidgetValuesFromNotes(order.lineItems, widget.label)
+                    if (!selectedValues.any { it in orderValues }) return false
+                }
             }
-            if (!matchesAny) return false
         }
 
-        // Order status filter (multi-select - match ANY)
-        if (filters.orderStatuses.isNotEmpty()) {
-            val orderState = order.state?.toString()?.lowercase() ?: ""
-            val matchesAny = filters.orderStatuses.any { filterValue ->
-                orderState.contains(filterValue)
+        // Check date filters
+        for ((categoryId, dates) in filters.dateSelections) {
+            if (dates.isEmpty()) continue
+            
+            when {
+                // Widget date filters (like Pickup Date)
+                FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
+                    val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
+                    val widget = widgetManager?.getWidgetById(widgetId ?: "") ?: continue
+                    val orderDateValues = extractWidgetValuesFromNotes(order.lineItems, widget.label)
+                    
+                    val matchesAny = dates.any { filterDate ->
+                        val dateStr = java.text.SimpleDateFormat("M/d/yy", java.util.Locale.getDefault()).format(filterDate)
+                        orderDateValues.any { it.contains(dateStr) }
+                    }
+                    if (!matchesAny) return false
+                }
             }
-            if (!matchesAny) return false
-        }
-
-        // Payment type filter (multi-select - match ANY)
-        if (filters.paymentTypes.isNotEmpty()) {
-            val paymentModes = getPaymentMode(order.payments).lowercase()
-            val matchesAny = filters.paymentTypes.any { filterValue ->
-                paymentModes.contains(filterValue)
-            }
-            if (!matchesAny) return false
-        }
-
-        // Category filter (multi-select - match ANY)
-        if (filters.categories.isNotEmpty()) {
-            val matchesAny = filters.categories.any { category ->
-                order.lineItems?.any { lineItem ->
-                    lineItem?.note?.contains(category, ignoreCase = true) == true
-                } ?: false
-            }
-            if (!matchesAny) return false
-        }
-
-        // Employee filter (multi-select - match ANY)
-        if (filters.employees.isNotEmpty()) {
-            val employeeName = try {
-                order.employee?.jsonObject?.get(Constants.name)?.toString() ?: ""
-            } catch (e: Exception) { "" }
-            if (!filters.employees.contains(employeeName)) return false
-        }
-
-        // Order date filter
-        if (filters.orderDates.isNotEmpty()) {
-            val orderDate = order.createdTime?.let { java.util.Date(it) }
-            if (orderDate == null) return false
-            val matchesDate = filters.orderDates.any { filterDate ->
-                isSameDay(orderDate, filterDate)
-            }
-            if (!matchesDate) return false
-        }
-
-        // Pickup date filter (check in notes)
-        if (filters.pickupDates.isNotEmpty()) {
-            val matchesPickup = filters.pickupDates.any { filterDate ->
-                val dateStr = java.text.SimpleDateFormat("MM/dd", java.util.Locale.getDefault()).format(filterDate)
-                order.lineItems?.any { it?.note?.contains(dateStr) == true } ?: false
-            }
-            if (!matchesPickup) return false
         }
 
         return true
+    }
+    
+    /**
+     * Extract widget values from line item notes
+     * Notes format: "Label: Value • Label2: Value2"
+     */
+    private fun extractWidgetValuesFromNotes(lineItems: MutableList<LineItem?>?, widgetLabel: String): Set<String> {
+        val values = mutableSetOf<String>()
+        lineItems?.forEach { item ->
+            item?.note?.let { note ->
+                // Parse note format: "Label: Value • Label2: Value2"
+                val regex = "$widgetLabel:\\s*([^•]+)".toRegex(RegexOption.IGNORE_CASE)
+                regex.find(note)?.groupValues?.getOrNull(1)?.trim()?.let { 
+                    values.add(it) 
+                }
+            }
+        }
+        return values
     }
 
     private fun isSameDay(d1: java.util.Date, d2: java.util.Date): Boolean {
@@ -555,27 +582,30 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         val activeFilters = mutableListOf<String>()
         val dateFormat = java.text.SimpleDateFormat("MMM d", java.util.Locale.getDefault())
         
-        // Each selected filter becomes its own pill
-        filters.paymentStatuses.forEach { status ->
-            activeFilters.add(status.replaceFirstChar { it.uppercase() })
+        // Add selection filters as pills
+        filters.selections.forEach { (categoryId, values) ->
+            values.forEach { value ->
+                // Format the value for display
+                val displayValue = when (categoryId) {
+                    FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> formatPaymentStatus(value)
+                    FilterCategoryBuilder.CLOVER_ORDER_STATUS -> formatOrderStatus(value)
+                    else -> value
+                }
+                activeFilters.add(displayValue)
+            }
         }
-        filters.orderStatuses.forEach { status ->
-            activeFilters.add(status.replaceFirstChar { it.uppercase() })
-        }
-        filters.paymentTypes.forEach { type ->
-            activeFilters.add(type.replaceFirstChar { it.uppercase() })
-        }
-        filters.categories.forEach { category ->
-            activeFilters.add(category)
-        }
-        filters.employees.forEach { employee ->
-            activeFilters.add(employee)
-        }
-        filters.orderDates.forEach { date ->
-            activeFilters.add(dateFormat.format(date))
-        }
-        filters.pickupDates.forEach { date ->
-            activeFilters.add("Pickup: ${dateFormat.format(date)}")
+        
+        // Add date filters as pills
+        filters.dateSelections.forEach { (categoryId, dates) ->
+            val widgetLabel = if (FilterCategoryBuilder.isWidgetFilter(categoryId)) {
+                val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
+                widgetManager?.getWidgetById(widgetId ?: "")?.label ?: "Date"
+            } else {
+                "Date"
+            }
+            dates.forEach { date ->
+                activeFilters.add("$widgetLabel: ${dateFormat.format(date)}")
+            }
         }
 
         if (activeFilters.isEmpty()) {
@@ -588,6 +618,24 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         activeFilters.forEach { filterText ->
             val pill = createFilterPill(filterText)
             binding.filterPillsContainer.addView(pill)
+        }
+    }
+    
+    private fun formatPaymentStatus(status: String): String {
+        return when (status.uppercase()) {
+            "PAID" -> "Paid"
+            "NOT_PAID" -> "Unpaid"
+            "PARTIALLY_PAID" -> "Partial"
+            "REFUNDED" -> "Refunded"
+            else -> status.replaceFirstChar { it.uppercase() }
+        }
+    }
+    
+    private fun formatOrderStatus(status: String): String {
+        return when (status.lowercase()) {
+            "open" -> "Open"
+            "locked" -> "Closed"
+            else -> status.replaceFirstChar { it.uppercase() }
         }
     }
 

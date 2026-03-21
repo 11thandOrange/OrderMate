@@ -16,14 +16,23 @@ import androidx.fragment.app.DialogFragment
 import com.google.android.flexbox.FlexboxLayout
 import com.orderMate.R
 import com.orderMate.databinding.DialogFiltersBinding
+import com.orderMate.utils.FilterCategoryBuilder
+import com.orderMate.utils.FilterCategoryBuilder.FilterCategory
+import com.orderMate.utils.FilterCategoryBuilder.FilterOption
+import com.orderMate.utils.FilterCategoryBuilder.FilterType
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 /**
- * Filter dialog for order list (#80 requirement)
- * Pill-style filter options for payment status, order status, payment type, etc.
+ * Filter dialog for order list
+ * 
+ * Dynamically builds filter sections from:
+ * 1. Clover data (payment status, order status, payment type, employee)
+ * 2. OrderMate widgets (where showInFilter=true)
+ * 
+ * Categories are passed via FilterCategoryBuilder.buildCategories()
  */
 class FilterDialogFragment : DialogFragment() {
 
@@ -32,20 +41,14 @@ class FilterDialogFragment : DialogFragment() {
 
     private var listener: FilterListener? = null
 
-    // Current filter selections (multi-select)
-    private val selectedPaymentStatuses = mutableSetOf<String>()
-    private val selectedOrderStatuses = mutableSetOf<String>()
-    private val selectedPaymentTypes = mutableSetOf<String>()
-    private val selectedCategories = mutableSetOf<String>()
-    private val selectedEmployees = mutableSetOf<String>()
+    // Dynamic filter categories (built from Clover + OrderMate widgets)
+    private var filterCategories: List<FilterCategory> = emptyList()
 
-    // Date filters (can have multiple)
-    private val selectedOrderDates = mutableListOf<Date>()
-    private val selectedPickupDates = mutableListOf<Date>()
+    // Current filter selections: categoryId -> selected values
+    private val selections = mutableMapOf<String, MutableSet<String>>()
 
-    // Available options (passed from fragment)
-    private var availableEmployees: List<String> = emptyList()
-    private var availableCategories: List<String> = emptyList()
+    // Date selections: categoryId -> selected dates
+    private val dateSelections = mutableMapOf<String, MutableList<Date>>()
 
     private val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
 
@@ -54,24 +57,29 @@ class FilterDialogFragment : DialogFragment() {
         fun onFilterCleared()
     }
 
+    /**
+     * Filter state using dynamic category IDs
+     */
     data class FilterState(
-        val paymentStatuses: Set<String> = emptySet(),
-        val orderStatuses: Set<String> = emptySet(),
-        val paymentTypes: Set<String> = emptySet(),
-        val categories: Set<String> = emptySet(),
-        val employees: Set<String> = emptySet(),
-        val orderDates: List<Date> = emptyList(),
-        val pickupDates: List<Date> = emptyList()
+        val selections: Map<String, Set<String>> = emptyMap(),      // categoryId -> selected values
+        val dateSelections: Map<String, List<Date>> = emptyMap()    // categoryId -> selected dates
     ) {
         fun hasActiveFilters(): Boolean {
-            return paymentStatuses.isNotEmpty() || orderStatuses.isNotEmpty() || 
-                   paymentTypes.isNotEmpty() || categories.isNotEmpty() || employees.isNotEmpty() ||
-                   orderDates.isNotEmpty() || pickupDates.isNotEmpty()
+            return selections.values.any { it.isNotEmpty() } ||
+                   dateSelections.values.any { it.isNotEmpty() }
         }
 
         fun getActiveFilterCount(): Int {
-            return paymentStatuses.size + orderStatuses.size + paymentTypes.size + 
-                   categories.size + employees.size + orderDates.size + pickupDates.size
+            return selections.values.sumOf { it.size } +
+                   dateSelections.values.sumOf { it.size }
+        }
+        
+        fun getSelectedValues(categoryId: String): Set<String> {
+            return selections[categoryId] ?: emptySet()
+        }
+        
+        fun getSelectedDates(categoryId: String): List<Date> {
+            return dateSelections[categoryId] ?: emptyList()
         }
     }
 
@@ -122,35 +130,112 @@ class FilterDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Restore any passed filter state
-        arguments?.let { args ->
-            args.getStringArrayList(ARG_PAYMENT_STATUSES)?.let { selectedPaymentStatuses.addAll(it) }
-            args.getStringArrayList(ARG_ORDER_STATUSES)?.let { selectedOrderStatuses.addAll(it) }
-            args.getStringArrayList(ARG_PAYMENT_TYPES)?.let { selectedPaymentTypes.addAll(it) }
-            args.getStringArrayList(ARG_CATEGORIES_SELECTED)?.let { selectedCategories.addAll(it) }
-            args.getStringArrayList(ARG_EMPLOYEES_SELECTED)?.let { selectedEmployees.addAll(it) }
-            availableEmployees = args.getStringArrayList(ARG_EMPLOYEES) ?: emptyList()
-            availableCategories = args.getStringArrayList(ARG_CATEGORIES) ?: emptyList()
+        // Build dynamic filter sections
+        buildFilterSections()
+    }
+
+    /**
+     * Build all filter sections dynamically from filterCategories
+     */
+    private fun buildFilterSections() {
+        // Clear existing dynamic sections (keep the static container)
+        binding.filterSectionsContainer.removeAllViews()
+
+        // Build each category section
+        filterCategories.forEach { category ->
+            when (category.type) {
+                FilterType.MULTI_SELECT -> {
+                    if (category.options.isNotEmpty()) {
+                        addMultiSelectSection(category)
+                    }
+                }
+                FilterType.DATE_PICKER -> {
+                    addDatePickerSection(category)
+                }
+            }
         }
-
-        setupDateInputs()
-        setupFilterOptions()
     }
 
-    private fun setupDateInputs() {
-        // Order Date input
-        binding.orderDateInput.setOnClickListener { showDatePicker(true) }
-        binding.orderDatePickerLabel.setOnClickListener { showDatePicker(true) }
+    /**
+     * Add a multi-select filter section
+     */
+    private fun addMultiSelectSection(category: FilterCategory) {
+        val sectionView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.filter_section_multiselect, binding.filterSectionsContainer, false)
 
-        // Pickup Date input
-        binding.pickupDateInput.setOnClickListener { showDatePicker(false) }
-        binding.pickupDatePickerLabel.setOnClickListener { showDatePicker(false) }
+        // Set section label
+        val labelView = sectionView.findViewById<TextView>(R.id.sectionLabel)
+        labelView.text = category.label
 
-        // Update chips
-        updateDateChips()
+        // Setup options
+        val optionsContainer = sectionView.findViewById<FlexboxLayout>(R.id.optionsContainer)
+        setupMultiSelectOptions(optionsContainer, category)
+
+        binding.filterSectionsContainer.addView(sectionView)
     }
 
-    private fun showDatePicker(isOrderDate: Boolean) {
+    /**
+     * Add a date picker filter section
+     */
+    private fun addDatePickerSection(category: FilterCategory) {
+        val sectionView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.filter_section_date, binding.filterSectionsContainer, false)
+
+        // Set section label
+        val labelView = sectionView.findViewById<TextView>(R.id.sectionLabel)
+        labelView.text = category.label
+
+        // Setup date input
+        val dateInput = sectionView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.dateInput)
+        val dateChips = sectionView.findViewById<FlexboxLayout>(R.id.dateChips)
+
+        dateInput.setOnClickListener { showDatePicker(category.id, dateInput, dateChips) }
+
+        // Show existing selections
+        updateDateChipsForCategory(category.id, dateChips, dateInput)
+
+        binding.filterSectionsContainer.addView(sectionView)
+    }
+
+    /**
+     * Setup multi-select options in a FlexboxLayout
+     */
+    private fun setupMultiSelectOptions(container: FlexboxLayout, category: FilterCategory) {
+        container.removeAllViews()
+
+        // Initialize selections set for this category if not exists
+        if (!selections.containsKey(category.id)) {
+            selections[category.id] = mutableSetOf()
+        }
+        val selectedValues = selections[category.id]!!
+
+        category.options.forEach { option ->
+            val isSelected = selectedValues.contains(option.value)
+            val chip = createFilterChip(option.label, option.value, isSelected)
+            
+            chip.setOnClickListener {
+                if (selectedValues.contains(option.value)) {
+                    selectedValues.remove(option.value)
+                    updateChipState(chip, false)
+                } else {
+                    selectedValues.add(option.value)
+                    updateChipState(chip, true)
+                }
+                applyFiltersImmediately()
+            }
+            
+            container.addView(chip)
+        }
+    }
+
+    /**
+     * Show date picker for a specific category
+     */
+    private fun showDatePicker(
+        categoryId: String, 
+        dateInput: com.google.android.material.textfield.TextInputEditText,
+        dateChips: FlexboxLayout
+    ) {
         val calendar = Calendar.getInstance()
 
         DatePickerDialog(
@@ -160,19 +245,18 @@ class FilterDialogFragment : DialogFragment() {
                 calendar.set(year, month, day)
                 val date = calendar.time
 
-                if (isOrderDate) {
-                    if (!selectedOrderDates.any { isSameDay(it, date) }) {
-                        selectedOrderDates.add(date)
-                        binding.orderDateInput.setText(dateFormat.format(date))
-                    }
-                } else {
-                    if (!selectedPickupDates.any { isSameDay(it, date) }) {
-                        selectedPickupDates.add(date)
-                        binding.pickupDateInput.setText(dateFormat.format(date))
-                    }
+                // Initialize date list for this category if not exists
+                if (!dateSelections.containsKey(categoryId)) {
+                    dateSelections[categoryId] = mutableListOf()
                 }
-                updateDateChips()
-                // Apply filters immediately
+                val dates = dateSelections[categoryId]!!
+
+                if (!dates.any { isSameDay(it, date) }) {
+                    dates.add(date)
+                    dateInput.setText(dateFormat.format(date))
+                }
+                
+                updateDateChipsForCategory(categoryId, dateChips, dateInput)
                 applyFiltersImmediately()
             },
             calendar.get(Calendar.YEAR),
@@ -188,35 +272,28 @@ class FilterDialogFragment : DialogFragment() {
                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
 
-    private fun updateDateChips() {
-        // Order date chips
-        binding.orderDateChips.removeAllViews()
-        selectedOrderDates.forEach { date ->
-            val chip = createDateChip(dateFormat.format(date)) {
-                selectedOrderDates.remove(date)
-                updateDateChips()
-                if (selectedOrderDates.isEmpty()) {
-                    binding.orderDateInput.text?.clear()
-                }
-                // Apply filters immediately
-                applyFiltersImmediately()
-            }
-            binding.orderDateChips.addView(chip)
-        }
+    /**
+     * Update date chips for a specific category
+     */
+    private fun updateDateChipsForCategory(
+        categoryId: String,
+        dateChips: FlexboxLayout,
+        dateInput: com.google.android.material.textfield.TextInputEditText
+    ) {
+        dateChips.removeAllViews()
+        
+        val dates = dateSelections[categoryId] ?: return
 
-        // Pickup date chips
-        binding.pickupDateChips.removeAllViews()
-        selectedPickupDates.forEach { date ->
+        dates.forEach { date ->
             val chip = createDateChip(dateFormat.format(date)) {
-                selectedPickupDates.remove(date)
-                updateDateChips()
-                if (selectedPickupDates.isEmpty()) {
-                    binding.pickupDateInput.text?.clear()
+                dates.remove(date)
+                updateDateChipsForCategory(categoryId, dateChips, dateInput)
+                if (dates.isEmpty()) {
+                    dateInput.text?.clear()
                 }
-                // Apply filters immediately
                 applyFiltersImmediately()
             }
-            binding.pickupDateChips.addView(chip)
+            dateChips.addView(chip)
         }
     }
 
@@ -254,81 +331,10 @@ class FilterDialogFragment : DialogFragment() {
         }
     }
 
-    private fun setupFilterOptions() {
-        // Payment Status options (excluding "All" - multi-select doesn't need it)
-        setupMultiSelectSection(
-            binding.paymentStatusOptions,
-            listOf("Paid" to "paid", "Unpaid" to "unpaid", "Refunded" to "refunded", "Partial" to "partial"),
-            selectedPaymentStatuses
-        )
-
-        // Order Status options
-        setupMultiSelectSection(
-            binding.orderStatusOptions,
-            listOf("Open" to "open", "Closed" to "closed"),
-            selectedOrderStatuses
-        )
-
-        // Payment Type options
-        setupMultiSelectSection(
-            binding.paymentTypeOptions,
-            listOf("Card" to "card", "Cash" to "cash"),
-            selectedPaymentTypes
-        )
-
-        // Category options
-        val categoryOptions = availableCategories.map { it to it }
-        setupMultiSelectSection(
-            binding.categoryOptions,
-            categoryOptions,
-            selectedCategories
-        )
-
-        // Employee options
-        val employeeOptions = availableEmployees.map { it to it }
-        setupMultiSelectSection(
-            binding.employeeOptions,
-            employeeOptions,
-            selectedEmployees
-        )
-    }
-
-    private fun setupMultiSelectSection(
-        container: FlexboxLayout,
-        options: List<Pair<String, String>>,
-        selectedValues: MutableSet<String>
-    ) {
-        container.removeAllViews()
-
-        options.forEach { (label, value) ->
-            val isSelected = selectedValues.contains(value)
-            val chip = createFilterChip(label, value, isSelected)
-            chip.setOnClickListener {
-                if (selectedValues.contains(value)) {
-                    // Deselect
-                    selectedValues.remove(value)
-                    updateChipState(chip, false)
-                } else {
-                    // Select
-                    selectedValues.add(value)
-                    updateChipState(chip, true)
-                }
-                // Apply filters immediately
-                applyFiltersImmediately()
-            }
-            container.addView(chip)
-        }
-    }
-
     private fun applyFiltersImmediately() {
         val filterState = FilterState(
-            paymentStatuses = selectedPaymentStatuses.toSet(),
-            orderStatuses = selectedOrderStatuses.toSet(),
-            paymentTypes = selectedPaymentTypes.toSet(),
-            categories = selectedCategories.toSet(),
-            employees = selectedEmployees.toSet(),
-            orderDates = selectedOrderDates.toList(),
-            pickupDates = selectedPickupDates.toList()
+            selections = selections.mapValues { it.value.toSet() },
+            dateSelections = dateSelections.mapValues { it.value.toList() }
         )
         listener?.onFiltersApplied(filterState)
     }
@@ -377,31 +383,50 @@ class FilterDialogFragment : DialogFragment() {
         this.listener = listener
     }
 
+    /**
+     * Set the filter categories (must be called before showing dialog)
+     */
+    fun setFilterCategories(categories: List<FilterCategory>) {
+        this.filterCategories = categories
+    }
+
+    /**
+     * Restore previous filter selections
+     */
+    fun setCurrentFilters(filterState: FilterState) {
+        selections.clear()
+        filterState.selections.forEach { (key, values) ->
+            selections[key] = values.toMutableSet()
+        }
+        
+        dateSelections.clear()
+        filterState.dateSelections.forEach { (key, dates) ->
+            dateSelections[key] = dates.toMutableList()
+        }
+    }
+
     companion object {
         const val TAG = "FilterDialogFragment"
 
-        private const val ARG_PAYMENT_STATUSES = "payment_statuses"
-        private const val ARG_ORDER_STATUSES = "order_statuses"
-        private const val ARG_PAYMENT_TYPES = "payment_types"
-        private const val ARG_CATEGORIES_SELECTED = "categories_selected"
-        private const val ARG_EMPLOYEES_SELECTED = "employees_selected"
-        private const val ARG_EMPLOYEES = "employees"
-        private const val ARG_CATEGORIES = "categories"
-
+        /**
+         * Create a new filter dialog with dynamic categories
+         * 
+         * @param categories Filter categories built from FilterCategoryBuilder
+         * @param currentFilters Current filter state to restore
+         */
         fun newInstance(
-            currentFilters: FilterState = FilterState(),
-            employees: List<String> = emptyList(),
-            categories: List<String> = emptyList()
+            categories: List<FilterCategory>,
+            currentFilters: FilterState = FilterState()
         ): FilterDialogFragment {
             return FilterDialogFragment().apply {
-                arguments = Bundle().apply {
-                    putStringArrayList(ARG_PAYMENT_STATUSES, ArrayList(currentFilters.paymentStatuses))
-                    putStringArrayList(ARG_ORDER_STATUSES, ArrayList(currentFilters.orderStatuses))
-                    putStringArrayList(ARG_PAYMENT_TYPES, ArrayList(currentFilters.paymentTypes))
-                    putStringArrayList(ARG_CATEGORIES_SELECTED, ArrayList(currentFilters.categories))
-                    putStringArrayList(ARG_EMPLOYEES_SELECTED, ArrayList(currentFilters.employees))
-                    putStringArrayList(ARG_EMPLOYEES, ArrayList(employees))
-                    putStringArrayList(ARG_CATEGORIES, ArrayList(categories))
+                filterCategories = categories
+                
+                // Restore selections
+                currentFilters.selections.forEach { (key, values) ->
+                    selections[key] = values.toMutableSet()
+                }
+                currentFilters.dateSelections.forEach { (key, dates) ->
+                    dateSelections[key] = dates.toMutableList()
                 }
             }
         }
