@@ -339,25 +339,39 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         if (order == null) return false
         
         return exceptionHandlerWithReturn {
+            // Order number/ID
             val orderId = order.id?.lowercase() ?: ""
+            
+            // Customer name
             val customerName = try {
                 val customer = order.customers?.firstOrNull()
                 "${customer?.firstName ?: ""} ${customer?.lastName ?: ""}".lowercase()
             } catch (e: Exception) { "" }
             
+            // Employee name
             val employeeName = try {
                 order.employee?.jsonObject?.get(Constants.name)?.toString()?.lowercase() ?: ""
             } catch (e: Exception) { "" }
             
             val paymentStatus = order.paymentState?.name?.lowercase() ?: ""
             
+            // Customer contact info
             val customerContact = try {
                 getCustomerContactDetails(order.customers?.firstOrNull())
             } catch (e: Exception) { Pair("", "") }
 
-            // Check line item notes
-            val notesMatch = order.lineItems?.any { lineItem ->
-                lineItem?.note?.lowercase()?.contains(query) == true
+            // Widget data from line item notes (includes labels, values, descriptions)
+            val widgetDataMatch = order.lineItems?.any { lineItem ->
+                val note = lineItem?.note?.lowercase() ?: ""
+                val itemName = lineItem?.name?.lowercase() ?: ""
+                note.contains(query) || itemName.contains(query)
+            } ?: false
+            
+            // Line item alterations/modifications
+            val alterationsMatch = order.lineItems?.any { lineItem ->
+                lineItem?.alterations?.any { alteration ->
+                    alteration?.name?.lowercase()?.contains(query) == true
+                } ?: false
             } ?: false
 
             orderId.contains(query) ||
@@ -366,7 +380,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             paymentStatus.contains(query) ||
             customerContact.first.lowercase().contains(query) ||
             customerContact.second.lowercase().contains(query) ||
-            notesMatch
+            widgetDataMatch ||
+            alterationsMatch
         } ?: false
     }
 
