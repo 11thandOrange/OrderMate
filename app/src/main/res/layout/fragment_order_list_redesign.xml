@@ -20,23 +20,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Header Top Row: Search + Filter + Reset + Syncing -->
+        <!-- Header Top Row: Search + Filter + Reset + Syncing (left-aligned) -->
         <LinearLayout
             android:id="@+id/headerTopRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
+            android:gravity="center_vertical|start"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <!-- Search Container -->
+            <!-- Search Container (max 400dp, not full width) -->
             <LinearLayout
                 android:id="@+id/searchContainer"
-                android:layout_width="0dp"
+                android:layout_width="400dp"
                 android:layout_height="48dp"
-                android:layout_weight="1"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="20dp"
