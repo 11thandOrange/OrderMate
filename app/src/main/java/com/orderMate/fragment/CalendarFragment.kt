@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.clover.sdk.v3.order.Order
 import com.orderMate.R
@@ -672,6 +673,14 @@ class CalendarFragment : Fragment() {
     // ==================== Calendar Rendering ====================
     
     fun renderCalendar() {
+        when (currentViewMode) {
+            "day" -> renderDayView()
+            "week" -> renderWeekView()
+            else -> renderMonthView()
+        }
+    }
+    
+    private fun renderMonthView() {
         val year = currentDate.get(Calendar.YEAR)
         val month = currentDate.get(Calendar.MONTH)
         
@@ -684,13 +693,255 @@ class CalendarFragment : Fragment() {
             eventCal.get(Calendar.YEAR) == year && eventCal.get(Calendar.MONTH) == month
         }
         
+        // Show grid with 7 columns for month view
+        calendarGrid?.layoutManager = GridLayoutManager(requireContext(), 7)
+        
         val days = generateCalendarDays(year, month, monthEvents)
         
         calendarGrid?.adapter = CalendarDayAdapter(days) { day ->
             if (day.hasEvents) {
-                showEventPreview(day.events.first())
+                showDayEventsDialog(day)
             }
         }
+    }
+    
+    private fun renderWeekView() {
+        val year = currentDate.get(Calendar.YEAR)
+        val month = currentDate.get(Calendar.MONTH)
+        val day = currentDate.get(Calendar.DAY_OF_MONTH)
+        
+        // Get week start (Sunday)
+        val weekStart = Calendar.getInstance().apply {
+            time = currentDate.time
+            set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+        }
+        
+        val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
+        val weekEnd = Calendar.getInstance().apply {
+            time = weekStart.time
+            add(Calendar.DAY_OF_MONTH, 6)
+        }
+        monthYearTitle?.text = "${dateFormat.format(weekStart.time)} - ${dateFormat.format(weekEnd.time)}, ${year}"
+        
+        // Generate week days with events
+        val weekDays = mutableListOf<WeekDay>()
+        val dayNames = arrayOf("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
+        
+        for (i in 0..6) {
+            val dayCalendar = Calendar.getInstance().apply {
+                time = weekStart.time
+                add(Calendar.DAY_OF_MONTH, i)
+            }
+            
+            val dayEvents = filteredEvents.filter { event ->
+                val eventCal = Calendar.getInstance()
+                eventCal.time = event.dueDate
+                eventCal.get(Calendar.YEAR) == dayCalendar.get(Calendar.YEAR) &&
+                eventCal.get(Calendar.DAY_OF_YEAR) == dayCalendar.get(Calendar.DAY_OF_YEAR)
+            }
+            
+            val today = Calendar.getInstance()
+            val isToday = dayCalendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                         dayCalendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
+            
+            weekDays.add(WeekDay(
+                dayName = dayNames[i],
+                dayNumber = dayCalendar.get(Calendar.DAY_OF_MONTH),
+                date = dayCalendar.time,
+                events = dayEvents,
+                isToday = isToday
+            ))
+        }
+        
+        // Use linear layout for week view
+        calendarGrid?.layoutManager = LinearLayoutManager(requireContext())
+        calendarGrid?.adapter = WeekDayAdapter(weekDays) { weekDay ->
+            if (weekDay.events.isNotEmpty()) {
+                val dialog = EventPreviewDialog.newInstance(weekDay.events, weekDay.date)
+                dialog.setOnEventClickListener { event ->
+                    viewFullOrderDetails(event.orderId)
+                }
+                dialog.show(childFragmentManager, EventPreviewDialog.TAG)
+            }
+        }
+    }
+    
+    private fun renderDayView() {
+        val dateFormat = SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault())
+        monthYearTitle?.text = dateFormat.format(currentDate.time)
+        
+        // Get events for current day
+        val dayEvents = filteredEvents.filter { event ->
+            val eventCal = Calendar.getInstance()
+            eventCal.time = event.dueDate
+            eventCal.get(Calendar.YEAR) == currentDate.get(Calendar.YEAR) &&
+            eventCal.get(Calendar.DAY_OF_YEAR) == currentDate.get(Calendar.DAY_OF_YEAR)
+        }
+        
+        // Use linear layout for day view
+        calendarGrid?.layoutManager = LinearLayoutManager(requireContext())
+        calendarGrid?.adapter = DayEventAdapter(dayEvents) { event ->
+            viewFullOrderDetails(event.orderId)
+        }
+    }
+    
+    data class WeekDay(
+        val dayName: String,
+        val dayNumber: Int,
+        val date: Date,
+        val events: List<ScheduledEvent>,
+        val isToday: Boolean
+    )
+    
+    /**
+     * Adapter for week view
+     */
+    inner class WeekDayAdapter(
+        private val weekDays: List<WeekDay>,
+        private val onDayClick: (WeekDay) -> Unit
+    ) : RecyclerView.Adapter<WeekDayAdapter.ViewHolder>() {
+        
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_calendar_week_day, parent, false)
+            return ViewHolder(view)
+        }
+        
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.bind(weekDays[position])
+        }
+        
+        override fun getItemCount(): Int = weekDays.size
+        
+        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            private val dayName: TextView = itemView.findViewById(R.id.dayName)
+            private val dayNumber: TextView = itemView.findViewById(R.id.dayNumber)
+            private val eventCount: TextView = itemView.findViewById(R.id.eventCount)
+            private val eventsContainer: LinearLayout = itemView.findViewById(R.id.eventsContainer)
+            
+            fun bind(weekDay: WeekDay) {
+                val context = itemView.context
+                
+                dayName.text = weekDay.dayName
+                dayNumber.text = weekDay.dayNumber.toString()
+                
+                // Highlight today
+                if (weekDay.isToday) {
+                    dayNumber.setBackgroundResource(R.drawable.bg_today_circle)
+                    dayNumber.setTextColor(ContextCompat.getColor(context, R.color.text_primary))
+                } else {
+                    dayNumber.setBackgroundResource(0)
+                    dayNumber.setTextColor(ContextCompat.getColor(context, R.color.text_light))
+                }
+                
+                // Show events
+                if (weekDay.events.isNotEmpty()) {
+                    eventCount.text = "${weekDay.events.size} orders"
+                    eventCount.visibility = View.VISIBLE
+                    
+                    eventsContainer.removeAllViews()
+                    eventsContainer.visibility = View.VISIBLE
+                    
+                    // Show up to 3 events
+                    weekDay.events.take(3).forEach { event ->
+                        val eventView = createEventRow(context, event)
+                        eventsContainer.addView(eventView)
+                    }
+                    
+                    itemView.setOnClickListener { onDayClick(weekDay) }
+                } else {
+                    eventCount.visibility = View.GONE
+                    eventsContainer.visibility = View.GONE
+                    itemView.setOnClickListener(null)
+                }
+            }
+            
+            private fun createEventRow(context: android.content.Context, event: ScheduledEvent): View {
+                val view = LayoutInflater.from(context)
+                    .inflate(R.layout.item_calendar_day_event, eventsContainer, false)
+                
+                val colorBar = view.findViewById<View>(R.id.eventColorBar)
+                val customerName = view.findViewById<TextView>(R.id.customerName)
+                val eventDetails = view.findViewById<TextView>(R.id.eventDetails)
+                val orderTotal = view.findViewById<TextView>(R.id.orderTotal)
+                
+                customerName.text = event.customerName
+                eventDetails.text = "${event.type.getDisplayName()} • ${event.itemCount} items"
+                orderTotal.text = "$${String.format("%.2f", event.total)}"
+                
+                val color = when (event.type) {
+                    EventType.PICKUP -> ContextCompat.getColor(context, R.color.event_pickup)
+                    EventType.DELIVERY -> ContextCompat.getColor(context, R.color.event_delivery)
+                    EventType.PREORDER -> ContextCompat.getColor(context, R.color.event_preorder)
+                }
+                colorBar.setBackgroundColor(color)
+                
+                view.setOnClickListener { viewFullOrderDetails(event.orderId) }
+                
+                return view
+            }
+        }
+    }
+    
+    /**
+     * Adapter for day view (full event list)
+     */
+    inner class DayEventAdapter(
+        private val events: List<ScheduledEvent>,
+        private val onClick: (ScheduledEvent) -> Unit
+    ) : RecyclerView.Adapter<DayEventAdapter.ViewHolder>() {
+        
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_calendar_day_event, parent, false)
+            return ViewHolder(view)
+        }
+        
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.bind(events[position])
+        }
+        
+        override fun getItemCount(): Int = events.size
+        
+        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            private val colorBar: View = itemView.findViewById(R.id.eventColorBar)
+            private val customerName: TextView = itemView.findViewById(R.id.customerName)
+            private val eventDetails: TextView = itemView.findViewById(R.id.eventDetails)
+            private val orderTotal: TextView = itemView.findViewById(R.id.orderTotal)
+            
+            fun bind(event: ScheduledEvent) {
+                val context = itemView.context
+                
+                customerName.text = event.customerName
+                eventDetails.text = "${event.type.getDisplayName()} • ${event.itemCount} items"
+                orderTotal.text = "$${String.format("%.2f", event.total)}"
+                
+                val color = when (event.type) {
+                    EventType.PICKUP -> ContextCompat.getColor(context, R.color.event_pickup)
+                    EventType.DELIVERY -> ContextCompat.getColor(context, R.color.event_delivery)
+                    EventType.PREORDER -> ContextCompat.getColor(context, R.color.event_preorder)
+                }
+                colorBar.setBackgroundColor(color)
+                
+                itemView.setOnClickListener { onClick(event) }
+            }
+        }
+    }
+    
+    /**
+     * Show dialog with all events for a selected day
+     */
+    private fun showDayEventsDialog(day: CalendarDay) {
+        val dayDate = Calendar.getInstance().apply {
+            time = currentDate.time
+            set(Calendar.DAY_OF_MONTH, day.dayNumber)
+        }.time
+        
+        val dialog = EventPreviewDialog.newInstance(day.events, dayDate)
+        dialog.setOnEventClickListener { event ->
+            viewFullOrderDetails(event.orderId)
+        }
+        dialog.show(childFragmentManager, EventPreviewDialog.TAG)
     }
     
     private fun generateCalendarDays(year: Int, month: Int, events: List<ScheduledEvent>): List<CalendarDay> {
@@ -749,26 +1000,39 @@ class CalendarFragment : Fragment() {
     }
     
     fun goToNextFulfillment() {
-        val nextEvent = calendarManager.getNextScheduledEvent()
+        // Find next event from filtered events
+        val now = Date()
+        val nextEvent = filteredEvents
+            .filter { it.dueDate.after(now) }
+            .minByOrNull { it.dueDate }
+        
         nextEvent?.let { event ->
             currentDate.time = event.dueDate
             renderCalendar()
-            showEventPreview(event)
+            
+            // Show single event in dialog
+            val dialog = EventPreviewDialog.newInstance(listOf(event), event.dueDate)
+            dialog.setOnEventClickListener { e ->
+                viewFullOrderDetails(e.orderId)
+            }
+            dialog.show(childFragmentManager, EventPreviewDialog.TAG)
         } ?: run {
             showNoUpcomingEventsMessage()
         }
     }
     
-    fun showEventPreview(event: ScheduledEvent) {
-        Toast.makeText(
-            requireContext(),
-            "Order: ${event.orderId}\n${event.customerName}\n$${event.total}",
-            Toast.LENGTH_LONG
-        ).show()
-    }
-    
     fun viewFullOrderDetails(orderId: String) {
-        // Navigate to order details page
+        // Navigate to order details using existing infrastructure
+        try {
+            val order = allOrders.find { it?.id == orderId }
+            if (order != null) {
+                OrderListRedesignFragment.userClickedData = order
+                // Trigger navigation to detail view
+                (activity as? com.orderMate.communicators.IOrderItemClickListener)?.onItemClick(order, 0)
+            }
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Unable to open order details", Toast.LENGTH_SHORT).show()
+        }
     }
     
     private fun showNoUpcomingEventsMessage() {
