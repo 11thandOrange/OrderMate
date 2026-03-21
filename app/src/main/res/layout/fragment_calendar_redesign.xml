@@ -53,13 +53,25 @@
                     android:layout_weight="1"
                     android:layout_marginStart="12dp"
                     android:background="@null"
-                    android:hint="Search scheduled orders..."
+                    android:hint="@string/search_orders"
                     android:textColorHint="@color/text_muted"
                     android:textColor="@color/text_light"
                     android:textSize="14sp"
                     android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:maxLines="1"/>
+
+                <ImageView
+                    android:id="@+id/calendarIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_calender"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Pick date"
+                    app:tint="@color/text_muted"
+                    android:clickable="true"
+                    android:focusable="true"/>
             </LinearLayout>
 
             <!-- Filter Button -->

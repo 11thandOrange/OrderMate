@@ -1,5 +1,6 @@
 package com.orderMate.fragment
 
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.HorizontalScrollView
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -16,26 +18,28 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.clover.sdk.v3.order.Order
 import com.orderMate.R
 import com.orderMate.model.ScheduledEvent
 import com.orderMate.model.EventType
 import com.orderMate.utils.CalendarManager
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FilterCategoryBuilder
-import com.orderMate.utils.FilterCategoryBuilder.FilterCategory
-import com.orderMate.utils.FilterCategoryBuilder.FilterOption
-import com.orderMate.utils.FilterCategoryBuilder.FilterSource
-import com.orderMate.utils.FilterCategoryBuilder.FilterType
+import com.orderMate.utils.MyApp
+import com.orderMate.utils.WidgetManager
+import com.orderMate.utils.exceptionHandlerWithReturn
+import com.orderMate.utils.getCustomerContactDetails
+import com.orderMate.utils.migrations.SchemaMigrator
+import com.orderMate.utils.runOnBackgroundThread
+import com.orderMate.utils.runOnMainThread
 import java.text.SimpleDateFormat
 import java.util.*
 
 /**
  * iOS-style Calendar Tab Fragment (#82 requirement)
  * 
- * Displays scheduled orders as calendar events for:
- * - Pickup orders
- * - Delivery orders
- * - Preorders
+ * Displays scheduled orders as calendar events.
+ * Uses same search/filter logic as OrderListRedesignFragment.
  * 
  * Features:
  * - Monthly calendar grid view (default)
@@ -52,13 +56,23 @@ class CalendarFragment : Fragment() {
     private var currentDate: Calendar = Calendar.getInstance()
     private var currentViewMode: String = "month"
     
-    // All events and filtered events
+    // Order data (same as List tab)
+    private var allOrders: ArrayList<Order?> = ArrayList()
+    private var filteredOrders: ArrayList<Order?> = ArrayList()
+    
+    // Events for calendar display
     private var allEvents: List<ScheduledEvent> = emptyList()
     private var filteredEvents: List<ScheduledEvent> = emptyList()
     
-    // Filter state
+    // Filter state (same as List tab)
     private var currentFilterState = FilterDialogFragment.FilterState()
     private var currentSearchQuery: String = ""
+    private var selectedDateFilter: Date? = null
+    
+    // Widget manager for dynamic filters (same as List tab)
+    private var widgetManager: WidgetManager? = null
+    
+    private val myApp by lazy { MyApp.getInstance() }
     
     // Handler for search debouncing
     private val handler = Handler(Looper.getMainLooper())
@@ -75,8 +89,9 @@ class CalendarFragment : Fragment() {
     private var btnToday: TextView? = null
     private var btnNextFulfillment: TextView? = null
     
-    // Header Views
+    // Header Views (same as List tab)
     private var searchInput: EditText? = null
+    private var calendarIcon: ImageView? = null
     private var filterButton: View? = null
     private var resetButton: View? = null
     private var filterPillsScroll: HorizontalScrollView? = null
@@ -99,7 +114,8 @@ class CalendarFragment : Fragment() {
         setupCalendarNavigation()
         setupViewToggle()
         setupActionButtons()
-        loadEvents()
+        initWidgetManager()
+        loadOrders()
     }
     
     private fun initViews(view: View) {
@@ -114,8 +130,9 @@ class CalendarFragment : Fragment() {
         btnToday = view.findViewById(R.id.btnToday)
         btnNextFulfillment = view.findViewById(R.id.btnNextFulfillment)
         
-        // Header views
+        // Header views (same as List tab)
         searchInput = view.findViewById(R.id.searchInput)
+        calendarIcon = view.findViewById(R.id.calendarIcon)
         filterButton = view.findViewById(R.id.filterButton)
         resetButton = view.findViewById(R.id.resetButton)
         filterPillsScroll = view.findViewById(R.id.filterPillsScroll)
@@ -128,6 +145,7 @@ class CalendarFragment : Fragment() {
     private fun setupHeaderActions() {
         filterButton?.setOnClickListener { showFilterDialog() }
         resetButton?.setOnClickListener { resetFilters() }
+        calendarIcon?.setOnClickListener { showDatePicker() }
     }
     
     private fun setupSearchListener() {
@@ -137,7 +155,7 @@ class CalendarFragment : Fragment() {
             }
             searchRunnable = Runnable {
                 currentSearchQuery = text.toString().trim()
-                applyFilters()
+                searchOrders(currentSearchQuery)
             }
             handler.postDelayed(searchRunnable, Constants.debouncingTime)
         }
@@ -159,96 +177,331 @@ class CalendarFragment : Fragment() {
         btnNextFulfillment?.setOnClickListener { goToNextFulfillment() }
     }
     
-    private fun loadEvents() {
-        // Load all events from calendar manager
-        allEvents = calendarManager.getAllEvents()
-        filteredEvents = allEvents
-        renderCalendar()
+    /**
+     * Initialize widget manager for dynamic filters (same as List tab)
+     */
+    private fun initWidgetManager() {
+        val merchantId = myApp.getMerchantId() ?: return
+        
+        SchemaMigrator.migrateIfNeeded(merchantId) { success ->
+            if (success) {
+                widgetManager = WidgetManager(merchantId)
+                widgetManager?.load { loaded ->
+                    if (loaded) {
+                        android.util.Log.d("CalendarFragment", "Widget manager loaded: ${widgetManager?.getWidgetCount()} widgets")
+                    }
+                }
+            }
+        }
     }
     
-    private fun showFilterDialog() {
-        val categories = buildCalendarFilterCategories()
+    /**
+     * Load orders from Clover (same as List tab)
+     */
+    private fun loadOrders() {
+        runOnBackgroundThread {
+            try {
+                val orderData = myApp.getOrderConnector().getOrders(mutableListOf())
+                allOrders.clear()
+                filteredOrders.clear()
+                
+                orderData?.forEach {
+                    allOrders.add(it)
+                    filteredOrders.add(it)
+                }
+                
+                // Convert orders to events for calendar display
+                allEvents = convertOrdersToEvents(allOrders)
+                filteredEvents = allEvents
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            runOnMainThread {
+                renderCalendar()
+            }
+        }
+    }
+    
+    /**
+     * Convert Clover orders to calendar events
+     */
+    private fun convertOrdersToEvents(orders: List<Order?>): List<ScheduledEvent> {
+        return orders.mapNotNull { order ->
+            order ?: return@mapNotNull null
+            
+            val dueDate = order.createdTime?.let { Date(it) } ?: return@mapNotNull null
+            val customerName = try {
+                val customer = order.customers?.firstOrNull()
+                "${customer?.firstName ?: ""} ${customer?.lastName ?: ""}".trim().ifEmpty { "-" }
+            } catch (e: Exception) { "-" }
+            
+            val total = try {
+                (order.total ?: 0L) / 100.0
+            } catch (e: Exception) { 0.0 }
+            
+            // Determine event type based on order data
+            val eventType = determineEventType(order)
+            
+            ScheduledEvent(
+                id = order.id?.hashCode()?.toLong() ?: System.currentTimeMillis(),
+                orderId = order.id ?: "",
+                customerName = customerName,
+                dueDate = dueDate,
+                type = eventType,
+                total = total,
+                note = null
+            )
+        }
+    }
+    
+    private fun determineEventType(order: Order): EventType {
+        // Check line item notes for delivery/pickup indicators
+        val hasDelivery = order.lineItems?.any { 
+            it?.note?.lowercase()?.contains("delivery") == true 
+        } == true
         
-        val dialog = FilterDialogFragment.newInstance(categories, currentFilterState)
+        if (hasDelivery) return EventType.DELIVERY
+        
+        // Default to pickup
+        return EventType.PICKUP
+    }
+
+    // ==================== Search (same as List tab) ====================
+    
+    private fun searchOrders(query: String?) {
+        runOnBackgroundThread {
+            val isFilterApplied = currentFilterState.hasActiveFilters()
+
+            if (query.isNullOrEmpty()) {
+                filteredOrders.clear()
+                if (isFilterApplied) {
+                    // Keep filtered results
+                } else {
+                    allOrders.forEach { filteredOrders.add(it) }
+                }
+            } else {
+                filteredOrders.clear()
+                val sourceList = allOrders
+                
+                for (order in sourceList) {
+                    if (matchesSearch(order, query.lowercase())) {
+                        filteredOrders.add(order)
+                    }
+                }
+            }
+            
+            // Convert filtered orders to events
+            filteredEvents = convertOrdersToEvents(filteredOrders)
+
+            runOnMainThread {
+                renderCalendar()
+            }
+        }
+    }
+    
+    /**
+     * Search matching logic (same as List tab)
+     */
+    private fun matchesSearch(order: Order?, query: String): Boolean {
+        if (order == null) return false
+        
+        return exceptionHandlerWithReturn {
+            val orderId = order.id?.lowercase() ?: ""
+            
+            val customerName = try {
+                val customer = order.customers?.firstOrNull()
+                "${customer?.firstName ?: ""} ${customer?.lastName ?: ""}".lowercase()
+            } catch (e: Exception) { "" }
+            
+            val employeeName = try {
+                order.employee?.jsonObject?.get(Constants.name)?.toString()?.lowercase() ?: ""
+            } catch (e: Exception) { "" }
+            
+            val paymentStatus = order.paymentState?.name?.lowercase() ?: ""
+            
+            val customerContact = try {
+                getCustomerContactDetails(order.customers?.firstOrNull())
+            } catch (e: Exception) { Pair("", "") }
+
+            val widgetDataMatch = order.lineItems?.any { lineItem ->
+                val note = lineItem?.note?.lowercase() ?: ""
+                val itemName = lineItem?.name?.lowercase() ?: ""
+                note.contains(query) || itemName.contains(query)
+            } ?: false
+
+            orderId.contains(query) ||
+            customerName.contains(query) ||
+            employeeName.contains(query) ||
+            paymentStatus.contains(query) ||
+            customerContact.first.lowercase().contains(query) ||
+            customerContact.second.lowercase().contains(query) ||
+            widgetDataMatch
+        } ?: false
+    }
+
+    // ==================== Date Picker (same as List tab) ====================
+    
+    private fun showDatePicker() {
+        val calendar = Calendar.getInstance()
+        selectedDateFilter?.let { calendar.time = it }
+
+        DatePickerDialog(
+            requireContext(),
+            R.style.Theme_OrderMate_Dialog,
+            { _, year, month, day ->
+                calendar.set(year, month, day)
+                selectedDateFilter = calendar.time
+                currentDate.set(year, month, day)
+                filterByDate(calendar.time)
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+    
+    private fun filterByDate(date: Date) {
+        runOnBackgroundThread {
+            val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+            val targetDate = dateFormat.format(date)
+
+            filteredOrders.clear()
+
+            for (order in allOrders) {
+                val orderDate = order?.createdTime?.let {
+                    dateFormat.format(Date(it))
+                }
+                if (orderDate == targetDate) {
+                    filteredOrders.add(order)
+                }
+            }
+            
+            filteredEvents = convertOrdersToEvents(filteredOrders)
+
+            runOnMainThread {
+                renderCalendar()
+            }
+        }
+    }
+
+    // ==================== Filters (same as List tab) ====================
+    
+    private fun showFilterDialog() {
+        val filterableWidgets = widgetManager?.filterableWidgets ?: emptyList()
+        val categories = FilterCategoryBuilder.buildCategories(allOrders, filterableWidgets)
+        
+        val dialog = FilterDialogFragment.newInstance(
+            categories = categories,
+            currentFilters = currentFilterState
+        )
+        
         dialog.setFilterListener(object : FilterDialogFragment.FilterListener {
             override fun onFiltersApplied(filters: FilterDialogFragment.FilterState) {
                 currentFilterState = filters
-                applyFilters()
-                updateFilterPills()
+                applyDialogFilters(filters)
             }
-            
+
             override fun onFilterCleared() {
+                currentFilterState = FilterDialogFragment.FilterState()
                 resetFilters()
             }
         })
-        dialog.show(parentFragmentManager, "CalendarFilterDialog")
+        
+        dialog.show(childFragmentManager, FilterDialogFragment.TAG)
     }
     
-    private fun buildCalendarFilterCategories(): List<FilterCategory> {
-        val categories = mutableListOf<FilterCategory>()
-        
-        // Event Type filter
-        categories.add(FilterCategory(
-            id = "event_type",
-            label = "Event Type",
-            type = FilterType.MULTI_SELECT,
-            source = FilterSource.ORDERMATE,
-            options = listOf(
-                FilterOption("pickup", "Pickup", "Pickup"),
-                FilterOption("delivery", "Delivery", "Delivery"),
-                FilterOption("preorder", "Preorder", "Preorder")
-            )
-        ))
-        
-        // Date filter
-        categories.add(FilterCategory(
-            id = FilterCategoryBuilder.CLOVER_ORDER_DATE,
-            label = "Due Date",
-            type = FilterType.DATE_PICKER,
-            source = FilterSource.ORDERMATE,
-            options = emptyList()
-        ))
-        
-        return categories
-    }
-    
-    private fun applyFilters() {
-        filteredEvents = allEvents.filter { event ->
-            matchesSearch(event) && matchesFilters(event)
-        }
-        renderCalendar()
-    }
-    
-    private fun matchesSearch(event: ScheduledEvent): Boolean {
-        if (currentSearchQuery.isEmpty()) return true
-        
-        val query = currentSearchQuery.lowercase()
-        return event.customerName.lowercase().contains(query) ||
-               event.orderId.lowercase().contains(query) ||
-               event.type.getDisplayName().lowercase().contains(query) ||
-               (event.note?.lowercase()?.contains(query) == true)
-    }
-    
-    private fun matchesFilters(event: ScheduledEvent): Boolean {
-        // Check event type filter
-        val eventTypeSelections = currentFilterState.selections["event_type"]
-        if (!eventTypeSelections.isNullOrEmpty()) {
-            val eventTypeName = event.type.getDisplayName()
-            if (!eventTypeSelections.any { it.equals(eventTypeName, ignoreCase = true) }) {
-                return false
+    private fun applyDialogFilters(filters: FilterDialogFragment.FilterState) {
+        runOnBackgroundThread {
+            filteredOrders.clear()
+
+            allOrders.forEach { order ->
+                if (orderMatchesFilters(order, filters)) {
+                    filteredOrders.add(order)
+                }
+            }
+            
+            filteredEvents = convertOrdersToEvents(filteredOrders)
+
+            runOnMainThread {
+                renderCalendar()
+                updateFilterPills(filters)
             }
         }
-        
-        // Check date filter
-        val dateSelections = currentFilterState.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE]
-        if (!dateSelections.isNullOrEmpty()) {
-            val matchesAnyDate = dateSelections.any { selectedDate ->
-                isSameDay(event.dueDate, selectedDate)
+    }
+    
+    /**
+     * Order filter matching logic (same as List tab)
+     */
+    private fun orderMatchesFilters(order: Order?, filters: FilterDialogFragment.FilterState): Boolean {
+        if (order == null) return false
+
+        for ((categoryId, selectedValues) in filters.selections) {
+            if (selectedValues.isEmpty()) continue
+            
+            when {
+                categoryId == FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> {
+                    val orderPayment = order.paymentState?.name ?: ""
+                    if (!selectedValues.contains(orderPayment)) return false
+                }
+                categoryId == FilterCategoryBuilder.CLOVER_ORDER_STATUS -> {
+                    val orderState = order.state?.lowercase() ?: ""
+                    if (!selectedValues.any { it.lowercase() == orderState }) return false
+                }
+                categoryId == FilterCategoryBuilder.CLOVER_PAYMENT_TYPE -> {
+                    val paymentTypes = order.payments?.mapNotNull { it?.tender?.label?.lowercase() } ?: emptyList()
+                    val selectedLower = selectedValues.map { it.lowercase() }
+                    if (!paymentTypes.any { it in selectedLower }) return false
+                }
+                categoryId == FilterCategoryBuilder.CLOVER_EMPLOYEE -> {
+                    val employeeName = try {
+                        order.employee?.jsonObject?.getString("name") ?: ""
+                    } catch (e: Exception) { "" }
+                    if (!selectedValues.contains(employeeName)) return false
+                }
+                FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
+                    val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
+                    val widget = widgetManager?.getWidgetById(widgetId ?: "") ?: continue
+                    val orderValues = extractWidgetValuesFromNotes(order.lineItems, widget.label)
+                    if (!selectedValues.any { it in orderValues }) return false
+                }
             }
-            if (!matchesAnyDate) return false
         }
-        
+
+        for ((categoryId, dates) in filters.dateSelections) {
+            if (dates.isEmpty()) continue
+            
+            when {
+                categoryId == FilterCategoryBuilder.CLOVER_ORDER_DATE -> {
+                    val orderDate = order.createdTime?.let { Date(it) }
+                    if (orderDate == null) return false
+                    
+                    val matchesAny = dates.any { filterDate ->
+                        isSameDay(orderDate, filterDate)
+                    }
+                    if (!matchesAny) return false
+                }
+            }
+        }
+
         return true
+    }
+    
+    private fun extractWidgetValuesFromNotes(lineItems: List<com.clover.sdk.v3.order.LineItem>?, widgetLabel: String): Set<String> {
+        val values = mutableSetOf<String>()
+        lineItems?.forEach { lineItem ->
+            val note = lineItem?.note ?: return@forEach
+            if (note.contains(widgetLabel, ignoreCase = true)) {
+                val parts = note.split("\n")
+                parts.forEach { part ->
+                    if (part.contains(widgetLabel, ignoreCase = true)) {
+                        val value = part.substringAfter(":").trim()
+                        if (value.isNotEmpty()) values.add(value)
+                    }
+                }
+            }
+        }
+        return values
     }
     
     private fun isSameDay(date1: Date, date2: Date): Boolean {
@@ -261,35 +514,47 @@ class CalendarFragment : Fragment() {
     private fun resetFilters() {
         currentFilterState = FilterDialogFragment.FilterState()
         currentSearchQuery = ""
+        selectedDateFilter = null
         searchInput?.text?.clear()
+        searchInput?.hint = getString(R.string.search_orders)
+        
+        filterPillsScroll?.visibility = View.GONE
+        filterPillsContainer?.removeAllViews()
+        
+        filteredOrders.clear()
+        allOrders.forEach { filteredOrders.add(it) }
         filteredEvents = allEvents
-        updateFilterPills()
+        
         renderCalendar()
         Toast.makeText(requireContext(), "Filters cleared", Toast.LENGTH_SHORT).show()
     }
     
-    private fun updateFilterPills() {
+    private fun updateFilterPills(filters: FilterDialogFragment.FilterState) {
         filterPillsContainer?.removeAllViews()
         
         val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
         var hasPills = false
         
-        // Add event type filter pills
-        currentFilterState.selections["event_type"]?.forEach { value ->
-            hasPills = true
-            val pill = createFilterPillWithClose(value) {
-                removeSelectionFilter("event_type", value)
+        // Add selection filter pills
+        for ((categoryId, values) in filters.selections) {
+            values.forEach { value ->
+                hasPills = true
+                val pill = createFilterPillWithClose(value) {
+                    removeSelectionFilter(categoryId, value)
+                }
+                filterPillsContainer?.addView(pill)
             }
-            filterPillsContainer?.addView(pill)
         }
         
         // Add date filter pills
-        currentFilterState.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE]?.forEachIndexed { index, date ->
-            hasPills = true
-            val pill = createFilterPillWithClose("Due: ${dateFormat.format(date)}") {
-                removeDateFilter(FilterCategoryBuilder.CLOVER_ORDER_DATE, index)
+        for ((categoryId, dates) in filters.dateSelections) {
+            dates.forEachIndexed { index, date ->
+                hasPills = true
+                val pill = createFilterPillWithClose(dateFormat.format(date)) {
+                    removeDateFilter(categoryId, index)
+                }
+                filterPillsContainer?.addView(pill)
             }
-            filterPillsContainer?.addView(pill)
         }
         
         filterPillsScroll?.visibility = if (hasPills) View.VISIBLE else View.GONE
@@ -307,8 +572,7 @@ class CalendarFragment : Fragment() {
             }
         }
         currentFilterState = currentFilterState.copy(selections = newSelections)
-        applyFilters()
-        updateFilterPills()
+        applyDialogFilters(currentFilterState)
     }
     
     private fun removeDateFilter(categoryId: String, index: Int) {
@@ -325,8 +589,7 @@ class CalendarFragment : Fragment() {
             }
         }
         currentFilterState = currentFilterState.copy(dateSelections = newDateSelections)
-        applyFilters()
-        updateFilterPills()
+        applyDialogFilters(currentFilterState)
     }
     
     private fun createFilterPillWithClose(text: String, onClose: () -> Unit): View {
@@ -344,7 +607,6 @@ class CalendarFragment : Fragment() {
             lp.bottomMargin = dpToPx(4)
             layoutParams = lp
             
-            // Text label
             val textView = TextView(context).apply {
                 this.text = text
                 textSize = 12f
@@ -353,7 +615,6 @@ class CalendarFragment : Fragment() {
             }
             addView(textView)
             
-            // Close button
             val closeBtn = android.widget.ImageView(context).apply {
                 setImageResource(R.drawable.ic_close)
                 setColorFilter(ContextCompat.getColor(context, R.color.text_primary))
@@ -370,11 +631,12 @@ class CalendarFragment : Fragment() {
     private fun dpToPx(dp: Int): Int {
         return (dp * resources.displayMetrics.density).toInt()
     }
+
+    // ==================== View Mode ====================
     
     private fun setViewMode(mode: String) {
         currentViewMode = mode
         
-        // Reset all buttons
         val inactiveColor = ContextCompat.getColor(requireContext(), R.color.text_muted)
         btnDay?.setBackgroundResource(0)
         btnDay?.setTextColor(inactiveColor)
@@ -383,7 +645,6 @@ class CalendarFragment : Fragment() {
         btnMonth?.setBackgroundResource(0)
         btnMonth?.setTextColor(inactiveColor)
         
-        // Set active button (orange background, dark text)
         val activeColor = ContextCompat.getColor(requireContext(), R.color.text_primary)
         when (mode) {
             "day" -> {
@@ -400,29 +661,26 @@ class CalendarFragment : Fragment() {
             }
         }
         
-        // Re-render calendar with new view mode
         renderCalendar()
     }
+
+    // ==================== Calendar Rendering ====================
     
     fun renderCalendar() {
         val year = currentDate.get(Calendar.YEAR)
         val month = currentDate.get(Calendar.MONTH)
         
-        // Update title
         val dateFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
         monthYearTitle?.text = dateFormat.format(currentDate.time)
         
-        // Get filtered events for the current month
         val monthEvents = filteredEvents.filter { event ->
             val eventCal = Calendar.getInstance()
             eventCal.time = event.dueDate
             eventCal.get(Calendar.YEAR) == year && eventCal.get(Calendar.MONTH) == month
         }
         
-        // Generate calendar days
         val days = generateCalendarDays(year, month, monthEvents)
         
-        // Set adapter
         calendarGrid?.adapter = CalendarDayAdapter(days) { day ->
             if (day.hasEvents) {
                 showEventPreview(day.events.first())
