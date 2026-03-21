@@ -318,7 +318,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             val paymentStatus = order.paymentState?.name?.lowercase() ?: ""
             
             val customerContact = try {
-                order.customers?.firstOrNull()?.getCustomerContactDetails() ?: Pair("", "")
+                getCustomerContactDetails(order.customers?.firstOrNull())
             } catch (e: Exception) { Pair("", "") }
 
             // Check line item notes
