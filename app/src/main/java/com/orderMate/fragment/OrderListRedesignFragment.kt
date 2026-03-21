@@ -421,10 +421,12 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     private fun showFilterDialog() {
         val employeeList = orderEmployeeType.filter { it != Constants.all_employee }.toList()
+        val categoryList = notesFilter.keys.filter { it != getString(R.string.all_orders) }.toList()
         
         val dialog = FilterDialogFragment.newInstance(
             currentFilters = currentFilterState,
-            employees = employeeList
+            employees = employeeList,
+            categories = categoryList
         )
         
         dialog.setFilterListener(object : FilterDialogFragment.FilterListener {
@@ -491,31 +493,12 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             if (!paymentModes.contains(filters.paymentType)) return false
         }
 
-        // Booking type filter
-        if (filters.bookingType != "all") {
-            val isOnline = order.isNotNullOnlineOrder == true
-            when (filters.bookingType) {
-                "pickup" -> {
-                    // Check notes for pickup indicator
-                    val hasPickup = order.lineItems?.any { 
-                        it?.note?.lowercase()?.contains("pickup") == true 
-                    } ?: false
-                    if (!hasPickup && !isOnline) return false
-                }
-                "delivery" -> {
-                    val hasDelivery = order.lineItems?.any { 
-                        it?.note?.lowercase()?.contains("delivery") == true 
-                    } ?: false
-                    if (!hasDelivery) return false
-                }
-                "preorder" -> {
-                    val hasPreorder = order.lineItems?.any { 
-                        it?.note?.lowercase()?.contains("preorder") == true ||
-                        it?.note?.lowercase()?.contains("pre-order") == true
-                    } ?: false
-                    if (!hasPreorder) return false
-                }
-            }
+        // Category filter (from notes)
+        if (filters.category != "all") {
+            val hasCategory = order.lineItems?.any { lineItem ->
+                lineItem?.note?.contains(filters.category, ignoreCase = true) == true
+            } ?: false
+            if (!hasCategory) return false
         }
 
         // Employee filter
@@ -526,13 +509,42 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             if (employeeName != filters.employee) return false
         }
 
+        // Order date filter
+        if (filters.orderDates.isNotEmpty()) {
+            val orderDate = order.createdTime?.let { java.util.Date(it) }
+            if (orderDate == null) return false
+            val matchesDate = filters.orderDates.any { filterDate ->
+                isSameDay(orderDate, filterDate)
+            }
+            if (!matchesDate) return false
+        }
+
+        // Pickup date filter (check in notes)
+        if (filters.pickupDates.isNotEmpty()) {
+            // This would need custom logic based on how pickup dates are stored
+            // For now, we'll check if any line item has a matching date in notes
+            val matchesPickup = filters.pickupDates.any { filterDate ->
+                val dateStr = java.text.SimpleDateFormat("MM/dd", java.util.Locale.getDefault()).format(filterDate)
+                order.lineItems?.any { it?.note?.contains(dateStr) == true } ?: false
+            }
+            if (!matchesPickup) return false
+        }
+
         return true
+    }
+
+    private fun isSameDay(d1: java.util.Date, d2: java.util.Date): Boolean {
+        val cal1 = java.util.Calendar.getInstance().apply { time = d1 }
+        val cal2 = java.util.Calendar.getInstance().apply { time = d2 }
+        return cal1.get(java.util.Calendar.YEAR) == cal2.get(java.util.Calendar.YEAR) &&
+               cal1.get(java.util.Calendar.DAY_OF_YEAR) == cal2.get(java.util.Calendar.DAY_OF_YEAR)
     }
 
     private fun updateFilterPills(filters: FilterDialogFragment.FilterState) {
         binding.filterPillsContainer.removeAllViews()
 
         val activeFilters = mutableListOf<Pair<String, String>>()
+        val dateFormat = java.text.SimpleDateFormat("MMM d", java.util.Locale.getDefault())
         
         if (filters.paymentStatus != "all") {
             activeFilters.add("Payment" to filters.paymentStatus.replaceFirstChar { it.uppercase() })
@@ -543,11 +555,17 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         if (filters.paymentType != "all") {
             activeFilters.add("Type" to filters.paymentType.replaceFirstChar { it.uppercase() })
         }
-        if (filters.bookingType != "all") {
-            activeFilters.add("Booking" to filters.bookingType.replaceFirstChar { it.uppercase() })
+        if (filters.category != "all") {
+            activeFilters.add("Category" to filters.category)
         }
         if (filters.employee != "all") {
             activeFilters.add("Employee" to filters.employee)
+        }
+        filters.orderDates.forEach { date ->
+            activeFilters.add("Order" to dateFormat.format(date))
+        }
+        filters.pickupDates.forEach { date ->
+            activeFilters.add("Pickup" to dateFormat.format(date))
         }
 
         if (activeFilters.isEmpty()) {

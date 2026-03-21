@@ -9,15 +9,28 @@
     android:background="@drawable/bg_dialog"
     android:padding="24dp">
 
-    <!-- Header -->
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- Header with bottom border -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Filter Orders"
-        android:textColor="@color/text_light"
-        android:textSize="20sp"
-        android:fontFamily="sans-serif-medium"
-        android:layout_marginBottom="24dp"/>
+        android:orientation="vertical"
+        android:layout_marginBottom="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filter Orders"
+            android:textColor="@color/text_light"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-medium"
+            android:paddingBottom="16dp"/>
+
+        <!-- Header bottom border -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#1AFFFFFF"/>
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -30,6 +43,160 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Order Date Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_calendar"
+                        app:tint="@color/text_muted"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="ORDER DATE"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.05"/>
+                </LinearLayout>
+
+                <!-- Date Input -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/orderDateInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_date_input"
+                        android:paddingHorizontal="16dp"
+                        android:paddingEnd="120dp"
+                        android:hint="Select date"
+                        android:textColorHint="@color/text_muted"
+                        android:textColor="@color/text_light"
+                        android:textSize="13sp"
+                        android:focusable="false"
+                        android:clickable="true"
+                        tools:ignore="RtlSymmetry"/>
+
+                    <TextView
+                        android:id="@+id/orderDatePickerLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="8dp"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp"
+                        android:background="@drawable/bg_date_picker_label"
+                        android:text="📅 Select date"
+                        android:textColor="@color/orange_accent"
+                        android:textSize="12sp"/>
+                </FrameLayout>
+
+                <!-- Order Date Chips -->
+                <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/orderDateChips"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    app:flexWrap="wrap"
+                    app:alignItems="flex_start"
+                    app:flexDirection="row"/>
+            </LinearLayout>
+
+            <!-- Pickup Date Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_local_shipping"
+                        app:tint="@color/text_muted"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="PICK UP DATE"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.05"/>
+                </LinearLayout>
+
+                <!-- Date Input -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/pickupDateInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_date_input"
+                        android:paddingHorizontal="16dp"
+                        android:paddingEnd="120dp"
+                        android:hint="Select date"
+                        android:textColorHint="@color/text_muted"
+                        android:textColor="@color/text_light"
+                        android:textSize="13sp"
+                        android:focusable="false"
+                        android:clickable="true"
+                        tools:ignore="RtlSymmetry"/>
+
+                    <TextView
+                        android:id="@+id/pickupDatePickerLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="8dp"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp"
+                        android:background="@drawable/bg_date_picker_label"
+                        android:text="📅 Select date"
+                        android:textColor="@color/orange_accent"
+                        android:textSize="12sp"/>
+                </FrameLayout>
+
+                <!-- Pickup Date Chips -->
+                <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/pickupDateChips"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    app:flexWrap="wrap"
+                    app:alignItems="flex_start"
+                    app:flexDirection="row"/>
+            </LinearLayout>
+
             <!-- Payment Status Section -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -37,14 +204,30 @@
                 android:orientation="vertical"
                 android:layout_marginBottom="20dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="PAYMENT STATUS"
-                    android:textColor="@color/text_muted"
-                    android:textSize="11sp"
-                    android:letterSpacing="0.05"
-                    android:layout_marginBottom="10dp"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_attach_money"
+                        app:tint="@color/text_muted"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="PAYMENT STATUS"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.05"/>
+                </LinearLayout>
 
                 <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/paymentStatusOptions"
@@ -62,14 +245,30 @@
                 android:orientation="vertical"
                 android:layout_marginBottom="20dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ORDER STATUS"
-                    android:textColor="@color/text_muted"
-                    android:textSize="11sp"
-                    android:letterSpacing="0.05"
-                    android:layout_marginBottom="10dp"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_assignment"
+                        app:tint="@color/text_muted"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="ORDER STATUS"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.05"/>
+                </LinearLayout>
 
                 <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/orderStatusOptions"
@@ -87,14 +286,30 @@
                 android:orientation="vertical"
                 android:layout_marginBottom="20dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="PAYMENT TYPE"
-                    android:textColor="@color/text_muted"
-                    android:textSize="11sp"
-                    android:letterSpacing="0.05"
-                    android:layout_marginBottom="10dp"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_credit_card"
+                        app:tint="@color/text_muted"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="PAYMENT TYPE"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.05"/>
+                </LinearLayout>
 
                 <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/paymentTypeOptions"
@@ -105,24 +320,40 @@
                     app:flexDirection="row"/>
             </LinearLayout>
 
-            <!-- Booking Type Section -->
+            <!-- Category Section (from Notes) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginBottom="20dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="BOOKING TYPE"
-                    android:textColor="@color/text_muted"
-                    android:textSize="11sp"
-                    android:letterSpacing="0.05"
-                    android:layout_marginBottom="10dp"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_label"
+                        app:tint="@color/text_muted"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="CATEGORY"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.05"/>
+                </LinearLayout>
 
                 <com.google.android.flexbox.FlexboxLayout
-                    android:id="@+id/bookingTypeOptions"
+                    android:id="@+id/categoryOptions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:flexWrap="wrap"
@@ -137,45 +368,33 @@
                 android:orientation="vertical"
                 android:layout_marginBottom="20dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="EMPLOYEE"
-                    android:textColor="@color/text_muted"
-                    android:textSize="11sp"
-                    android:letterSpacing="0.05"
-                    android:layout_marginBottom="10dp"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_person"
+                        app:tint="@color/text_muted"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="EMPLOYEE"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.05"/>
+                </LinearLayout>
 
                 <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/employeeOptions"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:flexWrap="wrap"
-                    app:alignItems="flex_start"
-                    app:flexDirection="row"/>
-            </LinearLayout>
-
-            <!-- Notes Category Section -->
-            <LinearLayout
-                android:id="@+id/notesCategorySection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="20dp"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="CATEGORY"
-                    android:textColor="@color/text_muted"
-                    android:textSize="11sp"
-                    android:letterSpacing="0.05"
-                    android:layout_marginBottom="10dp"/>
-
-                <com.google.android.flexbox.FlexboxLayout
-                    android:id="@+id/categoryOptions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:flexWrap="wrap"

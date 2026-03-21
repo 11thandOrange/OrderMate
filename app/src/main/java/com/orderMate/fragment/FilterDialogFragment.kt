@@ -1,5 +1,6 @@
 package com.orderMate.fragment
 
+import android.app.DatePickerDialog
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -8,12 +9,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.google.android.flexbox.FlexboxLayout
 import com.orderMate.R
 import com.orderMate.databinding.DialogFiltersBinding
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 /**
  * Filter dialog for order list (#80 requirement)
@@ -30,11 +36,18 @@ class FilterDialogFragment : DialogFragment() {
     private var selectedPaymentStatus: String = "all"
     private var selectedOrderStatus: String = "all"
     private var selectedPaymentType: String = "all"
-    private var selectedBookingType: String = "all"
+    private var selectedCategory: String = "all"
     private var selectedEmployee: String = "all"
 
-    // Available employees (passed from fragment)
+    // Date filters (can have multiple)
+    private val selectedOrderDates = mutableListOf<Date>()
+    private val selectedPickupDates = mutableListOf<Date>()
+
+    // Available options (passed from fragment)
     private var availableEmployees: List<String> = emptyList()
+    private var availableCategories: List<String> = emptyList()
+
+    private val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
 
     interface FilterListener {
         fun onFiltersApplied(filters: FilterState)
@@ -45,12 +58,15 @@ class FilterDialogFragment : DialogFragment() {
         val paymentStatus: String = "all",
         val orderStatus: String = "all",
         val paymentType: String = "all",
-        val bookingType: String = "all",
-        val employee: String = "all"
+        val category: String = "all",
+        val employee: String = "all",
+        val orderDates: List<Date> = emptyList(),
+        val pickupDates: List<Date> = emptyList()
     ) {
         fun hasActiveFilters(): Boolean {
             return paymentStatus != "all" || orderStatus != "all" || 
-                   paymentType != "all" || bookingType != "all" || employee != "all"
+                   paymentType != "all" || category != "all" || employee != "all" ||
+                   orderDates.isNotEmpty() || pickupDates.isNotEmpty()
         }
 
         fun getActiveFilterCount(): Int {
@@ -58,8 +74,10 @@ class FilterDialogFragment : DialogFragment() {
             if (paymentStatus != "all") count++
             if (orderStatus != "all") count++
             if (paymentType != "all") count++
-            if (bookingType != "all") count++
+            if (category != "all") count++
             if (employee != "all") count++
+            count += orderDates.size
+            count += pickupDates.size
             return count
         }
     }
@@ -95,13 +113,126 @@ class FilterDialogFragment : DialogFragment() {
             selectedPaymentStatus = args.getString(ARG_PAYMENT_STATUS, "all")
             selectedOrderStatus = args.getString(ARG_ORDER_STATUS, "all")
             selectedPaymentType = args.getString(ARG_PAYMENT_TYPE, "all")
-            selectedBookingType = args.getString(ARG_BOOKING_TYPE, "all")
+            selectedCategory = args.getString(ARG_CATEGORY, "all")
             selectedEmployee = args.getString(ARG_EMPLOYEE, "all")
             availableEmployees = args.getStringArrayList(ARG_EMPLOYEES) ?: emptyList()
+            availableCategories = args.getStringArrayList(ARG_CATEGORIES) ?: emptyList()
         }
 
+        setupDateInputs()
         setupFilterOptions()
         setupButtons()
+    }
+
+    private fun setupDateInputs() {
+        // Order Date input
+        binding.orderDateInput.setOnClickListener { showDatePicker(true) }
+        binding.orderDatePickerLabel.setOnClickListener { showDatePicker(true) }
+
+        // Pickup Date input
+        binding.pickupDateInput.setOnClickListener { showDatePicker(false) }
+        binding.pickupDatePickerLabel.setOnClickListener { showDatePicker(false) }
+
+        // Update chips
+        updateDateChips()
+    }
+
+    private fun showDatePicker(isOrderDate: Boolean) {
+        val calendar = Calendar.getInstance()
+
+        DatePickerDialog(
+            requireContext(),
+            R.style.Theme_OrderMate_Dialog,
+            { _, year, month, day ->
+                calendar.set(year, month, day)
+                val date = calendar.time
+
+                if (isOrderDate) {
+                    if (!selectedOrderDates.any { isSameDay(it, date) }) {
+                        selectedOrderDates.add(date)
+                        binding.orderDateInput.setText(dateFormat.format(date))
+                    }
+                } else {
+                    if (!selectedPickupDates.any { isSameDay(it, date) }) {
+                        selectedPickupDates.add(date)
+                        binding.pickupDateInput.setText(dateFormat.format(date))
+                    }
+                }
+                updateDateChips()
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+
+    private fun isSameDay(d1: Date, d2: Date): Boolean {
+        val cal1 = Calendar.getInstance().apply { time = d1 }
+        val cal2 = Calendar.getInstance().apply { time = d2 }
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+               cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+    }
+
+    private fun updateDateChips() {
+        // Order date chips
+        binding.orderDateChips.removeAllViews()
+        selectedOrderDates.forEach { date ->
+            val chip = createDateChip(dateFormat.format(date)) {
+                selectedOrderDates.remove(date)
+                updateDateChips()
+                if (selectedOrderDates.isEmpty()) {
+                    binding.orderDateInput.text?.clear()
+                }
+            }
+            binding.orderDateChips.addView(chip)
+        }
+
+        // Pickup date chips
+        binding.pickupDateChips.removeAllViews()
+        selectedPickupDates.forEach { date ->
+            val chip = createDateChip(dateFormat.format(date)) {
+                selectedPickupDates.remove(date)
+                updateDateChips()
+                if (selectedPickupDates.isEmpty()) {
+                    binding.pickupDateInput.text?.clear()
+                }
+            }
+            binding.pickupDateChips.addView(chip)
+        }
+    }
+
+    private fun createDateChip(text: String, onRemove: () -> Unit): View {
+        return LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            setBackgroundResource(R.drawable.bg_date_chip)
+            setPadding(dpToPx(12), dpToPx(6), dpToPx(8), dpToPx(6))
+
+            val lp = FlexboxLayout.LayoutParams(
+                FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                FlexboxLayout.LayoutParams.WRAP_CONTENT
+            )
+            lp.setMargins(0, 0, dpToPx(6), dpToPx(6))
+            layoutParams = lp
+
+            // Date text
+            val textView = TextView(context).apply {
+                this.text = text
+                setTextColor(ContextCompat.getColor(context, R.color.text_light))
+                textSize = 12f
+            }
+            addView(textView)
+
+            // Remove button
+            val removeBtn = TextView(context).apply {
+                this.text = "✕"
+                setTextColor(ContextCompat.getColor(context, R.color.text_muted))
+                textSize = 12f
+                setPadding(dpToPx(6), 0, 0, 0)
+                setOnClickListener { onRemove() }
+            }
+            addView(removeBtn)
+        }
     }
 
     private fun setupFilterOptions() {
@@ -126,12 +257,16 @@ class FilterDialogFragment : DialogFragment() {
             selectedPaymentType
         ) { value -> selectedPaymentType = value }
 
-        // Booking Type options
+        // Category options
+        val categoryOptions = mutableListOf("All" to "all")
+        availableCategories.forEach { name ->
+            categoryOptions.add(name to name)
+        }
         setupFilterSection(
-            binding.bookingTypeOptions,
-            listOf("All" to "all", "Pickup" to "pickup", "Delivery" to "delivery", "Preorder" to "preorder"),
-            selectedBookingType
-        ) { value -> selectedBookingType = value }
+            binding.categoryOptions,
+            categoryOptions,
+            selectedCategory
+        ) { value -> selectedCategory = value }
 
         // Employee options
         val employeeOptions = mutableListOf("All" to "all")
@@ -214,11 +349,16 @@ class FilterDialogFragment : DialogFragment() {
         selectedPaymentStatus = "all"
         selectedOrderStatus = "all"
         selectedPaymentType = "all"
-        selectedBookingType = "all"
+        selectedCategory = "all"
         selectedEmployee = "all"
+        selectedOrderDates.clear()
+        selectedPickupDates.clear()
 
         // Reset UI
+        binding.orderDateInput.text?.clear()
+        binding.pickupDateInput.text?.clear()
         setupFilterOptions()
+        updateDateChips()
 
         listener?.onFilterCleared()
         dismiss()
@@ -229,8 +369,10 @@ class FilterDialogFragment : DialogFragment() {
             paymentStatus = selectedPaymentStatus,
             orderStatus = selectedOrderStatus,
             paymentType = selectedPaymentType,
-            bookingType = selectedBookingType,
-            employee = selectedEmployee
+            category = selectedCategory,
+            employee = selectedEmployee,
+            orderDates = selectedOrderDates.toList(),
+            pickupDates = selectedPickupDates.toList()
         )
         listener?.onFiltersApplied(filterState)
         dismiss()
@@ -255,22 +397,25 @@ class FilterDialogFragment : DialogFragment() {
         private const val ARG_PAYMENT_STATUS = "payment_status"
         private const val ARG_ORDER_STATUS = "order_status"
         private const val ARG_PAYMENT_TYPE = "payment_type"
-        private const val ARG_BOOKING_TYPE = "booking_type"
+        private const val ARG_CATEGORY = "category"
         private const val ARG_EMPLOYEE = "employee"
         private const val ARG_EMPLOYEES = "employees"
+        private const val ARG_CATEGORIES = "categories"
 
         fun newInstance(
             currentFilters: FilterState = FilterState(),
-            employees: List<String> = emptyList()
+            employees: List<String> = emptyList(),
+            categories: List<String> = emptyList()
         ): FilterDialogFragment {
             return FilterDialogFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PAYMENT_STATUS, currentFilters.paymentStatus)
                     putString(ARG_ORDER_STATUS, currentFilters.orderStatus)
                     putString(ARG_PAYMENT_TYPE, currentFilters.paymentType)
-                    putString(ARG_BOOKING_TYPE, currentFilters.bookingType)
+                    putString(ARG_CATEGORY, currentFilters.category)
                     putString(ARG_EMPLOYEE, currentFilters.employee)
                     putStringArrayList(ARG_EMPLOYEES, ArrayList(employees))
+                    putStringArrayList(ARG_CATEGORIES, ArrayList(categories))
                 }
             }
         }
