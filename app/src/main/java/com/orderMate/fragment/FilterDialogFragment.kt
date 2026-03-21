@@ -32,12 +32,12 @@ class FilterDialogFragment : DialogFragment() {
 
     private var listener: FilterListener? = null
 
-    // Current filter selections
-    private var selectedPaymentStatus: String = "all"
-    private var selectedOrderStatus: String = "all"
-    private var selectedPaymentType: String = "all"
-    private var selectedCategory: String = "all"
-    private var selectedEmployee: String = "all"
+    // Current filter selections (multi-select)
+    private val selectedPaymentStatuses = mutableSetOf<String>()
+    private val selectedOrderStatuses = mutableSetOf<String>()
+    private val selectedPaymentTypes = mutableSetOf<String>()
+    private val selectedCategories = mutableSetOf<String>()
+    private val selectedEmployees = mutableSetOf<String>()
 
     // Date filters (can have multiple)
     private val selectedOrderDates = mutableListOf<Date>()
@@ -55,30 +55,23 @@ class FilterDialogFragment : DialogFragment() {
     }
 
     data class FilterState(
-        val paymentStatus: String = "all",
-        val orderStatus: String = "all",
-        val paymentType: String = "all",
-        val category: String = "all",
-        val employee: String = "all",
+        val paymentStatuses: Set<String> = emptySet(),
+        val orderStatuses: Set<String> = emptySet(),
+        val paymentTypes: Set<String> = emptySet(),
+        val categories: Set<String> = emptySet(),
+        val employees: Set<String> = emptySet(),
         val orderDates: List<Date> = emptyList(),
         val pickupDates: List<Date> = emptyList()
     ) {
         fun hasActiveFilters(): Boolean {
-            return paymentStatus != "all" || orderStatus != "all" || 
-                   paymentType != "all" || category != "all" || employee != "all" ||
+            return paymentStatuses.isNotEmpty() || orderStatuses.isNotEmpty() || 
+                   paymentTypes.isNotEmpty() || categories.isNotEmpty() || employees.isNotEmpty() ||
                    orderDates.isNotEmpty() || pickupDates.isNotEmpty()
         }
 
         fun getActiveFilterCount(): Int {
-            var count = 0
-            if (paymentStatus != "all") count++
-            if (orderStatus != "all") count++
-            if (paymentType != "all") count++
-            if (category != "all") count++
-            if (employee != "all") count++
-            count += orderDates.size
-            count += pickupDates.size
-            return count
+            return paymentStatuses.size + orderStatuses.size + paymentTypes.size + 
+                   categories.size + employees.size + orderDates.size + pickupDates.size
         }
     }
 
@@ -131,11 +124,11 @@ class FilterDialogFragment : DialogFragment() {
 
         // Restore any passed filter state
         arguments?.let { args ->
-            selectedPaymentStatus = args.getString(ARG_PAYMENT_STATUS, "all")
-            selectedOrderStatus = args.getString(ARG_ORDER_STATUS, "all")
-            selectedPaymentType = args.getString(ARG_PAYMENT_TYPE, "all")
-            selectedCategory = args.getString(ARG_CATEGORY, "all")
-            selectedEmployee = args.getString(ARG_EMPLOYEE, "all")
+            args.getStringArrayList(ARG_PAYMENT_STATUSES)?.let { selectedPaymentStatuses.addAll(it) }
+            args.getStringArrayList(ARG_ORDER_STATUSES)?.let { selectedOrderStatuses.addAll(it) }
+            args.getStringArrayList(ARG_PAYMENT_TYPES)?.let { selectedPaymentTypes.addAll(it) }
+            args.getStringArrayList(ARG_CATEGORIES_SELECTED)?.let { selectedCategories.addAll(it) }
+            args.getStringArrayList(ARG_EMPLOYEES_SELECTED)?.let { selectedEmployees.addAll(it) }
             availableEmployees = args.getStringArrayList(ARG_EMPLOYEES) ?: emptyList()
             availableCategories = args.getStringArrayList(ARG_CATEGORIES) ?: emptyList()
         }
@@ -262,69 +255,64 @@ class FilterDialogFragment : DialogFragment() {
     }
 
     private fun setupFilterOptions() {
-        // Payment Status options
-        setupFilterSection(
+        // Payment Status options (excluding "All" - multi-select doesn't need it)
+        setupMultiSelectSection(
             binding.paymentStatusOptions,
-            listOf("All" to "all", "Paid" to "paid", "Unpaid" to "unpaid", "Refunded" to "refunded", "Partial" to "partial"),
-            selectedPaymentStatus
-        ) { value -> selectedPaymentStatus = value }
+            listOf("Paid" to "paid", "Unpaid" to "unpaid", "Refunded" to "refunded", "Partial" to "partial"),
+            selectedPaymentStatuses
+        )
 
         // Order Status options
-        setupFilterSection(
+        setupMultiSelectSection(
             binding.orderStatusOptions,
-            listOf("All" to "all", "Open" to "open", "Closed" to "closed"),
-            selectedOrderStatus
-        ) { value -> selectedOrderStatus = value }
+            listOf("Open" to "open", "Closed" to "closed"),
+            selectedOrderStatuses
+        )
 
         // Payment Type options
-        setupFilterSection(
+        setupMultiSelectSection(
             binding.paymentTypeOptions,
-            listOf("All" to "all", "Card" to "card", "Cash" to "cash"),
-            selectedPaymentType
-        ) { value -> selectedPaymentType = value }
+            listOf("Card" to "card", "Cash" to "cash"),
+            selectedPaymentTypes
+        )
 
         // Category options
-        val categoryOptions = mutableListOf("All" to "all")
-        availableCategories.forEach { name ->
-            categoryOptions.add(name to name)
-        }
-        setupFilterSection(
+        val categoryOptions = availableCategories.map { it to it }
+        setupMultiSelectSection(
             binding.categoryOptions,
             categoryOptions,
-            selectedCategory
-        ) { value -> selectedCategory = value }
+            selectedCategories
+        )
 
         // Employee options
-        val employeeOptions = mutableListOf("All" to "all")
-        availableEmployees.forEach { name ->
-            employeeOptions.add(name to name)
-        }
-        setupFilterSection(
+        val employeeOptions = availableEmployees.map { it to it }
+        setupMultiSelectSection(
             binding.employeeOptions,
             employeeOptions,
-            selectedEmployee
-        ) { value -> selectedEmployee = value }
+            selectedEmployees
+        )
     }
 
-    private fun setupFilterSection(
+    private fun setupMultiSelectSection(
         container: FlexboxLayout,
         options: List<Pair<String, String>>,
-        selectedValue: String,
-        onSelect: (String) -> Unit
+        selectedValues: MutableSet<String>
     ) {
         container.removeAllViews()
 
         options.forEach { (label, value) ->
-            val chip = createFilterChip(label, value, value == selectedValue)
+            val isSelected = selectedValues.contains(value)
+            val chip = createFilterChip(label, value, isSelected)
             chip.setOnClickListener {
-                // Deselect all in this container
-                for (i in 0 until container.childCount) {
-                    val child = container.getChildAt(i) as? TextView
-                    child?.let { updateChipState(it, false) }
+                if (selectedValues.contains(value)) {
+                    // Deselect
+                    selectedValues.remove(value)
+                    updateChipState(chip, false)
+                } else {
+                    // Select
+                    selectedValues.add(value)
+                    updateChipState(chip, true)
                 }
-                // Select this one
-                updateChipState(chip, true)
-                onSelect(value)
                 // Apply filters immediately
                 applyFiltersImmediately()
             }
@@ -334,11 +322,11 @@ class FilterDialogFragment : DialogFragment() {
 
     private fun applyFiltersImmediately() {
         val filterState = FilterState(
-            paymentStatus = selectedPaymentStatus,
-            orderStatus = selectedOrderStatus,
-            paymentType = selectedPaymentType,
-            category = selectedCategory,
-            employee = selectedEmployee,
+            paymentStatuses = selectedPaymentStatuses.toSet(),
+            orderStatuses = selectedOrderStatuses.toSet(),
+            paymentTypes = selectedPaymentTypes.toSet(),
+            categories = selectedCategories.toSet(),
+            employees = selectedEmployees.toSet(),
             orderDates = selectedOrderDates.toList(),
             pickupDates = selectedPickupDates.toList()
         )
@@ -392,11 +380,11 @@ class FilterDialogFragment : DialogFragment() {
     companion object {
         const val TAG = "FilterDialogFragment"
 
-        private const val ARG_PAYMENT_STATUS = "payment_status"
-        private const val ARG_ORDER_STATUS = "order_status"
-        private const val ARG_PAYMENT_TYPE = "payment_type"
-        private const val ARG_CATEGORY = "category"
-        private const val ARG_EMPLOYEE = "employee"
+        private const val ARG_PAYMENT_STATUSES = "payment_statuses"
+        private const val ARG_ORDER_STATUSES = "order_statuses"
+        private const val ARG_PAYMENT_TYPES = "payment_types"
+        private const val ARG_CATEGORIES_SELECTED = "categories_selected"
+        private const val ARG_EMPLOYEES_SELECTED = "employees_selected"
         private const val ARG_EMPLOYEES = "employees"
         private const val ARG_CATEGORIES = "categories"
 
@@ -407,11 +395,11 @@ class FilterDialogFragment : DialogFragment() {
         ): FilterDialogFragment {
             return FilterDialogFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PAYMENT_STATUS, currentFilters.paymentStatus)
-                    putString(ARG_ORDER_STATUS, currentFilters.orderStatus)
-                    putString(ARG_PAYMENT_TYPE, currentFilters.paymentType)
-                    putString(ARG_CATEGORY, currentFilters.category)
-                    putString(ARG_EMPLOYEE, currentFilters.employee)
+                    putStringArrayList(ARG_PAYMENT_STATUSES, ArrayList(currentFilters.paymentStatuses))
+                    putStringArrayList(ARG_ORDER_STATUSES, ArrayList(currentFilters.orderStatuses))
+                    putStringArrayList(ARG_PAYMENT_TYPES, ArrayList(currentFilters.paymentTypes))
+                    putStringArrayList(ARG_CATEGORIES_SELECTED, ArrayList(currentFilters.categories))
+                    putStringArrayList(ARG_EMPLOYEES_SELECTED, ArrayList(currentFilters.employees))
                     putStringArrayList(ARG_EMPLOYEES, ArrayList(employees))
                     putStringArrayList(ARG_CATEGORIES, ArrayList(categories))
                 }

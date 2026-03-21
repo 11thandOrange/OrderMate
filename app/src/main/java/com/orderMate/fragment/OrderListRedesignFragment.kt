@@ -468,45 +468,56 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     private fun orderMatchesFilters(order: Order?, filters: FilterDialogFragment.FilterState): Boolean {
         if (order == null) return false
 
-        // Payment status filter
-        if (filters.paymentStatus != "all") {
+        // Payment status filter (multi-select - match ANY)
+        if (filters.paymentStatuses.isNotEmpty()) {
             val orderPayment = order.paymentState?.name?.lowercase() ?: ""
-            val filterValue = when (filters.paymentStatus) {
-                "paid" -> "paid"
-                "unpaid" -> "not_paid"
-                "refunded" -> "refunded"
-                "partial" -> "partially_paid"
-                else -> filters.paymentStatus
+            val matchesAny = filters.paymentStatuses.any { filterValue ->
+                val mappedValue = when (filterValue) {
+                    "paid" -> "paid"
+                    "unpaid" -> "not_paid"
+                    "refunded" -> "refunded"
+                    "partial" -> "partially_paid"
+                    else -> filterValue
+                }
+                orderPayment.contains(mappedValue)
             }
-            if (!orderPayment.contains(filterValue)) return false
+            if (!matchesAny) return false
         }
 
-        // Order status filter
-        if (filters.orderStatus != "all") {
+        // Order status filter (multi-select - match ANY)
+        if (filters.orderStatuses.isNotEmpty()) {
             val orderState = order.state?.toString()?.lowercase() ?: ""
-            if (!orderState.contains(filters.orderStatus)) return false
+            val matchesAny = filters.orderStatuses.any { filterValue ->
+                orderState.contains(filterValue)
+            }
+            if (!matchesAny) return false
         }
 
-        // Payment type filter
-        if (filters.paymentType != "all") {
+        // Payment type filter (multi-select - match ANY)
+        if (filters.paymentTypes.isNotEmpty()) {
             val paymentModes = getPaymentMode(order.payments).lowercase()
-            if (!paymentModes.contains(filters.paymentType)) return false
+            val matchesAny = filters.paymentTypes.any { filterValue ->
+                paymentModes.contains(filterValue)
+            }
+            if (!matchesAny) return false
         }
 
-        // Category filter (from notes)
-        if (filters.category != "all") {
-            val hasCategory = order.lineItems?.any { lineItem ->
-                lineItem?.note?.contains(filters.category, ignoreCase = true) == true
-            } ?: false
-            if (!hasCategory) return false
+        // Category filter (multi-select - match ANY)
+        if (filters.categories.isNotEmpty()) {
+            val matchesAny = filters.categories.any { category ->
+                order.lineItems?.any { lineItem ->
+                    lineItem?.note?.contains(category, ignoreCase = true) == true
+                } ?: false
+            }
+            if (!matchesAny) return false
         }
 
-        // Employee filter
-        if (filters.employee != "all") {
+        // Employee filter (multi-select - match ANY)
+        if (filters.employees.isNotEmpty()) {
             val employeeName = try {
                 order.employee?.jsonObject?.get(Constants.name)?.toString() ?: ""
             } catch (e: Exception) { "" }
-            if (employeeName != filters.employee) return false
+            if (!filters.employees.contains(employeeName)) return false
         }
 
         // Order date filter
@@ -521,8 +532,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
         // Pickup date filter (check in notes)
         if (filters.pickupDates.isNotEmpty()) {
-            // This would need custom logic based on how pickup dates are stored
-            // For now, we'll check if any line item has a matching date in notes
             val matchesPickup = filters.pickupDates.any { filterDate ->
                 val dateStr = java.text.SimpleDateFormat("MM/dd", java.util.Locale.getDefault()).format(filterDate)
                 order.lineItems?.any { it?.note?.contains(dateStr) == true } ?: false
@@ -543,29 +552,30 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     private fun updateFilterPills(filters: FilterDialogFragment.FilterState) {
         binding.filterPillsContainer.removeAllViews()
 
-        val activeFilters = mutableListOf<Pair<String, String>>()
+        val activeFilters = mutableListOf<String>()
         val dateFormat = java.text.SimpleDateFormat("MMM d", java.util.Locale.getDefault())
         
-        if (filters.paymentStatus != "all") {
-            activeFilters.add("Payment" to filters.paymentStatus.replaceFirstChar { it.uppercase() })
+        // Each selected filter becomes its own pill
+        filters.paymentStatuses.forEach { status ->
+            activeFilters.add(status.replaceFirstChar { it.uppercase() })
         }
-        if (filters.orderStatus != "all") {
-            activeFilters.add("Status" to filters.orderStatus.replaceFirstChar { it.uppercase() })
+        filters.orderStatuses.forEach { status ->
+            activeFilters.add(status.replaceFirstChar { it.uppercase() })
         }
-        if (filters.paymentType != "all") {
-            activeFilters.add("Type" to filters.paymentType.replaceFirstChar { it.uppercase() })
+        filters.paymentTypes.forEach { type ->
+            activeFilters.add(type.replaceFirstChar { it.uppercase() })
         }
-        if (filters.category != "all") {
-            activeFilters.add("Category" to filters.category)
+        filters.categories.forEach { category ->
+            activeFilters.add(category)
         }
-        if (filters.employee != "all") {
-            activeFilters.add("Employee" to filters.employee)
+        filters.employees.forEach { employee ->
+            activeFilters.add(employee)
         }
         filters.orderDates.forEach { date ->
-            activeFilters.add("Order" to dateFormat.format(date))
+            activeFilters.add(dateFormat.format(date))
         }
         filters.pickupDates.forEach { date ->
-            activeFilters.add("Pickup" to dateFormat.format(date))
+            activeFilters.add("Pickup: ${dateFormat.format(date)}")
         }
 
         if (activeFilters.isEmpty()) {
@@ -575,8 +585,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
         binding.filterPillsScroll.visibility = View.VISIBLE
 
-        activeFilters.forEach { (category, value) ->
-            val pill = createFilterPill("$category: $value")
+        activeFilters.forEach { filterText ->
+            val pill = createFilterPill(filterText)
             binding.filterPillsContainer.addView(pill)
         }
     }
