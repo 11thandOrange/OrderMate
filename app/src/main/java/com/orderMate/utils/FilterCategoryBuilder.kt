@@ -54,6 +54,7 @@ object FilterCategoryBuilder {
     }
     
     // Clover filter IDs (prefixed to avoid collision with widget IDs)
+    const val CLOVER_ORDER_DATE = "clover_order_date"  // Always shown, not editable
     const val CLOVER_PAYMENT_STATUS = "clover_payment_status"
     const val CLOVER_ORDER_STATUS = "clover_order_status"
     const val CLOVER_PAYMENT_TYPE = "clover_payment_type"
@@ -75,7 +76,10 @@ object FilterCategoryBuilder {
     ): List<FilterCategory> {
         val categories = mutableListOf<FilterCategory>()
         
-        // 1. Clover filters (always shown if they have options)
+        // 1. Order Date - ALWAYS shown (Clover data, not user-editable widget)
+        categories.add(buildOrderDateFilter())
+        
+        // 2. Clover filters (shown if they have options from order data)
         val paymentStatusFilter = buildPaymentStatusFilter(orders)
         if (paymentStatusFilter.options.isNotEmpty()) {
             categories.add(paymentStatusFilter)
@@ -96,15 +100,29 @@ object FilterCategoryBuilder {
             categories.add(employeeFilter)
         }
         
-        // 2. OrderMate widget filters (enabled + showInFilter + not TEXT_BOX)
+        // 3. ALL enabled OrderMate widgets (not TEXT_BOX - can't filter text)
         widgets
-            .filter { it.isEnabled && it.showInFilter && it.type != WidgetType.TEXT_BOX }
+            .filter { it.isEnabled && it.type != WidgetType.TEXT_BOX }
             .sortedBy { it.order }
             .forEach { widget ->
                 categories.add(buildWidgetFilter(widget))
             }
         
         return categories
+    }
+    
+    /**
+     * Build Order Date filter - always shown, from Clover data
+     * This is NOT a widget users can edit in settings
+     */
+    private fun buildOrderDateFilter(): FilterCategory {
+        return FilterCategory(
+            id = CLOVER_ORDER_DATE,
+            label = "Order Date",
+            type = FilterType.DATE_PICKER,
+            source = FilterSource.CLOVER,
+            options = emptyList()  // Date picker doesn't use options
+        )
     }
     
     /**

@@ -24,9 +24,10 @@ class WidgetManager(private val merchantId: String) {
     val enabledWidgets: List<WidgetConfig> 
         get() = _widgets.filter { it.isEnabled }.sortedBy { it.order }
     
+    // All enabled widgets appear in filters (except TEXT_BOX which can't be filtered)
     val filterableWidgets: List<WidgetConfig>
         get() = _widgets
-            .filter { it.isEnabled && it.showInFilter && it.type != WidgetType.TEXT_BOX }
+            .filter { it.isEnabled && it.type != WidgetType.TEXT_BOX }
             .sortedBy { it.order }
     
     val settings: PopupSettings 
