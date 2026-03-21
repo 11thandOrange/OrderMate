@@ -73,4 +73,8 @@
     
     <!-- Header colors -->
     <color name="header_background">#1A000000</color>
+    
+    <!-- Card colors -->
+    <color name="glass_card_background">#26FFFFFF</color>
+    <color name="note_chip_bg">#1AFFFFFF</color>
 </resources>

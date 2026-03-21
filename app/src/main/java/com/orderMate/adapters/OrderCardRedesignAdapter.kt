@@ -81,8 +81,17 @@ class OrderCardRedesignAdapter(
             // Custom Notes Pills
             setupNotesPills(order)
 
-            // Unpaid Indicator
-            binding.unpaidIndicator.isVisible = order.paymentState?.name == "NOT_PAID"
+            // Left Status Indicator (green for paid, red for unpaid)
+            val paymentState = order.paymentState?.name ?: "NOT_PAID"
+            val indicatorColor = when (paymentState) {
+                "PAID" -> ContextCompat.getColor(context, R.color.paid_status_color)
+                "NOT_PAID" -> ContextCompat.getColor(context, R.color.unpaid_status_color)
+                "PARTIALLY_PAID" -> ContextCompat.getColor(context, R.color.orange_accent)
+                "REFUNDED" -> ContextCompat.getColor(context, R.color.orange_accent)
+                else -> ContextCompat.getColor(context, R.color.paid_status_color)
+            }
+            binding.unpaidIndicator.setBackgroundColor(indicatorColor)
+            binding.unpaidIndicator.visibility = View.VISIBLE
         }
 
         private fun setupOrderStatusBadge(order: Order) {
@@ -271,24 +280,15 @@ class OrderCardRedesignAdapter(
         private fun createNoteChip(noteItem: NoteItem): Chip {
             return Chip(binding.root.context).apply {
                 text = noteItem.text
-                textSize = 11f
-                chipMinHeight = 24f.dpToPx()
+                textSize = 12f
+                chipMinHeight = 28f.dpToPx()
+                chipCornerRadius = 6f.dpToPx()
+                chipStrokeWidth = 0f
                 isClickable = false
                 
-                when (noteItem.type) {
-                    NoteType.CATEGORY -> {
-                        setChipBackgroundColorResource(R.color.category_chip_bg)
-                        setTextColor(ContextCompat.getColor(context, R.color.orange_accent))
-                    }
-                    NoteType.TAG -> {
-                        setChipBackgroundColorResource(R.color.tag_chip_bg)
-                        setTextColor(ContextCompat.getColor(context, R.color.closed_status_color))
-                    }
-                    NoteType.TEXT -> {
-                        setChipBackgroundColorResource(R.color.text_chip_bg)
-                        setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
-                    }
-                }
+                // Glass-style background for all chips
+                setChipBackgroundColorResource(R.color.note_chip_bg)
+                setTextColor(ContextCompat.getColor(context, R.color.text_light))
             }
         }
 

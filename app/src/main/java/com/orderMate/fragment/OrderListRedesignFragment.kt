@@ -559,11 +559,51 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         val total = orderItems.sumOf { (it?.total ?: 0L) } / 100.0
         val totalFormatted = String.format("$%.2f", total)
         
-        binding.resultsInfo.text = when {
+        val text = when {
             count == 0 -> "No orders found"
             count == 1 -> "Showing 1 order • Total: $totalFormatted"
             else -> "Showing $count orders • Total: $totalFormatted"
         }
+        
+        // Apply bold styling to numbers
+        val spannable = android.text.SpannableString(text)
+        val countStr = count.toString()
+        val countStart = text.indexOf(countStr)
+        if (countStart >= 0) {
+            spannable.setSpan(
+                android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                countStart,
+                countStart + countStr.length,
+                android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            spannable.setSpan(
+                android.text.style.ForegroundColorSpan(
+                    androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_light)
+                ),
+                countStart,
+                countStart + countStr.length,
+                android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        val totalStart = text.indexOf(totalFormatted)
+        if (totalStart >= 0) {
+            spannable.setSpan(
+                android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                totalStart,
+                totalStart + totalFormatted.length,
+                android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            spannable.setSpan(
+                android.text.style.ForegroundColorSpan(
+                    androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_light)
+                ),
+                totalStart,
+                totalStart + totalFormatted.length,
+                android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        
+        binding.resultsInfo.text = spannable
     }
 
     @SuppressLint("NotifyDataSetChanged")
