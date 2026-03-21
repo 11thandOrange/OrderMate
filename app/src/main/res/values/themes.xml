@@ -8,4 +8,13 @@
         <item name="colorControlNormal">@android:color/darker_gray</item>
     </style>
     <style name="Theme.OrderAppClover" parent="Base.Theme.OrderAppClover" />
+    
+    <!-- Dialog theme for iOS-style dialogs -->
+    <style name="Theme.OrderMate.Dialog" parent="Theme.Material3.DayNight.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.6</item>
+    </style>
 </resources>
