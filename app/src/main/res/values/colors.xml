@@ -59,4 +59,8 @@
     <!-- Card/Modal backgrounds -->
     <color name="modal_overlay">#99000000</color>
     <color name="card_border">#1AFFFFFF</color>
+    
+    <!-- Profile settings colors -->
+    <color name="background_primary">#F5F5F7</color>
+    <color name="divider_color">#E5E5EA</color>
 </resources>
