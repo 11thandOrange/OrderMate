@@ -912,7 +912,12 @@ class CalendarFragment : Fragment() {
                     }
                     
                     setOnClickListener {
-                        showEventPreview(event)
+                        // Show event preview dialog
+                        val dialog = EventPreviewDialog.newInstance(listOf(event), event.dueDate)
+                        dialog.setOnEventClickListener { e ->
+                            viewFullOrderDetails(e.orderId)
+                        }
+                        dialog.show(childFragmentManager, EventPreviewDialog.TAG)
                     }
                 }
                 dayColumn.addView(eventView)
