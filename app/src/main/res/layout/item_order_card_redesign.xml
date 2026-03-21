@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- iOS-style Order Card Item (#80, #81 requirement) -->
-<LinearLayout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,18 +8,25 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    android:orientation="horizontal"
-    android:background="@drawable/bg_order_card"
+    app:cardBackgroundColor="@color/glass_card_background"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/card_border"
+    app:strokeWidth="1dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground">
 
-    <!-- Left Status Bar (only covers straight part, not curved corners) -->
-    <View
-        android:id="@+id/unpaidIndicator"
-        android:layout_width="4dp"
-        android:layout_height="match_parent"
-        android:layout_marginVertical="16dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Left Status Bar (full height, clipped by CardView corners) -->
+        <View
+            android:id="@+id/unpaidIndicator"
+            android:layout_width="4dp"
+            android:layout_height="match_parent"/>
 
     <!-- Card Content -->
     <LinearLayout
@@ -254,6 +261,8 @@
                     app:flexDirection="row"/>
             </LinearLayout>
 
+        </LinearLayout>
+
     </LinearLayout>
 
-</LinearLayout>
+</androidx.cardview.widget.CardView>
