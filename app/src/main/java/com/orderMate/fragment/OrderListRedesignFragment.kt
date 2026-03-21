@@ -247,7 +247,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         
         // Show syncing indicator
         binding.syncingContainer.showView()
-        binding.filterButtonsContainer.hideView()
 
         runOnBackgroundThread {
             try {
@@ -267,7 +266,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             runOnMainThread {
                 isSyncing = false
                 binding.syncingContainer.hideView()
-                binding.filterButtonsContainer.showView()
                 
                 updateResultsInfo()
                 notifyAdapter()
@@ -546,12 +544,13 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     // ==================== UI Updates ====================
 
     private fun showLoading(show: Boolean) {
-        binding.loadingProgress.isVisible = show
-        binding.ordersRecycler.isVisible = !show
+        binding.loadingContainer.isVisible = show
+        binding.ordersRecycler.isVisible = !show && orderItems.isNotEmpty()
+        binding.emptyState.isVisible = !show && orderItems.isEmpty()
     }
 
     private fun updateEmptyState() {
-        binding.emptyState.isVisible = orderItems.isEmpty() && !binding.loadingProgress.isVisible
+        binding.emptyState.isVisible = orderItems.isEmpty() && !binding.loadingContainer.isVisible
         binding.ordersRecycler.isVisible = orderItems.isNotEmpty()
     }
 
