@@ -1,40 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- iOS-style Order Card Item (#80, #81 requirement) -->
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp">
+    android:layout_marginBottom="12dp"
+    android:orientation="horizontal"
+    android:background="@drawable/bg_order_card"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
 
-    <!-- Left Status Bar (absolute positioned) -->
+    <!-- Left Status Bar (extends full card height, rounded on left) -->
     <View
         android:id="@+id/unpaidIndicator"
         android:layout_width="4dp"
         android:layout_height="match_parent"
-        android:background="@color/paid_status_color"
-        android:layout_gravity="start"/>
+        android:background="@drawable/bg_status_bar_left"/>
 
     <!-- Card Content -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        app:cardBackgroundColor="@color/glass_card_background"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="0dp"
-        app:strokeColor="@color/card_border"
-        app:strokeWidth="1dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?android:attr/selectableItemBackground">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="20dp">
 
             <!-- Card Header -->
             <LinearLayout
@@ -263,6 +256,6 @@
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </LinearLayout>
 
-</FrameLayout>
+</LinearLayout>

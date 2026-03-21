@@ -49,8 +49,11 @@ class OrderCardRedesignAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.root.setOnClickListener {
-                listener.onOrderItemClick(adapterPosition, null)
+            // Set click listener on the card root (LinearLayout)
+            binding.cardRoot.setOnClickListener {
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    listener.onOrderItemClick(adapterPosition, null)
+                }
             }
         }
 
@@ -90,8 +93,24 @@ class OrderCardRedesignAdapter(
                 "REFUNDED" -> ContextCompat.getColor(context, R.color.orange_accent)
                 else -> ContextCompat.getColor(context, R.color.paid_status_color)
             }
-            binding.unpaidIndicator.setBackgroundColor(indicatorColor)
+            
+            // Create rounded drawable for status bar
+            val drawable = android.graphics.drawable.GradientDrawable().apply {
+                shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                setColor(indicatorColor)
+                cornerRadii = floatArrayOf(
+                    16f.dpToPx(), 16f.dpToPx(),  // top-left
+                    0f, 0f,                       // top-right
+                    0f, 0f,                       // bottom-right
+                    16f.dpToPx(), 16f.dpToPx()   // bottom-left
+                )
+            }
+            binding.unpaidIndicator.background = drawable
             binding.unpaidIndicator.visibility = View.VISIBLE
+        }
+
+        private fun Float.dpToPx(): Float {
+            return this * binding.root.context.resources.displayMetrics.density
         }
 
         private fun setupOrderStatusBadge(order: Order) {
@@ -290,10 +309,6 @@ class OrderCardRedesignAdapter(
                 setChipBackgroundColorResource(R.color.note_chip_bg)
                 setTextColor(ContextCompat.getColor(context, R.color.text_light))
             }
-        }
-
-        private fun Float.dpToPx(): Float {
-            return this * binding.root.context.resources.displayMetrics.density
         }
     }
 
