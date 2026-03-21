@@ -163,20 +163,20 @@ class OrderCardRedesignAdapter(
                 val customer = order.customers?.firstOrNull()
                 if (customer != null) {
                     "${customer.firstName ?: ""} ${customer.lastName ?: ""}".trim()
-                        .ifEmpty { "Walk-in" }
+                        .ifEmpty { "-" }
                 } else {
-                    "Walk-in"
+                    "-"
                 }
             } catch (e: Exception) {
-                "Walk-in"
+                "-"
             }
         }
 
         private fun getEmployeeName(order: Order): String {
             return try {
-                order.employee?.jsonObject?.get(Constants.name)?.toString() ?: "Staff"
+                order.employee?.jsonObject?.get(Constants.name)?.toString() ?: "-"
             } catch (e: Exception) {
-                "Staff"
+                "-"
             }
         }
 
@@ -185,7 +185,7 @@ class OrderCardRedesignAdapter(
             val payments = order.payments
 
             if (payments.isNullOrEmpty()) {
-                binding.paymentType.text = "Pending"
+                binding.paymentType.text = "-"
                 binding.paymentIcon.setImageResource(R.drawable.ic_credit_card)
                 return
             }
@@ -202,7 +202,7 @@ class OrderCardRedesignAdapter(
                     binding.paymentIcon.setImageResource(R.drawable.ic_credit_card)
                 }
                 else -> {
-                    binding.paymentType.text = payments.firstOrNull()?.tender?.label ?: "Other"
+                    binding.paymentType.text = payments.firstOrNull()?.tender?.label ?: "-"
                     binding.paymentIcon.setImageResource(R.drawable.ic_credit_card)
                 }
             }
