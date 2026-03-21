@@ -93,19 +93,7 @@ class OrderCardRedesignAdapter(
                 "REFUNDED" -> ContextCompat.getColor(context, R.color.orange_accent)
                 else -> ContextCompat.getColor(context, R.color.paid_status_color)
             }
-            
-            // Create rounded drawable for status bar
-            val drawable = android.graphics.drawable.GradientDrawable().apply {
-                shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                setColor(indicatorColor)
-                cornerRadii = floatArrayOf(
-                    16f.dpToPx(), 16f.dpToPx(),  // top-left
-                    0f, 0f,                       // top-right
-                    0f, 0f,                       // bottom-right
-                    16f.dpToPx(), 16f.dpToPx()   // bottom-left
-                )
-            }
-            binding.unpaidIndicator.background = drawable
+            binding.unpaidIndicator.setBackgroundColor(indicatorColor)
             binding.unpaidIndicator.visibility = View.VISIBLE
         }
 
