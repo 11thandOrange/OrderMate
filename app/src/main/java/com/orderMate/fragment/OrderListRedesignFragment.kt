@@ -366,13 +366,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 val itemName = lineItem?.name?.lowercase() ?: ""
                 note.contains(query) || itemName.contains(query)
             } ?: false
-            
-            // Line item alterations/modifications
-            val alterationsMatch = order.lineItems?.any { lineItem ->
-                lineItem?.alterations?.any { alteration ->
-                    alteration?.name?.lowercase()?.contains(query) == true
-                } ?: false
-            } ?: false
 
             orderId.contains(query) ||
             customerName.contains(query) ||
@@ -380,8 +373,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             paymentStatus.contains(query) ||
             customerContact.first.lowercase().contains(query) ||
             customerContact.second.lowercase().contains(query) ||
-            widgetDataMatch ||
-            alterationsMatch
+            widgetDataMatch
         } ?: false
     }
 
