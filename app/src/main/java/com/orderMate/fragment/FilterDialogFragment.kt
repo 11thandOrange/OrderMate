@@ -145,6 +145,8 @@ class FilterDialogFragment : DialogFragment() {
         filterCategories.forEach { category ->
             when (category.type) {
                 FilterType.MULTI_SELECT -> {
+                    // Clover filters: always render with all known values
+                    // Widget filters: only render if has options (enabled widgets already filtered upstream)
                     if (category.options.isNotEmpty()) {
                         addMultiSelectSection(category)
                     }

@@ -63,6 +63,11 @@ object FilterCategoryBuilder {
     // Widget filter ID prefix
     const val WIDGET_PREFIX = "widget_"
     
+    // Clover enum values (from Clover SDK)
+    private val CLOVER_PAYMENT_STATUS_VALUES = listOf("PAID", "NOT_PAID", "PARTIALLY_PAID", "REFUNDED", "PARTIALLY_REFUNDED", "OPEN")
+    private val CLOVER_ORDER_STATUS_VALUES = listOf("open", "locked")
+    private val CLOVER_PAYMENT_TYPE_VALUES = listOf("Cash", "Credit Card", "Debit Card", "Check", "Gift Card", "External Gift Card", "Other")
+    
     /**
      * Build all filter categories for the filter modal
      * 
@@ -79,22 +84,12 @@ object FilterCategoryBuilder {
         // 1. Order Date - ALWAYS shown (Clover data, not user-editable widget)
         categories.add(buildOrderDateFilter())
         
-        // 2. Clover filters (shown if they have options from order data)
-        val paymentStatusFilter = buildPaymentStatusFilter(orders)
-        if (paymentStatusFilter.options.isNotEmpty()) {
-            categories.add(paymentStatusFilter)
-        }
+        // 2. Clover filters - use Clover's known values (always render all values)
+        categories.add(buildPaymentStatusFilter())
+        categories.add(buildOrderStatusFilter())
+        categories.add(buildPaymentTypeFilter())
         
-        val orderStatusFilter = buildOrderStatusFilter(orders)
-        if (orderStatusFilter.options.isNotEmpty()) {
-            categories.add(orderStatusFilter)
-        }
-        
-        val paymentTypeFilter = buildPaymentTypeFilter(orders)
-        if (paymentTypeFilter.options.isNotEmpty()) {
-            categories.add(paymentTypeFilter)
-        }
-        
+        // Employee filter - dynamic, extracted from orders (can't predefine employees)
         val employeeFilter = buildEmployeeFilter(orders)
         if (employeeFilter.options.isNotEmpty()) {
             categories.add(employeeFilter)
@@ -126,19 +121,16 @@ object FilterCategoryBuilder {
     }
     
     /**
-     * Build Payment Status filter from Clover order data
+     * Build Payment Status filter using Clover's known values
      */
-    private fun buildPaymentStatusFilter(orders: List<Order?>): FilterCategory {
-        val options = orders
-            .mapNotNull { it?.paymentState?.name }
-            .distinct()
-            .map { status ->
-                FilterOption(
-                    id = status.lowercase(),
-                    label = formatPaymentStatus(status),
-                    value = status
-                )
-            }
+    private fun buildPaymentStatusFilter(): FilterCategory {
+        val options = CLOVER_PAYMENT_STATUS_VALUES.map { status ->
+            FilterOption(
+                id = status.lowercase(),
+                label = formatPaymentStatus(status),
+                value = status
+            )
+        }
         
         return FilterCategory(
             id = CLOVER_PAYMENT_STATUS,
@@ -150,19 +142,16 @@ object FilterCategoryBuilder {
     }
     
     /**
-     * Build Order Status filter from Clover order data
+     * Build Order Status filter using Clover's known values
      */
-    private fun buildOrderStatusFilter(orders: List<Order?>): FilterCategory {
-        val options = orders
-            .mapNotNull { it?.state }
-            .distinct()
-            .map { status ->
-                FilterOption(
-                    id = status.lowercase(),
-                    label = formatOrderStatus(status),
-                    value = status
-                )
-            }
+    private fun buildOrderStatusFilter(): FilterCategory {
+        val options = CLOVER_ORDER_STATUS_VALUES.map { status ->
+            FilterOption(
+                id = status.lowercase(),
+                label = formatOrderStatus(status),
+                value = status
+            )
+        }
         
         return FilterCategory(
             id = CLOVER_ORDER_STATUS,
@@ -174,20 +163,16 @@ object FilterCategoryBuilder {
     }
     
     /**
-     * Build Payment Type filter from Clover payment tender data
+     * Build Payment Type filter using Clover's known tender types
      */
-    private fun buildPaymentTypeFilter(orders: List<Order?>): FilterCategory {
-        val options = orders
-            .flatMap { it?.payments ?: emptyList() }
-            .mapNotNull { it?.tender?.label }
-            .distinct()
-            .map { tenderLabel ->
-                FilterOption(
-                    id = tenderLabel.lowercase().replace(" ", "_"),
-                    label = tenderLabel,
-                    value = tenderLabel
-                )
-            }
+    private fun buildPaymentTypeFilter(): FilterCategory {
+        val options = CLOVER_PAYMENT_TYPE_VALUES.map { tenderLabel ->
+            FilterOption(
+                id = tenderLabel.lowercase().replace(" ", "_"),
+                label = tenderLabel,
+                value = tenderLabel
+            )
+        }
         
         return FilterCategory(
             id = CLOVER_PAYMENT_TYPE,
