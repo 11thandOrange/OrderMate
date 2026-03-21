@@ -96,6 +96,25 @@ class FilterDialogFragment : DialogFragment() {
         return dialog
     }
 
+    override fun onStart() {
+        super.onStart()
+        // Set dialog width to 90% of screen, max 520dp
+        dialog?.window?.let { window ->
+            val displayMetrics = resources.displayMetrics
+            val screenWidth = displayMetrics.widthPixels
+            val maxWidthPx = (520 * displayMetrics.density).toInt()
+            val targetWidth = minOf((screenWidth * 0.9).toInt(), maxWidthPx)
+            val maxHeightPx = (displayMetrics.heightPixels * 0.85).toInt()
+            
+            window.setLayout(targetWidth, android.view.WindowManager.LayoutParams.WRAP_CONTENT)
+            
+            // Also set max height via layout params
+            window.attributes = window.attributes.apply {
+                height = minOf(height, maxHeightPx)
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
