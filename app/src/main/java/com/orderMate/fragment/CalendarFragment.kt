@@ -23,6 +23,8 @@ import com.orderMate.utils.CalendarManager
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FilterCategoryBuilder
 import com.orderMate.utils.FilterCategoryBuilder.FilterCategory
+import com.orderMate.utils.FilterCategoryBuilder.FilterOption
+import com.orderMate.utils.FilterCategoryBuilder.FilterSource
 import com.orderMate.utils.FilterCategoryBuilder.FilterType
 import java.text.SimpleDateFormat
 import java.util.*
@@ -169,13 +171,13 @@ class CalendarFragment : Fragment() {
         
         val dialog = FilterDialogFragment.newInstance(categories, currentFilterState)
         dialog.setFilterListener(object : FilterDialogFragment.FilterListener {
-            override fun onFiltersApplied(filterState: FilterDialogFragment.FilterState) {
-                currentFilterState = filterState
+            override fun onFiltersApplied(filters: FilterDialogFragment.FilterState) {
+                currentFilterState = filters
                 applyFilters()
                 updateFilterPills()
             }
             
-            override fun onFiltersCleared() {
+            override fun onFilterCleared() {
                 resetFilters()
             }
         })
@@ -188,16 +190,22 @@ class CalendarFragment : Fragment() {
         // Event Type filter
         categories.add(FilterCategory(
             id = "event_type",
-            title = "Event Type",
+            label = "Event Type",
             type = FilterType.MULTI_SELECT,
-            options = listOf("Pickup", "Delivery", "Preorder")
+            source = FilterSource.ORDERMATE,
+            options = listOf(
+                FilterOption("pickup", "Pickup", "Pickup"),
+                FilterOption("delivery", "Delivery", "Delivery"),
+                FilterOption("preorder", "Preorder", "Preorder")
+            )
         ))
         
         // Date filter
         categories.add(FilterCategory(
             id = FilterCategoryBuilder.CLOVER_ORDER_DATE,
-            title = "Due Date",
+            label = "Due Date",
             type = FilterType.DATE_PICKER,
+            source = FilterSource.ORDERMATE,
             options = emptyList()
         ))
         
