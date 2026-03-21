@@ -77,4 +77,7 @@
     <!-- Card colors -->
     <color name="glass_card_background">#26FFFFFF</color>
     <color name="note_chip_bg">#1AFFFFFF</color>
+    
+    <!-- Dark backgrounds -->
+    <color name="bg_dark">#1a1a2e</color>
 </resources>
