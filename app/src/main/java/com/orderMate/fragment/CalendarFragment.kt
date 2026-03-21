@@ -727,8 +727,8 @@ class CalendarFragment : Fragment() {
         val hasSearchedDates = searchedDates.isNotEmpty()
         
         // Update nav button visibility (matches HTML: hide when searching dates)
-        val navPrev = view?.findViewById<View>(R.id.btnPrevMonth)
-        val navNext = view?.findViewById<View>(R.id.btnNextMonth)
+        val navPrev = view?.findViewById<View>(R.id.btnPrev)
+        val navNext = view?.findViewById<View>(R.id.btnNext)
         val navVisibility = if (hasSearchedDates) View.INVISIBLE else View.VISIBLE
         navPrev?.visibility = navVisibility
         navNext?.visibility = navVisibility
