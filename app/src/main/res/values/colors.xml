@@ -63,4 +63,5 @@
     <!-- Profile settings colors -->
     <color name="background_primary">#F5F5F7</color>
     <color name="divider_color">#E5E5EA</color>
+    <color name="text_primary_dark">#1C1C1E</color>
 </resources>
