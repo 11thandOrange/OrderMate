@@ -81,8 +81,8 @@
     <!-- Dark backgrounds -->
     <color name="bg_dark">#1a1a2e</color>
     
-    <!-- Input field colors -->
-    <color name="input_bg">#1A1A1A</color>
-    <color name="input_border">#333333</color>
+    <!-- Input field colors (glass theme) -->
+    <color name="input_bg">#1AFFFFFF</color>
+    <color name="input_border">#33FFFFFF</color>
     <color name="accent_orange">#FF9F43</color>
 </resources>
