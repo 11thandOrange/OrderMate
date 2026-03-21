@@ -88,7 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:text="@string/filters"
+                android:text="Filters"
                 android:textColor="@color/text_light"
                 android:textSize="14sp"/>
         </LinearLayout>
@@ -116,7 +116,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:text="@string/reset"
+                android:text="Reset"
                 android:textColor="@color/text_muted"
                 android:textSize="14sp"/>
         </LinearLayout>
