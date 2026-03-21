@@ -606,19 +606,22 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     private fun updateFilterPills(filters: FilterDialogFragment.FilterState) {
         binding.filterPillsContainer.removeAllViews()
 
-        val activeFilters = mutableListOf<String>()
         val dateFormat = java.text.SimpleDateFormat("MMM d", java.util.Locale.getDefault())
+        var hasFilters = false
         
         // Add selection filters as pills
         filters.selections.forEach { (categoryId, values) ->
             values.forEach { value ->
-                // Format the value for display
+                hasFilters = true
                 val displayValue = when (categoryId) {
                     FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> formatPaymentStatus(value)
                     FilterCategoryBuilder.CLOVER_ORDER_STATUS -> formatOrderStatus(value)
                     else -> value
                 }
-                activeFilters.add(displayValue)
+                val pill = createFilterPillWithClose(displayValue) {
+                    removeSelectionFilter(categoryId, value)
+                }
+                binding.filterPillsContainer.addView(pill)
             }
         }
         
@@ -632,22 +635,48 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 }
                 else -> "Date"
             }
-            dates.forEach { date ->
-                activeFilters.add("$label: ${dateFormat.format(date)}")
+            dates.forEachIndexed { index, date ->
+                hasFilters = true
+                val pill = createFilterPillWithClose("$label: ${dateFormat.format(date)}") {
+                    removeDateFilter(categoryId, index)
+                }
+                binding.filterPillsContainer.addView(pill)
             }
         }
 
-        if (activeFilters.isEmpty()) {
-            binding.filterPillsScroll.visibility = View.GONE
-            return
+        binding.filterPillsScroll.visibility = if (hasFilters) View.VISIBLE else View.GONE
+    }
+    
+    private fun removeSelectionFilter(categoryId: String, value: String) {
+        val newSelections = currentFilterState.selections.toMutableMap()
+        newSelections[categoryId]?.let { values ->
+            val newValues = values.toMutableSet()
+            newValues.remove(value)
+            if (newValues.isEmpty()) {
+                newSelections.remove(categoryId)
+            } else {
+                newSelections[categoryId] = newValues
+            }
         }
-
-        binding.filterPillsScroll.visibility = View.VISIBLE
-
-        activeFilters.forEach { filterText ->
-            val pill = createFilterPill(filterText)
-            binding.filterPillsContainer.addView(pill)
+        currentFilterState = currentFilterState.copy(selections = newSelections)
+        applyDialogFilters(currentFilterState)
+    }
+    
+    private fun removeDateFilter(categoryId: String, index: Int) {
+        val newDateSelections = currentFilterState.dateSelections.toMutableMap()
+        newDateSelections[categoryId]?.let { dates ->
+            val newDates = dates.toMutableList()
+            if (index < newDates.size) {
+                newDates.removeAt(index)
+            }
+            if (newDates.isEmpty()) {
+                newDateSelections.remove(categoryId)
+            } else {
+                newDateSelections[categoryId] = newDates
+            }
         }
+        currentFilterState = currentFilterState.copy(dateSelections = newDateSelections)
+        applyDialogFilters(currentFilterState)
     }
     
     private fun formatPaymentStatus(status: String): String {
@@ -668,14 +697,13 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         }
     }
 
-    private fun createFilterPill(text: String): View {
-        return android.widget.TextView(requireContext()).apply {
-            this.text = text
-            textSize = 12f
-            typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
-            setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.text_primary))
+    private fun createFilterPillWithClose(text: String, onClose: () -> Unit): View {
+        return android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
             setBackgroundResource(R.drawable.bg_filter_pill)
-            setPadding(dpToPx(12), dpToPx(6), dpToPx(12), dpToPx(6))
+            setPadding(dpToPx(12), dpToPx(6), dpToPx(8), dpToPx(6))
+            
             val lp = android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
                 android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
@@ -683,6 +711,27 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             lp.marginEnd = dpToPx(8)
             lp.bottomMargin = dpToPx(4)
             layoutParams = lp
+            
+            // Text label
+            val textView = android.widget.TextView(context).apply {
+                this.text = text
+                textSize = 12f
+                typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
+                setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.text_primary))
+            }
+            addView(textView)
+            
+            // Close button
+            val closeBtn = android.widget.ImageView(context).apply {
+                setImageResource(R.drawable.ic_close)
+                setColorFilter(androidx.core.content.ContextCompat.getColor(context, R.color.text_light))
+                val size = dpToPx(16)
+                val closeLp = android.widget.LinearLayout.LayoutParams(size, size)
+                closeLp.marginStart = dpToPx(6)
+                layoutParams = closeLp
+                setOnClickListener { onClose() }
+            }
+            addView(closeBtn)
         }
     }
 
