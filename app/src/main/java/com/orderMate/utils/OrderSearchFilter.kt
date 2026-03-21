@@ -107,20 +107,31 @@ object OrderSearchFilter {
         if (!filters.hasActiveFilters()) return true
 
         // Check selections (status, payment, etc.)
-        for ((category, selectedValue) in filters.selections) {
-            if (!matchesSelection(order, category, selectedValue)) {
+        // selections is Map<String, Set<String>> - category -> set of selected values
+        for ((category, selectedValues) in filters.selections) {
+            if (selectedValues.isEmpty()) continue
+            if (!matchesAnySelection(order, category, selectedValues)) {
                 return false
             }
         }
 
         // Check date selections
-        for ((dateType, dateValue) in filters.dateSelections) {
-            if (!matchesDateSelection(order, dateType, dateValue)) {
+        // dateSelections is Map<String, List<Date>> - category -> list of selected dates
+        for ((dateType, selectedDates) in filters.dateSelections) {
+            if (selectedDates.isEmpty()) continue
+            if (!matchesAnyDateSelection(order, dateType, selectedDates)) {
                 return false
             }
         }
 
         return true
+    }
+
+    private fun matchesAnySelection(order: Order, category: String, selectedValues: Set<String>): Boolean {
+        // Order must match at least one of the selected values
+        return selectedValues.any { value ->
+            matchesSelection(order, category, value)
+        }
     }
 
     private fun matchesSelection(order: Order, category: String, selectedValue: String): Boolean {
@@ -165,6 +176,26 @@ object OrderSearchFilter {
         } ?: false
     }
 
+
+    private fun matchesAnyDateSelection(order: Order, dateType: String, selectedDates: List<Date>): Boolean {
+        // Order must match at least one of the selected dates
+        val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+        
+        return when (dateType.lowercase()) {
+            "orderdate", "order date" -> {
+                val orderDate = order.createdTime?.let { dateFormat.format(Date(it)) } ?: return false
+                selectedDates.any { date -> dateFormat.format(date) == orderDate }
+            }
+            "pickupdate", "pickup date" -> {
+                val pickupDateStr = extractPickupDateFromNotes(order) ?: return false
+                selectedDates.any { date -> 
+                    val selectedStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
+                    pickupDateStr == selectedStr 
+                }
+            }
+            else -> true
+        }
+    }
     private fun matchesDateSelection(order: Order, dateType: String, dateValue: String): Boolean {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         
