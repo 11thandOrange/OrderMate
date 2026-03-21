@@ -2,6 +2,7 @@ package com.orderMate.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import androidx.core.content.edit
 import org.json.JSONArray
 import org.json.JSONObject
@@ -207,6 +208,54 @@ class SettingsManager(private val context: Context) {
         prefs.edit { putInt(KEY_THEME_COLOR, color) }
     }
 
+    // ==================== Profile/Avatar Settings ====================
+
+    fun setCustomAvatarUri(uri: Uri) {
+        prefs.edit { putString(KEY_CUSTOM_AVATAR_URI, uri.toString()) }
+    }
+
+    fun getCustomAvatarUri(): Uri? {
+        val uriString = prefs.getString(KEY_CUSTOM_AVATAR_URI, null)
+        return uriString?.let { Uri.parse(it) }
+    }
+
+    fun clearCustomAvatarUri() {
+        prefs.edit { remove(KEY_CUSTOM_AVATAR_URI) }
+    }
+
+    fun setAvatarEmoji(emoji: String) {
+        prefs.edit { putString(KEY_AVATAR_EMOJI, emoji) }
+    }
+
+    fun getAvatarEmoji(): String? {
+        return prefs.getString(KEY_AVATAR_EMOJI, null)
+    }
+
+    // ==================== Color Scheme Settings ====================
+
+    fun getColorScheme(): String {
+        return prefs.getString(KEY_COLOR_SCHEME, DEFAULT_COLOR_SCHEME) ?: DEFAULT_COLOR_SCHEME
+    }
+
+    fun setColorScheme(schemeId: String) {
+        prefs.edit { putString(KEY_COLOR_SCHEME, schemeId) }
+    }
+
+    fun isThemeTargetEnabled(target: String): Boolean {
+        return prefs.getBoolean("${KEY_THEME_TARGET_PREFIX}$target", true)
+    }
+
+    fun setThemeTargetEnabled(target: String, enabled: Boolean) {
+        prefs.edit { putBoolean("${KEY_THEME_TARGET_PREFIX}$target", enabled) }
+    }
+
+    // ==================== Commit (apply pending changes) ====================
+
+    fun commit() {
+        // SharedPreferences with edit{} already applies changes
+        // This method exists for explicit save semantics in UI
+    }
+
     // ==================== Reset ====================
 
     fun resetToDefaults() {
@@ -222,6 +271,9 @@ class SettingsManager(private val context: Context) {
             putBoolean(KEY_NOTIFICATIONS_ENABLED, true)
             putBoolean(KEY_AUTO_SYNC_ENABLED, true)
             putInt(KEY_THEME_COLOR, DEFAULT_THEME_COLOR)
+            remove(KEY_CUSTOM_AVATAR_URI)
+            remove(KEY_AVATAR_EMOJI)
+            putString(KEY_COLOR_SCHEME, DEFAULT_COLOR_SCHEME)
         }
     }
 
@@ -240,6 +292,10 @@ class SettingsManager(private val context: Context) {
         private const val KEY_NOTIFICATIONS_ENABLED = "notifications_enabled"
         private const val KEY_AUTO_SYNC_ENABLED = "auto_sync_enabled"
         private const val KEY_THEME_COLOR = "theme_color"
+        private const val KEY_CUSTOM_AVATAR_URI = "custom_avatar_uri"
+        private const val KEY_AVATAR_EMOJI = "avatar_emoji"
+        private const val KEY_COLOR_SCHEME = "color_scheme"
+        private const val KEY_THEME_TARGET_PREFIX = "theme_target_"
 
         // Defaults
         private const val DEFAULT_NOTIFICATION_DAYS = 3
@@ -247,6 +303,7 @@ class SettingsManager(private val context: Context) {
         private const val DEFAULT_RECEIPT_UNIT = "minutes"
         private const val DEFAULT_TEMPLATE = "Your order from {{merchant_name}} is ready for pickup!"
         private const val DEFAULT_THEME_COLOR = 0xFFFF9F43.toInt() // Orange accent
+        private const val DEFAULT_COLOR_SCHEME = "purple"
         
         const val MAX_WIDGETS = 7
         const val MAX_TEMPLATE_LENGTH = 250
