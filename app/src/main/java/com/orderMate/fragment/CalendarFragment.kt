@@ -158,13 +158,19 @@ class CalendarFragment : Fragment() {
         val calendar = Calendar.getInstance()
         calendar.set(year, month, 1)
         
+        // Get today's date for comparison
+        val today = Calendar.getInstance()
+        val todayYear = today.get(Calendar.YEAR)
+        val todayMonth = today.get(Calendar.MONTH)
+        val todayDay = today.get(Calendar.DAY_OF_MONTH)
+        
         // Get the day of week for the first day of month
         val firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1
         val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
         
         // Add empty days for padding
         for (i in 0 until firstDayOfWeek) {
-            days.add(CalendarDay(0, false, emptyList()))
+            days.add(CalendarDay(0, false, emptyList(), isToday = false, isOtherMonth = true))
         }
         
         // Add days of month
@@ -173,9 +179,20 @@ class CalendarFragment : Fragment() {
             val dayEvents = events.filter { event ->
                 val eventCal = Calendar.getInstance()
                 eventCal.time = event.dueDate
-                eventCal.get(Calendar.DAY_OF_MONTH) == day
+                eventCal.get(Calendar.DAY_OF_MONTH) == day &&
+                eventCal.get(Calendar.MONTH) == month &&
+                eventCal.get(Calendar.YEAR) == year
             }
-            days.add(CalendarDay(day, dayEvents.isNotEmpty(), dayEvents))
+            
+            val isToday = (year == todayYear && month == todayMonth && day == todayDay)
+            
+            days.add(CalendarDay(
+                dayNumber = day,
+                hasEvents = dayEvents.isNotEmpty(),
+                events = dayEvents,
+                isToday = isToday,
+                isOtherMonth = false
+            ))
         }
         
         return days
@@ -225,7 +242,9 @@ class CalendarFragment : Fragment() {
     data class CalendarDay(
         val dayNumber: Int,
         val hasEvents: Boolean,
-        val events: List<ScheduledEvent>
+        val events: List<ScheduledEvent>,
+        val isToday: Boolean = false,
+        val isOtherMonth: Boolean = false
     )
     
     inner class CalendarDayAdapter(
@@ -247,28 +266,92 @@ class CalendarFragment : Fragment() {
         
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             private val dayNumber: TextView = itemView.findViewById(R.id.dayNumber)
-            private val eventIndicator: View = itemView.findViewById(R.id.eventIndicator)
-            private val eventPreview: TextView = itemView.findViewById(R.id.eventPreview)
             private val dayContainer: View = itemView.findViewById(R.id.dayContainer)
+            private val eventsContainer: View = itemView.findViewById(R.id.eventsContainer)
+            private val event1: TextView = itemView.findViewById(R.id.event1)
+            private val event2: TextView = itemView.findViewById(R.id.event2)
+            private val moreEvents: TextView = itemView.findViewById(R.id.moreEvents)
+            private val eventIndicator: View = itemView.findViewById(R.id.eventIndicator)
             
             fun bind(day: CalendarDay) {
+                val context = itemView.context
+                
                 if (day.dayNumber == 0) {
+                    // Empty cell (padding)
                     dayNumber.text = ""
+                    eventsContainer.visibility = View.GONE
                     eventIndicator.visibility = View.GONE
-                    eventPreview.visibility = View.GONE
                     dayContainer.setOnClickListener(null)
+                    dayContainer.alpha = 0f
+                    return
+                }
+                
+                dayContainer.alpha = if (day.isOtherMonth) 0.4f else 1f
+                dayNumber.text = day.dayNumber.toString()
+                
+                // Today highlight
+                if (day.isToday) {
+                    dayNumber.setBackgroundResource(R.drawable.bg_today_circle)
+                    dayNumber.setTextColor(ContextCompat.getColor(context, R.color.text_primary))
                 } else {
-                    dayNumber.text = day.dayNumber.toString()
+                    dayNumber.setBackgroundResource(0)
+                    dayNumber.setTextColor(ContextCompat.getColor(context, R.color.text_light))
+                }
+                
+                // Events
+                if (day.hasEvents && day.events.isNotEmpty()) {
+                    eventsContainer.visibility = View.VISIBLE
+                    eventIndicator.visibility = View.GONE
                     
-                    if (day.hasEvents) {
-                        eventIndicator.visibility = View.VISIBLE
-                        eventPreview.visibility = View.VISIBLE
-                        eventPreview.text = day.events.first().customerName
-                        dayContainer.setOnClickListener { onDayClick(day) }
+                    // Show first event
+                    val firstEvent = day.events[0]
+                    event1.text = firstEvent.customerName
+                    event1.visibility = View.VISIBLE
+                    setEventStyle(event1, firstEvent.type)
+                    
+                    // Show second event if exists
+                    if (day.events.size > 1) {
+                        val secondEvent = day.events[1]
+                        event2.text = secondEvent.customerName
+                        event2.visibility = View.VISIBLE
+                        setEventStyle(event2, secondEvent.type)
                     } else {
-                        eventIndicator.visibility = View.GONE
-                        eventPreview.visibility = View.GONE
-                        dayContainer.setOnClickListener(null)
+                        event2.visibility = View.GONE
+                    }
+                    
+                    // Show more indicator if > 2 events
+                    if (day.events.size > 2) {
+                        moreEvents.text = "+${day.events.size - 2} more"
+                        moreEvents.visibility = View.VISIBLE
+                    } else {
+                        moreEvents.visibility = View.GONE
+                    }
+                    
+                    dayContainer.setOnClickListener { onDayClick(day) }
+                } else {
+                    eventsContainer.visibility = View.GONE
+                    event1.visibility = View.GONE
+                    event2.visibility = View.GONE
+                    moreEvents.visibility = View.GONE
+                    eventIndicator.visibility = View.GONE
+                    dayContainer.setOnClickListener(null)
+                }
+            }
+            
+            private fun setEventStyle(textView: TextView, eventType: com.orderMate.model.EventType) {
+                val context = textView.context
+                when (eventType) {
+                    com.orderMate.model.EventType.PICKUP -> {
+                        textView.setBackgroundResource(R.drawable.bg_calendar_event_pickup)
+                        textView.setTextColor(ContextCompat.getColor(context, R.color.event_pickup))
+                    }
+                    com.orderMate.model.EventType.DELIVERY -> {
+                        textView.setBackgroundResource(R.drawable.bg_calendar_event_delivery)
+                        textView.setTextColor(ContextCompat.getColor(context, R.color.event_delivery))
+                    }
+                    com.orderMate.model.EventType.PREORDER -> {
+                        textView.setBackgroundResource(R.drawable.bg_calendar_event_preorder)
+                        textView.setTextColor(ContextCompat.getColor(context, R.color.event_preorder))
                     }
                 }
             }
