@@ -70,4 +70,7 @@
     <color name="tag_chip_bg">#267367F0</color>
     <color name="text_chip_bg">#266c757d</color>
     <color name="bg_glass">#26FFFFFF</color>
+    
+    <!-- Header colors -->
+    <color name="header_background">#1A000000</color>
 </resources>

@@ -13,125 +13,182 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:background="@color/side_nav_background"
+        android:paddingVertical="20dp"
+        android:paddingHorizontal="30dp"
+        android:background="@color/header_background"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Search Container -->
-        <LinearLayout
-            android:id="@+id/searchContainer"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="16dp"
-            android:background="@drawable/bg_search_bar"
+        <!-- Header Top Row -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/headerTopRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/filterButton"
-            app:layout_constraintWidth_percent="0.65">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_search"
-                app:tint="@color/text_muted"/>
-
-            <EditText
-                android:id="@+id/searchInput"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:background="@null"
-                android:hint="Search orders, customers..."
-                android:textColorHint="@color/text_muted"
-                android:textColor="@color/text_light"
-                android:textSize="14sp"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:maxLines="1"/>
-
-            <ImageView
-                android:id="@+id/calendarIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_calender"
-                app:tint="@color/text_muted"
-                android:clickable="true"
-                android:focusable="true"/>
-        </LinearLayout>
-
-        <!-- Filter Button -->
-        <LinearLayout
-            android:id="@+id/filterButton"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:paddingHorizontal="16dp"
-            android:layout_marginStart="12dp"
-            android:background="@drawable/bg_glass_button"
-            android:clickable="true"
-            android:focusable="true"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/syncButton">
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_filter"
-                app:tint="@color/text_light"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Filters"
-                android:textColor="@color/text_light"
-                android:textSize="13sp"/>
-        </LinearLayout>
-
-        <!-- Sync Button -->
-        <FrameLayout
-            android:id="@+id/syncButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="12dp"
-            android:background="@drawable/bg_glass_button"
-            android:clickable="true"
-            android:focusable="true"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <ImageView
-                android:id="@+id/syncIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_refresh"
-                app:tint="@color/text_light"/>
+            <!-- Search Container -->
+            <LinearLayout
+                android:id="@+id/searchContainer"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="20dp"
+                android:background="@drawable/bg_search_bar"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/filterButtonsContainer"
+                app:layout_constraintWidth_max="400dp"
+                app:layout_constraintHorizontal_bias="0">
 
-            <ProgressBar
-                android:id="@+id/syncProgress"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_search"
+                    android:contentDescription="Search"
+                    app:tint="@color/text_muted"/>
+
+                <EditText
+                    android:id="@+id/searchInput"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:background="@null"
+                    android:hint="Search orders, customers, dates..."
+                    android:textColorHint="@color/text_muted"
+                    android:textColor="@color/text_light"
+                    android:textSize="14sp"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1"/>
+
+                <ImageView
+                    android:id="@+id/calendarIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_calender"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Pick date"
+                    app:tint="@color/text_muted"
+                    android:clickable="true"
+                    android:focusable="true"/>
+            </LinearLayout>
+
+            <!-- Filter Buttons Container -->
+            <LinearLayout
+                android:id="@+id/filterButtonsContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="20dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/syncingContainer">
+
+                <!-- Filter Button -->
+                <LinearLayout
+                    android:id="@+id/filterButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:paddingHorizontal="20dp"
+                    android:background="@drawable/bg_header_button"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_filter"
+                        app:tint="@color/text_light"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Filters"
+                        android:textColor="@color/text_light"
+                        android:textSize="14sp"/>
+                </LinearLayout>
+
+                <!-- Reset Button -->
+                <LinearLayout
+                    android:id="@+id/resetButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:paddingHorizontal="20dp"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/bg_header_button_outline"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_refresh"
+                        app:tint="@color/text_light"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Reset"
+                        android:textColor="@color/text_light"
+                        android:textSize="14sp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Syncing Indicator -->
+            <LinearLayout
+                android:id="@+id/syncingContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginStart="20dp"
                 android:visibility="gone"
-                android:indeterminateTint="@color/text_light"/>
-        </FrameLayout>
+                tools:visibility="visible"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ProgressBar
+                    android:id="@+id/syncProgress"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:indeterminateTint="@color/text_light"
+                    style="?android:attr/progressBarStyleSmall"/>
+
+                <TextView
+                    android:id="@+id/syncingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Syncing..."
+                    android:textColor="@color/text_muted"
+                    android:textSize="13sp"/>
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Filter Pills Row -->
         <HorizontalScrollView
             android:id="@+id/filterPillsScroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="15dp"
             android:scrollbars="none"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/searchContainer"
+            tools:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@id/headerTopRow"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
@@ -139,7 +196,8 @@
                 android:id="@+id/filterPillsContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"/>
+                android:orientation="horizontal"
+                tools:ignore="UselessLeaf"/>
         </HorizontalScrollView>
 
         <!-- Results Info -->
@@ -147,10 +205,10 @@
             android:id="@+id/resultsInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="15dp"
             android:textColor="@color/text_muted"
-            android:textSize="12sp"
-            android:text="Showing 5 orders"
+            android:textSize="13sp"
+            tools:text="Showing 5 orders • Total: $533.75"
             app:layout_constraintTop_toBottomOf="@id/filterPillsScroll"
             app:layout_constraintStart_toStartOf="parent"/>
 

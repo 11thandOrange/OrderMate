@@ -8,7 +8,6 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -127,7 +126,16 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     override fun onStart() {
         super.onStart()
-        loadOrders()
+        if (orderItems.isEmpty()) {
+            loadOrders()
+        }
+    }
+
+    /**
+     * Called from filter button or pull-to-refresh to sync orders
+     */
+    fun triggerSync() {
+        syncOrders()
     }
 
     override fun onDestroyView() {
@@ -146,22 +154,43 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun setupClickListeners() {
-        // Sync button
-        binding.syncButton.setOnClickListener {
-            if (!isSyncing) {
-                syncOrders()
-            }
-        }
-
         // Filter button
         binding.filterButton.setOnClickListener {
             showFilterDialog()
+        }
+
+        // Reset button
+        binding.resetButton.setOnClickListener {
+            resetFilters()
         }
 
         // Calendar icon for date picker
         binding.calendarIcon.setOnClickListener {
             showDatePicker()
         }
+    }
+
+    private fun resetFilters() {
+        // Clear all filters
+        filterArray.keys.forEach { filterArray[it] = 0 }
+        selectedDateFilter = null
+        binding.searchInput.text?.clear()
+        binding.searchInput.hint = getString(R.string.search_orders)
+        
+        // Hide pills
+        binding.filterPillsScroll.visibility = View.GONE
+        binding.filterPillsContainer.removeAllViews()
+        
+        // Reload all orders
+        orderItems.clear()
+        allItemList.forEach { orderItems.add(it) }
+        filterData.clear()
+        
+        updateResultsInfo()
+        notifyAdapter()
+        updateEmptyState()
+        
+        Toast.makeText(requireContext(), "Filters cleared", Toast.LENGTH_SHORT).show()
     }
 
     private fun setupSearchListener() {
@@ -216,12 +245,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         binding.searchInput.text?.clear()
         selectedDateFilter = null
         
-        // Show sync animation
-        binding.syncIcon.startAnimation(
-            AnimationUtils.loadAnimation(requireContext(), R.anim.rotate_sync)
-        )
-        binding.syncProgress.showView()
-        binding.syncIcon.hideView()
+        // Show syncing indicator
+        binding.syncingContainer.showView()
+        binding.filterButtonsContainer.hideView()
 
         runOnBackgroundThread {
             try {
@@ -240,9 +266,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
             runOnMainThread {
                 isSyncing = false
-                binding.syncIcon.clearAnimation()
-                binding.syncProgress.hideView()
-                binding.syncIcon.showView()
+                binding.syncingContainer.hideView()
+                binding.filterButtonsContainer.showView()
                 
                 updateResultsInfo()
                 notifyAdapter()
@@ -532,10 +557,13 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     private fun updateResultsInfo() {
         val count = orderItems.size
+        val total = orderItems.sumOf { (it?.total ?: 0L) } / 100.0
+        val totalFormatted = String.format("$%.2f", total)
+        
         binding.resultsInfo.text = when {
             count == 0 -> "No orders found"
-            count == 1 -> "Showing 1 order"
-            else -> "Showing $count orders"
+            count == 1 -> "Showing 1 order • Total: $totalFormatted"
+            else -> "Showing $count orders • Total: $totalFormatted"
         }
     }
 
