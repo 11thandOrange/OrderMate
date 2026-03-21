@@ -111,6 +111,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     
     // Widget manager for dynamic filters
     private var widgetManager: WidgetManager? = null
+    
+    // Current search query (for pill display)
+    private var currentSearchQuery: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -185,6 +188,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         filterArray.keys.forEach { filterArray[it] = 0 }
         selectedDateFilter = null
         currentFilterState = FilterDialogFragment.FilterState()
+        currentSearchQuery = ""
         binding.searchInput.text?.clear()
         binding.searchInput.hint = getString(R.string.search_orders)
         
@@ -213,6 +217,18 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 searchOrders(text.toString().trim())
             }
             handler.postDelayed(searchRunnable, Constants.debouncingTime)
+        }
+        
+        // Create search pill when focus is lost
+        binding.searchInput.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                val query = binding.searchInput.text.toString().trim()
+                if (query.isNotEmpty()) {
+                    currentSearchQuery = query
+                    binding.searchInput.text?.clear()
+                    updateAllPills()
+                }
+            }
         }
     }
 
@@ -596,15 +612,30 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun updateFilterPills(filters: FilterDialogFragment.FilterState) {
+        updateAllPills()
+    }
+    
+    private fun updateAllPills() {
         binding.filterPillsContainer.removeAllViews()
 
         val dateFormat = java.text.SimpleDateFormat("MMM d", java.util.Locale.getDefault())
-        var hasFilters = false
+        var hasPills = false
+        
+        // Add search query as pill (first)
+        if (currentSearchQuery.isNotEmpty()) {
+            hasPills = true
+            val pill = createFilterPillWithClose("\"$currentSearchQuery\"") {
+                currentSearchQuery = ""
+                searchOrders("")
+                updateAllPills()
+            }
+            binding.filterPillsContainer.addView(pill)
+        }
         
         // Add selection filters as pills
-        filters.selections.forEach { (categoryId, values) ->
+        currentFilterState.selections.forEach { (categoryId, values) ->
             values.forEach { value ->
-                hasFilters = true
+                hasPills = true
                 val displayValue = when (categoryId) {
                     FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> formatPaymentStatus(value)
                     FilterCategoryBuilder.CLOVER_ORDER_STATUS -> formatOrderStatus(value)
@@ -618,7 +649,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         }
         
         // Add date filters as pills
-        filters.dateSelections.forEach { (categoryId, dates) ->
+        currentFilterState.dateSelections.forEach { (categoryId, dates) ->
             val label = when {
                 categoryId == FilterCategoryBuilder.CLOVER_ORDER_DATE -> "Order Date"
                 FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
@@ -628,7 +659,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 else -> "Date"
             }
             dates.forEachIndexed { index, date ->
-                hasFilters = true
+                hasPills = true
                 val pill = createFilterPillWithClose("$label: ${dateFormat.format(date)}") {
                     removeDateFilter(categoryId, index)
                 }
@@ -636,7 +667,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             }
         }
 
-        binding.filterPillsScroll.visibility = if (hasFilters) View.VISIBLE else View.GONE
+        binding.filterPillsScroll.visibility = if (hasPills) View.VISIBLE else View.GONE
     }
     
     private fun removeSelectionFilter(categoryId: String, value: String) {
@@ -716,7 +747,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             // Close button
             val closeBtn = android.widget.ImageView(context).apply {
                 setImageResource(R.drawable.ic_close)
-                setColorFilter(androidx.core.content.ContextCompat.getColor(context, R.color.text_light))
+                setColorFilter(androidx.core.content.ContextCompat.getColor(context, R.color.text_primary))
                 val size = dpToPx(16)
                 val closeLp = android.widget.LinearLayout.LayoutParams(size, size)
                 closeLp.marginStart = dpToPx(6)
