@@ -533,7 +533,18 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             if (dates.isEmpty()) continue
             
             when {
-                // Widget date filters (like Pickup Date)
+                // Order Date filter (Clover createdTime)
+                categoryId == FilterCategoryBuilder.CLOVER_ORDER_DATE -> {
+                    val orderDate = order.createdTime?.let { java.util.Date(it) }
+                    if (orderDate == null) return false
+                    
+                    val matchesAny = dates.any { filterDate ->
+                        isSameDay(orderDate, filterDate)
+                    }
+                    if (!matchesAny) return false
+                }
+                
+                // Widget date filters (like Pickup Date from OrderMate widgets)
                 FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
                     val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
                     val widget = widgetManager?.getWidgetById(widgetId ?: "") ?: continue
@@ -597,14 +608,16 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         
         // Add date filters as pills
         filters.dateSelections.forEach { (categoryId, dates) ->
-            val widgetLabel = if (FilterCategoryBuilder.isWidgetFilter(categoryId)) {
-                val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
-                widgetManager?.getWidgetById(widgetId ?: "")?.label ?: "Date"
-            } else {
-                "Date"
+            val label = when {
+                categoryId == FilterCategoryBuilder.CLOVER_ORDER_DATE -> "Order Date"
+                FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
+                    val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
+                    widgetManager?.getWidgetById(widgetId ?: "")?.label ?: "Date"
+                }
+                else -> "Date"
             }
             dates.forEach { date ->
-                activeFilters.add("$widgetLabel: ${dateFormat.format(date)}")
+                activeFilters.add("$label: ${dateFormat.format(date)}")
             }
         }
 
