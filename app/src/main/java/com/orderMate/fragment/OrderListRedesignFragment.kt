@@ -505,12 +505,13 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                     if (!selectedValues.contains(orderPayment)) return false
                 }
                 categoryId == FilterCategoryBuilder.CLOVER_ORDER_STATUS -> {
-                    val orderState = order.state ?: ""
-                    if (!selectedValues.contains(orderState)) return false
+                    val orderState = order.state?.lowercase() ?: ""
+                    if (!selectedValues.any { it.lowercase() == orderState }) return false
                 }
                 categoryId == FilterCategoryBuilder.CLOVER_PAYMENT_TYPE -> {
-                    val paymentTypes = order.payments?.mapNotNull { it?.tender?.label } ?: emptyList()
-                    if (!paymentTypes.any { it in selectedValues }) return false
+                    val paymentTypes = order.payments?.mapNotNull { it?.tender?.label?.lowercase() } ?: emptyList()
+                    val selectedLower = selectedValues.map { it.lowercase() }
+                    if (!paymentTypes.any { it in selectedLower }) return false
                 }
                 categoryId == FilterCategoryBuilder.CLOVER_EMPLOYEE -> {
                     val employeeName = try {
