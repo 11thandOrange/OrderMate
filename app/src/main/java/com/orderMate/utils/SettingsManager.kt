@@ -142,9 +142,34 @@ class SettingsManager(private val context: Context) {
     }
 
     fun setNotificationDays(days: Int) {
-        prefs.edit { putInt(KEY_NOTIFICATION_DAYS, days.coerceIn(1, 30)) }
+        prefs.edit { putInt(KEY_NOTIFICATION_DAYS, days.coerceIn(0, 30)) }
     }
 
+    fun getNotificationMinutes(): Int {
+        return prefs.getInt(KEY_NOTIFICATION_MINUTES, DEFAULT_NOTIFICATION_MINUTES)
+    }
+
+    fun setNotificationMinutes(minutes: Int) {
+        prefs.edit { putInt(KEY_NOTIFICATION_MINUTES, minutes.coerceIn(0, 999)) }
+    }
+
+    fun getReceiptDays(): Int {
+        return prefs.getInt(KEY_RECEIPT_DAYS, DEFAULT_RECEIPT_DAYS)
+    }
+
+    fun setReceiptDays(days: Int) {
+        prefs.edit { putInt(KEY_RECEIPT_DAYS, days.coerceIn(0, 30)) }
+    }
+
+    fun getReceiptMinutes(): Int {
+        return prefs.getInt(KEY_RECEIPT_MINUTES, DEFAULT_RECEIPT_MINUTES)
+    }
+
+    fun setReceiptMinutes(minutes: Int) {
+        prefs.edit { putInt(KEY_RECEIPT_MINUTES, minutes.coerceIn(0, 999)) }
+    }
+
+    // Legacy methods for backward compatibility
     fun getReceiptTime(): Int {
         return prefs.getInt(KEY_RECEIPT_TIME, DEFAULT_RECEIPT_TIME)
     }
@@ -264,6 +289,9 @@ class SettingsManager(private val context: Context) {
             putBoolean(KEY_USE_BOTH_REGISTERS, false)
             remove(KEY_WIDGETS)
             putInt(KEY_NOTIFICATION_DAYS, DEFAULT_NOTIFICATION_DAYS)
+            putInt(KEY_NOTIFICATION_MINUTES, DEFAULT_NOTIFICATION_MINUTES)
+            putInt(KEY_RECEIPT_DAYS, DEFAULT_RECEIPT_DAYS)
+            putInt(KEY_RECEIPT_MINUTES, DEFAULT_RECEIPT_MINUTES)
             putInt(KEY_RECEIPT_TIME, DEFAULT_RECEIPT_TIME)
             putString(KEY_RECEIPT_UNIT, DEFAULT_RECEIPT_UNIT)
             putString(KEY_SMS_NUMBER, "")
@@ -285,8 +313,11 @@ class SettingsManager(private val context: Context) {
         private const val KEY_USE_BOTH_REGISTERS = "use_both_registers"
         private const val KEY_WIDGETS = "popup_widgets"
         private const val KEY_NOTIFICATION_DAYS = "notification_days"
-        private const val KEY_RECEIPT_TIME = "receipt_time"
-        private const val KEY_RECEIPT_UNIT = "receipt_unit"
+        private const val KEY_NOTIFICATION_MINUTES = "notification_minutes"
+        private const val KEY_RECEIPT_DAYS = "receipt_days"
+        private const val KEY_RECEIPT_MINUTES = "receipt_minutes"
+        private const val KEY_RECEIPT_TIME = "receipt_time" // Legacy
+        private const val KEY_RECEIPT_UNIT = "receipt_unit" // Legacy
         private const val KEY_SMS_NUMBER = "sms_number"
         private const val KEY_NOTIFICATION_TEMPLATE = "notification_template"
         private const val KEY_NOTIFICATIONS_ENABLED = "notifications_enabled"
@@ -299,8 +330,11 @@ class SettingsManager(private val context: Context) {
 
         // Defaults
         private const val DEFAULT_NOTIFICATION_DAYS = 3
-        private const val DEFAULT_RECEIPT_TIME = 60
-        private const val DEFAULT_RECEIPT_UNIT = "minutes"
+        private const val DEFAULT_NOTIFICATION_MINUTES = 0
+        private const val DEFAULT_RECEIPT_DAYS = 0
+        private const val DEFAULT_RECEIPT_MINUTES = 60
+        private const val DEFAULT_RECEIPT_TIME = 60 // Legacy
+        private const val DEFAULT_RECEIPT_UNIT = "minutes" // Legacy
         private const val DEFAULT_TEMPLATE = "Your order from {{merchant_name}} is ready for pickup!"
         private const val DEFAULT_THEME_COLOR = 0xFFFF9F43.toInt() // Orange accent
         private const val DEFAULT_COLOR_SCHEME = "purple"
