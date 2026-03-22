@@ -304,6 +304,8 @@ class ProfileSettingsFragment : Fragment() {
         recyclerView.adapter = EmojiAdapter(emojis) { emoji ->
             selectAvatar(emoji)
             saveToFirebase()
+            // Update nav avatar in MainActivity immediately
+            updateNavAvatar(emoji)
             showToast("Avatar updated!")
             dialog.dismiss()
         }
@@ -366,6 +368,23 @@ class ProfileSettingsFragment : Fragment() {
         updateAvatarDisplay()
         onAvatarChangedListener?.invoke(emoji, null)
     }
+    
+    /**
+     * Update nav avatar in MainActivity immediately
+     * Matches HTML: navProfile.innerHTML = profileSettings.avatar
+     */
+    private fun updateNavAvatar(emoji: String) {
+        activity?.let { act ->
+            val navProfileIcon = act.findViewById<View>(R.id.navProfileIcon)
+            val navProfileEmoji = act.findViewById<TextView>(R.id.navProfileEmoji)
+            
+            if (navProfileIcon != null && navProfileEmoji != null) {
+                navProfileEmoji.text = emoji
+                navProfileEmoji.visibility = View.VISIBLE
+                navProfileIcon.visibility = View.GONE
+            }
+        }
+    }
 
     private fun updateAvatarDisplay() {
         val customUri = settingsManager.getCustomAvatarUri()
@@ -398,6 +417,9 @@ class ProfileSettingsFragment : Fragment() {
         settingsManager.setAvatarEmoji(DEFAULT_AVATAR)
         settingsManager.clearCustomAvatarUri()
         updateAvatarDisplay()
+        
+        // Update nav avatar immediately
+        updateNavAvatar(DEFAULT_AVATAR)
         
         // Save to Firebase
         saveToFirebase()
