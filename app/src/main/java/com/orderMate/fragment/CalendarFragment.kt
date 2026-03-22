@@ -888,6 +888,7 @@ class CalendarFragment : Fragment() {
     
     /**
      * Render timeline view for specific dates (used for searched dates)
+     * Uses XML-defined views for proper layout (fixed header height)
      */
     private fun renderTimelineViewForDates(dates: List<Date>) {
         val context = requireContext()
@@ -897,22 +898,15 @@ class CalendarFragment : Fragment() {
         val density = resources.displayMetrics.density
         val hourHeightPx = (hourHeight * density).toInt()
         
-        val timelineContainer = view?.findViewById<LinearLayout>(R.id.timelineContainer)
-            ?: return
+        // Show timeline container (XML-defined)
+        timelineContainer?.visibility = View.VISIBLE
         
-        timelineContainer.visibility = View.VISIBLE
-        timelineContainer.removeAllViews()
+        // Clear and populate header (XML-defined, fixed 40dp height)
+        timelineHeader?.removeAllViews()
         
-        // Day headers row - matching renderTimelineView style
-        val dayHeadersRow = LinearLayout(context).apply {
-            orientation = LinearLayout.HORIZONTAL
-            setBackgroundResource(R.drawable.bg_calendar_weekday_header)
-            setPadding(0, (12 * density).toInt(), 0, (12 * density).toInt())
-        }
-        
-        // Gutter space for hour labels (matching renderTimelineView)
-        dayHeadersRow.addView(View(context).apply {
-            layoutParams = LinearLayout.LayoutParams((50 * density).toInt(), 1)
+        // Gutter space for hour labels
+        timelineHeader?.addView(View(context).apply {
+            layoutParams = LinearLayout.LayoutParams((50 * density).toInt(), LinearLayout.LayoutParams.MATCH_PARENT)
         })
         
         // Day headers - single line format "SAT - 21" (matching HTML and renderTimelineView)
@@ -928,7 +922,7 @@ class CalendarFragment : Fragment() {
                 text = "$dayName - $dayNum"
                 textSize = 11f
                 gravity = android.view.Gravity.CENTER
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
                 letterSpacing = 0.05f
                 setTypeface(null, android.graphics.Typeface.BOLD)
                 
@@ -939,26 +933,11 @@ class CalendarFragment : Fragment() {
                     setTextColor(ContextCompat.getColor(context, R.color.text_muted))
                 }
             }
-            dayHeadersRow.addView(headerView)
-        }
-        timelineContainer.addView(dayHeadersRow)
-        
-        // Timeline scroll container - use weight to fill remaining space below header
-        val scrollView = android.widget.ScrollView(context).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                0,  // Height 0 with weight 1 to fill remaining space
-                1f  // Weight
-            )
+            timelineHeader?.addView(headerView)
         }
         
-        val timelineContent = LinearLayout(context).apply {
-            orientation = LinearLayout.HORIZONTAL
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-        }
+        // Clear and populate body (XML-defined ScrollView)
+        timelineBody?.removeAllViews()
         
         // Hours column
         val hoursColumn = LinearLayout(context).apply {
@@ -980,9 +959,14 @@ class CalendarFragment : Fragment() {
             }
             hoursColumn.addView(hourView)
         }
-        timelineContent.addView(hoursColumn)
+        timelineBody?.addView(hoursColumn)
         
         // Day columns with events
+        val columnsContainer = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        }
+        
         dates.forEach { date ->
             val cal = Calendar.getInstance().apply { time = date }
             val dayEvents = filteredEvents.filter { event ->
@@ -1040,11 +1024,10 @@ class CalendarFragment : Fragment() {
                 dayColumn.addView(eventView)
             }
             
-            timelineContent.addView(dayColumn)
+            columnsContainer.addView(dayColumn)
         }
         
-        scrollView.addView(timelineContent)
-        timelineContainer.addView(scrollView)
+        timelineBody?.addView(columnsContainer)
     }
     
     private fun renderMonthView() {

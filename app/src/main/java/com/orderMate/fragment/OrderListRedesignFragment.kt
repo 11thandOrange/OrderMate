@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.clover.sdk.v3.order.LineItem
 import com.clover.sdk.v3.order.Order
@@ -40,6 +41,7 @@ import com.orderMate.utils.migrations.SchemaMigrator
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
 import com.orderMate.utils.showView
+import com.orderMate.viewmodel.SharedFilterViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -99,6 +101,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     private val myApp by lazy {
         MyApp.getInstance()
     }
+    
+    // Shared ViewModel for filter/search state persistence across tabs
+    private val sharedFilterViewModel: SharedFilterViewModel by activityViewModels()
 
     private var orderAdapter: OrderCardRedesignAdapter? = null
 
@@ -107,8 +112,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     private var isSyncing = false
 
-    // Current filter state for dialog
+    // Current filter state for dialog (synced with shared ViewModel)
     private var currentFilterState = FilterDialogFragment.FilterState()
+    private var currentSearchQuery = ""
     
     // Widget manager for dynamic filters
     private var widgetManager: WidgetManager? = null
@@ -133,6 +139,35 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         setupClickListeners()
         setupSearchListener()
         initWidgetManager()
+        observeSharedState()
+    }
+    
+    /**
+     * Observe shared ViewModel for filter/search state changes
+     * Restores state when navigating back to this tab
+     */
+    private fun observeSharedState() {
+        // Observe filter state
+        sharedFilterViewModel.filterState.observe(viewLifecycleOwner) { state ->
+            if (state != currentFilterState) {
+                currentFilterState = state
+                applyDialogFilters(state)
+            }
+        }
+        
+        // Observe search query
+        sharedFilterViewModel.searchQuery.observe(viewLifecycleOwner) { query ->
+            if (query != currentSearchQuery) {
+                currentSearchQuery = query
+                // Update search input without triggering listener
+                binding.searchInput.apply {
+                    if (text.toString() != query) {
+                        setText(query)
+                        setSelection(query.length)
+                    }
+                }
+            }
+        }
     }
 
     override fun onStart() {
@@ -186,6 +221,11 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         filterArray.keys.forEach { filterArray[it] = 0 }
         selectedDateFilter = null
         currentFilterState = FilterDialogFragment.FilterState()
+        currentSearchQuery = ""
+        
+        // Sync reset to shared ViewModel for cross-tab persistence
+        sharedFilterViewModel.resetAll()
+        
         binding.searchInput.text?.clear()
         binding.searchInput.hint = getString(R.string.search_orders)
         
@@ -211,7 +251,10 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 handler.removeCallbacks(searchRunnable)
             }
             searchRunnable = Runnable {
-                searchOrders(text.toString().trim())
+                currentSearchQuery = text.toString().trim()
+                // Sync to shared ViewModel for cross-tab persistence
+                sharedFilterViewModel.setSearchQuery(currentSearchQuery)
+                searchOrders(currentSearchQuery)
             }
             handler.postDelayed(searchRunnable, Constants.debouncingTime)
         }
@@ -439,11 +482,14 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         dialog.setFilterListener(object : FilterDialogFragment.FilterListener {
             override fun onFiltersApplied(filters: FilterDialogFragment.FilterState) {
                 currentFilterState = filters
+                // Sync to shared ViewModel for cross-tab persistence
+                sharedFilterViewModel.setFilterState(filters)
                 applyDialogFilters(filters)
             }
 
             override fun onFilterCleared() {
                 currentFilterState = FilterDialogFragment.FilterState()
+                sharedFilterViewModel.resetAll()
                 resetFilters()
             }
         })
