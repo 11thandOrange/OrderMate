@@ -171,11 +171,14 @@ class CalendarFragment : Fragment() {
      * Restores state when navigating back to this tab
      */
     private fun observeSharedState() {
-        // Observe filter state
+        // Observe filter state - only apply if we have orders loaded
         sharedFilterViewModel.filterState.observe(viewLifecycleOwner) { state ->
             if (state != currentFilterState) {
                 currentFilterState = state
-                applyDialogFilters(state)
+                // Only apply filters if orders are loaded
+                if (allOrders.isNotEmpty()) {
+                    applyDialogFilters(state)
+                }
             }
         }
         
@@ -197,8 +200,8 @@ class CalendarFragment : Fragment() {
         sharedFilterViewModel.searchedDates.observe(viewLifecycleOwner) { dates ->
             searchedDates = dates
             updateViewModeButtonsState()
-            // Only render if views are initialized
-            if (view != null && calendarGrid != null) {
+            // Only render if views and data are initialized
+            if (view != null && calendarGrid != null && allOrders.isNotEmpty()) {
                 renderCalendar()
             }
         }
@@ -208,8 +211,8 @@ class CalendarFragment : Fragment() {
             if (mode != currentViewMode) {
                 currentViewMode = mode
                 updateViewModeButtonVisuals(mode)
-                // Only render if views are initialized
-                if (view != null && calendarGrid != null) {
+                // Only render if views and data are initialized
+                if (view != null && calendarGrid != null && allOrders.isNotEmpty()) {
                     renderCalendar()
                 }
             }
@@ -348,7 +351,30 @@ class CalendarFragment : Fragment() {
             }
 
             runOnMainThread {
-                renderCalendar()
+                // Apply any pending shared state after orders are loaded
+                val sharedState = sharedFilterViewModel.filterState.value
+                if (sharedState != null && sharedState.hasActiveFilters()) {
+                    currentFilterState = sharedState
+                    applyDialogFilters(sharedState)
+                } else {
+                    renderCalendar()
+                }
+                
+                // Restore searched dates from shared state
+                sharedFilterViewModel.searchedDates.value?.let { dates ->
+                    if (dates.isNotEmpty()) {
+                        searchedDates = dates
+                        updateViewModeButtonsState()
+                    }
+                }
+                
+                // Restore view mode from shared state
+                sharedFilterViewModel.calendarViewMode.value?.let { mode ->
+                    if (mode != currentViewMode) {
+                        currentViewMode = mode
+                        updateViewModeButtonVisuals(mode)
+                    }
+                }
             }
         }
     }
@@ -622,11 +648,11 @@ class CalendarFragment : Fragment() {
                 .sortedBy { it.time }
             
             searchedDates = combinedDates
-            
-            // Sync to shared ViewModel
-            sharedFilterViewModel.setSearchedDates(combinedDates)
 
             runOnMainThread {
+                // Sync to shared ViewModel (must be on main thread)
+                sharedFilterViewModel.setSearchedDates(combinedDates)
+                
                 updateViewModeButtonsState()
                 renderCalendar()
                 updateFilterPills(filters)

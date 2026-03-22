@@ -147,11 +147,14 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
      * Restores state when navigating back to this tab
      */
     private fun observeSharedState() {
-        // Observe filter state
+        // Observe filter state - only apply if we have orders loaded
         sharedFilterViewModel.filterState.observe(viewLifecycleOwner) { state ->
             if (state != currentFilterState) {
                 currentFilterState = state
-                applyDialogFilters(state)
+                // Only apply filters if orders are loaded
+                if (allItemList.isNotEmpty()) {
+                    applyDialogFilters(state)
+                }
             }
         }
         
@@ -160,10 +163,12 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             if (query != currentSearchQuery) {
                 currentSearchQuery = query
                 // Update search input without triggering listener
-                binding.searchInput.apply {
-                    if (text.toString() != query) {
-                        setText(query)
-                        setSelection(query.length)
+                if (_binding != null) {
+                    binding.searchInput.apply {
+                        if (text.toString() != query) {
+                            setText(query)
+                            setSelection(query.length)
+                        }
                     }
                 }
             }
@@ -283,9 +288,17 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
             runOnMainThread {
                 showLoading(false)
-                updateResultsInfo()
-                orderAdapter?.notifyDataSetChanged()
-                updateEmptyState()
+                
+                // Apply any pending shared state after orders are loaded
+                val sharedState = sharedFilterViewModel.filterState.value
+                if (sharedState != null && sharedState.hasActiveFilters()) {
+                    currentFilterState = sharedState
+                    applyDialogFilters(sharedState)
+                } else {
+                    updateResultsInfo()
+                    orderAdapter?.notifyDataSetChanged()
+                    updateEmptyState()
+                }
             }
 
             // Update filter options
