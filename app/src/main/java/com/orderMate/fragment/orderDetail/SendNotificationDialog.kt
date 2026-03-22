@@ -59,7 +59,7 @@ class SendNotificationDialog(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_FRAME, R.style.DialogTheme)
+        setStyle(STYLE_NO_FRAME, R.style.Theme_OrderMate_Dialog)
     }
 
     override fun onCreateView(
