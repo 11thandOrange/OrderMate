@@ -351,29 +351,32 @@ class CalendarFragment : Fragment() {
             }
 
             runOnMainThread {
-                // Apply any pending shared state after orders are loaded
-                val sharedState = sharedFilterViewModel.filterState.value
-                if (sharedState != null && sharedState.hasActiveFilters()) {
-                    currentFilterState = sharedState
-                    applyDialogFilters(sharedState)
-                } else {
-                    renderCalendar()
+                // Restore selected date from shared state FIRST
+                sharedFilterViewModel.selectedDate.value?.let { date ->
+                    currentDate.time = date
                 }
                 
                 // Restore searched dates from shared state
                 sharedFilterViewModel.searchedDates.value?.let { dates ->
-                    if (dates.isNotEmpty()) {
-                        searchedDates = dates
-                        updateViewModeButtonsState()
-                    }
+                    searchedDates = dates
                 }
                 
                 // Restore view mode from shared state
                 sharedFilterViewModel.calendarViewMode.value?.let { mode ->
-                    if (mode != currentViewMode) {
-                        currentViewMode = mode
-                        updateViewModeButtonVisuals(mode)
-                    }
+                    currentViewMode = mode
+                    updateViewModeButtonVisuals(mode)
+                }
+                
+                updateViewModeButtonsState()
+                
+                // Apply any pending shared state after orders are loaded
+                val sharedState = sharedFilterViewModel.filterState.value
+                if (sharedState != null && sharedState.hasActiveFilters()) {
+                    currentFilterState = sharedState
+                    // applyDialogFilters will render the calendar when done
+                    applyDialogFilters(sharedState)
+                } else {
+                    renderCalendar()
                 }
             }
         }
@@ -527,8 +530,9 @@ class CalendarFragment : Fragment() {
                 // Add date to filter state (supports multiple dates like HTML)
                 addDateToFilterState(selectedDate)
                 
-                // Navigate calendar to this date
+                // Navigate calendar to this date and persist
                 currentDate.set(year, month, day)
+                sharedFilterViewModel.setSelectedDate(currentDate.time)
                 
                 // Sync filter state to shared ViewModel
                 sharedFilterViewModel.setFilterState(currentFilterState)
@@ -1609,11 +1613,13 @@ class CalendarFragment : Fragment() {
     
     fun navigateMonth(direction: Int) {
         currentDate.add(Calendar.MONTH, direction)
+        sharedFilterViewModel.setSelectedDate(currentDate.time)
         renderCalendar()
     }
     
     fun goToToday() {
         currentDate = Calendar.getInstance()
+        sharedFilterViewModel.setSelectedDate(currentDate.time)
         renderCalendar()
     }
     
@@ -1626,6 +1632,7 @@ class CalendarFragment : Fragment() {
         
         nextEvent?.let { event ->
             currentDate.time = event.dueDate
+            sharedFilterViewModel.setSelectedDate(currentDate.time)
             renderCalendar()
             
             // Show single event in dialog

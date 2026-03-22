@@ -27,6 +27,10 @@ class SharedFilterViewModel : ViewModel() {
     // Calendar view mode (day/week/month) - persists across navigation
     private val _calendarViewMode = MutableLiveData("month")
     val calendarViewMode: LiveData<String> = _calendarViewMode
+    
+    // Selected calendar date - persists across navigation
+    private val _selectedDate = MutableLiveData<Date?>(null)
+    val selectedDate: LiveData<Date?> = _selectedDate
 
     /**
      * Update the filter state
@@ -55,6 +59,13 @@ class SharedFilterViewModel : ViewModel() {
      */
     fun setCalendarViewMode(mode: String) {
         _calendarViewMode.value = mode
+    }
+    
+    /**
+     * Update selected calendar date (for day/week view persistence)
+     */
+    fun setSelectedDate(date: Date?) {
+        _selectedDate.value = date
     }
 
     /**
