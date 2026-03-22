@@ -4,6 +4,7 @@ import android.accounts.Account
 import android.app.Application
 import com.clover.sdk.util.CloverAccount
 import com.clover.sdk.v1.ForbiddenException
+import com.clover.sdk.v1.customer.CustomerConnector
 import com.clover.sdk.v1.merchant.MerchantConnector
 import com.clover.sdk.v3.employees.EmployeeConnector
 import com.clover.sdk.v3.inventory.InventoryConnector
@@ -19,6 +20,7 @@ class MyApp : Application() {
     private var inventoryConnector: InventoryConnector? = null
     private var employeeConnector: EmployeeConnector? = null
     private var merchantConnector: MerchantConnector? = null
+    private var customerConnector: CustomerConnector? = null
 
     companion object {
          var latestAxis: Pair<Int?, Int?>? = Pair(700, 700)
@@ -102,6 +104,33 @@ class MyApp : Application() {
         }
     }
 
+    /**
+     * Get the CustomerConnector for searching/managing Clover customers
+     */
+    fun getCustomerConnector(): CustomerConnector? {
+        return try {
+            customerConnector ?: synchronized(this) {
+                CustomerConnector(applicationContext, getCloverAccount(), null).also {
+                    customerConnector = it
+                    connectCustomerConnector()
+                }
+            }
+        } catch (e: ForbiddenException) {
+            e.printStackTrace()
+            null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private fun connectCustomerConnector() {
+        if (customerConnector?.isConnected == true) {
+            return
+        }
+        customerConnector?.connect()
+    }
+
     private fun employeeOrderConnector() {
         if (employeeConnector?.isConnected == true) {
             return
@@ -155,6 +184,7 @@ class MyApp : Application() {
         orderConnector?.disconnect()
         merchantConnector?.disconnect()
         inventoryConnector?.disconnect()
+        customerConnector?.disconnect()
     }
 
 
