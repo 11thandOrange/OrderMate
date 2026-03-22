@@ -1,18 +1,20 @@
 package com.orderMate.services
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
-import androidx.work.*
+import android.content.Intent
+import android.os.Build
 import com.orderMate.utils.FirebaseConfigManager
-import com.orderMate.utils.NotificationTemplate
-import com.orderMate.utils.PreferenceManager
+import com.orderMate.utils.SettingsManager
 import java.util.Calendar
-import java.util.concurrent.TimeUnit
 
 /**
  * Scheduled Order Notification Service (#83 requirement)
  * 
  * Schedules email notifications X days and Y minutes before order due date.
- * Uses WorkManager for reliable background execution.
+ * Uses AlarmManager for reliable background execution on Clover devices.
  * 
  * Features:
  * - Schedule notification based on order due date
@@ -21,7 +23,10 @@ import java.util.concurrent.TimeUnit
  */
 object NotificationScheduler {
     
-    private const val NOTIFICATION_WORK_PREFIX = "order_notification_"
+    private const val ACTION_ORDER_NOTIFICATION = "com.orderMate.ACTION_ORDER_NOTIFICATION"
+    const val EXTRA_ORDER_ID = "order_id"
+    const val EXTRA_MERCHANT_ID = "merchant_id"
+    const val EXTRA_DUE_DATE = "due_date"
     
     /**
      * Schedule a notification for an order
@@ -37,47 +42,65 @@ object NotificationScheduler {
         dueDate: Long,
         merchantId: String
     ) {
-        val prefManager = PreferenceManager.getInstance(context)
-        val notificationDays = prefManager.getInt("notification_days", 3)
-        val notificationMinutes = prefManager.getInt("notification_minutes", 0)
+        val settingsManager = SettingsManager(context)
+        val notificationDays = settingsManager.getNotificationDays()
+        val notificationMinutes = settingsManager.getNotificationMinutes()
         
         // Calculate notification time
         val notificationTime = calculateNotificationTime(dueDate, notificationDays, notificationMinutes)
-        val delay = notificationTime - System.currentTimeMillis()
+        val now = System.currentTimeMillis()
         
-        if (delay <= 0) {
+        if (notificationTime <= now) {
             // Due date already passed or notification time is in the past
             return
         }
         
-        // Build work request
-        val workRequest = OneTimeWorkRequestBuilder<OrderNotificationWorker>()
-            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-            .setInputData(
-                workDataOf(
-                    OrderNotificationWorker.KEY_ORDER_ID to orderId,
-                    OrderNotificationWorker.KEY_MERCHANT_ID to merchantId,
-                    OrderNotificationWorker.KEY_DUE_DATE to dueDate
-                )
-            )
-            .addTag(getWorkTag(orderId))
-            .build()
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = createNotificationIntent(context, orderId, merchantId, dueDate)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            orderId.hashCode(),
+            intent,
+            getPendingIntentFlags()
+        )
         
-        // Enqueue with unique work to replace any existing notification for this order
-        WorkManager.getInstance(context)
-            .enqueueUniqueWork(
-                getWorkTag(orderId),
-                ExistingWorkPolicy.REPLACE,
-                workRequest
+        // Schedule alarm
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                notificationTime,
+                pendingIntent
             )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                notificationTime,
+                pendingIntent
+            )
+        } else {
+            alarmManager.set(
+                AlarmManager.RTC_WAKEUP,
+                notificationTime,
+                pendingIntent
+            )
+        }
     }
     
     /**
      * Cancel scheduled notification for an order
      */
     fun cancelOrderNotification(context: Context, orderId: String) {
-        WorkManager.getInstance(context)
-            .cancelUniqueWork(getWorkTag(orderId))
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, OrderNotificationReceiver::class.java).apply {
+            action = ACTION_ORDER_NOTIFICATION
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            orderId.hashCode(),
+            intent,
+            getPendingIntentFlags()
+        )
+        alarmManager.cancel(pendingIntent)
     }
     
     /**
@@ -96,52 +119,62 @@ object NotificationScheduler {
         return calendar.timeInMillis
     }
     
-    private fun getWorkTag(orderId: String) = "$NOTIFICATION_WORK_PREFIX$orderId"
-}
-
-/**
- * Worker that sends the actual notification/email
- */
-class OrderNotificationWorker(
-    context: Context,
-    params: WorkerParameters
-) : CoroutineWorker(context, params) {
-    
-    companion object {
-        const val KEY_ORDER_ID = "order_id"
-        const val KEY_MERCHANT_ID = "merchant_id"
-        const val KEY_DUE_DATE = "due_date"
-    }
-    
-    override suspend fun doWork(): Result {
-        val orderId = inputData.getString(KEY_ORDER_ID) ?: return Result.failure()
-        val merchantId = inputData.getString(KEY_MERCHANT_ID) ?: return Result.failure()
-        val dueDate = inputData.getLong(KEY_DUE_DATE, 0)
-        
-        return try {
-            // Fetch templates and order data, then send notification
-            sendOrderNotification(orderId, merchantId, dueDate)
-            Result.success()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.retry()
+    private fun createNotificationIntent(
+        context: Context,
+        orderId: String,
+        merchantId: String,
+        dueDate: Long
+    ): Intent {
+        return Intent(context, OrderNotificationReceiver::class.java).apply {
+            action = ACTION_ORDER_NOTIFICATION
+            putExtra(EXTRA_ORDER_ID, orderId)
+            putExtra(EXTRA_MERCHANT_ID, merchantId)
+            putExtra(EXTRA_DUE_DATE, dueDate)
         }
     }
     
-    private suspend fun sendOrderNotification(orderId: String, merchantId: String, dueDate: Long) {
+    private fun getPendingIntentFlags(): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+    }
+}
+
+/**
+ * BroadcastReceiver that handles scheduled notifications
+ */
+class OrderNotificationReceiver : BroadcastReceiver() {
+    
+    override fun onReceive(context: Context, intent: Intent) {
+        val orderId = intent.getStringExtra(NotificationScheduler.EXTRA_ORDER_ID) ?: return
+        val merchantId = intent.getStringExtra(NotificationScheduler.EXTRA_MERCHANT_ID) ?: return
+        val dueDate = intent.getLongExtra(NotificationScheduler.EXTRA_DUE_DATE, 0)
+        
+        // Send the notification/email
+        sendOrderNotification(context, orderId, merchantId, dueDate)
+    }
+    
+    private fun sendOrderNotification(
+        context: Context,
+        orderId: String,
+        merchantId: String,
+        dueDate: Long
+    ) {
         // This would integrate with your email service
         // For now, we'll create the notification content using template substitution
         
         val firebase = FirebaseConfigManager.getInstance()
         
-        // Get templates (synchronous wrapper needed for coroutine context)
-        // In production, use suspendCoroutine or Flow
-        
-        // Create notification content
-        val templateContent = "Your order is due soon!"
-        
-        // Send via your email/notification service
-        // EmailService.send(customerEmail, subject, processedContent)
+        // Get templates and send notification
+        firebase.getTemplates(merchantId) { templates ->
+            if (templates.isNotEmpty()) {
+                val template = templates.first()
+                // Process template and send email
+                // EmailService.send(customerEmail, "Order Reminder", processedContent)
+            }
+        }
     }
 }
 

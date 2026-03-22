@@ -51,6 +51,12 @@
         </receiver>
 
         <service android:name="com.orderMate.fragment.FloatingWidgetService"/>
+        
+        <!-- Scheduled Order Notification Receiver (#83 requirement) -->
+        <receiver
+            android:name="com.orderMate.services.OrderNotificationReceiver"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>
