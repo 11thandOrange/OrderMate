@@ -371,7 +371,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             }
             
             // Set timestamp
-            itemView.findViewById<android.widget.TextView>(R.id.historyTimestamp)?.apply {
+            itemView.findViewById<android.widget.TextView>(R.id.historyDate)?.apply {
                 text = item.timestamp.formatMillisToDateTime(Constants.yearFormat)
             }
             
