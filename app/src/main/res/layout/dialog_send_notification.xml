@@ -5,7 +5,9 @@
     android:layout_width="520dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/bg_dialog">
+    android:background="@drawable/bg_dialog"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
     <!-- Header - matches HTML .modal-header -->
     <LinearLayout
@@ -145,7 +147,9 @@
                     android:hint="@string/enter_the_customer_number"
                     android:textColor="@color/text_light"
                     android:textColorHint="@color/text_muted"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true" />
             </LinearLayout>
         </LinearLayout>
 

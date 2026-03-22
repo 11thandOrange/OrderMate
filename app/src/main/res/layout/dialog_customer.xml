@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Customer Dialog - Editable with Search, Close, Save buttons -->
+<!-- Customer Dialog - Styled like HTML customer modal with gradient background -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="420dp"
+    android:layout_width="400dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/bg_dialog">
+    android:background="@drawable/bg_dialog_gradient">
 
-    <!-- Header -->
+    <!-- Header - matches HTML .customer-modal-header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

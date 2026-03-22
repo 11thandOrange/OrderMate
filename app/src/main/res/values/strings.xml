@@ -237,5 +237,14 @@
     <!-- Order history scroll indicator -->
     <string name="scroll_for_more">Scroll for more</string>
     <string name="scroll_down">Scroll down</string>
+    
+    <!-- Order History Dialog -->
+    <string name="no_history">No history available</string>
+    <string name="history_event">History event</string>
+    <string name="order_created">Order Created</string>
+    <string name="order_modified">Order Modified</string>
+    <string name="payment_added">Payment Added</string>
+    <string name="status_changed">Status Changed</string>
+    <string name="select_template">Select a template</string>
 
 </resources>

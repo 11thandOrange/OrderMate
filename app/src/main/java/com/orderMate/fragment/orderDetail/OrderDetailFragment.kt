@@ -501,6 +501,14 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                     }
                 ).show(parentFragmentManager, CustomerDialog.TAG)
             }
+            
+            // View All History button - opens order history dialog
+            viewAllHistoryButton.setOnClickListener {
+                orderArguments?.let { order ->
+                    OrderHistoryDialog.newInstance(order)
+                        .show(parentFragmentManager, OrderHistoryDialog.TAG)
+                }
+            }
         }
     }
 

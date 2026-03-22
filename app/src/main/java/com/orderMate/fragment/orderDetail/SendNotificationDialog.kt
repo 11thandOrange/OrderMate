@@ -1,11 +1,16 @@
 package com.orderMate.fragment.orderDetail
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.InputType
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.ArrayAdapter
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.clover.sdk.v3.order.Order
@@ -24,11 +29,14 @@ import com.orderMate.modals.ShareSmsModal
 import com.orderMate.modals.SmsBody
 import com.orderMate.modals.Text
 import com.orderMate.utils.Constants
+import com.orderMate.utils.FirebaseConfigManager
+import com.orderMate.utils.NotificationTemplate
 import com.orderMate.utils.hideKeyboard
 import com.orderMate.utils.hideView
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
 import com.orderMate.utils.showView
+import com.orderMate.utils.MyApp
 
 class SendNotificationDialog(
     private val order: Order?,
@@ -42,11 +50,16 @@ class SendNotificationDialog(
     private var isSmsEnabled: Boolean = true
     private var customerEmailArray: MutableList<String?> = mutableListOf()
     private var customerPhoneArray: MutableList<String?> = mutableListOf()
-
+    private var templates: List<NotificationTemplate> = emptyList()
 
     @Synchronized
     fun tabChanged() {
         isSmsEnabled = !isSmsEnabled
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NO_FRAME, R.style.DialogTheme)
     }
 
     override fun onCreateView(
@@ -59,64 +72,133 @@ class SendNotificationDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        setupDialog()
+        preventKeyboardAutoOpen()
         setUpClickListener()
+        loadTemplates()
+        
         runOnBackgroundThread {
             dialog?.setCancelable(false)
             updateTheCustomerData()
         }
     }
 
+    private fun setupDialog() {
+        dialog?.window?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setLayout(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT
+            )
+            setDimAmount(0.6f)
+            // Prevent keyboard from auto-opening
+            setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
+        }
+    }
+
+    private fun preventKeyboardAutoOpen() {
+        // Clear focus from all input fields
+        binding.customerNumber.clearFocus()
+        binding.subject.clearFocus()
+        binding.etNotes.clearFocus()
+        
+        // Set focus to a non-editable view
+        binding.root.isFocusableInTouchMode = true
+        binding.root.requestFocus()
+    }
+
+    private fun loadTemplates() {
+        val app = requireContext().applicationContext as? MyApp ?: return
+        val merchantId = app.getMerchantId() ?: return
+        
+        FirebaseConfigManager.getInstance(requireContext()).getTemplates(merchantId) { loadedTemplates ->
+            templates = loadedTemplates
+            runOnMainThread {
+                setupTemplateSpinner()
+            }
+        }
+    }
+
+    private fun setupTemplateSpinner() {
+        val templateNames = mutableListOf(getString(R.string.select_template))
+        templateNames.addAll(templates.map { it.name })
+        
+        val adapter = object : ArrayAdapter<String>(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            templateNames
+        ) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent)
+                (view as? TextView)?.apply {
+                    setTextColor(ContextCompat.getColor(context, R.color.text_light))
+                    textSize = 14f
+                }
+                return view
+            }
+
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getDropDownView(position, convertView, parent)
+                (view as? TextView)?.apply {
+                    setTextColor(ContextCompat.getColor(context, R.color.text_light))
+                    setBackgroundColor(ContextCompat.getColor(context, R.color.glass_background))
+                    setPadding(32, 24, 32, 24)
+                    textSize = 14f
+                }
+                return view
+            }
+        }
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.templateSpinner.adapter = adapter
+        
+        binding.templateSpinner.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (position > 0 && position <= templates.size) {
+                    val selectedTemplate = templates[position - 1]
+                    binding.etNotes.setText(selectedTemplate.content)
+                }
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+        }
+    }
 
     private fun setUpClickListener() {
         binding.apply {
+            // Close button (X)
+            closeButton.setOnClickListener {
+                hideKeyboard(binding.root)
+                dismiss()
+            }
+            
             shareEmail.setOnClickListener {
-                tabChanged()
-                binding.apply {
-                    emailSubject.showView()
-                    llSubject.showView()
-                    customerNumber.hint = getString(R.string.enter_the_customer_email_address)
-                    customerEmail.text = getString(R.string.customer_email)
-                    customerNumber.inputType = InputType.TYPE_CLASS_TEXT
-                    shareSms.setBackgroundColor(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.white
-                        )
-                    )
-                    shareEmail.setBackgroundColor(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.darker_gray_light
-                        )
-                    )
-                    updateThePassedArray(customerEmailArray)
+                if (isSmsEnabled) { // Only change if switching tabs
+                    tabChanged()
+                    updateTabStyles(isEmail = true)
+                    binding.apply {
+                        subjectContainer.showView()
+                        customerNumber.hint = getString(R.string.enter_the_customer_email_address)
+                        customerEmail.text = getString(R.string.customer_email)
+                        customerNumber.inputType = InputType.TYPE_CLASS_TEXT
+                        updateThePassedArray(customerEmailArray)
+                    }
                 }
             }
 
             shareSms.setOnClickListener {
-                tabChanged()
-                binding.apply {
-                    emailSubject.hideView()
-                    llSubject.hideView()
-                    customerNumber.hint = getString(R.string.enter_the_customer_number)
-                    customerEmail.text = getString(R.string.customer_number)
-                    customerNumber.inputType = InputType.TYPE_CLASS_PHONE
-                    shareSms.setBackgroundColor(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.darker_gray_light
-                        )
-                    )
-                    binding.shareEmail.setBackgroundColor(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.white
-                        )
-                    )
-                    updateThePassedArray(customerPhoneArray)
+                if (!isSmsEnabled) { // Only change if switching tabs
+                    tabChanged()
+                    updateTabStyles(isEmail = false)
+                    binding.apply {
+                        subjectContainer.hideView()
+                        customerNumber.hint = getString(R.string.enter_the_customer_number)
+                        customerEmail.text = getString(R.string.customer_number)
+                        customerNumber.inputType = InputType.TYPE_CLASS_PHONE
+                        updateThePassedArray(customerPhoneArray)
+                    }
                 }
-
             }
+            
             cancelButton.setOnClickListener {
                 hideKeyboard(binding.root)
                 dismiss()
@@ -131,7 +213,6 @@ class SendNotificationDialog(
                     return@setOnClickListener
                 }
                 if (isSmsEnabled) {
-
                     val data = processTheSmSData()
                     listener.shareSms(data)
                 } else {
@@ -139,6 +220,24 @@ class SendNotificationDialog(
                     listener.sendEmail(data)
                 }
                 dismiss()
+            }
+        }
+    }
+
+    private fun updateTabStyles(isEmail: Boolean) {
+        binding.apply {
+            if (isEmail) {
+                // Email tab selected
+                shareEmail.setBackgroundResource(R.drawable.bg_filter_option_selected)
+                shareEmail.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
+                shareSms.setBackgroundResource(R.drawable.bg_filter_option)
+                shareSms.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_light))
+            } else {
+                // SMS tab selected
+                shareSms.setBackgroundResource(R.drawable.bg_filter_option_selected)
+                shareSms.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
+                shareEmail.setBackgroundResource(R.drawable.bg_filter_option)
+                shareEmail.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_light))
             }
         }
     }

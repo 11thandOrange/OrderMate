@@ -600,7 +600,7 @@
                             android:background="#0DFFFFFF" />
 
                         <!-- Customer (Clickable) - matches HTML .detail-info-row.clickable -->
-                        <!-- cursor: pointer, border-radius: 8px, margin: 0 -8px, padding: 12px 8px -->
+                        <!-- HTML: margin: 0 -12px extends beyond parent padding, padding: 12px -->
                         <LinearLayout
                             android:id="@+id/customerRow"
                             android:layout_width="match_parent"
@@ -609,8 +609,8 @@
                             android:gravity="center_vertical"
                             android:background="@drawable/bg_clickable_row"
                             android:paddingVertical="12dp"
-                            android:paddingHorizontal="8dp"
-                            android:layout_marginHorizontal="-8dp"
+                            android:paddingHorizontal="12dp"
+                            android:layout_marginHorizontal="-12dp"
                             android:layout_marginTop="4dp"
                             android:clickable="true"
                             android:focusable="true">
