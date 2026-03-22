@@ -849,11 +849,12 @@ class CalendarFragment : Fragment() {
         }
         timelineContainer.addView(dayHeadersRow)
         
-        // Timeline scroll container with hours and events
+        // Timeline scroll container - use weight to fill remaining space below header
         val scrollView = android.widget.ScrollView(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
+                0,  // Height 0 with weight 1 to fill remaining space
+                1f  // Weight
             )
         }
         
@@ -1099,11 +1100,12 @@ class CalendarFragment : Fragment() {
         
         timelineContainer.addView(headerRow)
         
-        // Scrollable timeline body
+        // Scrollable timeline body - use weight to fill remaining space below header
         val scrollView = android.widget.ScrollView(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
+                0,  // Height 0 with weight 1 to fill remaining space
+                1f  // Weight
             )
         }
         
