@@ -1,32 +1,72 @@
 package com.orderMate.fragment.orderDetail
 
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
+import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import com.clover.sdk.v1.Intents
 import com.clover.sdk.v3.customers.Customer
+import com.clover.sdk.v3.customers.EmailAddress
+import com.clover.sdk.v3.customers.PhoneNumber
 import com.orderMate.R
 import com.orderMate.databinding.DialogCustomerBinding
+import com.orderMate.repository.CloverRepository
+import kotlinx.coroutines.launch
 
 /**
- * Dialog to display customer details in the iOS-style redesign (#87)
- * Edit button launches Clover's customer editor (same as Register app)
+ * Dialog to display and edit customer details
+ * Features:
+ * - Editable fields: first name, last name, phone, email
+ * - Search button: opens CustomerSearchDialog to find existing customers
+ * - Close button: dismisses without saving
+ * - Save button: saves/updates customer in Clover and assigns to order
  */
 class CustomerDialog(
-    private val customer: Customer?,
+    private var customer: Customer?,
     private val orderId: String? = null,
-    private val onCustomerEdited: (() -> Unit)? = null
+    private val onCustomerUpdated: ((Customer?) -> Unit)? = null
 ) : DialogFragment() {
 
     private var _binding: DialogCustomerBinding? = null
     private val binding get() = _binding!!
+    
+    private var isSaving = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NO_FRAME, R.style.Theme_OrderMate_Dialog)
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.apply {
+            requestFeature(Window.FEATURE_NO_TITLE)
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        }
+        dialog.setCanceledOnTouchOutside(true)
+        return dialog
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.let { window ->
+            val displayMetrics = resources.displayMetrics
+            val screenWidth = displayMetrics.widthPixels
+            val maxWidthPx = (420 * displayMetrics.density).toInt()
+            val targetWidth = minOf((screenWidth * 0.9).toInt(), maxWidthPx)
+            window.setLayout(targetWidth, ViewGroup.LayoutParams.WRAP_CONTENT)
+        }
     }
 
     override fun onCreateView(
@@ -42,110 +82,141 @@ class CustomerDialog(
         super.onViewCreated(view, savedInstanceState)
         setupUI()
         setupClickListeners()
+        setupTextWatchers()
     }
 
     private fun setupUI() {
         customer?.let { cust ->
-            // Set customer name
-            val fullName = "${cust.firstName ?: ""} ${cust.lastName ?: ""}".trim()
-            binding.customerName.text = fullName.ifEmpty { getString(R.string.customer) }
+            // Populate editable fields
+            binding.inputFirstName.setText(cust.firstName ?: "")
+            binding.inputLastName.setText(cust.lastName ?: "")
+            
+            val phoneNumber = cust.phoneNumbers?.firstOrNull()?.phoneNumber
+            binding.inputPhone.setText(phoneNumber ?: "")
+            
+            val email = cust.emailAddresses?.firstOrNull()?.emailAddress
+            binding.inputEmail.setText(email ?: "")
             
             // Set avatar initials
-            val initials = getInitials(cust.firstName, cust.lastName)
-            binding.customerAvatar.text = initials
-            
-            // Set phone number
-            val phoneNumber = cust.phoneNumbers?.firstOrNull()?.phoneNumber
-            if (!phoneNumber.isNullOrEmpty()) {
-                binding.customerPhone.text = phoneNumber
-            } else {
-                binding.customerPhone.text = getString(R.string.no_number)
-            }
-            
-            // Set email
-            val email = cust.emailAddresses?.firstOrNull()?.emailAddress
-            if (!email.isNullOrEmpty()) {
-                binding.customerEmail.text = email
-            } else {
-                binding.customerEmail.text = getString(R.string.hypen_text)
-            }
-            
-            // Set notes if available (using metadata or addresses as notes placeholder)
-            val notes = cust.addresses?.firstOrNull()?.let { addr ->
-                listOfNotNull(addr.address1, addr.city, addr.state).joinToString(", ")
-            }
-            if (!notes.isNullOrEmpty()) {
-                binding.notesRow.visibility = View.VISIBLE
-                binding.customerNotes.text = notes
-            }
-        } ?: run {
-            binding.customerName.text = getString(R.string.customer)
-            binding.customerAvatar.text = "?"
-            binding.customerPhone.text = getString(R.string.no_number)
-            binding.customerEmail.text = getString(R.string.hypen_text)
+            updateAvatar()
         }
     }
 
+    private fun setupTextWatchers() {
+        // Update avatar when name changes
+        val nameWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                updateAvatar()
+            }
+        }
+        binding.inputFirstName.addTextChangedListener(nameWatcher)
+        binding.inputLastName.addTextChangedListener(nameWatcher)
+    }
+
+    private fun updateAvatar() {
+        val firstName = binding.inputFirstName.text?.toString()
+        val lastName = binding.inputLastName.text?.toString()
+        val initials = getInitials(firstName, lastName)
+        binding.customerAvatar.text = initials
+    }
+
     private fun setupClickListeners() {
+        // Close button (header X)
         binding.closeButton.setOnClickListener {
             dismiss()
         }
         
+        // Close button (footer)
         binding.btnClose.setOnClickListener {
             dismiss()
         }
         
-        // Edit button - launches Clover's customer selector/editor
-        // Same behavior as Clover Register app
-        binding.btnEdit.setOnClickListener {
-            launchCloverCustomerEditor()
+        // Search button - opens customer search dialog
+        binding.btnSearch.setOnClickListener {
+            openCustomerSearchDialog()
+        }
+        
+        // Save button - saves customer to Clover
+        binding.btnSave.setOnClickListener {
+            saveCustomer()
         }
     }
-    
+
     /**
-     * Launch Clover's customer editor/selector
-     * Uses Register app to edit customer on order (same as Clover Register flow)
+     * Open customer search dialog to find existing Clover customers
      */
-    private fun launchCloverCustomerEditor() {
-        try {
-            // Launch Register app with order - user can then add/edit customer
-            if (!orderId.isNullOrEmpty()) {
-                val intent = Intent(Intents.ACTION_START_REGISTER).apply {
-                    putExtra(Intents.EXTRA_ORDER_ID, orderId)
-                }
-                startActivityForResult(intent, REQUEST_CUSTOMER_EDIT)
-            } else {
-                // Fallback: launch Clover Customers app directly
-                val intent = Intent().apply {
-                    setClassName("com.clover.customers", "com.clover.customers.activities.CustomersActivity")
-                }
-                startActivityForResult(intent, REQUEST_CUSTOMER_SELECT)
-            }
-        } catch (e: Exception) {
-            // Try alternative customers activity
-            try {
-                val intent = Intent().apply {
-                    setClassName("com.clover.customers", "com.clover.customers.CustomerSelectActivity")
-                }
-                startActivityForResult(intent, REQUEST_CUSTOMER_SELECT)
-            } catch (e2: Exception) {
-                // No Clover Customers app available
-                android.widget.Toast.makeText(
-                    requireContext(),
-                    R.string.clover_customers_not_available,
-                    android.widget.Toast.LENGTH_SHORT
-                ).show()
-            }
+    private fun openCustomerSearchDialog() {
+        val searchDialog = CustomerSearchDialog.newInstance { selectedCustomer ->
+            // Customer selected from search - populate fields
+            customer = selectedCustomer
+            setupUI()
         }
+        searchDialog.show(parentFragmentManager, CustomerSearchDialog.TAG)
     }
-    
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CUSTOMER_EDIT || requestCode == REQUEST_CUSTOMER_SELECT) {
-            // Customer was edited or selected, notify parent to refresh
-            onCustomerEdited?.invoke()
-            dismiss()
+
+    /**
+     * Save customer to Clover and assign to order
+     */
+    private fun saveCustomer() {
+        if (isSaving) return
+        
+        val firstName = binding.inputFirstName.text?.toString()?.trim()
+        val lastName = binding.inputLastName.text?.toString()?.trim()
+        val phone = binding.inputPhone.text?.toString()?.trim()
+        val email = binding.inputEmail.text?.toString()?.trim()
+        
+        // Validate at least one field is filled
+        if (firstName.isNullOrEmpty() && lastName.isNullOrEmpty() && 
+            phone.isNullOrEmpty() && email.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "Please enter customer details", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        isSaving = true
+        binding.btnSave.isEnabled = false
+        binding.btnSave.text = getString(R.string.saving_customer)
+        
+        lifecycleScope.launch {
+            try {
+                val repository = CloverRepository.getInstance(requireContext())
+                
+                // Create or update customer
+                val updatedCustomer = if (customer != null) {
+                    // Update existing customer
+                    repository.updateCustomer(
+                        customerId = customer!!.id,
+                        firstName = firstName,
+                        lastName = lastName,
+                        phone = phone,
+                        email = email
+                    )
+                } else {
+                    // Create new customer
+                    repository.createCustomer(
+                        firstName = firstName,
+                        lastName = lastName,
+                        phone = phone,
+                        email = email
+                    )
+                }
+                
+                // Assign customer to order if orderId is provided
+                if (updatedCustomer != null && !orderId.isNullOrEmpty()) {
+                    repository.assignCustomerToOrder(orderId, updatedCustomer.id)
+                }
+                
+                Toast.makeText(requireContext(), R.string.customer_saved, Toast.LENGTH_SHORT).show()
+                onCustomerUpdated?.invoke(updatedCustomer)
+                dismiss()
+                
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), R.string.customer_save_failed, Toast.LENGTH_SHORT).show()
+                isSaving = false
+                binding.btnSave.isEnabled = true
+                binding.btnSave.text = getString(R.string.save)
+            }
         }
     }
 
@@ -162,15 +233,13 @@ class CustomerDialog(
 
     companion object {
         const val TAG = "CustomerDialog"
-        private const val REQUEST_CUSTOMER_EDIT = 1001
-        private const val REQUEST_CUSTOMER_SELECT = 1002
         
         fun newInstance(
             customer: Customer?,
             orderId: String? = null,
-            onCustomerEdited: (() -> Unit)? = null
+            onCustomerUpdated: ((Customer?) -> Unit)? = null
         ): CustomerDialog {
-            return CustomerDialog(customer, orderId, onCustomerEdited)
+            return CustomerDialog(customer, orderId, onCustomerUpdated)
         }
     }
 }

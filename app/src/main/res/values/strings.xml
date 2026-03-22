@@ -214,5 +214,19 @@
     <string name="customer_details">Customer Details</string>
     <string name="select_template">Select Template</string>
     <string name="template">Template</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="phone">Phone</string>
+    <string name="enter_first_name">Enter first name</string>
+    <string name="enter_last_name">Enter last name</string>
+    <string name="enter_phone_number">Enter phone number</string>
+    <string name="enter_email">Enter email address</string>
+    <string name="search_customers">Search Customers</string>
+    <string name="search_by_name_phone_email">Search by name, phone, or email</string>
+    <string name="no_customers_found">No customers found</string>
+    <string name="saving_customer">Saving customer…</string>
+    <string name="customer_saved">Customer saved successfully</string>
+    <string name="customer_save_failed">Failed to save customer</string>
+    <string name="select_customer">Select</string>
 
 </resources>

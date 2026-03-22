@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Customer Dialog - matches HTML .customer-modal-content with filter modal styling -->
-<!-- background: gradient, border-radius: 20px -->
+<!-- Customer Dialog - Editable with Search, Close, Save buttons -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="400dp"
+    android:layout_width="420dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/bg_dialog">
 
-    <!-- Header - matches HTML .customer-modal-header -->
-    <!-- padding: 20px, border-bottom: 1px solid rgba(255,255,255,0.1) -->
+    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,8 +25,6 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <!-- Close button - matches HTML .customer-modal-close -->
-        <!-- 32x32, border-radius: 8px, background: rgba(255,255,255,0.1) -->
         <ImageView
             android:id="@+id/closeButton"
             android:layout_width="32dp"
@@ -46,15 +42,14 @@
         android:layout_height="1dp"
         android:background="@color/nav_border" />
 
-    <!-- Body - matches HTML .customer-modal-body -->
-    <!-- padding: 24px -->
+    <!-- Body -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- Customer Avatar and Name - matches HTML .customer-view-header -->
+        <!-- Customer Avatar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -62,121 +57,172 @@
             android:gravity="center"
             android:layout_marginBottom="24dp">
 
-            <!-- Avatar - 70x70, orange background -->
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/customerAvatar"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:background="@drawable/bg_customer_avatar_large"
                 android:gravity="center"
-                android:text="ED"
+                android:text="?"
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 android:textStyle="bold" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/customerName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Emily Davis"
-                android:textColor="@color/text_light"
-                android:textSize="20sp"
-                android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Customer Details - matches HTML .customer-view-details -->
-        <!-- gap: 12px -->
+        <!-- Editable Customer Fields -->
+
+        <!-- First Name -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/first_name"
+                android:textColor="@color/text_muted"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:letterSpacing="0.05" />
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputFirstName"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_modal_input"
+                android:paddingHorizontal="16dp"
+                android:hint="@string/enter_first_name"
+                android:textColor="@color/text_light"
+                android:textColorHint="@color/text_muted"
+                android:textSize="14sp"
+                android:inputType="textPersonName" />
+        </LinearLayout>
+
+        <!-- Last Name -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/last_name"
+                android:textColor="@color/text_muted"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:letterSpacing="0.05" />
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputLastName"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_modal_input"
+                android:paddingHorizontal="16dp"
+                android:hint="@string/enter_last_name"
+                android:textColor="@color/text_light"
+                android:textColorHint="@color/text_muted"
+                android:textSize="14sp"
+                android:inputType="textPersonName" />
+        </LinearLayout>
+
+        <!-- Phone Number -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/phone"
+                android:textColor="@color/text_muted"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:letterSpacing="0.05" />
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputPhone"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_modal_input"
+                android:paddingHorizontal="16dp"
+                android:hint="@string/enter_phone_number"
+                android:textColor="@color/text_light"
+                android:textColorHint="@color/text_muted"
+                android:textSize="14sp"
+                android:inputType="phone" />
+        </LinearLayout>
+
+        <!-- Email -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Phone Row - matches HTML .customer-view-row -->
-            <!-- padding: 12px 16px, background: rgba(0,0,0,0.2), border-radius: 10px -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_modal_info_row"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="12dp"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="8dp"
+                android:text="@string/email"
+                android:textColor="@color/text_muted"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:letterSpacing="0.05" />
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_phone"
-                    app:tint="@color/text_muted"
-                    android:contentDescription="@string/customer_number" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/customerPhone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="(555) 234-5678"
-                    android:textColor="@color/text_light"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <!-- Email Row -->
-            <LinearLayout
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputEmail"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_modal_info_row"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_modal_input"
                 android:paddingHorizontal="16dp"
-                android:paddingVertical="12dp"
-                android:layout_marginBottom="12dp">
+                android:hint="@string/enter_email"
+                android:textColor="@color/text_light"
+                android:textColorHint="@color/text_muted"
+                android:textSize="14sp"
+                android:inputType="textEmailAddress" />
+        </LinearLayout>
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_email"
-                    app:tint="@color/text_muted"
-                    android:contentDescription="@string/email" />
+        <!-- Hidden views for backward compatibility -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/customerName"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/customerEmail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="emily.davis@email.com"
-                    android:textColor="@color/text_light"
-                    android:textSize="14sp" />
-            </LinearLayout>
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/customerPhone"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-            <!-- Notes Row -->
-            <LinearLayout
-                android:id="@+id/notesRow"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_modal_info_row"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="12dp"
-                android:visibility="gone">
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/customerEmail"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_notes"
-                    app:tint="@color/text_muted"
-                    android:contentDescription="@string/notes" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/customerNotes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="Prefers text messages"
-                    android:textColor="@color/text_light"
-                    android:textSize="14sp" />
-            </LinearLayout>
+        <LinearLayout
+            android:id="@+id/notesRow"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone">
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/customerNotes"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 
@@ -186,8 +232,7 @@
         android:layout_height="1dp"
         android:background="@color/nav_border" />
 
-    <!-- Footer - matches HTML .customer-modal-footer -->
-    <!-- padding: 16px 24px, gap: 12px -->
+    <!-- Footer - Three buttons: Search, Close, Save -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -196,7 +241,24 @@
         android:paddingVertical="16dp"
         android:gravity="end">
 
-        <!-- Close button - matches HTML .customer-modal-btn.cancel -->
+        <!-- Search button - opens customer search dialog -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginEnd="12dp"
+            android:backgroundTint="@color/glass_background"
+            android:text="@string/search"
+            android:textColor="@color/text_light"
+            android:textSize="14sp"
+            android:paddingHorizontal="16dp"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_search"
+            app:iconTint="@color/text_light"
+            app:iconSize="16dp"
+            app:iconPadding="6dp" />
+
+        <!-- Close button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnClose"
             android:layout_width="wrap_content"
@@ -206,19 +268,26 @@
             android:text="@string/close"
             android:textColor="@color/text_light"
             android:textSize="14sp"
-            android:paddingHorizontal="20dp"
+            android:paddingHorizontal="16dp"
             app:cornerRadius="12dp" />
 
-        <!-- Edit button - matches HTML .customer-modal-btn.save -->
+        <!-- Save button - saves customer to Clover -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnEdit"
+            android:id="@+id/btnSave"
             android:layout_width="wrap_content"
             android:layout_height="44dp"
             android:backgroundTint="@color/orange_accent"
-            android:text="@string/edit"
+            android:text="@string/save"
             android:textColor="@color/white"
             android:textSize="14sp"
             android:paddingHorizontal="20dp"
             app:cornerRadius="12dp" />
+
+        <!-- Hidden for backward compatibility -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEdit"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
     </LinearLayout>
 </LinearLayout>
