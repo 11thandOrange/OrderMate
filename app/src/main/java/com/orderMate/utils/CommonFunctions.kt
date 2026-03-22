@@ -20,56 +20,56 @@ private val modalData: ArrayList<ModalData> = arrayListOf(
         Constants.isCustomModalShown,
         ModalDialogCategories.ModalShown,
         hasDropDown = false,
-        isActive = false,
+        isActive = true,
         list = mutableListOf()
     ),
     ModalData(
         Constants.isCustomModalBasket,
         ModalDialogCategories.BasketShown,
         hasDropDown = false,
-        isActive = false,
+        isActive = true,
         list = mutableListOf()
     ),
     ModalData(
         Constants.fbPickUp,
         ModalDialogCategories.PickUpDate,
         hasDropDown = false,
-        isActive = false,
+        isActive = true,
         list = mutableListOf()
     ),
     ModalData(
         Constants.fbType,
         ModalDialogCategories.OrderType,
         hasDropDown = true,
-        isActive = false,
+        isActive = true,
         list = mutableListOf()
     ),
     ModalData(
         Constants.fbStatus,
         ModalDialogCategories.OrderProgress,
         hasDropDown = true,
-        isActive = false,
+        isActive = true,
         list = mutableListOf()
     ),
     ModalData(
         Constants.fbCategory,
         ModalDialogCategories.OrderCategories,
         hasDropDown = true,
-        isActive = false,
+        isActive = true,
         list = mutableListOf()
     ),
     ModalData(
         Constants.fbSubcategory,
         ModalDialogCategories.OrderSubCategories,
         hasDropDown = true,
-        isActive = false,
+        isActive = true,
         list = mutableListOf()
     ),
     ModalData(
         Constants.fbDescription,
         ModalDialogCategories.Description,
         hasDropDown = false,
-        isActive = false,
+        isActive = true,
         list = mutableListOf()
     )
 )
