@@ -493,7 +493,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 CustomerDialog.newInstance(
                     customer = customer,
                     orderId = orderArguments?.id,
-                    onCustomerEdited = {
+                    onCustomerUpdated = {
                         // Refresh order data when customer is edited
                         CoroutineScope(Dispatchers.IO).launch {
                             refreshUI()
