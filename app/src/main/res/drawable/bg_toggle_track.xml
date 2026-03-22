@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Toggle switch track background -->
+<!-- Toggle switch track background - matches HTML toggle-switch -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_checked="true">
         <shape android:shape="rectangle">
-            <solid android:color="@color/orange_accent" />
+            <solid android:color="#3CCD79" />
             <corners android:radius="12dp" />
             <size
                 android:width="44dp"

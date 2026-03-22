@@ -470,12 +470,12 @@ class WidgetEditorAdapter(
                 populateValues(widget)
             }
 
-            // Expand/collapse
-            val isExpanded = expandedPositions.contains(position)
+            // Expand/collapse - use widget ID for stable expand state
+            val isExpanded = expandedPositions.contains(widget.id)
             widgetBody.visibility = if (isExpanded) View.VISIBLE else View.GONE
             expandChevron.rotation = if (isExpanded) 180f else 0f
 
-            // Listeners
+            // Listeners - use bindingAdapterPosition for safe position access
             dragHandle.setOnTouchListener { _, event ->
                 if (event.actionMasked == android.view.MotionEvent.ACTION_DOWN) {
                     itemTouchHelper?.startDrag(this)
@@ -484,12 +484,15 @@ class WidgetEditorAdapter(
             }
 
             widgetHeader.setOnClickListener {
-                if (expandedPositions.contains(position)) {
-                    expandedPositions.remove(position)
+                val currentPos = bindingAdapterPosition
+                if (currentPos == RecyclerView.NO_POSITION) return@setOnClickListener
+                
+                if (expandedPositions.contains(widget.id)) {
+                    expandedPositions.remove(widget.id)
                 } else {
-                    expandedPositions.add(position)
+                    expandedPositions.add(widget.id)
                 }
-                notifyItemChanged(position)
+                notifyItemChanged(currentPos)
             }
 
             widgetToggle.setOnCheckedChangeListener { _, isChecked ->
@@ -501,7 +504,8 @@ class WidgetEditorAdapter(
                 if (!hasFocus) {
                     widget.label = inputWidgetLabel.text.toString()
                     onWidgetUpdate(widget)
-                    notifyItemChanged(position)
+                    // Update title text without full rebind
+                    widgetTitle.text = widget.label
                 }
             }
 
@@ -614,39 +618,52 @@ class NotificationTemplateAdapter(
         private val inputTemplateContent: EditText = itemView.findViewById(R.id.inputTemplateContent)
         private val charCount: TextView = itemView.findViewById(R.id.charCount)
         private val btnDeleteTemplate: View = itemView.findViewById(R.id.btnDeleteTemplate)
+        
+        private var currentTextWatcher: TextWatcher? = null
 
         fun bind(template: NotificationTemplate, position: Int) {
             templateName.text = template.name
             templatePreview.text = if (template.content.length > 50) 
                 "${template.content.take(50)}..." else template.content
+            
+            // Remove previous text watcher to avoid duplicate callbacks
+            currentTextWatcher?.let { inputTemplateContent.removeTextChangedListener(it) }
+            
             inputTemplateName.setText(template.name)
             inputTemplateContent.setText(template.content)
             updateCharCount(template.content.length)
 
-            // Expand/collapse
-            val isExpanded = expandedPositions.contains(position)
+            // Expand/collapse - use template ID for stable expand state
+            val isExpanded = expandedPositions.contains(template.id)
             templateBody.visibility = if (isExpanded) View.VISIBLE else View.GONE
             expandChevron.rotation = if (isExpanded) 180f else 0f
 
-            // Listeners
+            // Listeners - use bindingAdapterPosition for safe position access
             templateHeader.setOnClickListener {
-                if (expandedPositions.contains(position)) {
-                    expandedPositions.remove(position)
+                val currentPos = bindingAdapterPosition
+                if (currentPos == RecyclerView.NO_POSITION) return@setOnClickListener
+                
+                if (expandedPositions.contains(template.id)) {
+                    expandedPositions.remove(template.id)
                 } else {
-                    expandedPositions.add(position)
+                    expandedPositions.add(template.id)
                 }
-                notifyItemChanged(position)
+                notifyItemChanged(currentPos)
             }
 
             inputTemplateName.setOnFocusChangeListener { _, hasFocus ->
                 if (!hasFocus) {
+                    val currentPos = bindingAdapterPosition
+                    if (currentPos == RecyclerView.NO_POSITION) return@setOnFocusChangeListener
+                    
                     template.name = inputTemplateName.text.toString()
                     onTemplateUpdate(template)
-                    notifyItemChanged(position)
+                    // Update header text without full rebind
+                    templateName.text = template.name
                 }
             }
 
-            inputTemplateContent.addTextChangedListener(object : TextWatcher {
+            currentTextWatcher = object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
                     val content = s?.toString() ?: ""
                     template.content = content
@@ -655,7 +672,8 @@ class NotificationTemplateAdapter(
                 }
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            })
+            }
+            inputTemplateContent.addTextChangedListener(currentTextWatcher)
 
             btnDeleteTemplate.setOnClickListener {
                 onTemplateDelete(template)
