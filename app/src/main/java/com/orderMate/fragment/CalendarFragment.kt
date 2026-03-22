@@ -171,14 +171,14 @@ class CalendarFragment : Fragment() {
      * Restores state when navigating back to this tab
      */
     private fun observeSharedState() {
-        // Observe filter state - only apply if we have orders loaded
+        // Observe filter state - update pills and apply if orders loaded
         sharedFilterViewModel.filterState.observe(viewLifecycleOwner) { state ->
-            if (state != currentFilterState) {
-                currentFilterState = state
-                // Only apply filters if orders are loaded
-                if (allOrders.isNotEmpty()) {
-                    applyDialogFilters(state)
-                }
+            currentFilterState = state
+            // Always update pills for visual consistency
+            updateFilterPills(state)
+            // Only apply filters if orders are loaded
+            if (allOrders.isNotEmpty()) {
+                applyDialogFilters(state)
             }
         }
         
@@ -771,11 +771,12 @@ class CalendarFragment : Fragment() {
         val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
         var hasPills = false
         
-        // Add selection filter pills
+        // Add selection filter pills with formatted display (matches List tab)
         for ((categoryId, values) in filters.selections) {
             values.forEach { value ->
                 hasPills = true
-                val pill = createFilterPillWithClose(value) {
+                val displayValue = formatFilterValue(categoryId, value)
+                val pill = createFilterPillWithClose(displayValue) {
                     removeSelectionFilter(categoryId, value)
                 }
                 filterPillsContainer?.addView(pill)
@@ -785,8 +786,13 @@ class CalendarFragment : Fragment() {
         // Add date filter pills (with "Order Date:" label like HTML)
         for ((categoryId, dates) in filters.dateSelections) {
             val label = when (categoryId) {
-                FilterCategoryBuilder.CLOVER_ORDER_DATE -> "Order"
-                else -> "Date"
+                FilterCategoryBuilder.CLOVER_ORDER_DATE -> "Order Date"
+                else -> {
+                    if (FilterCategoryBuilder.isWidgetFilter(categoryId)) {
+                        val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
+                        widgetManager?.getWidgetById(widgetId ?: "")?.label ?: "Date"
+                    } else "Date"
+                }
             }
             dates.forEachIndexed { index, date ->
                 hasPills = true
@@ -798,6 +804,31 @@ class CalendarFragment : Fragment() {
         }
         
         filterPillsScroll?.visibility = if (hasPills) View.VISIBLE else View.GONE
+    }
+    
+    /**
+     * Format filter values for display (consistent with List tab)
+     */
+    private fun formatFilterValue(categoryId: String, value: String): String {
+        return when (categoryId) {
+            FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> formatPaymentStatus(value)
+            FilterCategoryBuilder.CLOVER_ORDER_STATUS -> formatOrderStatus(value)
+            else -> value
+        }
+    }
+    
+    private fun formatPaymentStatus(status: String): String {
+        return when (status.uppercase()) {
+            "PAID" -> "Paid"
+            "NOT_PAID" -> "Unpaid"
+            "PARTIALLY_PAID" -> "Partial"
+            "REFUNDED" -> "Refunded"
+            else -> status.lowercase().replaceFirstChar { it.uppercase() }
+        }
+    }
+    
+    private fun formatOrderStatus(status: String): String {
+        return status.lowercase().replaceFirstChar { it.uppercase() }
     }
     
     private fun removeSelectionFilter(categoryId: String, value: String) {
@@ -812,6 +843,8 @@ class CalendarFragment : Fragment() {
             }
         }
         currentFilterState = currentFilterState.copy(selections = newSelections)
+        // Sync to shared ViewModel for cross-tab consistency
+        sharedFilterViewModel.setFilterState(currentFilterState)
         applyDialogFilters(currentFilterState)
     }
     
@@ -829,6 +862,8 @@ class CalendarFragment : Fragment() {
             }
         }
         currentFilterState = currentFilterState.copy(dateSelections = newDateSelections)
+        // Sync to shared ViewModel for cross-tab consistency
+        sharedFilterViewModel.setFilterState(currentFilterState)
         applyDialogFilters(currentFilterState)
     }
     

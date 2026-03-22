@@ -147,14 +147,16 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
      * Restores state when navigating back to this tab
      */
     private fun observeSharedState() {
-        // Observe filter state - only apply if we have orders loaded
+        // Observe filter state - update pills and apply if orders loaded
         sharedFilterViewModel.filterState.observe(viewLifecycleOwner) { state ->
-            if (state != currentFilterState) {
-                currentFilterState = state
-                // Only apply filters if orders are loaded
-                if (allItemList.isNotEmpty()) {
-                    applyDialogFilters(state)
-                }
+            currentFilterState = state
+            // Always update pills for visual consistency
+            if (_binding != null) {
+                updateFilterPills(state)
+            }
+            // Only apply filters if orders are loaded
+            if (allItemList.isNotEmpty()) {
+                applyDialogFilters(state)
             }
         }
         
@@ -703,6 +705,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             }
         }
         currentFilterState = currentFilterState.copy(selections = newSelections)
+        // Sync to shared ViewModel for cross-tab consistency
+        sharedFilterViewModel.setFilterState(currentFilterState)
         applyDialogFilters(currentFilterState)
     }
     
@@ -720,6 +724,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             }
         }
         currentFilterState = currentFilterState.copy(dateSelections = newDateSelections)
+        // Sync to shared ViewModel for cross-tab consistency
+        sharedFilterViewModel.setFilterState(currentFilterState)
         applyDialogFilters(currentFilterState)
     }
     
