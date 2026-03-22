@@ -1,11 +1,15 @@
 package com.orderMate.activities
 
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -13,10 +17,12 @@ import com.google.gson.Gson
 import com.orderMate.R
 import com.orderMate.fragment.orderHistory.OrderHistoryFragment
 import com.orderMate.utils.Constants
+import com.orderMate.utils.FirebaseConfigManager
 import com.orderMate.utils.FirebaseRealtimeDataBaseManager
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.PermissionUtils
 import com.orderMate.utils.PreferenceManager
+import com.orderMate.utils.ProfileSettingsManager
 import com.orderMate.utils.createAndShowDialog
 import com.orderMate.utils.defaultCustomDataForFirebase
 import com.orderMate.utils.exceptionHandler
@@ -42,8 +48,15 @@ class MainActivity : AppCompatActivity() {
     private val myApplication: MyApp by lazy {
         MyApp.getInstance()
     }
+    private val profileSettingsManager: ProfileSettingsManager by lazy {
+        ProfileSettingsManager.getInstance(this)
+    }
+    private val firebaseConfigManager: FirebaseConfigManager by lazy {
+        FirebaseConfigManager.getInstance()
+    }
 
     private lateinit var navController: NavController
+    private var rootLayout: ConstraintLayout? = null
     
     // Navigation items
     private var navList: FrameLayout? = null
@@ -56,14 +69,115 @@ class MainActivity : AppCompatActivity() {
     private var navCalendarIndicator: View? = null
     private var navSettingsIndicator: View? = null
     
+    // Profile nav elements
+    private var navProfileIcon: ImageView? = null
+    private var navProfileEmoji: TextView? = null
+    
     private var currentNavItem: Int = R.id.navList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_redesign)
         
+        rootLayout = findViewById(R.id.rootLayout)
+        
         setupNavigation()
         setupSideNav()
+        
+        // Apply theme settings immediately
+        applyThemeSettings()
+        
+        // Sync from Firebase in background
+        syncProfileSettingsFromFirebase()
+    }
+    
+    /**
+     * Apply theme settings (gradient background + nav avatar)
+     */
+    fun applyThemeSettings() {
+        applyThemeGradient()
+        updateNavProfileAvatar()
+    }
+    
+    /**
+     * Apply gradient background to entire app
+     */
+    private fun applyThemeGradient() {
+        val themeColor = profileSettingsManager.getThemeColor()
+        val baseColor = Color.parseColor(themeColor)
+        val lighterColor = lightenColor(baseColor, 0.3f)
+        
+        val gradientDrawable = GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            intArrayOf(baseColor, lighterColor)
+        )
+        
+        rootLayout?.background = gradientDrawable
+    }
+    
+    /**
+     * Update nav profile to show emoji avatar
+     */
+    private fun updateNavProfileAvatar() {
+        val avatar = profileSettingsManager.getAvatarEmoji()
+        
+        if (avatar.isNotEmpty()) {
+            navProfileEmoji?.text = avatar
+            navProfileEmoji?.visibility = View.VISIBLE
+            navProfileIcon?.visibility = View.GONE
+        } else {
+            navProfileIcon?.visibility = View.VISIBLE
+            navProfileEmoji?.visibility = View.GONE
+        }
+        
+        applyThemeToNavProfile()
+    }
+    
+    /**
+     * Apply theme color gradient to nav profile button
+     */
+    private fun applyThemeToNavProfile() {
+        val themeColor = profileSettingsManager.getThemeColor()
+        val baseColor = Color.parseColor(themeColor)
+        val lighterColor = lightenColor(baseColor, 0.3f)
+        
+        val gradientDrawable = GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            intArrayOf(baseColor, lighterColor)
+        )
+        gradientDrawable.cornerRadius = 22f * resources.displayMetrics.density
+        
+        navProfile?.background = gradientDrawable
+    }
+    
+    /**
+     * Lighten a color by percentage
+     */
+    private fun lightenColor(color: Int, percent: Float): Int {
+        val r = minOf(255, (Color.red(color) + 255 * percent).toInt())
+        val g = minOf(255, (Color.green(color) + 255 * percent).toInt())
+        val b = minOf(255, (Color.blue(color) + 255 * percent).toInt())
+        return Color.rgb(r, g, b)
+    }
+    
+    /**
+     * Sync profile settings from Firebase
+     */
+    private fun syncProfileSettingsFromFirebase() {
+        val merchantId = myApplication.getMerchantId()
+        if (!merchantId.isNullOrEmpty()) {
+            firebaseConfigManager.getProfileSettings(merchantId) { settings ->
+                if (settings.themeColor != "#3C4B80" || settings.avatar.isNotEmpty()) {
+                    profileSettingsManager.setThemeColor(settings.themeColor)
+                    if (settings.avatar.isNotEmpty()) {
+                        profileSettingsManager.setAvatarEmoji(settings.avatar)
+                    }
+                    runOnUiThread {
+                        applyThemeSettings()
+                    }
+                }
+            }
+        }
     }
     
     private fun setupNavigation() {
@@ -88,6 +202,10 @@ class MainActivity : AppCompatActivity() {
         navCalendar = findViewById(R.id.navCalendar)
         navSettings = findViewById(R.id.navSettings)
         navProfile = findViewById(R.id.navProfile)
+        
+        // Initialize profile nav elements
+        navProfileIcon = findViewById(R.id.navProfileIcon)
+        navProfileEmoji = findViewById(R.id.navProfileEmoji)
         
         // Initialize indicators
         navListIndicator = findViewById(R.id.navListIndicator)
@@ -157,6 +275,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        
+        // Refresh theme settings when returning from profile
+        applyThemeSettings()
+        
         CoroutineScope(Dispatchers.IO).launch {
           firebaseRealTimeManager.getData(
                 this@MainActivity,
