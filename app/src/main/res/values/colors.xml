@@ -108,4 +108,7 @@
     <!-- Glassmorphism event preview -->
     <color name="event_preview_bg">#26FFFFFF</color>
     <color name="event_preview_border">#1AFFFFFF</color>
+    
+    <!-- Ripple and clickable effects -->
+    <color name="glass_ripple">#40FFFFFF</color>
 </resources>
