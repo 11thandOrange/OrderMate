@@ -452,7 +452,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:text="minutes before"
+                            android:text="minutes before due date"
                             android:textColor="@color/text_light"
                             android:textSize="13sp" />
 
@@ -532,7 +532,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:text="minutes before"
+                            android:text="minutes before due date"
                             android:textColor="@color/text_light"
                             android:textSize="13sp" />
 

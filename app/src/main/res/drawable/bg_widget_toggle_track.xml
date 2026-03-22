@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget toggle track - smaller than main toggle (36x20 vs 44x24) -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#3CCD79" />
+            <corners android:radius="10dp" />
+            <size
+                android:width="36dp"
+                android:height="20dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#33FFFFFF" />
+            <corners android:radius="10dp" />
+            <size
+                android:width="36dp"
+                android:height="20dp" />
+        </shape>
+    </item>
+</selector>

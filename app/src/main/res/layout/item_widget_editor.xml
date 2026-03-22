@@ -78,14 +78,14 @@
 
         </LinearLayout>
 
-        <!-- Toggle Switch -->
+        <!-- Toggle Switch (smaller for widgets) -->
         <Switch
             android:id="@+id/widgetToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:thumb="@drawable/bg_toggle_thumb"
-            android:track="@drawable/bg_toggle_track" />
+            android:thumb="@drawable/bg_widget_toggle_thumb"
+            android:track="@drawable/bg_widget_toggle_track" />
 
         <!-- Expand Chevron -->
         <ImageView

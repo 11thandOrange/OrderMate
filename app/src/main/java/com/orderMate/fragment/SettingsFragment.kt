@@ -426,7 +426,7 @@ class WidgetEditorAdapter(
     override fun getItemCount() = widgets.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val widgetCard: androidx.cardview.widget.CardView = itemView.findViewById(R.id.widgetCard)
+        private val widgetCard: CardView = itemView.findViewById(R.id.widgetCard)
         private val widgetContainer: View = itemView.findViewById(R.id.widgetContainer)
         private val dragHandle: View = itemView.findViewById(R.id.dragHandle)
         private val widgetIconContainer: View = itemView.findViewById(R.id.widgetIconContainer)
@@ -442,6 +442,8 @@ class WidgetEditorAdapter(
         private val inputAddOption: EditText = itemView.findViewById(R.id.inputAddOption)
         private val valuesContainer: FlexboxLayout = itemView.findViewById(R.id.valuesContainer)
         private val btnDeleteWidget: View = itemView.findViewById(R.id.btnDeleteWidget)
+        
+        private var currentWidgetTintColor: Int = 0xFFFFFFFF.toInt()
 
         fun bind(widget: PopUpWidget, position: Int) {
             widgetTitle.text = widget.label
@@ -460,13 +462,8 @@ class WidgetEditorAdapter(
             widgetIcon.setColorFilter(tintColor)
             widgetIconContainer.setBackgroundResource(bgRes)
             
-            // Set card border color to match widget type using GradientDrawable
-            val borderDrawable = GradientDrawable().apply {
-                setColor(0x4D000000.toInt()) // Dark background
-                cornerRadius = 10f * itemView.resources.displayMetrics.density
-                setStroke((1.5f * itemView.resources.displayMetrics.density).toInt(), tintColor)
-            }
-            widgetContainer.background = borderDrawable
+            // Store tint color for value pills
+            currentWidgetTintColor = tintColor
 
             // Show options for select types
             val hasOptions = widget.type == WidgetType.SINGLE_SELECT || widget.type == WidgetType.MULTI_SELECT
@@ -552,16 +549,26 @@ class WidgetEditorAdapter(
 
         private fun createValueTag(text: String, onRemove: () -> Unit): View {
             val context = itemView.context
+            val density = context.resources.displayMetrics.density
+            
             return LinearLayout(context).apply {
                 orientation = LinearLayout.HORIZONTAL
-                setBackgroundResource(R.drawable.bg_value_tag)
                 gravity = android.view.Gravity.CENTER_VERTICAL
+                setPadding((10 * density).toInt(), (6 * density).toInt(), (10 * density).toInt(), (6 * density).toInt())
+                
+                // Create pill background with widget-specific border color
+                val pillBg = GradientDrawable().apply {
+                    setColor(0x33000000) // Dark semi-transparent background
+                    cornerRadius = 16 * density
+                    setStroke((1 * density).toInt(), currentWidgetTintColor)
+                }
+                background = pillBg
                 
                 val params = ViewGroup.MarginLayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-                params.setMargins(0, 0, 8, 8)
+                params.setMargins(0, 0, (8 * density).toInt(), (8 * density).toInt())
                 layoutParams = params
 
                 addView(TextView(context).apply {
@@ -572,9 +579,9 @@ class WidgetEditorAdapter(
 
                 addView(TextView(context).apply {
                     this.text = "×"
-                    setTextColor(ContextCompat.getColor(context, R.color.text_muted))
+                    setTextColor(currentWidgetTintColor)
                     textSize = 14f
-                    setPadding(12, 0, 4, 0)
+                    setPadding((8 * density).toInt(), 0, (2 * density).toInt(), 0)
                     setOnClickListener { onRemove() }
                 })
             }
