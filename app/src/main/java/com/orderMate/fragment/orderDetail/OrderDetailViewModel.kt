@@ -14,9 +14,9 @@ import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.net.UnknownHostException
 
-class OrderDetailViewModel( application: Application) : AndroidViewModel(application) {
+class OrderDetailViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: CloverRepository = CloverRepository.getInstance()
+    private val repository: CloverRepository = CloverRepository.getInstance(application)
 
 
     private val _successResponse: MutableLiveData<Pair<String , Boolean>> = MutableLiveData()
