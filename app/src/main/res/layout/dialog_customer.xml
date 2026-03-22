@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Customer Dialog - Styled like HTML customer modal with gradient background -->
+<!-- Customer Dialog - Styled like filter modal -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="400dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/bg_dialog_gradient">
+    android:background="@drawable/bg_dialog">
 
     <!-- Header - matches HTML .customer-modal-header -->
     <LinearLayout
