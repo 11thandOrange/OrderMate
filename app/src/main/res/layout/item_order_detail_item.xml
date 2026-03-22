@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Order detail item row with pills (#87 requirement) -->
+<!-- Order detail item row with pills + chevron (#87 requirement) -->
+<!-- Clickable row opens OrderMate editor popup -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemRowContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="12dp"
     android:gravity="center_vertical"
-    android:background="@drawable/bg_item_row_rounded"
+    android:background="@drawable/bg_item_row_clickable"
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
     android:layout_marginBottom="8dp">
 
     <!-- Item Icon -->
     <FrameLayout
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:background="@drawable/bg_item_icon">
 
         <ImageView
@@ -24,7 +29,7 @@
             android:layout_height="24dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_item_cake"
-            app:tint="@color/orange_accent"/>
+            app:tint="@color/text_muted"/>
     </FrameLayout>
 
     <!-- Item Info -->
@@ -40,7 +45,7 @@
             android:id="@+id/itemName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_primary"
+            android:textColor="@color/text_light"
             android:textSize="14sp"
             android:textStyle="bold"
             tools:text="Custom Birthday Cake"/>
@@ -55,24 +60,39 @@
             app:alignItems="flex_start"/>
     </LinearLayout>
 
-    <!-- Quantity -->
+    <!-- Quantity Badge -->
     <TextView
         android:id="@+id/itemQty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_secondary"
+        android:background="@drawable/bg_qty_badge"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="4dp"
+        android:textColor="@color/text_muted"
         android:textSize="13sp"
-        android:layout_marginEnd="16dp"
+        android:textStyle="bold"
         tools:text="x1"/>
 
     <!-- Price -->
     <TextView
         android:id="@+id/itemPrice"
-        android:layout_width="wrap_content"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_primary"
+        android:gravity="end"
+        android:layout_marginStart="12dp"
+        android:textColor="@color/text_light"
         android:textSize="14sp"
         android:textStyle="bold"
         tools:text="$85.00"/>
+
+    <!-- Chevron Indicator (indicates row is clickable) -->
+    <ImageView
+        android:id="@+id/itemChevron"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_chevron_right"
+        app:tint="@color/text_muted"
+        android:contentDescription="@string/edit_item"/>
 
 </LinearLayout>

@@ -485,6 +485,22 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                     refreshUI()
                 }
             }
+            
+            // Customer row click - opens customer dialog
+            customerRow.setOnClickListener {
+                val customers = orderArguments?.customers
+                val customer = if (customers?.isNotEmpty() == true) customers[0] else null
+                CustomerDialog.newInstance(
+                    customer = customer,
+                    orderId = orderArguments?.id,
+                    onCustomerEdited = {
+                        // Refresh order data when customer is edited
+                        CoroutineScope(Dispatchers.IO).launch {
+                            refreshUI()
+                        }
+                    }
+                ).show(parentFragmentManager, CustomerDialog.TAG)
+            }
         }
     }
 

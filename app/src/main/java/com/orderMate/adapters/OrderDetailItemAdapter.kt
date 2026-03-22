@@ -14,9 +14,11 @@ import com.orderMate.utils.toDoubleFloatPoint
 /**
  * Adapter for order detail items with note pills (#87 requirement)
  * Displays items with icon, name, pills, quantity, and price
+ * Clicking row opens OrderMate editor popup
  */
 class OrderDetailItemAdapter(
-    private val items: List<LineItem>
+    private val items: List<LineItem>,
+    private val onItemClick: ((position: Int, lineItemId: String?) -> Unit)? = null
 ) : RecyclerView.Adapter<OrderDetailItemAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -28,7 +30,13 @@ class OrderDetailItemAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         if (position >= items.size) return
-        holder.bind(items[position])
+        val item = items[position]
+        holder.bind(item)
+        
+        // Set click listener for entire row - opens OrderMate editor popup
+        holder.itemView.setOnClickListener {
+            onItemClick?.invoke(position, item.item?.id)
+        }
     }
 
     override fun getItemCount(): Int = items.size

@@ -1,19 +1,24 @@
 package com.orderMate.fragment.orderDetail
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import com.clover.sdk.v1.Intents
 import com.clover.sdk.v3.customers.Customer
 import com.orderMate.R
 import com.orderMate.databinding.DialogCustomerBinding
 
 /**
  * Dialog to display customer details in the iOS-style redesign (#87)
+ * Edit button launches Clover's customer editor (same as Register app)
  */
 class CustomerDialog(
-    private val customer: Customer?
+    private val customer: Customer?,
+    private val orderId: String? = null,
+    private val onCustomerEdited: (() -> Unit)? = null
 ) : DialogFragment() {
 
     private var _binding: DialogCustomerBinding? = null
@@ -85,6 +90,61 @@ class CustomerDialog(
         binding.closeButton.setOnClickListener {
             dismiss()
         }
+        
+        binding.btnClose.setOnClickListener {
+            dismiss()
+        }
+        
+        // Edit button - launches Clover's customer selector/editor
+        // Same behavior as Clover Register app
+        binding.btnEdit.setOnClickListener {
+            launchCloverCustomerEditor()
+        }
+    }
+    
+    /**
+     * Launch Clover's customer editor/selector
+     * This uses the same Clover intent that Register app uses
+     */
+    private fun launchCloverCustomerEditor() {
+        try {
+            // If we have an order, use the order-based customer intent
+            if (!orderId.isNullOrEmpty()) {
+                val intent = Intent(Intents.ACTION_CUSTOMER_ADD_TO_ORDER).apply {
+                    putExtra(Intents.EXTRA_ORDER_ID, orderId)
+                }
+                startActivityForResult(intent, REQUEST_CUSTOMER_EDIT)
+            } else {
+                // Otherwise launch customer selector
+                val intent = Intent(Intents.ACTION_CUSTOMER_SELECT)
+                startActivityForResult(intent, REQUEST_CUSTOMER_SELECT)
+            }
+        } catch (e: Exception) {
+            // Fallback: launch Clover Customers app directly
+            try {
+                val intent = Intent().apply {
+                    setClassName("com.clover.customers", "com.clover.customers.CustomerSelectActivity")
+                }
+                startActivityForResult(intent, REQUEST_CUSTOMER_SELECT)
+            } catch (e2: Exception) {
+                // No Clover Customers app available
+                android.widget.Toast.makeText(
+                    requireContext(),
+                    R.string.clover_customers_not_available,
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+    
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CUSTOMER_EDIT || requestCode == REQUEST_CUSTOMER_SELECT) {
+            // Customer was edited or selected, notify parent to refresh
+            onCustomerEdited?.invoke()
+            dismiss()
+        }
     }
 
     private fun getInitials(firstName: String?, lastName: String?): String {
@@ -100,9 +160,15 @@ class CustomerDialog(
 
     companion object {
         const val TAG = "CustomerDialog"
+        private const val REQUEST_CUSTOMER_EDIT = 1001
+        private const val REQUEST_CUSTOMER_SELECT = 1002
         
-        fun newInstance(customer: Customer?): CustomerDialog {
-            return CustomerDialog(customer)
+        fun newInstance(
+            customer: Customer?,
+            orderId: String? = null,
+            onCustomerEdited: (() -> Unit)? = null
+        ): CustomerDialog {
+            return CustomerDialog(customer, orderId, onCustomerEdited)
         }
     }
 }

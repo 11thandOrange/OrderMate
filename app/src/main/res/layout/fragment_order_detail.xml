@@ -203,33 +203,42 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <!-- Card Header -->
+                    <!-- Card Header - matches HTML .detail-card-header -->
                     <LinearLayout
                         android:id="@+id/itemsHeader"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:padding="16dp"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="16dp"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent">
 
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_order_big"
-                            app:tint="@color/text_light"
-                            android:contentDescription="@string/items" />
+                        <!-- Icon with background - matches HTML .detail-card-title i -->
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_card_title_icon">
+                            
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_box"
+                                app:tint="@color/text_light"
+                                android:contentDescription="@string/items" />
+                        </FrameLayout>
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/orderItemCountText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="10dp"
                             android:text="@string/items"
                             android:textColor="@color/text_light"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -388,31 +397,41 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Card Header with Status Badges -->
+                    <!-- Card Header with Status Badges - matches HTML .detail-card-header -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:padding="16dp">
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="16dp">
 
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_receipt"
-                            app:tint="@color/text_light"
-                            android:contentDescription="@string/order_details" />
+                        <!-- Icon with background - matches HTML .detail-card-title i -->
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_card_title_icon">
+                            
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_receipt"
+                                app:tint="@color/text_light"
+                                android:contentDescription="@string/order_details" />
+                        </FrameLayout>
 
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="10dp"
                             android:text="@string/order_details"
                             android:textColor="@color/text_light"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
+                        <!-- Status badges - matches HTML .detail-status-badge -->
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/orderPlacedStatusValue"
                             android:layout_width="wrap_content"
@@ -422,9 +441,10 @@
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="4dp"
                             android:text="@string/open"
-                            android:textColor="@color/black"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
+                            android:textColor="@color/open_status_color"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:textAllCaps="true" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/paymentStatusBadge"
@@ -434,9 +454,10 @@
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="4dp"
                             android:text="@string/paid"
-                            android:textColor="@color/white"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
+                            android:textColor="@color/paid_status_color"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:textAllCaps="true" />
                     </LinearLayout>
 
                     <View
@@ -558,28 +579,33 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
-                        <!-- Customer (Clickable) -->
+                        <!-- Customer (Clickable) - matches HTML .detail-info-row.clickable -->
                         <LinearLayout
                             android:id="@+id/customerRow"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
-                            android:background="?attr/selectableItemBackground"
-                            android:padding="4dp">
+                            android:background="@drawable/bg_clickable_row"
+                            android:padding="12dp"
+                            android:layout_marginHorizontal="-12dp"
+                            android:layout_marginTop="4dp"
+                            android:clickable="true"
+                            android:focusable="true">
                             <com.google.android.material.textview.MaterialTextView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="@string/customer"
                                 android:textColor="@color/text_muted"
-                                android:textSize="14sp" />
+                                android:textSize="13sp" />
                             
+                            <!-- Customer inline avatar with initials -->
                             <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/customerAvatar"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:background="@drawable/bg_tag_chip"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:background="@drawable/bg_customer_avatar_inline"
                                 android:gravity="center"
                                 android:text="ED"
                                 android:textColor="@color/white"
@@ -592,13 +618,15 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
                                 android:textColor="@color/text_light"
-                                android:textSize="14sp" />
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
                             
+                            <!-- Chevron icon -->
                             <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
                                 android:layout_marginStart="8dp"
-                                android:src="@drawable/ic_arrow_right"
+                                android:src="@drawable/ic_chevron_right"
                                 app:tint="@color/text_muted"
                                 android:contentDescription="@string/view_customer" />
                         </LinearLayout>
@@ -620,45 +648,68 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Card Header -->
+                    <!-- Card Header - matches HTML .detail-card-header -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:padding="16dp">
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="16dp">
 
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_history"
-                            app:tint="@color/text_light"
-                            android:contentDescription="@string/order_history" />
+                        <!-- Icon with background - matches HTML .detail-card-title i -->
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_card_title_icon">
+                            
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_history"
+                                app:tint="@color/text_light"
+                                android:contentDescription="@string/order_history" />
+                        </FrameLayout>
 
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="10dp"
                             android:text="@string/order_history"
                             android:textColor="@color/text_light"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
-                        <com.google.android.material.button.MaterialButton
+                        <!-- View All button with chevron - matches HTML .detail-card-action -->
+                        <LinearLayout
                             android:id="@+id/viewAllHistoryButton"
-                            style="@style/Widget.MaterialComponents.Button.TextButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/view_all"
-                            android:textColor="@color/text_muted"
-                            android:textSize="12sp"
-                            android:minHeight="0dp"
-                            android:minWidth="0dp"
-                            android:insetTop="0dp"
-                            android:insetBottom="0dp"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="4dp" />
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="@drawable/bg_view_all_button"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="6dp"
+                            android:clickable="true"
+                            android:focusable="true">
+                            
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/view_all"
+                                android:textColor="@color/text_light"
+                                android:textSize="12sp" />
+                            
+                            <ImageView
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:layout_marginStart="6dp"
+                                android:src="@drawable/ic_chevron_right"
+                                app:tint="@color/text_light"
+                                android:contentDescription="@string/view_all" />
+                        </LinearLayout>
                     </LinearLayout>
 
                     <View

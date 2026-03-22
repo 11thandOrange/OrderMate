@@ -207,5 +207,7 @@
     <string name="discount">Discount</string>
     <string name="rush">Rush</string>
     <string name="pickup">Pickup</string>
+    <string name="clover_customers_not_available">Clover Customers app not available</string>
+    <string name="edit_item">Edit item</string>
 
 </resources>
