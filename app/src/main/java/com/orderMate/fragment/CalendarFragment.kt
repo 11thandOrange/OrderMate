@@ -11,11 +11,13 @@ import android.widget.EditText
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,6 +37,7 @@ import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.migrations.SchemaMigrator
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
+import com.orderMate.viewmodel.SharedFilterViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -59,6 +62,9 @@ class CalendarFragment : Fragment() {
     private var currentDate: Calendar = Calendar.getInstance()
     private var currentViewMode: String = "month"
     
+    // Shared ViewModel for filter/search state persistence across tabs
+    private val sharedFilterViewModel: SharedFilterViewModel by activityViewModels()
+    
     // Order data (same as List tab)
     private var allOrders: ArrayList<Order?> = ArrayList()
     private var filteredOrders: ArrayList<Order?> = ArrayList()
@@ -67,7 +73,7 @@ class CalendarFragment : Fragment() {
     private var allEvents: List<ScheduledEvent> = emptyList()
     private var filteredEvents: List<ScheduledEvent> = emptyList()
     
-    // Filter state (same as List tab)
+    // Filter state (synced with shared ViewModel)
     private var currentFilterState = FilterDialogFragment.FilterState()
     private var currentSearchQuery: String = ""
     private var selectedDateFilter: Date? = null
@@ -76,6 +82,12 @@ class CalendarFragment : Fragment() {
     private var widgetManager: WidgetManager? = null
     
     private val myApp by lazy { MyApp.getInstance() }
+    
+    // Timeline views from XML
+    private var timelineContainer: LinearLayout? = null
+    private var timelineHeader: LinearLayout? = null
+    private var timelineScrollView: ScrollView? = null
+    private var timelineBody: LinearLayout? = null
     
     // Handler for search debouncing
     private val handler = Handler(Looper.getMainLooper())
@@ -119,6 +131,7 @@ class CalendarFragment : Fragment() {
         setupViewToggle()
         setupActionButtons()
         initWidgetManager()
+        observeSharedState()
         loadOrders()
     }
     
@@ -135,6 +148,12 @@ class CalendarFragment : Fragment() {
         btnToday = view.findViewById(R.id.btnToday)
         btnNextFulfillment = view.findViewById(R.id.btnNextFulfillment)
         
+        // Timeline views (Day/Week view)
+        timelineContainer = view.findViewById(R.id.timelineContainer)
+        timelineHeader = view.findViewById(R.id.timelineHeader)
+        timelineScrollView = view.findViewById(R.id.timelineScrollView)
+        timelineBody = view.findViewById(R.id.timelineBody)
+        
         // Header views (same as List tab)
         searchInput = view.findViewById(R.id.searchInput)
         calendarIcon = view.findViewById(R.id.calendarIcon)
@@ -145,6 +164,65 @@ class CalendarFragment : Fragment() {
         
         // Setup grid layout manager
         calendarGrid?.layoutManager = GridLayoutManager(requireContext(), 7)
+    }
+    
+    /**
+     * Observe shared ViewModel for filter/search state changes
+     * Restores state when navigating back to this tab
+     */
+    private fun observeSharedState() {
+        // Observe filter state
+        sharedFilterViewModel.filterState.observe(viewLifecycleOwner) { state ->
+            if (state != currentFilterState) {
+                currentFilterState = state
+                applyDialogFilters(state)
+            }
+        }
+        
+        // Observe search query
+        sharedFilterViewModel.searchQuery.observe(viewLifecycleOwner) { query ->
+            if (query != currentSearchQuery) {
+                currentSearchQuery = query
+                // Update search input without triggering listener
+                searchInput?.apply {
+                    if (text.toString() != query) {
+                        setText(query)
+                        setSelection(query.length)
+                    }
+                }
+            }
+        }
+        
+        // Observe searched dates (affects view mode buttons)
+        sharedFilterViewModel.searchedDates.observe(viewLifecycleOwner) { dates ->
+            searchedDates = dates
+            updateViewModeButtonsState()
+            renderCalendar()
+        }
+    }
+    
+    /**
+     * Update view mode buttons based on whether dates are selected
+     * Disables Month/Week when dates are searched/filtered
+     */
+    private fun updateViewModeButtonsState() {
+        val hasSelectedDates = searchedDates.isNotEmpty()
+        val disabledAlpha = 0.4f
+        val enabledAlpha = 1.0f
+        
+        btnMonth?.apply {
+            isEnabled = !hasSelectedDates
+            alpha = if (hasSelectedDates) disabledAlpha else enabledAlpha
+        }
+        btnWeek?.apply {
+            isEnabled = !hasSelectedDates
+            alpha = if (hasSelectedDates) disabledAlpha else enabledAlpha
+        }
+        // Day view is always enabled
+        btnDay?.apply {
+            isEnabled = true
+            alpha = enabledAlpha
+        }
     }
     
     private fun setupHeaderActions() {
@@ -160,6 +238,8 @@ class CalendarFragment : Fragment() {
             }
             searchRunnable = Runnable {
                 currentSearchQuery = text.toString().trim()
+                // Sync to shared ViewModel for cross-tab persistence
+                sharedFilterViewModel.setSearchQuery(currentSearchQuery)
                 searchOrders(currentSearchQuery)
             }
             handler.postDelayed(searchRunnable, Constants.debouncingTime)
@@ -449,11 +529,14 @@ class CalendarFragment : Fragment() {
         dialog.setFilterListener(object : FilterDialogFragment.FilterListener {
             override fun onFiltersApplied(filters: FilterDialogFragment.FilterState) {
                 currentFilterState = filters
+                // Sync to shared ViewModel for cross-tab persistence
+                sharedFilterViewModel.setFilterState(filters)
                 applyDialogFilters(filters)
             }
 
             override fun onFilterCleared() {
                 currentFilterState = FilterDialogFragment.FilterState()
+                sharedFilterViewModel.resetAll()
                 resetFilters()
             }
         })
@@ -486,11 +569,17 @@ class CalendarFragment : Fragment() {
             
             // Combine and deduplicate dates
             val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
-            searchedDates = (filterDates + queryDates)
+            val combinedDates = (filterDates + queryDates)
                 .distinctBy { dateFormat.format(it) }
                 .sortedBy { it.time }
+            
+            searchedDates = combinedDates
+            
+            // Sync to shared ViewModel
+            sharedFilterViewModel.setSearchedDates(combinedDates)
 
             runOnMainThread {
+                updateViewModeButtonsState()
                 renderCalendar()
                 updateFilterPills(filters)
             }
@@ -582,7 +671,11 @@ class CalendarFragment : Fragment() {
         currentFilterState = FilterDialogFragment.FilterState()
         currentSearchQuery = ""
         selectedDateFilter = null
-        searchedDates = emptyList()  // Clear searched dates
+        searchedDates = emptyList()
+        
+        // Sync reset to shared ViewModel for cross-tab persistence
+        sharedFilterViewModel.resetAll()
+        
         searchInput?.text?.clear()
         searchInput?.hint = getString(R.string.search_orders)
         
@@ -593,6 +686,7 @@ class CalendarFragment : Fragment() {
         allOrders.forEach { filteredOrders.add(it) }
         filteredEvents = allEvents
         
+        updateViewModeButtonsState()
         renderCalendar()
         Toast.makeText(requireContext(), "Filters cleared", Toast.LENGTH_SHORT).show()
     }
@@ -960,8 +1054,8 @@ class CalendarFragment : Fragment() {
         val dateFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
         monthYearTitle?.text = dateFormat.format(currentDate.time)
         
-        // Hide timeline, show grid
-        view?.findViewById<LinearLayout>(R.id.timelineContainer)?.visibility = View.GONE
+        // Hide timeline, show grid and weekday headers
+        timelineContainer?.visibility = View.GONE
         calendarGrid?.visibility = View.VISIBLE
         weekdayHeaders?.visibility = View.VISIBLE
         
@@ -999,11 +1093,11 @@ class CalendarFragment : Fragment() {
         }
         monthYearTitle?.text = "${dateFormat.format(weekStart.time)} - ${dateFormat.format(weekEnd.time)}, ${year}"
         
-        // Hide the grid and show timeline
+        // Hide grid and weekday headers, show timeline
         calendarGrid?.visibility = View.GONE
         weekdayHeaders?.visibility = View.GONE
         
-        // Show timeline view
+        // Show timeline view with 7 days
         renderTimelineView(weekStart, 7)
     }
     
@@ -1011,17 +1105,17 @@ class CalendarFragment : Fragment() {
         val dateFormat = SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault())
         monthYearTitle?.text = dateFormat.format(currentDate.time)
         
-        // Hide the grid and show timeline
+        // Hide grid and weekday headers, show timeline
         calendarGrid?.visibility = View.GONE
         weekdayHeaders?.visibility = View.GONE
         
-        // Show timeline view
+        // Show timeline view with 1 day
         renderTimelineView(currentDate, 1)
     }
     
     /**
      * Renders the timeline view with hours on the left and day columns
-     * Used for both Day (1 column) and Week (7 columns) views
+     * Uses XML-defined views for proper layout (fixed header height)
      */
     private fun renderTimelineView(startDate: Calendar, numDays: Int) {
         val context = requireContext()
@@ -1031,40 +1125,17 @@ class CalendarFragment : Fragment() {
         val density = resources.displayMetrics.density
         val hourHeightPx = (hourHeight * density).toInt()
         
-        // Get or create timeline container
-        val timelineContainer = view?.findViewById<LinearLayout>(R.id.timelineContainer) 
-            ?: run {
-                // Create timeline container dynamically if not in XML
-                val container = LinearLayout(context).apply {
-                    id = R.id.timelineContainer
-                    orientation = LinearLayout.VERTICAL
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT
-                    )
-                }
-                
-                // Add to parent (after weekday header)
-                val parent = calendarGrid?.parent as? ViewGroup
-                parent?.addView(container)
-                container
-            }
+        // Show timeline container (XML-defined)
+        timelineContainer?.visibility = View.VISIBLE
         
-        timelineContainer.visibility = View.VISIBLE
-        timelineContainer.removeAllViews()
-        
-        // Create day header row
-        val headerRow = LinearLayout(context).apply {
-            orientation = LinearLayout.HORIZONTAL
-            setBackgroundResource(R.drawable.bg_calendar_weekday_header)
-            setPadding(0, (12 * density).toInt(), 0, (12 * density).toInt())
-        }
+        // Clear and populate header (XML-defined, fixed 40dp height)
+        timelineHeader?.removeAllViews()
         
         // Gutter space for hour labels
         val gutter = View(context).apply {
-            layoutParams = LinearLayout.LayoutParams((50 * density).toInt(), 1)
+            layoutParams = LinearLayout.LayoutParams((50 * density).toInt(), LinearLayout.LayoutParams.MATCH_PARENT)
         }
-        headerRow.addView(gutter)
+        timelineHeader?.addView(gutter)
         
         // Day headers - single line format "SAT - 21" (matching HTML)
         for (i in 0 until numDays) {
@@ -1083,7 +1154,7 @@ class CalendarFragment : Fragment() {
                 text = "$dayName - $dayNum"
                 textSize = 11f
                 gravity = android.view.Gravity.CENTER
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
                 letterSpacing = 0.05f
                 setTypeface(null, android.graphics.Typeface.BOLD)
                 
@@ -1095,23 +1166,11 @@ class CalendarFragment : Fragment() {
                 }
             }
             
-            headerRow.addView(dayHeader)
+            timelineHeader?.addView(dayHeader)
         }
         
-        timelineContainer.addView(headerRow)
-        
-        // Scrollable timeline body - use weight to fill remaining space below header
-        val scrollView = android.widget.ScrollView(context).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                0,  // Height 0 with weight 1 to fill remaining space
-                1f  // Weight
-            )
-        }
-        
-        val bodyRow = LinearLayout(context).apply {
-            orientation = LinearLayout.HORIZONTAL
-        }
+        // Clear and populate body (XML-defined ScrollView)
+        timelineBody?.removeAllViews()
         
         // Hour labels column
         val hoursColumn = LinearLayout(context).apply {
@@ -1141,7 +1200,7 @@ class CalendarFragment : Fragment() {
             hoursColumn.addView(hourLabel)
         }
         
-        bodyRow.addView(hoursColumn)
+        timelineBody?.addView(hoursColumn)
         
         // Day columns container
         val columnsContainer = LinearLayout(context).apply {
@@ -1216,14 +1275,12 @@ class CalendarFragment : Fragment() {
             columnsContainer.addView(column)
         }
         
-        bodyRow.addView(columnsContainer)
-        scrollView.addView(bodyRow)
-        timelineContainer.addView(scrollView)
+        timelineBody?.addView(columnsContainer)
         
         // Scroll to current time if viewing today
         val nowHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        scrollView.post {
-            scrollView.scrollTo(0, ((nowHour - 1).coerceAtLeast(0) * hourHeightPx))
+        timelineScrollView?.post {
+            timelineScrollView?.scrollTo(0, ((nowHour - 1).coerceAtLeast(0) * hourHeightPx))
         }
     }
     

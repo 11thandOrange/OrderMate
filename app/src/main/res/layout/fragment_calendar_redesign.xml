@@ -347,14 +347,14 @@
             android:clipChildren="false"
             android:clipToPadding="false">
 
-            <!-- Weekday Headers -->
+            <!-- Weekday Headers (Month view) -->
             <LinearLayout
                 android:id="@+id/weekdayHeaders"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:orientation="horizontal"
                 android:background="@drawable/bg_calendar_weekday_header"
-                android:paddingVertical="12dp">
+                android:gravity="center_vertical">
 
                 <TextView
                     android:layout_width="0dp"
@@ -435,7 +435,7 @@
 
             </LinearLayout>
 
-            <!-- Calendar Days Grid -->
+            <!-- Calendar Days Grid (Month view) -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/calendarGrid"
                 android:layout_width="match_parent"
@@ -445,6 +445,41 @@
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                 app:spanCount="7"
                 tools:listitem="@layout/item_calendar_day"/>
+
+            <!-- Timeline Container (Day/Week view) - same level as grid -->
+            <LinearLayout
+                android:id="@+id/timelineContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Timeline Header - matches weekdayHeaders height -->
+                <LinearLayout
+                    android:id="@+id/timelineHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:orientation="horizontal"
+                    android:background="@drawable/bg_calendar_weekday_header"
+                    android:gravity="center_vertical"/>
+
+                <!-- Timeline Body (scrollable) -->
+                <ScrollView
+                    android:id="@+id/timelineScrollView"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:fillViewport="true">
+
+                    <LinearLayout
+                        android:id="@+id/timelineBody"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"/>
+
+                </ScrollView>
+
+            </LinearLayout>
 
         </LinearLayout>
 
