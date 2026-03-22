@@ -1,5 +1,6 @@
 package com.orderMate.fragment
 
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.*
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -60,9 +62,10 @@ class SettingsFragment : Fragment() {
     private var templateAdapter: NotificationTemplateAdapter? = null
     
     // Advanced Panel
-    private var inputNotificationTime: EditText? = null
-    private var inputReceiptTime: EditText? = null
-    private var spinnerReceiptUnit: Spinner? = null
+    private var inputNotificationDays: EditText? = null
+    private var inputNotificationMinutes: EditText? = null
+    private var inputReceiptDays: EditText? = null
+    private var inputReceiptMinutes: EditText? = null
     
     private var currentTab = "general"
 
@@ -116,9 +119,10 @@ class SettingsFragment : Fragment() {
         btnAddTemplate = view.findViewById(R.id.btnAddTemplate)
         
         // Advanced Panel
-        inputNotificationTime = view.findViewById(R.id.inputNotificationTime)
-        inputReceiptTime = view.findViewById(R.id.inputReceiptTime)
-        spinnerReceiptUnit = view.findViewById(R.id.spinnerReceiptUnit)
+        inputNotificationDays = view.findViewById(R.id.inputNotificationDays)
+        inputNotificationMinutes = view.findViewById(R.id.inputNotificationMinutes)
+        inputReceiptDays = view.findViewById(R.id.inputReceiptDays)
+        inputReceiptMinutes = view.findViewById(R.id.inputReceiptMinutes)
     }
 
     private fun setupSubTabs() {
@@ -285,14 +289,8 @@ class SettingsFragment : Fragment() {
     // ==================== Advanced Panel ====================
     
     private fun setupAdvancedPanel() {
-        // Setup receipt unit spinner
-        val units = arrayOf("minutes", "hours", "days")
-        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, units)
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerReceiptUnit?.adapter = spinnerAdapter
-        
-        // Notification time listener (days only, no spinner)
-        inputNotificationTime?.addTextChangedListener(object : TextWatcher {
+        // Notification time listeners (days and minutes)
+        inputNotificationDays?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 s?.toString()?.toIntOrNull()?.let { 
                     settingsManager.setNotificationDays(it) 
@@ -302,23 +300,36 @@ class SettingsFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
         
-        // Receipt time listeners
-        inputReceiptTime?.addTextChangedListener(object : TextWatcher {
+        inputNotificationMinutes?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 s?.toString()?.toIntOrNull()?.let { 
-                    settingsManager.setReceiptTime(it) 
+                    settingsManager.setNotificationMinutes(it) 
                 }
             }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
         
-        spinnerReceiptUnit?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                settingsManager.setReceiptUnit(units[position])
+        // Receipt time listeners (days and minutes)
+        inputReceiptDays?.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                s?.toString()?.toIntOrNull()?.let { 
+                    settingsManager.setReceiptDays(it) 
+                }
             }
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+        
+        inputReceiptMinutes?.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                s?.toString()?.toIntOrNull()?.let { 
+                    settingsManager.setReceiptMinutes(it) 
+                }
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
     }
 
     // ==================== Load Settings ====================
@@ -327,14 +338,11 @@ class SettingsFragment : Fragment() {
         // General
         switchUseInCloverRegister?.isChecked = settingsManager.getUseOrderMateRegister()
         
-        // Advanced
-        inputNotificationTime?.setText(settingsManager.getNotificationDays().toString())
-        inputReceiptTime?.setText(settingsManager.getReceiptTime().toString())
-        
-        // Set spinner positions
-        val units = arrayOf("days", "hours", "minutes")
-        val receiptUnit = settingsManager.getReceiptUnit()
-        spinnerReceiptUnit?.setSelection(units.indexOf(receiptUnit).coerceAtLeast(0))
+        // Advanced - load days and minutes
+        inputNotificationDays?.setText(settingsManager.getNotificationDays().toString())
+        inputNotificationMinutes?.setText(settingsManager.getNotificationMinutes().toString())
+        inputReceiptDays?.setText(settingsManager.getReceiptDays().toString())
+        inputReceiptMinutes?.setText(settingsManager.getReceiptMinutes().toString())
     }
 
     override fun onDestroyView() {
@@ -352,9 +360,10 @@ class SettingsFragment : Fragment() {
         btnAddWidget = null
         templateRecyclerView = null
         btnAddTemplate = null
-        inputNotificationTime = null
-        inputReceiptTime = null
-        spinnerReceiptUnit = null
+        inputNotificationDays = null
+        inputNotificationMinutes = null
+        inputReceiptDays = null
+        inputReceiptMinutes = null
     }
 
     companion object {
@@ -417,6 +426,8 @@ class WidgetEditorAdapter(
     override fun getItemCount() = widgets.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val widgetCard: androidx.cardview.widget.CardView = itemView.findViewById(R.id.widgetCard)
+        private val widgetContainer: View = itemView.findViewById(R.id.widgetContainer)
         private val dragHandle: View = itemView.findViewById(R.id.dragHandle)
         private val widgetIconContainer: View = itemView.findViewById(R.id.widgetIconContainer)
         private val widgetIcon: ImageView = itemView.findViewById(R.id.widgetIcon)
@@ -448,6 +459,14 @@ class WidgetEditorAdapter(
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
             widgetIconContainer.setBackgroundResource(bgRes)
+            
+            // Set card border color to match widget type using GradientDrawable
+            val borderDrawable = GradientDrawable().apply {
+                setColor(0x4D000000.toInt()) // Dark background
+                cornerRadius = 10f * itemView.resources.displayMetrics.density
+                setStroke((1.5f * itemView.resources.displayMetrics.density).toInt(), tintColor)
+            }
+            widgetContainer.background = borderDrawable
 
             // Show options for select types
             val hasOptions = widget.type == WidgetType.SINGLE_SELECT || widget.type == WidgetType.MULTI_SELECT
@@ -475,12 +494,15 @@ class WidgetEditorAdapter(
                 val currentPos = adapterPosition
                 if (currentPos == RecyclerView.NO_POSITION) return@setOnClickListener
                 
-                if (expandedPositions.contains(widget.id)) {
-                    expandedPositions.remove(widget.id)
-                } else {
+                val expanding = !expandedPositions.contains(widget.id)
+                if (expanding) {
                     expandedPositions.add(widget.id)
+                } else {
+                    expandedPositions.remove(widget.id)
                 }
-                notifyItemChanged(currentPos)
+                
+                // Smooth animation for expand/collapse
+                animateExpand(expanding)
             }
 
             widgetToggle.setOnCheckedChangeListener { _, isChecked ->
@@ -556,6 +578,29 @@ class WidgetEditorAdapter(
                     setOnClickListener { onRemove() }
                 })
             }
+        }
+        
+        private fun animateExpand(expanding: Boolean) {
+            if (expanding) {
+                widgetBody.visibility = View.VISIBLE
+                widgetBody.alpha = 0f
+                widgetBody.animate()
+                    .alpha(1f)
+                    .setDuration(200)
+                    .start()
+            } else {
+                widgetBody.animate()
+                    .alpha(0f)
+                    .setDuration(150)
+                    .withEndAction { widgetBody.visibility = View.GONE }
+                    .start()
+            }
+            
+            // Animate chevron rotation
+            expandChevron.animate()
+                .rotation(if (expanding) 180f else 0f)
+                .setDuration(200)
+                .start()
         }
     }
 }

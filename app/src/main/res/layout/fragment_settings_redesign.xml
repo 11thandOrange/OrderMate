@@ -304,56 +304,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Unique SMS Number Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_settings_card_glass"
-                    android:orientation="vertical"
-                    android:padding="20dp"
-                    android:layout_marginBottom="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Unique SMS Number"
-                        android:textColor="@color/text_light"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:layout_marginBottom="16dp"
-                        android:text="Input phone number to send SMS messages. Notifications use OrderMate's number by default."
-                        android:textColor="@color/text_muted"
-                        android:textSize="12sp" />
-
-                    <!-- Phone Input Row -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_input_row_container"
-                        android:padding="14dp"
-                        android:orientation="horizontal">
-
-                        <EditText
-                            android:id="@+id/inputSmsNumber"
-                            android:layout_width="180dp"
-                            android:layout_height="40dp"
-                            android:background="@drawable/bg_settings_input"
-                            android:hint="Enter phone number"
-                            android:inputType="phone"
-                            android:paddingHorizontal="14dp"
-                            android:textColor="@color/text_light"
-                            android:textColorHint="@color/text_muted"
-                            android:textSize="13sp" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
                 <!-- Notification Templates Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -456,7 +406,7 @@
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
 
-                    <!-- Input Row with container -->
+                    <!-- Input Row with days AND minutes -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -466,13 +416,13 @@
                         android:orientation="horizontal">
 
                         <EditText
-                            android:id="@+id/inputNotificationTime"
-                            android:layout_width="60dp"
+                            android:id="@+id/inputNotificationDays"
+                            android:layout_width="50dp"
                             android:layout_height="36dp"
                             android:background="@drawable/bg_settings_input"
                             android:gravity="center"
                             android:inputType="number"
-                            android:maxLength="3"
+                            android:maxLength="2"
                             android:text="3"
                             android:textColor="@color/text_light"
                             android:textSize="13sp" />
@@ -480,8 +430,29 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:text="days before due date"
+                            android:layout_marginStart="8dp"
+                            android:text="days"
+                            android:textColor="@color/text_light"
+                            android:textSize="13sp" />
+
+                        <EditText
+                            android:id="@+id/inputNotificationMinutes"
+                            android:layout_width="50dp"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="12dp"
+                            android:background="@drawable/bg_settings_input"
+                            android:gravity="center"
+                            android:inputType="number"
+                            android:maxLength="3"
+                            android:text="0"
+                            android:textColor="@color/text_light"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="minutes before"
                             android:textColor="@color/text_light"
                             android:textSize="13sp" />
 
@@ -511,11 +482,11 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:layout_marginBottom="16dp"
-                        android:text="Configure kitchen receipt printing"
+                        android:text="Print kitchen receipt before due date/time"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
 
-                    <!-- Input Row with container -->
+                    <!-- Input Row with days AND minutes -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -524,18 +495,31 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
+                        <EditText
+                            android:id="@+id/inputReceiptDays"
+                            android:layout_width="50dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_settings_input"
+                            android:gravity="center"
+                            android:inputType="number"
+                            android:maxLength="2"
+                            android:text="0"
+                            android:textColor="@color/text_light"
+                            android:textSize="13sp" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Print kitchen receipt"
+                            android:layout_marginStart="8dp"
+                            android:text="days"
                             android:textColor="@color/text_light"
                             android:textSize="13sp" />
 
                         <EditText
-                            android:id="@+id/inputReceiptTime"
-                            android:layout_width="60dp"
+                            android:id="@+id/inputReceiptMinutes"
+                            android:layout_width="50dp"
                             android:layout_height="36dp"
-                            android:layout_marginStart="10dp"
+                            android:layout_marginStart="12dp"
                             android:background="@drawable/bg_settings_input"
                             android:gravity="center"
                             android:inputType="number"
@@ -544,19 +528,11 @@
                             android:textColor="@color/text_light"
                             android:textSize="13sp" />
 
-                        <Spinner
-                            android:id="@+id/spinnerReceiptUnit"
-                            android:layout_width="100dp"
-                            android:layout_height="36dp"
-                            android:layout_marginStart="10dp"
-                            android:background="@drawable/bg_settings_input"
-                            android:spinnerMode="dropdown" />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:text="before due date/time"
+                            android:layout_marginStart="8dp"
+                            android:text="minutes before"
                             android:textColor="@color/text_light"
                             android:textSize="13sp" />
 
