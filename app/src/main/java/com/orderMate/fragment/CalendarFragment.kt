@@ -369,9 +369,8 @@ class CalendarFragment : Fragment() {
                 }
                 
                 // Restore searched dates from shared state
-                sharedFilterViewModel.searchedDates.value?.let { dates ->
-                    searchedDates = dates
-                }
+                val restoredSearchedDates = sharedFilterViewModel.searchedDates.value ?: emptyList()
+                searchedDates = restoredSearchedDates
                 
                 // Restore view mode from shared state
                 sharedFilterViewModel.calendarViewMode.value?.let { mode ->
@@ -388,6 +387,14 @@ class CalendarFragment : Fragment() {
                     updateFilterPills(sharedState)
                     // Apply filters synchronously to ensure correct order
                     applyFiltersSync(sharedState)
+                } else if (restoredSearchedDates.isNotEmpty()) {
+                    // We have searched dates but no active filters - need to filter by those dates
+                    // This can happen when dates were added but filter dialog wasn't used
+                    currentFilterState = currentFilterState.copy(
+                        dateSelections = mapOf(FilterCategoryBuilder.CLOVER_ORDER_DATE to restoredSearchedDates)
+                    )
+                    updateFilterPills(currentFilterState)
+                    applyFiltersSync(currentFilterState)
                 } else {
                     renderCalendar()
                 }
@@ -1695,6 +1702,9 @@ class CalendarFragment : Fragment() {
     }
     
     fun viewFullOrderDetails(orderId: String) {
+        // Save current state before navigating
+        saveCurrentStateToViewModel()
+        
         // Navigate to order details using nav controller
         try {
             val order = allOrders.find { it?.id == orderId }
@@ -1710,6 +1720,16 @@ class CalendarFragment : Fragment() {
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Unable to open order details", Toast.LENGTH_SHORT).show()
         }
+    }
+    
+    /**
+     * Save all current state to ViewModel before navigation
+     */
+    private fun saveCurrentStateToViewModel() {
+        sharedFilterViewModel.setSelectedDate(currentDate.time)
+        sharedFilterViewModel.setCalendarViewMode(currentViewMode)
+        sharedFilterViewModel.setFilterState(currentFilterState)
+        sharedFilterViewModel.setSearchedDates(searchedDates)
     }
     
     private fun showNoUpcomingEventsMessage() {
