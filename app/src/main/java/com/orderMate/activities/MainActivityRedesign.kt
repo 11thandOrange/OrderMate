@@ -81,11 +81,15 @@ class MainActivityRedesign : AppCompatActivity() {
         setContentView(R.layout.activity_main_redesign)
         
         profileSettingsManager = ProfileSettingsManager(this)
-        rootLayout = findViewById(R.id.rootLayout) ?: window.decorView.findViewById(android.R.id.content)
+        rootLayout = findViewById(R.id.rootLayout)
         
         setupNavigation()
         setupSideNav()
-        applyThemeSettings()
+        
+        // Apply theme after view is ready
+        rootLayout.post {
+            applyThemeSettings()
+        }
     }
     
     private fun setupNavigation() {
@@ -143,14 +147,8 @@ class MainActivityRedesign : AppCompatActivity() {
             intArrayOf(baseColor, lighterColor)
         )
         
-        // Apply to root layout
-        try {
-            val root = findViewById<ConstraintLayout>(R.id.rootLayout)
-            root?.background = gradientDrawable
-        } catch (e: Exception) {
-            // Fallback: apply to window
-            window.decorView.background = gradientDrawable
-        }
+        // Apply to root layout (already initialized in onCreate)
+        rootLayout.background = gradientDrawable
     }
     
     /**
