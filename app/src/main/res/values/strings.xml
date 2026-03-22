@@ -233,5 +233,9 @@
     <string name="customer_saved">Customer saved successfully</string>
     <string name="customer_save_failed">Failed to save customer</string>
     <string name="select_customer">Select</string>
+    
+    <!-- Order history scroll indicator -->
+    <string name="scroll_for_more">Scroll for more</string>
+    <string name="scroll_down">Scroll down</string>
 
 </resources>
