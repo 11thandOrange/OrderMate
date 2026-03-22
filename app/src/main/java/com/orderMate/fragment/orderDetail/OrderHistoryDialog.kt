@@ -113,7 +113,7 @@ class OrderHistoryDialog : DialogFragment() {
                     } ?: ""
                     historyItems.add(
                         HistoryItem(
-                            title = "${getString(R.string.payment_added)} $amount",
+                            title = "${getString(R.string.payment_received)} $amount",
                             timestamp = timestamp,
                             iconRes = R.drawable.ic_credit_card
                         )
