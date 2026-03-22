@@ -306,4 +306,126 @@ class FirebaseConfigManager private constructor() {
             .addOnSuccessListener { callback(it.exists()) }
             .addOnFailureListener { callback(false) }
     }
+    
+    // ==================== Notification Templates ====================
+    
+    fun getTemplates(merchantId: String, callback: (List<NotificationTemplate>) -> Unit) {
+        db.getReference(FirebasePaths.templates(merchantId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val templates = mutableListOf<NotificationTemplate>()
+                snapshot.children.forEach { child ->
+                    try {
+                        val id = child.key ?: return@forEach
+                        val name = child.child("name").getValue(String::class.java) ?: "Untitled"
+                        val content = child.child("content").getValue(String::class.java) ?: ""
+                        templates.add(NotificationTemplate(id, name, content))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                callback(templates)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(emptyList())
+            }
+    }
+    
+    fun saveTemplate(merchantId: String, template: NotificationTemplate, callback: (Boolean) -> Unit) {
+        val data = mapOf(
+            "name" to template.name,
+            "content" to template.content
+        )
+        db.getReference(FirebasePaths.template(merchantId, template.id))
+            .setValue(data)
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
+    
+    fun deleteTemplate(merchantId: String, templateId: String, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.template(merchantId, templateId))
+            .removeValue()
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener { callback(false) }
+    }
+    
+    // ==================== Advanced Settings ====================
+    
+    fun getAdvancedSettings(merchantId: String, callback: (AdvancedSettings) -> Unit) {
+        db.getReference(FirebasePaths.settings(merchantId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val settings = AdvancedSettings(
+                    useOrderMateInRegister = snapshot.child("useOrderMateInRegister").getValue(Boolean::class.java) ?: true,
+                    notificationDays = snapshot.child("notificationDays").getValue(Int::class.java) ?: 3,
+                    notificationMinutes = snapshot.child("notificationMinutes").getValue(Int::class.java) ?: 0,
+                    receiptDays = snapshot.child("receiptDays").getValue(Int::class.java) ?: 0,
+                    receiptMinutes = snapshot.child("receiptMinutes").getValue(Int::class.java) ?: 60
+                )
+                callback(settings)
+            }
+            .addOnFailureListener {
+                callback(AdvancedSettings())
+            }
+    }
+    
+    fun saveAdvancedSettings(merchantId: String, settings: AdvancedSettings, callback: (Boolean) -> Unit) {
+        val updates = mapOf<String, Any>(
+            "useOrderMateInRegister" to settings.useOrderMateInRegister,
+            "notificationDays" to settings.notificationDays,
+            "notificationMinutes" to settings.notificationMinutes,
+            "receiptDays" to settings.receiptDays,
+            "receiptMinutes" to settings.receiptMinutes
+        )
+        db.getReference(FirebasePaths.settings(merchantId))
+            .updateChildren(updates)
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
 }
+
+/**
+ * Notification template data class
+ */
+data class NotificationTemplate(
+    val id: String,
+    var name: String,
+    var content: String
+) {
+    companion object {
+        fun create(name: String = "New Template", content: String = ""): NotificationTemplate {
+            return NotificationTemplate(
+                id = java.util.UUID.randomUUID().toString(),
+                name = name,
+                content = content
+            )
+        }
+    }
+}
+
+/**
+ * Advanced settings data class
+ */
+data class AdvancedSettings(
+    val useOrderMateInRegister: Boolean = true,
+    val notificationDays: Int = 3,
+    val notificationMinutes: Int = 0,
+    val receiptDays: Int = 0,
+    val receiptMinutes: Int = 60
+)

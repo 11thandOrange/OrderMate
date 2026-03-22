@@ -11,19 +11,27 @@ package com.orderMate.utils
  *   │   └── updatedAt
  *   ├── settings/
  *   │   ├── triggerOnItemAdd
- *   │   └── triggerFromBasket
- *   └── widgets/{widgetId}/
- *       ├── type
- *       ├── label
- *       ├── isEnabled
- *       ├── isRequired
- *       ├── showInFilter
- *       ├── order
- *       └── options/{optionId}/
- *           ├── label
- *           ├── value
- *           ├── isDefault
- *           └── color
+ *   │   ├── triggerFromBasket
+ *   │   ├── useOrderMateInRegister
+ *   │   ├── notificationDays
+ *   │   ├── notificationMinutes
+ *   │   ├── receiptDays
+ *   │   └── receiptMinutes
+ *   ├── widgets/{widgetId}/
+ *   │   ├── type
+ *   │   ├── label
+ *   │   ├── isEnabled
+ *   │   ├── isRequired
+ *   │   ├── showInFilter
+ *   │   ├── order
+ *   │   └── options/{optionId}/
+ *   │       ├── label
+ *   │       ├── value
+ *   │       ├── isDefault
+ *   │       └── color
+ *   └── templates/{templateId}/
+ *       ├── name
+ *       └── content
  */
 object FirebasePaths {
     
@@ -35,6 +43,7 @@ object FirebasePaths {
     const val SETTINGS = "settings"
     const val WIDGETS = "widgets"
     const val OPTIONS = "options"
+    const val TEMPLATES = "templates"
     
     // Legacy (for migration)
     const val LEGACY_ROOT = "customData"
@@ -61,6 +70,10 @@ object FirebasePaths {
     
     fun option(merchantId: String, widgetId: String, optionId: String) = 
         "${options(merchantId, widgetId)}/$optionId"
+    
+    fun templates(merchantId: String) = "${merchant(merchantId)}/$TEMPLATES"
+    
+    fun template(merchantId: String, templateId: String) = "${templates(merchantId)}/$templateId"
     
     // Legacy paths
     fun legacyData(merchantId: String) = "$LEGACY_ROOT/$merchantId/$LEGACY_DATA"
