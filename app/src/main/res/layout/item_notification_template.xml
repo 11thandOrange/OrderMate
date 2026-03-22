@@ -119,6 +119,16 @@
             android:textColor="@color/text_light"
             android:textColorHint="@color/text_muted"
             android:textSize="13sp" />
+        
+        <!-- Template Variables Help -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Variables: {{merchant_name}}, {{order_id}}, {{customer_name}}, {{due_date}}, {{due_time}}, {{order_total}}"
+            android:textColor="#80FFFFFF"
+            android:textSize="10sp"
+            android:lineSpacingExtra="2dp" />
 
         <!-- Footer with char count and delete -->
         <LinearLayout
