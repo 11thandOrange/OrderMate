@@ -16,8 +16,7 @@ import kotlinx.coroutines.withContext
 /**
  * Repository for Clover API operations including:
  * - Bird Messaging API (SMS/Email)
- * - Customer management (search, create, update)
- * - Order-customer assignment
+ * - Customer management (create, update, assign to order)
  */
 class CloverRepository private constructor(private val context: Context) {
 
@@ -56,30 +55,39 @@ class CloverRepository private constructor(private val context: Context) {
     // ==================== Customer Management ====================
 
     /**
-     * Search for customers by name, phone, or email
-     * Uses CustomerConnector.getCustomers() and filters locally
+     * Search for customers - returns customers from recent orders
+     * Note: Full customer search requires Clover Customers app integration
      */
     suspend fun searchCustomers(query: String): List<Customer> = withContext(Dispatchers.IO) {
         try {
-            val customerConnector = myApp.getCustomerConnector()
-                ?: return@withContext emptyList()
-
-            // Get all customers using the connector's getCustomers method
-            val allCustomers: List<Customer> = customerConnector.getCustomers() ?: return@withContext emptyList()
-
+            // Get customers from recent orders as a search source
+            val orderConnector = myApp.getOrderConnector()
+            val orders = orderConnector.getOrders(mutableListOf()) ?: return@withContext emptyList()
+            
             val lowerQuery = query.lowercase()
-            allCustomers.filter { customer: Customer ->
-                val firstName = customer.firstName?.lowercase() ?: ""
-                val lastName = customer.lastName?.lowercase() ?: ""
-                val phone = customer.phoneNumbers?.firstOrNull()?.phoneNumber?.lowercase() ?: ""
-                val email = customer.emailAddresses?.firstOrNull()?.emailAddress?.lowercase() ?: ""
-
-                firstName.contains(lowerQuery) ||
-                lastName.contains(lowerQuery) ||
-                "$firstName $lastName".contains(lowerQuery) ||
-                phone.contains(lowerQuery) ||
-                email.contains(lowerQuery)
-            }.take(20) // Limit results
+            val customersMap = mutableMapOf<String, Customer>()
+            
+            // Collect unique customers from orders
+            orders.forEach { order ->
+                order?.customers?.forEach { customer ->
+                    if (customer?.id != null && !customersMap.containsKey(customer.id)) {
+                        val firstName = customer.firstName?.lowercase() ?: ""
+                        val lastName = customer.lastName?.lowercase() ?: ""
+                        val phone = customer.phoneNumbers?.firstOrNull()?.phoneNumber?.lowercase() ?: ""
+                        val email = customer.emailAddresses?.firstOrNull()?.emailAddress?.lowercase() ?: ""
+                        
+                        if (firstName.contains(lowerQuery) ||
+                            lastName.contains(lowerQuery) ||
+                            "$firstName $lastName".contains(lowerQuery) ||
+                            phone.contains(lowerQuery) ||
+                            email.contains(lowerQuery)) {
+                            customersMap[customer.id] = customer
+                        }
+                    }
+                }
+            }
+            
+            customersMap.values.take(20).toList()
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()
@@ -87,8 +95,8 @@ class CloverRepository private constructor(private val context: Context) {
     }
 
     /**
-     * Create a new customer in Clover
-     * Uses CustomerConnector to create customer and add contact info
+     * Create a new customer object (in-memory)
+     * The customer will be persisted when assigned to an order
      */
     suspend fun createCustomer(
         firstName: String?,
@@ -97,45 +105,26 @@ class CloverRepository private constructor(private val context: Context) {
         email: String?
     ): Customer? = withContext(Dispatchers.IO) {
         try {
-            val customerConnector = myApp.getCustomerConnector()
-                ?: return@withContext null
-
-            // Create customer object with basic info
-            val customer = Customer().apply {
-                setFirstName(firstName)
-                setLastName(lastName)
-            }
-
-            // Create customer in Clover
-            val createdCustomer = customerConnector.createCustomer(customer)
-                ?: return@withContext null
-
+            // Create customer object with contact info
+            val customer = Customer()
+            customer.setFirstName(firstName)
+            customer.setLastName(lastName)
+            
             // Add phone number if provided
             if (!phone.isNullOrBlank()) {
-                try {
-                    val phoneNumber = PhoneNumber().apply {
-                        setPhoneNumber(phone)
-                    }
-                    customerConnector.addPhoneNumber(createdCustomer.id, phoneNumber)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+                val phoneNumber = PhoneNumber()
+                phoneNumber.setPhoneNumber(phone)
+                customer.setPhoneNumbers(listOf(phoneNumber))
             }
 
             // Add email if provided
             if (!email.isNullOrBlank()) {
-                try {
-                    val emailAddress = EmailAddress().apply {
-                        setEmailAddress(email)
-                    }
-                    customerConnector.addEmailAddress(createdCustomer.id, emailAddress)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+                val emailAddress = EmailAddress()
+                emailAddress.setEmailAddress(email)
+                customer.setEmailAddresses(listOf(emailAddress))
             }
 
-            // Return the created customer (may not have updated contact info)
-            createdCustomer
+            customer
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -143,7 +132,7 @@ class CloverRepository private constructor(private val context: Context) {
     }
 
     /**
-     * Update an existing customer in Clover
+     * Update an existing customer object
      */
     suspend fun updateCustomer(
         customerId: String,
@@ -153,46 +142,27 @@ class CloverRepository private constructor(private val context: Context) {
         email: String?
     ): Customer? = withContext(Dispatchers.IO) {
         try {
-            val customerConnector = myApp.getCustomerConnector()
-                ?: return@withContext null
-
             // Create updated customer object
-            val updatedCustomer = Customer().apply {
-                setId(customerId)
-                setFirstName(firstName)
-                setLastName(lastName)
-            }
-            
-            // Update the customer
-            customerConnector.setCustomer(updatedCustomer)
+            val customer = Customer()
+            customer.setId(customerId)
+            customer.setFirstName(firstName)
+            customer.setLastName(lastName)
 
-            // Handle phone number update
+            // Add phone number if provided
             if (!phone.isNullOrBlank()) {
-                try {
-                    val phoneNumber = PhoneNumber().apply {
-                        setPhoneNumber(phone)
-                    }
-                    // Try to add new phone number (Clover may handle duplicates)
-                    customerConnector.addPhoneNumber(customerId, phoneNumber)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+                val phoneNumber = PhoneNumber()
+                phoneNumber.setPhoneNumber(phone)
+                customer.setPhoneNumbers(listOf(phoneNumber))
             }
 
-            // Handle email update
+            // Add email if provided
             if (!email.isNullOrBlank()) {
-                try {
-                    val emailAddress = EmailAddress().apply {
-                        setEmailAddress(email)
-                    }
-                    // Try to add new email (Clover may handle duplicates)
-                    customerConnector.addEmailAddress(customerId, emailAddress)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+                val emailAddress = EmailAddress()
+                emailAddress.setEmailAddress(email)
+                customer.setEmailAddresses(listOf(emailAddress))
             }
 
-            updatedCustomer
+            customer
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -201,18 +171,35 @@ class CloverRepository private constructor(private val context: Context) {
 
     /**
      * Assign a customer to an order
+     * Uses OrderConnector.addCustomer to link customer to order in Clover
      */
     suspend fun assignCustomerToOrder(orderId: String, customerId: String): Boolean = withContext(Dispatchers.IO) {
         try {
             val orderConnector = myApp.getOrderConnector()
 
-            // Create a customer reference with just the ID
-            val customer = Customer().apply {
-                setId(customerId)
-            }
+            // Create a customer reference with the ID
+            val customer = Customer()
+            customer.setId(customerId)
 
-            // Add customer to order using OrderConnector
-            orderConnector.setCustomer(orderId, customer)
+            // Add customer to order - this persists in Clover
+            orderConnector.addCustomer(orderId, customer)
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+    
+    /**
+     * Assign a full customer object to an order
+     * This creates/updates the customer in Clover and links to the order
+     */
+    suspend fun assignCustomerToOrder(orderId: String, customer: Customer): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val orderConnector = myApp.getOrderConnector()
+            
+            // Add customer to order - Clover will create/update the customer
+            orderConnector.addCustomer(orderId, customer)
             true
         } catch (e: Exception) {
             e.printStackTrace()

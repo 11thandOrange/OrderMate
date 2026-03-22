@@ -182,8 +182,8 @@ class CustomerDialog(
             try {
                 val repository = CloverRepository.getInstance(requireContext())
                 
-                // Create or update customer
-                val updatedCustomer = if (customer != null) {
+                // Create or update customer object
+                val updatedCustomer = if (customer?.id != null) {
                     // Update existing customer
                     repository.updateCustomer(
                         customerId = customer!!.id,
@@ -204,7 +204,8 @@ class CustomerDialog(
                 
                 // Assign customer to order if orderId is provided
                 if (updatedCustomer != null && !orderId.isNullOrEmpty()) {
-                    repository.assignCustomerToOrder(orderId, updatedCustomer.id)
+                    // Use the overloaded method that takes a Customer object
+                    repository.assignCustomerToOrder(orderId, updatedCustomer)
                 }
                 
                 Toast.makeText(requireContext(), R.string.customer_saved, Toast.LENGTH_SHORT).show()
