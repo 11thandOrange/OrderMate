@@ -809,21 +809,19 @@ class CalendarFragment : Fragment() {
         timelineContainer.visibility = View.VISIBLE
         timelineContainer.removeAllViews()
         
-        // Day headers row
+        // Day headers row - matching renderTimelineView style
         val dayHeadersRow = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
+            setBackgroundResource(R.drawable.bg_calendar_weekday_header)
+            setPadding(0, (12 * density).toInt(), 0, (12 * density).toInt())
         }
         
-        // Spacer for time column
+        // Gutter space for hour labels (matching renderTimelineView)
         dayHeadersRow.addView(View(context).apply {
             layoutParams = LinearLayout.LayoutParams((50 * density).toInt(), 1)
         })
         
-        val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
+        // Day headers - single line format "SAT - 21" (matching HTML and renderTimelineView)
         dates.forEach { date ->
             val cal = Calendar.getInstance().apply { time = date }
             val dayOfWeek = cal.get(Calendar.DAY_OF_WEEK) - 1
@@ -831,14 +829,21 @@ class CalendarFragment : Fragment() {
                           cal.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
             
             val headerView = TextView(context).apply {
-                text = "${dayNamesShort[dayOfWeek]}\n${dateFormat.format(date)}"
+                val dayName = dayNamesShort[dayOfWeek]
+                val dayNum = cal.get(Calendar.DAY_OF_MONTH)
+                text = "$dayName - $dayNum"
+                textSize = 11f
                 gravity = android.view.Gravity.CENTER
-                textSize = 12f
-                setTextColor(if (isToday) 
-                    ContextCompat.getColor(context, R.color.orange_accent) 
-                    else ContextCompat.getColor(context, R.color.text_light))
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                setPadding(0, (8 * density).toInt(), 0, (8 * density).toInt())
+                letterSpacing = 0.05f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+                
+                if (isToday) {
+                    setBackgroundColor(ContextCompat.getColor(context, R.color.today_highlight_bg))
+                    setTextColor(ContextCompat.getColor(context, R.color.accent_orange))
+                } else {
+                    setTextColor(ContextCompat.getColor(context, R.color.text_muted))
+                }
             }
             dayHeadersRow.addView(headerView)
         }
@@ -1070,16 +1075,16 @@ class CalendarFragment : Fragment() {
             val isToday = dayCalendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                          dayCalendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
             
-            // Single line header: "SAT - 21"
+            // Single line header: "SAT - 21" (matching weekdayHeaders XML style)
             val dayHeader = TextView(context).apply {
                 val dayName = dayNamesShort[dayCalendar.get(Calendar.DAY_OF_WEEK) - 1]
                 val dayNum = dayCalendar.get(Calendar.DAY_OF_MONTH)
                 text = "$dayName - $dayNum"
                 textSize = 11f
                 gravity = android.view.Gravity.CENTER
-                setPadding((12 * density).toInt(), (12 * density).toInt(), (12 * density).toInt(), (12 * density).toInt())
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                 letterSpacing = 0.05f
+                setTypeface(null, android.graphics.Typeface.BOLD)
                 
                 if (isToday) {
                     setBackgroundColor(ContextCompat.getColor(context, R.color.today_highlight_bg))
