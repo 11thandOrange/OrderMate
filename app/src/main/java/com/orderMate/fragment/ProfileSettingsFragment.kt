@@ -48,7 +48,7 @@ class ProfileSettingsFragment : Fragment() {
     
     // Default theme color matching HTML
     private val DEFAULT_THEME_COLOR = "#3C4B80"
-    private val DEFAULT_AVATAR = "😊"
+    private val DEFAULT_AVATAR = ""  // Empty = show placeholder icon
 
     // Emoji categories matching HTML
     private val emojiCategories = mapOf(
@@ -318,6 +318,7 @@ class ProfileSettingsFragment : Fragment() {
     /**
      * Update nav avatar in MainActivity immediately
      * Matches HTML: navProfile.innerHTML = profileSettings.avatar
+     * If emoji is empty, show placeholder icon instead
      */
     private fun updateNavAvatar(emoji: String) {
         activity?.let { act ->
@@ -325,9 +326,16 @@ class ProfileSettingsFragment : Fragment() {
             val navProfileEmoji = act.findViewById<TextView>(R.id.navProfileEmoji)
             
             if (navProfileIcon != null && navProfileEmoji != null) {
-                navProfileEmoji.text = emoji
-                navProfileEmoji.visibility = View.VISIBLE
-                navProfileIcon.visibility = View.GONE
+                if (emoji.isNotEmpty()) {
+                    // Show emoji, hide icon
+                    navProfileEmoji.text = emoji
+                    navProfileEmoji.visibility = View.VISIBLE
+                    navProfileIcon.visibility = View.GONE
+                } else {
+                    // Show placeholder icon, hide emoji
+                    navProfileIcon.visibility = View.VISIBLE
+                    navProfileEmoji.visibility = View.GONE
+                }
             }
         }
     }
@@ -336,17 +344,31 @@ class ProfileSettingsFragment : Fragment() {
         val customUri = settingsManager.getCustomAvatarUri()
         val emoji = settingsManager.getAvatarEmoji()
 
-        // Update header avatar
-        binding.headerAvatarEmoji.text = emoji
+        // Update header avatar - show placeholder if empty
+        if (emoji.isNotEmpty()) {
+            binding.headerAvatarEmoji.text = emoji
+            binding.headerAvatarEmoji.visibility = View.VISIBLE
+            binding.headerAvatarIcon?.visibility = View.GONE
+        } else {
+            binding.headerAvatarEmoji.visibility = View.GONE
+            binding.headerAvatarIcon?.visibility = View.VISIBLE
+        }
         
         // Update avatar preview
         if (customUri != null) {
             binding.profileAvatar.setImageURI(customUri)
             binding.avatarPreviewEmoji.visibility = View.GONE
+            binding.avatarPreviewIcon?.visibility = View.GONE
             binding.profileAvatar.visibility = View.VISIBLE
-        } else {
+        } else if (emoji.isNotEmpty()) {
             binding.avatarPreviewEmoji.text = emoji
             binding.avatarPreviewEmoji.visibility = View.VISIBLE
+            binding.avatarPreviewIcon?.visibility = View.GONE
+            binding.profileAvatar.visibility = View.GONE
+        } else {
+            // Show placeholder icon
+            binding.avatarPreviewEmoji.visibility = View.GONE
+            binding.avatarPreviewIcon?.visibility = View.VISIBLE
             binding.profileAvatar.visibility = View.GONE
         }
     }

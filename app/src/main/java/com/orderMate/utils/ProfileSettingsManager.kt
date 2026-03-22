@@ -225,7 +225,7 @@ class ProfileSettingsManager(private val context: Context) {
 
         // Defaults (matching HTML)
         private const val DEFAULT_THEME_COLOR = "#3C4B80"  // HTML default: rgb(60, 75, 128)
-        private const val DEFAULT_AVATAR = "😊"
+        private const val DEFAULT_AVATAR = ""  // Empty = show placeholder icon
         private const val DEFAULT_COLOR_SCHEME = "purple"
 
         // Emoji categories for picker
