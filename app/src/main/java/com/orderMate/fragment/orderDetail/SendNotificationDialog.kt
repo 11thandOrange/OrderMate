@@ -165,12 +165,6 @@ class SendNotificationDialog(
 
     private fun setUpClickListener() {
         binding.apply {
-            // Close button (X)
-            closeButton.setOnClickListener {
-                hideKeyboard(binding.root)
-                dismiss()
-            }
-            
             shareEmail.setOnClickListener {
                 if (isSmsEnabled) { // Only change if switching tabs
                     tabChanged()

@@ -62,19 +62,21 @@ class OrderHistoryDialog : DialogFragment() {
     }
 
     private fun setupDialog() {
-        dialog?.window?.apply {
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setLayout(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT
-            )
-            setDimAmount(0.6f)
+        dialog?.apply {
+            setCanceledOnTouchOutside(true)
+            window?.apply {
+                setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                setLayout(
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT
+                )
+                setDimAmount(0.6f)
+            }
         }
     }
 
     private fun setupClickListeners() {
-        binding.closeButton.setOnClickListener { dismiss() }
-        binding.btnClose.setOnClickListener { dismiss() }
+        // Dialog dismisses on outside click
     }
 
     private fun loadHistoryData() {

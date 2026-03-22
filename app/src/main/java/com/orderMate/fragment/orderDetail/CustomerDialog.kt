@@ -123,12 +123,7 @@ class CustomerDialog(
     }
 
     private fun setupClickListeners() {
-        // Close button (header X)
-        binding.closeButton.setOnClickListener {
-            dismiss()
-        }
-        
-        // Close button (footer)
+        // Cancel button (footer)
         binding.btnClose.setOnClickListener {
             dismiss()
         }

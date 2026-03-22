@@ -18,23 +18,12 @@
         android:padding="24dp">
 
         <com.google.android.material.textview.MaterialTextView
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="@string/send_notification"
             android:textColor="@color/text_light"
             android:textSize="20sp"
             android:textStyle="bold" />
-
-        <ImageView
-            android:id="@+id/closeButton"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@drawable/bg_dialog_close_button"
-            android:padding="8dp"
-            android:src="@drawable/ic_close"
-            app:tint="@color/text_light"
-            android:contentDescription="@string/cancel" />
     </LinearLayout>
 
     <!-- Header border -->
