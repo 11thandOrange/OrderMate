@@ -78,6 +78,10 @@ class CalendarFragment : Fragment() {
     private var currentSearchQuery: String = ""
     private var selectedDateFilter: Date? = null
     
+    // Flag to track if initial filters have been applied after load
+    private var isApplyingFilters = false
+    private var ordersLoaded = false
+    
     // Widget manager for dynamic filters (same as List tab)
     private var widgetManager: WidgetManager? = null
     
@@ -172,14 +176,13 @@ class CalendarFragment : Fragment() {
      */
     private fun observeSharedState() {
         // Observe filter state - update pills and apply if orders loaded
+        // Note: Initial filter application is handled by loadOrders() to avoid race conditions
         sharedFilterViewModel.filterState.observe(viewLifecycleOwner) { state ->
             currentFilterState = state
             // Always update pills for visual consistency
             updateFilterPills(state)
-            // Only apply filters if orders are loaded
-            if (allOrders.isNotEmpty()) {
-                applyDialogFilters(state)
-            }
+            // Don't apply filters here during initial load - loadOrders handles that
+            // Only apply for subsequent filter changes (when user interacts with filters)
         }
         
         // Observe search query
@@ -200,10 +203,7 @@ class CalendarFragment : Fragment() {
         sharedFilterViewModel.searchedDates.observe(viewLifecycleOwner) { dates ->
             searchedDates = dates
             updateViewModeButtonsState()
-            // Only render if views and data are initialized
-            if (view != null && calendarGrid != null && allOrders.isNotEmpty()) {
-                renderCalendar()
-            }
+            // Don't render here - the filter application will handle rendering
         }
         
         // Observe calendar view mode (persists across navigation)
@@ -211,10 +211,7 @@ class CalendarFragment : Fragment() {
             if (mode != currentViewMode) {
                 currentViewMode = mode
                 updateViewModeButtonVisuals(mode)
-                // Only render if views and data are initialized
-                if (view != null && calendarGrid != null && allOrders.isNotEmpty()) {
-                    renderCalendar()
-                }
+                // Don't render here - wait for filter application or loadOrders
             }
         }
     }
@@ -343,6 +340,8 @@ class CalendarFragment : Fragment() {
      * Load orders from Clover (same as List tab)
      */
     private fun loadOrders() {
+        ordersLoaded = false
+        
         runOnBackgroundThread {
             try {
                 val orderData = myApp.getOrderConnector().getOrders(mutableListOf())
@@ -362,6 +361,8 @@ class CalendarFragment : Fragment() {
             }
 
             runOnMainThread {
+                ordersLoaded = true
+                
                 // Restore selected date from shared state FIRST
                 sharedFilterViewModel.selectedDate.value?.let { date ->
                     currentDate.time = date
@@ -384,13 +385,49 @@ class CalendarFragment : Fragment() {
                 val sharedState = sharedFilterViewModel.filterState.value
                 if (sharedState != null && sharedState.hasActiveFilters()) {
                     currentFilterState = sharedState
-                    // applyDialogFilters will render the calendar when done
-                    applyDialogFilters(sharedState)
+                    updateFilterPills(sharedState)
+                    // Apply filters synchronously to ensure correct order
+                    applyFiltersSync(sharedState)
                 } else {
                     renderCalendar()
                 }
             }
         }
+    }
+    
+    /**
+     * Apply filters synchronously (on current thread)
+     * Used during initial load to avoid race conditions
+     */
+    private fun applyFiltersSync(filters: FilterDialogFragment.FilterState) {
+        filteredOrders.clear()
+        
+        allOrders.forEach { order ->
+            if (orderMatchesFilters(order, filters)) {
+                filteredOrders.add(order)
+            }
+        }
+        
+        filteredEvents = convertOrdersToEvents(filteredOrders)
+        
+        // Update searchedDates from filter state
+        val filterDates = filters.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE] ?: emptyList()
+        val queryDates = if (currentSearchQuery.isNotEmpty()) {
+            OrderSearchFilter.parseSearchDates(currentSearchQuery, currentDate.get(Calendar.YEAR))
+        } else {
+            emptyList()
+        }
+        
+        val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+        val combinedDates = (filterDates + queryDates)
+            .distinctBy { dateFormat.format(it) }
+            .sortedBy { it.time }
+        
+        searchedDates = combinedDates
+        sharedFilterViewModel.setSearchedDates(combinedDates)
+        
+        updateViewModeButtonsState()
+        renderCalendar()
     }
     
     /**
