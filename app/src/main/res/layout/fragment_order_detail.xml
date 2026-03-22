@@ -1,199 +1,199 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Order Detail Tab - matches HTML .order-detail-tab (#87) -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient_purple"
+    android:background="@android:color/transparent"
     tools:context=".fragment.orderDetail.OrderDetailFragment">
 
-    <!-- Top Header Bar -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Top Header Bar - matches HTML .order-detail-header -->
+    <!-- height: 70px, background: rgba(0,0,0,0.1), border-bottom: 1px solid rgba(255,255,255,0.1) -->
+    <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="24dp"
+        android:background="@color/header_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Back Button -->
+        <!-- Back Button - matches HTML .back-btn -->
+        <!-- 40x40, border-radius: 12px, background: rgba(255,255,255,0.15) -->
         <ImageView
             android:id="@+id/backButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@drawable/bg_button_header"
+            android:background="@drawable/bg_button_glass"
             android:padding="10dp"
             android:src="@drawable/ic_back"
-            app:tint="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/text_light"
             android:contentDescription="@string/back" />
 
-        <!-- Order ID Title -->
+        <!-- Order ID Title - matches HTML .order-detail-title -->
+        <!-- flex: 1, font-size: 18px, font-weight: 600, color: text-light -->
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/orderId"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginStart="16dp"
             android:text="@string/dummy_heading_dashboard"
-            android:textColor="@color/white"
+            android:textColor="@color/text_light"
             android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/backButton"
-            app:layout_constraintStart_toEndOf="@id/backButton"
-            app:layout_constraintTop_toTopOf="@id/backButton" />
+            android:textStyle="bold" />
 
-        <!-- Action Buttons Container -->
+        <!-- Action Buttons Container - matches HTML .order-detail-actions -->
+        <!-- gap: 12px -->
         <LinearLayout
             android:id="@+id/actionButtonsContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:gravity="center_vertical">
 
-            <!-- Add Payment Button -->
+            <!-- Add Payment Button - matches HTML .order-action-btn.secondary -->
+            <!-- background: rgba(255,255,255,0.15), padding: 10px 16px, border-radius: 12px -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/addPayment"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/paid_status_color"
+                android:layout_marginEnd="12dp"
+                android:backgroundTint="@color/glass_background"
                 android:text="@string/add_payment"
-                android:textSize="12sp"
-                android:textColor="@color/white"
-                app:cornerRadius="10dp"
+                android:textSize="13sp"
+                android:textColor="@color/text_light"
+                android:paddingHorizontal="16dp"
+                app:cornerRadius="12dp"
                 app:icon="@drawable/ic_cash"
-                app:iconTint="@color/white"
+                app:iconTint="@color/text_light"
                 app:iconSize="16dp"
-                app:iconPadding="4dp" />
+                app:iconPadding="8dp" />
 
-            <!-- Re-Open Button -->
+            <!-- Re-Open Button - matches HTML .order-action-btn.secondary -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/reOpenButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="12dp"
+                android:backgroundTint="@color/glass_background"
                 android:text="@string/re_open"
-                android:textSize="12sp"
-                android:textColor="@color/white"
-                app:cornerRadius="10dp"
-                app:strokeColor="@color/white"
-                app:strokeWidth="1dp"
+                android:textSize="13sp"
+                android:textColor="@color/text_light"
+                android:paddingHorizontal="16dp"
+                app:cornerRadius="12dp"
                 app:icon="@drawable/ic_refresh"
-                app:iconTint="@color/white"
+                app:iconTint="@color/text_light"
                 app:iconSize="16dp"
-                app:iconPadding="4dp" />
+                app:iconPadding="8dp" />
 
-            <!-- Send Notification Button -->
+            <!-- Send Notification Button - matches HTML .order-action-btn.primary -->
+            <!-- background: #FF9F43 (orange-accent) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/sendNotificationButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="12dp"
+                android:backgroundTint="@color/orange_accent"
                 android:text="@string/send_notification"
-                android:textSize="12sp"
-                android:textColor="@color/orange_accent"
-                app:cornerRadius="10dp"
-                app:strokeColor="@color/orange_accent"
-                app:strokeWidth="1dp"
+                android:textSize="13sp"
+                android:textColor="@color/white"
+                android:paddingHorizontal="16dp"
+                app:cornerRadius="12dp"
                 app:icon="@drawable/ic_notification"
-                app:iconTint="@color/orange_accent"
+                app:iconTint="@color/white"
                 app:iconSize="16dp"
-                app:iconPadding="4dp" />
+                app:iconPadding="8dp" />
 
-            <!-- Delete Button -->
+            <!-- Delete Button - matches HTML .order-action-btn.danger -->
+            <!-- background: #ea2c2f (unpaid-status-color) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/deleteButton"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:backgroundTint="@color/delete_red"
+                android:backgroundTint="@color/unpaid_status_color"
                 android:text="@string/delete_order"
-                android:textSize="12sp"
+                android:textSize="13sp"
                 android:textColor="@color/white"
-                app:cornerRadius="10dp"
+                android:paddingHorizontal="16dp"
+                app:cornerRadius="12dp"
                 app:icon="@drawable/ic_delete"
                 app:iconTint="@color/white"
                 app:iconSize="16dp"
-                app:iconPadding="4dp" />
+                app:iconPadding="8dp" />
         </LinearLayout>
 
-        <!-- Syncing Text -->
+        <!-- Hidden views for backward compatibility -->
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/syncingText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="@string/syncing"
-            android:textColor="@color/text_muted"
-            android:textSize="12sp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/actionButtonsContainer"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-        <!-- Hidden views for backward compatibility -->
         <ImageView
             android:id="@+id/syncButton"
-            android:layout_width="1dp"
-            android:layout_height="1dp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/merchantName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/reIssueReceiptButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+    </LinearLayout>
+    
+    <!-- Header border bottom - matches HTML border-bottom: 1px solid rgba(255,255,255,0.1) -->
+    <View
+        android:id="@+id/headerBorder"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/nav_border"
+        app:layout_constraintTop_toBottomOf="@id/topBar" />
 
-    <!-- Main Content Area -->
+    <!-- Main Content Area - matches HTML .order-detail-content -->
+    <!-- padding: 24px -->
     <LinearLayout
         android:id="@+id/mainContent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="24dp"
         android:orientation="horizontal"
-        android:paddingHorizontal="24dp"
-        android:weightSum="10"
+        android:padding="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topBar">
+        app:layout_constraintTop_toBottomOf="@id/headerBorder">
 
-        <!-- Left Column: Items Card -->
+        <!-- Left Column: Items Card - matches HTML .order-detail-main -->
+        <!-- grid-template-columns: 1fr 380px, gap: 24px -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/orderDetails"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="6"
-            android:layout_marginEnd="12dp">
+            android:layout_weight="1"
+            android:layout_marginEnd="24dp">
 
-            <androidx.cardview.widget.CardView
+            <!-- Items Card - matches HTML .detail-card -->
+            <!-- background: rgba(255,255,255,0.15), border-radius: 16px, border: 1px solid rgba(255,255,255,0.1) -->
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/itemsCard"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:cardBackgroundColor="@color/glass_background"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
+                app:strokeColor="@color/nav_border"
+                app:strokeWidth="1dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -370,27 +370,29 @@
                         </LinearLayout>
                     </LinearLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Right Column: Order Details & History -->
+        <!-- Right Column: Order Details & History - matches HTML .order-detail-sidebar -->
+        <!-- width: 380px, gap: 20px -->
         <LinearLayout
             android:id="@+id/buttonMenu"
-            android:layout_width="0dp"
+            android:layout_width="380dp"
             android:layout_height="match_parent"
-            android:layout_weight="4"
-            android:layout_marginStart="12dp"
             android:orientation="vertical">
 
-            <!-- Order Details Card -->
-            <androidx.cardview.widget.CardView
+            <!-- Order Details Card - matches HTML .detail-card -->
+            <!-- background: rgba(255,255,255,0.15), border-radius: 16px, border: 1px solid rgba(255,255,255,0.1) -->
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/orderDetailsCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="20dp"
                 app:cardBackgroundColor="@color/glass_background"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
+                app:cardElevation="0dp"
+                app:strokeColor="@color/nav_border"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -632,16 +634,18 @@
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <!-- Order History Card -->
-            <androidx.cardview.widget.CardView
+            <!-- Order History Card - matches HTML .detail-card -->
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/orderHistoryCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@color/glass_background"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
+                app:cardElevation="0dp"
+                app:strokeColor="@color/nav_border"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -775,7 +779,7 @@
                             android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </LinearLayout>
 

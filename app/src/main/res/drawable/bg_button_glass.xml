@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Back button background - matches HTML .back-btn -->
+<!-- background: rgba(255,255,255,0.15), border-radius: 12px -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/glass_ripple">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/glass_background"/>
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+</ripple>
