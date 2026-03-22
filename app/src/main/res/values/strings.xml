@@ -211,5 +211,8 @@
     <string name="edit_item">Edit item</string>
     <string name="close">Close</string>
     <string name="edit">Edit</string>
+    <string name="customer_details">Customer Details</string>
+    <string name="select_template">Select Template</string>
+    <string name="template">Template</string>
 
 </resources>
