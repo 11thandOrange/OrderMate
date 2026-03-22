@@ -1,11 +1,15 @@
 package com.orderMate.activities
 
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -13,10 +17,12 @@ import com.google.gson.Gson
 import com.orderMate.R
 import com.orderMate.fragment.orderHistory.OrderHistoryFragment
 import com.orderMate.utils.Constants
+import com.orderMate.utils.FirebaseConfigManager
 import com.orderMate.utils.FirebaseRealtimeDataBaseManager
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.PermissionUtils
 import com.orderMate.utils.PreferenceManager
+import com.orderMate.utils.ProfileSettingsManager
 import com.orderMate.utils.createAndShowDialog
 import com.orderMate.utils.defaultCustomDataForFirebase
 import com.orderMate.utils.exceptionHandler
@@ -26,6 +32,11 @@ import kotlinx.coroutines.launch
 
 /**
  * iOS-style redesigned MainActivity with side navigation (#80 requirement)
+ * 
+ * Features:
+ * - Side navigation with List, Calendar, Settings, Profile
+ * - App-wide gradient background based on theme color
+ * - Profile avatar shows in nav bar
  */
 class MainActivityRedesign : AppCompatActivity() {
 
@@ -42,14 +53,21 @@ class MainActivityRedesign : AppCompatActivity() {
     private val myApplication: MyApp by lazy {
         MyApp.getInstance()
     }
+    
+    private lateinit var profileSettingsManager: ProfileSettingsManager
 
     private lateinit var navController: NavController
+    private lateinit var rootLayout: ConstraintLayout
     
     // Navigation items
     private lateinit var navList: FrameLayout
     private lateinit var navCalendar: FrameLayout
     private lateinit var navSettings: FrameLayout
     private lateinit var navProfile: FrameLayout
+    
+    // Profile nav elements
+    private lateinit var navProfileIcon: ImageView
+    private lateinit var navProfileEmoji: TextView
     
     // Indicators
     private lateinit var navListIndicator: View
@@ -62,8 +80,12 @@ class MainActivityRedesign : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_redesign)
         
+        profileSettingsManager = ProfileSettingsManager(this)
+        rootLayout = findViewById(R.id.rootLayout) ?: window.decorView.findViewById(android.R.id.content)
+        
         setupNavigation()
         setupSideNav()
+        applyThemeSettings()
     }
     
     private fun setupNavigation() {
@@ -79,6 +101,10 @@ class MainActivityRedesign : AppCompatActivity() {
         navSettings = findViewById(R.id.navSettings)
         navProfile = findViewById(R.id.navProfile)
         
+        // Initialize profile nav elements
+        navProfileIcon = findViewById(R.id.navProfileIcon)
+        navProfileEmoji = findViewById(R.id.navProfileEmoji)
+        
         // Initialize indicators
         navListIndicator = findViewById(R.id.navListIndicator)
         navCalendarIndicator = findViewById(R.id.navCalendarIndicator)
@@ -92,6 +118,68 @@ class MainActivityRedesign : AppCompatActivity() {
         
         // Set initial state
         updateNavState(R.id.navList)
+    }
+    
+    /**
+     * Apply theme settings (gradient background + nav avatar)
+     * Called on create and when returning from profile settings
+     */
+    fun applyThemeSettings() {
+        applyThemeGradient()
+        updateNavProfileAvatar()
+    }
+    
+    /**
+     * Apply gradient background to entire app
+     * Matches HTML: linear-gradient(135deg, baseColor 0%, lighterColor 100%)
+     */
+    private fun applyThemeGradient() {
+        val themeColor = profileSettingsManager.getThemeColor()
+        val baseColor = Color.parseColor(themeColor)
+        val lighterColor = lightenColor(baseColor, 0.3f)
+        
+        val gradientDrawable = GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            intArrayOf(baseColor, lighterColor)
+        )
+        
+        // Apply to root layout
+        try {
+            val root = findViewById<ConstraintLayout>(R.id.rootLayout)
+            root?.background = gradientDrawable
+        } catch (e: Exception) {
+            // Fallback: apply to window
+            window.decorView.background = gradientDrawable
+        }
+    }
+    
+    /**
+     * Update nav profile to show emoji avatar
+     * Matches HTML: navProfile.innerHTML = profileSettings.avatar
+     */
+    private fun updateNavProfileAvatar() {
+        val avatar = profileSettingsManager.getAvatarEmoji()
+        
+        if (avatar.isNotEmpty() && avatar != "👤") {
+            // Show emoji, hide icon
+            navProfileEmoji.text = avatar
+            navProfileEmoji.visibility = View.VISIBLE
+            navProfileIcon.visibility = View.GONE
+        } else {
+            // Show icon, hide emoji
+            navProfileIcon.visibility = View.VISIBLE
+            navProfileEmoji.visibility = View.GONE
+        }
+    }
+    
+    /**
+     * Lighten a color by percentage (matches HTML lightenColor function)
+     */
+    private fun lightenColor(color: Int, percent: Float): Int {
+        val r = minOf(255, (Color.red(color) + 255 * percent).toInt())
+        val g = minOf(255, (Color.green(color) + 255 * percent).toInt())
+        val b = minOf(255, (Color.blue(color) + 255 * percent).toInt())
+        return Color.rgb(r, g, b)
     }
     
     private fun onNavItemClicked(itemId: Int) {
@@ -151,6 +239,10 @@ class MainActivityRedesign : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        
+        // Refresh theme settings when returning from profile
+        applyThemeSettings()
+        
         CoroutineScope(Dispatchers.IO).launch {
             firebaseRealTimeManager.getData(
                 this@MainActivityRedesign,

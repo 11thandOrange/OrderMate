@@ -44,6 +44,7 @@ object FirebasePaths {
     const val WIDGETS = "widgets"
     const val OPTIONS = "options"
     const val TEMPLATES = "templates"
+    const val PROFILE_SETTINGS = "profileSettings"
     
     // Legacy (for migration)
     const val LEGACY_ROOT = "customData"
@@ -74,6 +75,8 @@ object FirebasePaths {
     fun templates(merchantId: String) = "${merchant(merchantId)}/$TEMPLATES"
     
     fun template(merchantId: String, templateId: String) = "${templates(merchantId)}/$templateId"
+    
+    fun profileSettings(merchantId: String) = "${merchant(merchantId)}/$PROFILE_SETTINGS"
     
     // Legacy paths
     fun legacyData(merchantId: String) = "$LEGACY_ROOT/$merchantId/$LEGACY_DATA"

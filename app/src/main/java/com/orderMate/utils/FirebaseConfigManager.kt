@@ -398,6 +398,46 @@ class FirebaseConfigManager private constructor() {
                 callback(false)
             }
     }
+    
+    // ==================== Profile Settings ====================
+    
+    /**
+     * Get profile settings from Firebase
+     */
+    fun getProfileSettings(merchantId: String, callback: (ProfileSettings) -> Unit) {
+        db.getReference(FirebasePaths.profileSettings(merchantId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val settings = ProfileSettings(
+                    themeColor = snapshot.child("themeColor").getValue(String::class.java) ?: ProfileSettings.DEFAULT_THEME_COLOR,
+                    avatar = snapshot.child("avatar").getValue(String::class.java) ?: ProfileSettings.DEFAULT_AVATAR
+                )
+                callback(settings)
+            }
+            .addOnFailureListener {
+                callback(ProfileSettings())
+            }
+    }
+    
+    /**
+     * Save profile settings to Firebase
+     */
+    fun saveProfileSettings(merchantId: String, settings: ProfileSettings, callback: (Boolean) -> Unit) {
+        val updates = mapOf<String, Any>(
+            "themeColor" to settings.themeColor,
+            "avatar" to settings.avatar
+        )
+        db.getReference(FirebasePaths.profileSettings(merchantId))
+            .updateChildren(updates)
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
 }
 
 /**
@@ -429,3 +469,16 @@ data class AdvancedSettings(
     val receiptDays: Int = 0,
     val receiptMinutes: Int = 60
 )
+
+/**
+ * Profile settings data class (#85 requirement)
+ */
+data class ProfileSettings(
+    val themeColor: String = DEFAULT_THEME_COLOR,
+    val avatar: String = DEFAULT_AVATAR
+) {
+    companion object {
+        const val DEFAULT_THEME_COLOR = "#3C4B80"  // HTML default: rgb(60, 75, 128)
+        const val DEFAULT_AVATAR = "😊"
+    }
+}

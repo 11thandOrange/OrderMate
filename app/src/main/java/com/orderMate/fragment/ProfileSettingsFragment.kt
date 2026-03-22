@@ -20,6 +20,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.orderMate.R
 import com.orderMate.databinding.FragmentProfileSettingsBinding
+import com.orderMate.utils.FirebaseConfigManager
+import com.orderMate.utils.MyApp
+import com.orderMate.utils.ProfileSettings
 import com.orderMate.utils.ProfileSettingsManager
 
 /**
@@ -38,10 +41,12 @@ class ProfileSettingsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var settingsManager: ProfileSettingsManager
+    private lateinit var firebaseManager: FirebaseConfigManager
     private var onAvatarChangedListener: ((String?, Uri?) -> Unit)? = null
     
     // Default theme color matching HTML
     private val DEFAULT_THEME_COLOR = "#3C4B80"
+    private val DEFAULT_AVATAR = "😊"
 
     // Emoji categories matching HTML
     private val emojiCategories = mapOf(
@@ -76,6 +81,7 @@ class ProfileSettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         settingsManager = ProfileSettingsManager(requireContext())
+        firebaseManager = FirebaseConfigManager.getInstance()
         
         setupClickListeners()
         loadCurrentSettings()
@@ -142,6 +148,7 @@ class ProfileSettingsFragment : Fragment() {
         colorGrid.adapter = ColorAdapter(colors) { selectedColor ->
             applyThemeColor(selectedColor)
             settingsManager.setThemeColor(selectedColor)
+            saveToFirebase()
             showToast("Theme color updated!")
             dialog.dismiss()
         }
@@ -181,6 +188,7 @@ class ProfileSettingsFragment : Fragment() {
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 8)
         recyclerView.adapter = EmojiAdapter(emojis) { emoji ->
             selectAvatar(emoji)
+            saveToFirebase()
             showToast("Avatar updated!")
             dialog.dismiss()
         }
@@ -248,11 +256,32 @@ class ProfileSettingsFragment : Fragment() {
         settingsManager.setThemeColor(DEFAULT_THEME_COLOR)
         
         // Reset avatar to default
-        settingsManager.setAvatarEmoji("😊")
+        settingsManager.setAvatarEmoji(DEFAULT_AVATAR)
         settingsManager.clearCustomAvatarUri()
         updateAvatarDisplay()
         
+        // Save to Firebase
+        saveToFirebase()
+        
         showToast("Settings reset to defaults")
+    }
+    
+    /**
+     * Save profile settings to Firebase
+     */
+    private fun saveToFirebase() {
+        val merchantId = MyApp.getInstance().getMerchantId()
+        if (merchantId.isNotEmpty()) {
+            val settings = ProfileSettings(
+                themeColor = settingsManager.getThemeColor(),
+                avatar = settingsManager.getAvatarEmoji()
+            )
+            firebaseManager.saveProfileSettings(merchantId, settings) { success ->
+                if (!success) {
+                    // Silent fail - local settings are still saved
+                }
+            }
+        }
     }
 
     private fun showToast(message: String) {

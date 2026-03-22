@@ -4,6 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient_purple"
@@ -132,7 +133,7 @@
 
         </LinearLayout>
 
-        <!-- Profile Avatar at bottom -->
+        <!-- Profile Avatar at bottom (shows emoji when selected) -->
         <FrameLayout
             android:id="@+id/navProfile"
             android:layout_width="40dp"
@@ -141,12 +142,23 @@
             android:clickable="true"
             android:focusable="true">
             
+            <!-- Default user icon (hidden when emoji is set) -->
             <ImageView
+                android:id="@+id/navProfileIcon"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_nav_user"
                 app:tint="@color/white"/>
+            
+            <!-- Emoji avatar (shown when emoji is selected) -->
+            <TextView
+                android:id="@+id/navProfileEmoji"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:visibility="gone" />
         </FrameLayout>
 
     </LinearLayout>
