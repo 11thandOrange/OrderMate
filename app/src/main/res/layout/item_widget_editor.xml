@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget Editor Item Layout -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/bg_widget_item"
+    android:orientation="vertical">
+
+    <!-- Widget Header (always visible) -->
+    <LinearLayout
+        android:id="@+id/widgetHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <!-- Drag Handle -->
+        <ImageView
+            android:id="@+id/dragHandle"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_drag_handle"
+            app:tint="#66FFFFFF" />
+
+        <!-- Widget Icon -->
+        <FrameLayout
+            android:id="@+id/widgetIconContainer"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/bg_widget_icon_calendar">
+
+            <ImageView
+                android:id="@+id/widgetIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_calendar"
+                app:tint="#3B82F6" />
+
+        </FrameLayout>
+
+        <!-- Widget Info -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/widgetTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_light"
+                android:textSize="14sp"
+                tools:text="Due Date/Time" />
+
+            <TextView
+                android:id="@+id/widgetType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_muted"
+                android:textSize="11sp"
+                tools:text="Calendar" />
+
+        </LinearLayout>
+
+        <!-- Toggle Switch -->
+        <Switch
+            android:id="@+id/widgetToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:thumb="@drawable/bg_toggle_thumb"
+            android:track="@drawable/bg_toggle_track" />
+
+        <!-- Expand Chevron -->
+        <ImageView
+            android:id="@+id/expandChevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_chevron_down"
+            app:tint="@color/text_muted" />
+
+    </LinearLayout>
+
+    <!-- Widget Body (expandable) -->
+    <LinearLayout
+        android:id="@+id/widgetBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="12dp"
+        android:visibility="gone">
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="12dp"
+            android:background="#1AFFFFFF" />
+
+        <!-- Label Field -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Label"
+            android:textColor="@color/text_muted"
+            android:textSize="11sp" />
+
+        <EditText
+            android:id="@+id/inputWidgetLabel"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_settings_input"
+            android:hint="Enter label"
+            android:paddingHorizontal="12dp"
+            android:textColor="@color/text_light"
+            android:textColorHint="@color/text_muted"
+            android:textSize="13sp" />
+
+        <!-- Options Field (for select types) -->
+        <LinearLayout
+            android:id="@+id/optionsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Options (press Enter to add)"
+                android:textColor="@color/text_muted"
+                android:textSize="11sp" />
+
+            <EditText
+                android:id="@+id/inputAddOption"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_settings_input"
+                android:hint="Add option..."
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:paddingHorizontal="12dp"
+                android:textColor="@color/text_light"
+                android:textColorHint="@color/text_muted"
+                android:textSize="13sp" />
+
+            <!-- Values Tags Container -->
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/valuesContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:flexWrap="wrap"
+                app:alignItems="flex_start"
+                app:justifyContent="flex_start" />
+
+        </LinearLayout>
+
+        <!-- Delete Widget Button -->
+        <LinearLayout
+            android:id="@+id/btnDeleteWidget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingVertical="8dp">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_delete"
+                app:tint="#EF4444" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="Delete Widget"
+                android:textColor="#EF4444"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
