@@ -112,7 +112,7 @@ class SendNotificationDialog(
         val app = requireContext().applicationContext as? MyApp ?: return
         val merchantId = app.getMerchantId() ?: return
         
-        FirebaseConfigManager.getInstance(requireContext()).getTemplates(merchantId) { loadedTemplates ->
+        FirebaseConfigManager.getInstance().getTemplates(merchantId) { loadedTemplates ->
             templates = loadedTemplates
             runOnMainThread {
                 setupTemplateSpinner()
