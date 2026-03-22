@@ -152,13 +152,13 @@ class MainActivityRedesign : AppCompatActivity() {
     }
     
     /**
-     * Update nav profile to show emoji avatar
+     * Update nav profile to show emoji avatar and apply theme color to background
      * Matches HTML: navProfile.innerHTML = profileSettings.avatar
      */
     private fun updateNavProfileAvatar() {
         val avatar = profileSettingsManager.getAvatarEmoji()
         
-        if (avatar.isNotEmpty() && avatar != "👤") {
+        if (avatar.isNotEmpty()) {
             // Show emoji, hide icon
             navProfileEmoji.text = avatar
             navProfileEmoji.visibility = View.VISIBLE
@@ -168,6 +168,26 @@ class MainActivityRedesign : AppCompatActivity() {
             navProfileIcon.visibility = View.VISIBLE
             navProfileEmoji.visibility = View.GONE
         }
+        
+        // Apply theme color gradient to nav profile background
+        applyThemeToNavProfile()
+    }
+    
+    /**
+     * Apply theme color gradient to nav profile button background
+     */
+    private fun applyThemeToNavProfile() {
+        val themeColor = profileSettingsManager.getThemeColor()
+        val baseColor = Color.parseColor(themeColor)
+        val lighterColor = lightenColor(baseColor, 0.3f)
+        
+        val gradientDrawable = GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            intArrayOf(baseColor, lighterColor)
+        )
+        gradientDrawable.cornerRadius = 22f * resources.displayMetrics.density // Match 44dp / 2
+        
+        navProfile.background = gradientDrawable
     }
     
     /**

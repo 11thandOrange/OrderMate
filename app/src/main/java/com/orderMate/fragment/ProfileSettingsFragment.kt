@@ -331,6 +331,7 @@ class ProfileSettingsFragment : Fragment() {
         activity?.let { act ->
             val navProfileIcon = act.findViewById<View>(R.id.navProfileIcon)
             val navProfileEmoji = act.findViewById<TextView>(R.id.navProfileEmoji)
+            val navProfile = act.findViewById<View>(R.id.navProfile)
             
             if (navProfileIcon != null && navProfileEmoji != null) {
                 if (emoji.isNotEmpty()) {
@@ -344,7 +345,27 @@ class ProfileSettingsFragment : Fragment() {
                     navProfileEmoji.visibility = View.GONE
                 }
             }
+            
+            // Also update nav profile background with theme color
+            navProfile?.let { updateNavProfileBackground(it) }
         }
+    }
+    
+    /**
+     * Apply theme color gradient to nav profile button background
+     */
+    private fun updateNavProfileBackground(navProfile: View) {
+        val themeColor = settingsManager.getThemeColor()
+        val baseColor = Color.parseColor(themeColor)
+        val lighterColor = lightenColor(baseColor, 0.3f)
+        
+        val gradientDrawable = GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            intArrayOf(baseColor, lighterColor)
+        )
+        gradientDrawable.cornerRadius = 22f * resources.displayMetrics.density
+        
+        navProfile.background = gradientDrawable
     }
 
     private fun updateAvatarDisplay() {
