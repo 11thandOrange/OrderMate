@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Template item card background - matches HTML .template-item -->
+<!-- Toggle option row container - matches HTML .toggle-option -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <solid android:color="#4D000000" />

@@ -105,29 +105,31 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_settings_card_glass"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Enable OrderMate In Clover's Register"
                         android:textColor="@color/text_light"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="16dp"
                         android:text="Choose how OrderMate integrates with Clover Register"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
 
-                    <!-- Coming Soon Toggle (disabled) -->
+                    <!-- Coming Soon Toggle (disabled) - with container -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:background="@drawable/bg_toggle_option_container"
+                        android:padding="14dp"
                         android:alpha="0.6"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
@@ -167,11 +169,13 @@
 
                     </LinearLayout>
 
-                    <!-- Use OrderMate In Clover's Register Toggle -->
+                    <!-- Use OrderMate In Clover's Register Toggle - with container -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_toggle_option_container"
+                        android:padding="14dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
@@ -218,38 +222,51 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
+                    <!-- Centered title and subtitle -->
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:text="OrderMate Pop Up Editor"
                         android:textColor="@color/text_light"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
+                        android:layout_marginBottom="16dp"
+                        android:gravity="center"
                         android:text="Add &amp; Edit Sections That Appear In the OrderMate Editor"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
 
-                    <!-- Widget List -->
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/widgetRecyclerView"
+                    <!-- Widget List Container -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:nestedScrollingEnabled="false"
-                        tools:itemCount="4"
-                        tools:listitem="@layout/item_widget_editor" />
+                        android:background="@drawable/bg_widget_list_container"
+                        android:orientation="vertical"
+                        android:padding="12dp"
+                        android:minHeight="200dp">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/widgetRecyclerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false"
+                            tools:itemCount="4"
+                            tools:listitem="@layout/item_widget_editor" />
+
+                    </LinearLayout>
 
                     <!-- Add Widget Button -->
                     <LinearLayout
                         android:id="@+id/btnAddWidget"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="16dp"
                         android:background="@drawable/bg_add_widget_button"
                         android:gravity="center"
                         android:orientation="horizontal">
@@ -287,27 +304,78 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <!-- Unique SMS Number Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_settings_card_glass"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Unique SMS Number"
+                        android:textColor="@color/text_light"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="16dp"
+                        android:text="Input phone number to send SMS messages. Notifications use OrderMate's number by default."
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp" />
+
+                    <!-- Phone Input Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_input_row_container"
+                        android:padding="14dp"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/inputSmsNumber"
+                            android:layout_width="180dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/bg_settings_input"
+                            android:hint="Enter phone number"
+                            android:inputType="phone"
+                            android:paddingHorizontal="14dp"
+                            android:textColor="@color/text_light"
+                            android:textColorHint="@color/text_muted"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
                 <!-- Notification Templates Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_settings_card_glass"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Notification Templates"
                         android:textColor="@color/text_light"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Create text templates for notification popups. Used for email or SMS."
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="16dp"
+                        android:text="Create text templates for notification popups. Used for email or SMS. Available in notification popup dropdown."
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
 
@@ -316,7 +384,6 @@
                         android:id="@+id/templateRecyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
                         android:nestedScrollingEnabled="false"
                         tools:itemCount="2"
                         tools:listitem="@layout/item_notification_template" />
@@ -370,28 +437,31 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_settings_card_glass"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Scheduled Order Notifications"
                         android:textColor="@color/text_light"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="When to send email notifications to merchant for scheduled orders"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="16dp"
+                        android:text="When to receive notifications for scheduled orders"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
 
+                    <!-- Input Row with container -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:background="@drawable/bg_input_row_container"
+                        android:padding="14dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
@@ -407,20 +477,12 @@
                             android:textColor="@color/text_light"
                             android:textSize="13sp" />
 
-                        <Spinner
-                            android:id="@+id/spinnerNotificationUnit"
-                            android:layout_width="100dp"
-                            android:layout_height="36dp"
-                            android:layout_marginStart="8dp"
-                            android:background="@drawable/bg_settings_input"
-                            android:spinnerMode="dropdown" />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:text="before due date"
-                            android:textColor="@color/text_muted"
+                            android:layout_marginStart="10dp"
+                            android:text="days before due date"
+                            android:textColor="@color/text_light"
                             android:textSize="13sp" />
 
                     </LinearLayout>
@@ -434,28 +496,31 @@
                     android:layout_marginTop="16dp"
                     android:background="@drawable/bg_settings_card_glass"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Receipt Settings"
                         android:textColor="@color/text_light"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="16dp"
                         android:text="Configure kitchen receipt printing"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
 
+                    <!-- Input Row with container -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:background="@drawable/bg_input_row_container"
+                        android:padding="14dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
@@ -470,7 +535,7 @@
                             android:id="@+id/inputReceiptTime"
                             android:layout_width="60dp"
                             android:layout_height="36dp"
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="10dp"
                             android:background="@drawable/bg_settings_input"
                             android:gravity="center"
                             android:inputType="number"
@@ -483,19 +548,19 @@
                             android:id="@+id/spinnerReceiptUnit"
                             android:layout_width="100dp"
                             android:layout_height="36dp"
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="10dp"
                             android:background="@drawable/bg_settings_input"
                             android:spinnerMode="dropdown" />
 
-                    </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:text="before due date/time"
+                            android:textColor="@color/text_light"
+                            android:textSize="13sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="before due date/time"
-                        android:textColor="@color/text_muted"
-                        android:textSize="12sp" />
+                    </LinearLayout>
 
                 </LinearLayout>
 

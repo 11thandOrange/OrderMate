@@ -61,7 +61,6 @@ class SettingsFragment : Fragment() {
     
     // Advanced Panel
     private var inputNotificationTime: EditText? = null
-    private var spinnerNotificationUnit: Spinner? = null
     private var inputReceiptTime: EditText? = null
     private var spinnerReceiptUnit: Spinner? = null
     
@@ -118,7 +117,6 @@ class SettingsFragment : Fragment() {
         
         // Advanced Panel
         inputNotificationTime = view.findViewById(R.id.inputNotificationTime)
-        spinnerNotificationUnit = view.findViewById(R.id.spinnerNotificationUnit)
         inputReceiptTime = view.findViewById(R.id.inputReceiptTime)
         spinnerReceiptUnit = view.findViewById(R.id.spinnerReceiptUnit)
     }
@@ -261,7 +259,7 @@ class SettingsFragment : Fragment() {
                 content = ""
             )
             saveTemplate(newTemplate)
-            templateAdapter?.addTemplate(newTemplate)
+            templateAdapter?.addTemplateExpanded(newTemplate)
         }
     }
 
@@ -287,15 +285,13 @@ class SettingsFragment : Fragment() {
     // ==================== Advanced Panel ====================
     
     private fun setupAdvancedPanel() {
-        // Setup unit spinners
-        val units = arrayOf("days", "hours", "minutes")
+        // Setup receipt unit spinner
+        val units = arrayOf("minutes", "hours", "days")
         val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, units)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        
-        spinnerNotificationUnit?.adapter = spinnerAdapter
         spinnerReceiptUnit?.adapter = spinnerAdapter
         
-        // Notification time listeners
+        // Notification time listener (days only, no spinner)
         inputNotificationTime?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 s?.toString()?.toIntOrNull()?.let { 
@@ -305,13 +301,6 @@ class SettingsFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
-        
-        spinnerNotificationUnit?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                // Save notification unit
-            }
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
         
         // Receipt time listeners
         inputReceiptTime?.addTextChangedListener(object : TextWatcher {
@@ -364,7 +353,6 @@ class SettingsFragment : Fragment() {
         templateRecyclerView = null
         btnAddTemplate = null
         inputNotificationTime = null
-        spinnerNotificationUnit = null
         inputReceiptTime = null
         spinnerReceiptUnit = null
     }
@@ -450,12 +438,12 @@ class WidgetEditorAdapter(
             widgetToggle.isChecked = widget.enabled
             inputWidgetLabel.setText(widget.label)
 
-            // Set icon and colors based on type
+            // Set icon and colors based on type - matches HTML widget icon colors
             val (iconRes, bgRes, tintColor) = when (widget.type) {
-                WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, 0xFF3B82F6.toInt())
-                WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, 0xFF8B5CF6.toInt())
-                WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, 0xFF10B981.toInt())
-                WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, 0xFFFF9F43.toInt())
+                WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, 0xFF64B5F6.toInt())
+                WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, 0xFFCE93D8.toInt())
+                WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, 0xFF81C784.toInt())
+                WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, 0xFFFFB74D.toInt())
             }
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
@@ -584,6 +572,12 @@ class NotificationTemplateAdapter(
 
     fun addTemplate(template: NotificationTemplate) {
         templates.add(template)
+        notifyItemInserted(templates.size - 1)
+    }
+    
+    fun addTemplateExpanded(template: NotificationTemplate) {
+        templates.add(template)
+        expandedPositions.add(template.id)
         notifyItemInserted(templates.size - 1)
     }
 
