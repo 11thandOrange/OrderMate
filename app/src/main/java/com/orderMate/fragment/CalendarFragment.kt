@@ -252,6 +252,7 @@ class CalendarFragment : Fragment() {
     /**
      * Update view mode buttons based on whether dates are selected
      * Disables Month/Week when dates are searched/filtered
+     * Disables Today/Next Fulfillment when individual date is selected
      */
     private fun updateViewModeButtonsState() {
         val hasSelectedDates = searchedDates.isNotEmpty()
@@ -270,6 +271,16 @@ class CalendarFragment : Fragment() {
         btnDay?.apply {
             isEnabled = true
             alpha = enabledAlpha
+        }
+        
+        // Disable Today and Next Fulfillment when dates are selected
+        btnToday?.apply {
+            isEnabled = !hasSelectedDates
+            alpha = if (hasSelectedDates) disabledAlpha else enabledAlpha
+        }
+        btnNextFulfillment?.apply {
+            isEnabled = !hasSelectedDates
+            alpha = if (hasSelectedDates) disabledAlpha else enabledAlpha
         }
     }
     
