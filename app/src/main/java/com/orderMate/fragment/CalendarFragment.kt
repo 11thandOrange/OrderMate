@@ -472,6 +472,23 @@ class CalendarFragment : Fragment() {
             }
             
             filteredEvents = convertOrdersToEvents(filteredOrders)
+            
+            // Update searchedDates from filter state (matches HTML behavior)
+            // This triggers single/multiple day view when dates are selected via picker
+            val filterDates = filters.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE] ?: emptyList()
+            
+            // Also parse dates from search query if any
+            val queryDates = if (currentSearchQuery.isNotEmpty()) {
+                OrderSearchFilter.parseSearchDates(currentSearchQuery, currentDate.get(Calendar.YEAR))
+            } else {
+                emptyList()
+            }
+            
+            // Combine and deduplicate dates
+            val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+            searchedDates = (filterDates + queryDates)
+                .distinctBy { dateFormat.format(it) }
+                .sortedBy { it.time }
 
             runOnMainThread {
                 renderCalendar()
