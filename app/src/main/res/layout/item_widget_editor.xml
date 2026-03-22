@@ -178,13 +178,13 @@
 
         </LinearLayout>
 
-        <!-- Delete Widget Button (left-aligned) -->
+        <!-- Delete Widget Button (right-aligned) -->
         <LinearLayout
             android:id="@+id/btnDeleteWidget"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:layout_gravity="start"
+            android:layout_gravity="end"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingVertical="8dp"
