@@ -151,14 +151,15 @@ class ProfileSettingsFragment : Fragment() {
         val colorGrid = view.findViewById<RecyclerView>(R.id.colorGrid)
         colorGrid.layoutManager = GridLayoutManager(requireContext(), 4)
         colorGrid.adapter = ColorAdapter(colors) { selectedColor ->
-            // Match HTML behavior:
+            // Match HTML behavior exactly:
             // 1. Apply gradient to color preview
             applyThemeColor(selectedColor)
             // 2. Save to local settings
             settingsManager.setThemeColor(selectedColor)
             // 3. Save to Firebase
             saveToFirebase()
-            // 4. Apply to entire app (will take effect on activity resume)
+            // 4. Apply gradient to ENTIRE app background immediately (like document.body.style.background)
+            applyGradientToAppBackground(selectedColor)
             showToast("Theme color updated!")
             dialog.dismiss()
         }
@@ -234,6 +235,27 @@ class ProfileSettingsFragment : Fragment() {
         val b = Math.min(255, (Color.blue(color) + 255 * percent).toInt())
         return Color.rgb(r, g, b)
     }
+    
+    /**
+     * Apply gradient to entire app background immediately
+     * Matches HTML: document.body.style.background = gradient
+     */
+    private fun applyGradientToAppBackground(hexColor: String) {
+        val baseColor = Color.parseColor(hexColor)
+        val lighterColor = lightenColor(baseColor, 0.3f)
+        
+        val gradientDrawable = GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            intArrayOf(baseColor, lighterColor)
+        )
+        
+        // Apply to activity's root layout (like document.body)
+        activity?.let { act ->
+            act.window?.decorView?.background = gradientDrawable
+            // Also try to update root layout if available
+            act.findViewById<View>(R.id.rootLayout)?.background = gradientDrawable
+        }
+    }
 
     fun selectAvatar(emoji: String) {
         settingsManager.setAvatarEmoji(emoji)
@@ -265,6 +287,9 @@ class ProfileSettingsFragment : Fragment() {
         // Reset to default theme color (#3C4B80)
         applyThemeColor(DEFAULT_THEME_COLOR)
         settingsManager.setThemeColor(DEFAULT_THEME_COLOR)
+        
+        // Apply gradient to entire app background immediately
+        applyGradientToAppBackground(DEFAULT_THEME_COLOR)
         
         // Reset avatar to default
         settingsManager.setAvatarEmoji(DEFAULT_AVATAR)
