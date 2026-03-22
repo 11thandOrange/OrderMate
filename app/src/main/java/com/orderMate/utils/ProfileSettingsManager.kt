@@ -74,11 +74,10 @@ class ProfileSettingsManager(private val context: Context) {
     }
 
     /**
-     * Get the avatar emoji (alias for getAvatar)
+     * Get the avatar emoji (returns default if not set)
      */
-    fun getAvatarEmoji(): String? {
-        val emoji = prefs.getString(KEY_AVATAR, null)
-        return if (emoji == DEFAULT_AVATAR) null else emoji
+    fun getAvatarEmoji(): String {
+        return prefs.getString(KEY_AVATAR, DEFAULT_AVATAR) ?: DEFAULT_AVATAR
     }
 
     /**
@@ -224,8 +223,8 @@ class ProfileSettingsManager(private val context: Context) {
         private const val KEY_COLOR_SCHEME = "color_scheme"
         private const val KEY_THEME_TARGET_PREFIX = "theme_target_"
 
-        // Defaults
-        private const val DEFAULT_THEME_COLOR = "#667eea"
+        // Defaults (matching HTML)
+        private const val DEFAULT_THEME_COLOR = "#3C4B80"  // HTML default: rgb(60, 75, 128)
         private const val DEFAULT_AVATAR = "😊"
         private const val DEFAULT_COLOR_SCHEME = "purple"
 
