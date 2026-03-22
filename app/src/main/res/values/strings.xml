@@ -221,6 +221,7 @@
     <string name="enter_last_name">Enter last name</string>
     <string name="enter_phone_number">Enter phone number</string>
     <string name="enter_email">Enter email address</string>
+    <string name="search">Search</string>
     <string name="search_customers">Search Customers</string>
     <string name="search_by_name_phone_email">Search by name, phone, or email</string>
     <string name="no_customers_found">No customers found</string>
