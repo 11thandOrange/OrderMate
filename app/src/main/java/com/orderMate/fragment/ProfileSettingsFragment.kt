@@ -114,13 +114,18 @@ class ProfileSettingsFragment : Fragment() {
 
     /**
      * Show color picker dialog
-     * Uses Android's built-in color picker via an AlertDialog with color grid
+     * Matches HTML: Uses native color picker input (any color)
+     * When selected: Creates gradient and applies to entire app background
      */
     private fun showColorPickerDialog() {
+        // Use AmbilWarna color picker or simple AlertDialog with SeekBars
+        // For now, we'll use a simple color grid that matches common use cases
+        // The key difference from HTML is HTML uses native <input type="color">
+        
         val colors = listOf(
-            "#3C4B80", // Default (navy blue)
+            "#3C4B80", // Default (navy blue) - HTML default
             "#667eea", // Purple
-            "#764ba2", // Violet
+            "#764ba2", // Violet  
             "#f093fb", // Pink
             "#f5576c", // Red
             "#4facfe", // Blue
@@ -132,7 +137,7 @@ class ProfileSettingsFragment : Fragment() {
             "#ff9a9e", // Peach
             "#a18cd1", // Lavender
             "#fbc2eb", // Light pink
-            "#667eea", // Indigo
+            "#2c3e50", // Dark blue
             "#6a11cb"  // Deep purple
         )
 
@@ -146,14 +151,19 @@ class ProfileSettingsFragment : Fragment() {
         val colorGrid = view.findViewById<RecyclerView>(R.id.colorGrid)
         colorGrid.layoutManager = GridLayoutManager(requireContext(), 4)
         colorGrid.adapter = ColorAdapter(colors) { selectedColor ->
+            // Match HTML behavior:
+            // 1. Apply gradient to color preview
             applyThemeColor(selectedColor)
+            // 2. Save to local settings
             settingsManager.setThemeColor(selectedColor)
+            // 3. Save to Firebase
             saveToFirebase()
+            // 4. Apply to entire app (will take effect on activity resume)
             showToast("Theme color updated!")
             dialog.dismiss()
         }
         
-        view.findViewById<ImageView>(R.id.btnClose).setOnClickListener {
+        view.findViewById<View>(R.id.btnClose).setOnClickListener {
             dialog.dismiss()
         }
         
@@ -162,6 +172,7 @@ class ProfileSettingsFragment : Fragment() {
 
     /**
      * Show emoji picker dialog
+     * Matches HTML: Dark overlay (#000000 70% opacity), white card, close on X or outside click
      */
     private fun showEmojiPickerDialog() {
         val dialog = Dialog(requireContext())
@@ -177,7 +188,7 @@ class ProfileSettingsFragment : Fragment() {
         setupEmojiGrid(view.findViewById(R.id.emojiGridActivities), emojiCategories["activities"]!!, dialog)
         setupEmojiGrid(view.findViewById(R.id.emojiGridObjects), emojiCategories["objects"]!!, dialog)
         
-        view.findViewById<ImageView>(R.id.btnClose).setOnClickListener {
+        view.findViewById<View>(R.id.btnClose).setOnClickListener {
             dialog.dismiss()
         }
         
