@@ -475,7 +475,7 @@ class WidgetEditorAdapter(
             widgetBody.visibility = if (isExpanded) View.VISIBLE else View.GONE
             expandChevron.rotation = if (isExpanded) 180f else 0f
 
-            // Listeners - use bindingAdapterPosition for safe position access
+            // Listeners - use adapterPosition for safe position access
             dragHandle.setOnTouchListener { _, event ->
                 if (event.actionMasked == android.view.MotionEvent.ACTION_DOWN) {
                     itemTouchHelper?.startDrag(this)
@@ -484,7 +484,7 @@ class WidgetEditorAdapter(
             }
 
             widgetHeader.setOnClickListener {
-                val currentPos = bindingAdapterPosition
+                val currentPos = adapterPosition
                 if (currentPos == RecyclerView.NO_POSITION) return@setOnClickListener
                 
                 if (expandedPositions.contains(widget.id)) {
@@ -638,9 +638,9 @@ class NotificationTemplateAdapter(
             templateBody.visibility = if (isExpanded) View.VISIBLE else View.GONE
             expandChevron.rotation = if (isExpanded) 180f else 0f
 
-            // Listeners - use bindingAdapterPosition for safe position access
+            // Listeners - use adapterPosition for safe position access
             templateHeader.setOnClickListener {
-                val currentPos = bindingAdapterPosition
+                val currentPos = adapterPosition
                 if (currentPos == RecyclerView.NO_POSITION) return@setOnClickListener
                 
                 if (expandedPositions.contains(template.id)) {
@@ -653,7 +653,7 @@ class NotificationTemplateAdapter(
 
             inputTemplateName.setOnFocusChangeListener { _, hasFocus ->
                 if (!hasFocus) {
-                    val currentPos = bindingAdapterPosition
+                    val currentPos = adapterPosition
                     if (currentPos == RecyclerView.NO_POSITION) return@setOnFocusChangeListener
                     
                     template.name = inputTemplateName.text.toString()
