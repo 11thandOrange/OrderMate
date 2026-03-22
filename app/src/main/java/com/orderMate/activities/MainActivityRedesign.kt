@@ -55,6 +55,9 @@ class MainActivityRedesign : AppCompatActivity() {
     }
     
     private lateinit var profileSettingsManager: ProfileSettingsManager
+    private val firebaseConfigManager: FirebaseConfigManager by lazy {
+        FirebaseConfigManager.getInstance()
+    }
 
     private lateinit var navController: NavController
     private lateinit var rootLayout: ConstraintLayout
@@ -80,15 +83,40 @@ class MainActivityRedesign : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_redesign)
         
-        profileSettingsManager = ProfileSettingsManager(this)
+        profileSettingsManager = ProfileSettingsManager.getInstance(this)
         rootLayout = findViewById(R.id.rootLayout)
         
         setupNavigation()
         setupSideNav()
         
-        // Apply theme after view is ready
-        rootLayout.post {
-            applyThemeSettings()
+        // Load profile settings from Firebase, then apply theme
+        loadAndApplyProfileSettings()
+    }
+    
+    /**
+     * Load profile settings from Firebase and sync to SharedPreferences
+     * Then apply the theme to the UI
+     */
+    private fun loadAndApplyProfileSettings() {
+        val merchantId = myApplication.getMerchantId()
+        if (!merchantId.isNullOrEmpty()) {
+            firebaseConfigManager.getProfileSettings(merchantId) { settings ->
+                // Sync Firebase data to SharedPreferences
+                profileSettingsManager.setThemeColor(settings.themeColor)
+                if (settings.avatar.isNotEmpty()) {
+                    profileSettingsManager.setAvatarEmoji(settings.avatar)
+                }
+                
+                // Apply theme on main thread
+                runOnUiThread {
+                    applyThemeSettings()
+                }
+            }
+        } else {
+            // No merchant ID, just apply current settings
+            rootLayout.post {
+                applyThemeSettings()
+            }
         }
     }
     

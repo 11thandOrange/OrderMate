@@ -10,6 +10,7 @@ import androidx.core.content.edit
  * Profile Settings Manager (Issue #85)
  * 
  * Manages user-specific profile settings stored in SharedPreferences.
+ * Singleton pattern ensures consistent data across all components.
  * 
  * Settings include:
  * - Theme color (any hex color via color picker)
@@ -17,11 +18,13 @@ import androidx.core.content.edit
  * 
  * Each user's settings are stored separately.
  */
-class ProfileSettingsManager(private val context: Context) {
+class ProfileSettingsManager private constructor(context: Context) {
 
-    private val prefs: SharedPreferences = context.getSharedPreferences(
+    private val prefs: SharedPreferences = context.applicationContext.getSharedPreferences(
         PREFS_NAME, Context.MODE_PRIVATE
     )
+    
+
 
     // ==================== Theme Color ====================
 
@@ -214,6 +217,20 @@ class ProfileSettingsManager(private val context: Context) {
     }
 
     companion object {
+        @Volatile
+        private var INSTANCE: ProfileSettingsManager? = null
+        
+        fun getInstance(context: Context): ProfileSettingsManager {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: ProfileSettingsManager(context.applicationContext).also { INSTANCE = it }
+            }
+        }
+        
+        // For backward compatibility - creates/returns singleton
+        operator fun invoke(context: Context): ProfileSettingsManager {
+            return getInstance(context)
+        }
+        
         private const val PREFS_NAME = "ordermate_profile_settings_v2"
         
         // Keys
