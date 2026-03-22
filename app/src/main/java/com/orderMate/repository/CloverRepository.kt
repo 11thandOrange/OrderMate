@@ -170,19 +170,23 @@ class CloverRepository private constructor(private val context: Context) {
     }
 
     /**
-     * Assign a customer to an order
-     * Uses OrderConnector.addCustomer to link customer to order in Clover
+     * Assign a customer to an order by customer ID
+     * Gets the order and updates it with the customer
      */
     suspend fun assignCustomerToOrder(orderId: String, customerId: String): Boolean = withContext(Dispatchers.IO) {
         try {
             val orderConnector = myApp.getOrderConnector()
-
+            
+            // Get current order
+            val order = orderConnector.getOrder(orderId) ?: return@withContext false
+            
             // Create a customer reference with the ID
             val customer = Customer()
             customer.setId(customerId)
-
-            // Add customer to order - this persists in Clover
-            orderConnector.addCustomer(orderId, customer)
+            
+            // Update order with customer - use updateOrder or similar
+            order.setCustomers(listOf(customer))
+            orderConnector.updateOrder(order)
             true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -192,14 +196,18 @@ class CloverRepository private constructor(private val context: Context) {
     
     /**
      * Assign a full customer object to an order
-     * This creates/updates the customer in Clover and links to the order
+     * Updates the order with the new customer info
      */
     suspend fun assignCustomerToOrder(orderId: String, customer: Customer): Boolean = withContext(Dispatchers.IO) {
         try {
             val orderConnector = myApp.getOrderConnector()
             
-            // Add customer to order - Clover will create/update the customer
-            orderConnector.addCustomer(orderId, customer)
+            // Get current order
+            val order = orderConnector.getOrder(orderId) ?: return@withContext false
+            
+            // Update order with the customer
+            order.setCustomers(listOf(customer))
+            orderConnector.updateOrder(order)
             true
         } catch (e: Exception) {
             e.printStackTrace()
