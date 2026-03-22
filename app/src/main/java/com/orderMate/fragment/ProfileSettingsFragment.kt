@@ -105,7 +105,7 @@ class ProfileSettingsFragment : Fragment() {
 
     private fun loadCurrentSettings() {
         // Load theme color
-        val themeColor = settingsManager.getThemeColor() ?: DEFAULT_THEME_COLOR
+        val themeColor = settingsManager.getThemeColor()
         applyThemeColor(themeColor)
         
         // Load avatar
@@ -271,7 +271,7 @@ class ProfileSettingsFragment : Fragment() {
      */
     private fun saveToFirebase() {
         val merchantId = MyApp.getInstance().getMerchantId()
-        if (merchantId.isNotEmpty()) {
+        if (!merchantId.isNullOrEmpty()) {
             val settings = ProfileSettings(
                 themeColor = settingsManager.getThemeColor(),
                 avatar = settingsManager.getAvatarEmoji()
