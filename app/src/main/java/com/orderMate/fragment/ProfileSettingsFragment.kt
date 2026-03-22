@@ -106,12 +106,19 @@ class ProfileSettingsFragment : Fragment() {
     }
 
     private fun loadCurrentSettings() {
-        // Load theme color
+        // Load theme color and apply to preview
         val themeColor = settingsManager.getThemeColor()
         applyThemeColor(themeColor)
         
+        // Also apply to app background in case it wasn't applied
+        applyGradientToAppBackground(themeColor)
+        
         // Load avatar
         updateAvatarDisplay()
+        
+        // Update nav avatar as well
+        val emoji = settingsManager.getAvatarEmoji()
+        updateNavAvatar(emoji)
     }
 
     /**
