@@ -750,28 +750,97 @@
                         android:layout_marginHorizontal="16dp"
                         android:background="#1AFFFFFF" />
 
-                    <!-- History Items -->
+                    <!-- History Items - matches HTML .detail-card-body -->
+                    <!-- padding: 20px -->
                     <LinearLayout
                         android:id="@+id/historyContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="20dp">
 
+                        <!-- History Item 1 - matches HTML .detail-history-item -->
+                        <!-- gap: 12px, padding: 12px 0, border-bottom: 1px solid rgba(255,255,255,0.1) -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
-                            android:background="@drawable/bg_item_row"
-                            android:padding="12dp">
+                            android:paddingVertical="12dp">
 
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_notification"
-                                app:tint="@color/orange_accent"
-                                android:contentDescription="@string/notification" />
+                            <!-- History Icon - matches HTML .detail-history-icon -->
+                            <!-- 36x36, border-radius: 8px, background: rgba(255,255,255,0.1) -->
+                            <FrameLayout
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/bg_history_icon">
+                                
+                                <ImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_notification"
+                                    app:tint="@color/text_muted"
+                                    android:contentDescription="@string/notification" />
+                            </FrameLayout>
+
+                            <!-- History Content - matches HTML .detail-history-content -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:orientation="vertical">
+
+                                <!-- History Title - matches HTML .detail-history-title -->
+                                <!-- font-size: 13px, font-weight: 500, color: text-light -->
+                                <com.google.android.material.textview.MaterialTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/reminder_sent"
+                                    android:textColor="@color/text_light"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <!-- History Date - matches HTML .detail-history-date -->
+                                <!-- font-size: 11px, color: text-muted, margin-top: 2px -->
+                                <com.google.android.material.textview.MaterialTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="@string/sample_date_time"
+                                    android:textColor="@color/text_muted"
+                                    android:textSize="11sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                        
+                        <!-- Separator -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#1AFFFFFF" />
+
+                        <!-- History Item 2 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="12dp">
+
+                            <FrameLayout
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/bg_history_icon">
+                                
+                                <ImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_cash"
+                                    app:tint="@color/text_muted"
+                                    android:contentDescription="@string/payment" />
+                            </FrameLayout>
 
                             <LinearLayout
                                 android:layout_width="0dp"
@@ -783,28 +852,73 @@
                                 <com.google.android.material.textview.MaterialTextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/reminder_sent"
+                                    android:text="@string/payment_received"
                                     android:textColor="@color/text_light"
-                                    android:textSize="14sp"
+                                    android:textSize="13sp"
                                     android:textStyle="bold" />
 
                                 <com.google.android.material.textview.MaterialTextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="2dp"
-                                    android:text="@string/sample_date_time"
+                                    android:text="@string/sample_date_time_2"
                                     android:textColor="@color/text_muted"
-                                    android:textSize="12sp" />
+                                    android:textSize="11sp" />
                             </LinearLayout>
                         </LinearLayout>
+                        
+                        <!-- Separator -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#1AFFFFFF" />
 
-                        <com.google.android.material.textview.MaterialTextView
+                        <!-- History Item 3 (last - no border) -->
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="@string/sms_reminder_sent"
-                            android:textColor="@color/text_muted"
-                            android:textSize="12sp" />
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="12dp">
+
+                            <FrameLayout
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/bg_history_icon">
+                                
+                                <ImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_add_circle"
+                                    app:tint="@color/text_muted"
+                                    android:contentDescription="@string/order_created" />
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:orientation="vertical">
+
+                                <com.google.android.material.textview.MaterialTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/order_created"
+                                    android:textColor="@color/text_light"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <com.google.android.material.textview.MaterialTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="@string/sample_date_time_3"
+                                    android:textColor="@color/text_muted"
+                                    android:textSize="11sp" />
+                            </LinearLayout>
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

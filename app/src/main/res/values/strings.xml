@@ -201,6 +201,10 @@
     <string name="view_all">View All</string>
     <string name="reminder_sent">Reminder Sent</string>
     <string name="sample_date_time">March 15, 2026 • 9:00 AM</string>
+    <string name="sample_date_time_2">March 14, 2026 • 2:32 PM</string>
+    <string name="sample_date_time_3">March 14, 2026 • 2:30 PM</string>
+    <string name="payment_received">Payment Received</string>
+    <string name="order_created">Order Created</string>
     <string name="sms_reminder_sent">SMS reminder sent to customer</string>
     <string name="notification">Notification</string>
     <string name="send_notification">Send Notification</string>
