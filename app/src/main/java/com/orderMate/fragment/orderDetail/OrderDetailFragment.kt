@@ -283,6 +283,104 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         showLineItemOnScreen()
         showThePaymentData()
         showTheDiscountAndTaxData()
+        populateHistoryCard()
+    }
+    
+    private fun populateHistoryCard() {
+        val historyContainer = binding.historyContainer
+        historyContainer.removeAllViews()
+        
+        data class HistoryItem(
+            val title: String,
+            val timestamp: Long,
+            val iconRes: Int
+        )
+        
+        val historyItems = mutableListOf<HistoryItem>()
+        
+        // Add order created event
+        orderArguments?.createdTime?.let { createdTime ->
+            historyItems.add(
+                HistoryItem(
+                    title = getString(R.string.order_created),
+                    timestamp = createdTime,
+                    iconRes = R.drawable.ic_add_circle
+                )
+            )
+        }
+        
+        // Add order modified event (if different from created)
+        orderArguments?.modifiedTime?.let { modifiedTime ->
+            if (modifiedTime != orderArguments?.createdTime) {
+                historyItems.add(
+                    HistoryItem(
+                        title = getString(R.string.order_modified),
+                        timestamp = modifiedTime,
+                        iconRes = R.drawable.ic_edit
+                    )
+                )
+            }
+        }
+        
+        // Add payment events
+        orderArguments?.payments?.forEach { payment ->
+            payment?.createdTime?.let { timestamp ->
+                val amount = payment.amount?.let { amt ->
+                    "${currencyName.convertToSymbol()}${(amt / 100.0).toDoubleFloatPoint()}"
+                } ?: ""
+                historyItems.add(
+                    HistoryItem(
+                        title = "${getString(R.string.payment_received)} $amount",
+                        timestamp = timestamp,
+                        iconRes = R.drawable.ic_credit_card
+                    )
+                )
+            }
+        }
+        
+        // Sort by timestamp descending (most recent first)
+        historyItems.sortByDescending { it.timestamp }
+        
+        // Limit to 3 items for the card preview
+        val displayItems = historyItems.take(3)
+        
+        displayItems.forEachIndexed { index, item ->
+            // Add separator before items (except first)
+            if (index > 0) {
+                val separator = View(requireContext()).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        (1 * resources.displayMetrics.density).toInt()
+                    )
+                    setBackgroundColor(0x1AFFFFFF)
+                }
+                historyContainer.addView(separator)
+            }
+            
+            // Create history item view
+            val itemView = layoutInflater.inflate(R.layout.item_order_history, historyContainer, false)
+            
+            // Set icon
+            itemView.findViewById<android.widget.ImageView>(R.id.historyIcon)?.apply {
+                setImageResource(item.iconRes)
+            }
+            
+            // Set title
+            itemView.findViewById<android.widget.TextView>(R.id.historyTitle)?.apply {
+                text = item.title
+            }
+            
+            // Set timestamp
+            itemView.findViewById<android.widget.TextView>(R.id.historyTimestamp)?.apply {
+                text = item.timestamp.formatMillisToDateTime(Constants.yearFormat)
+            }
+            
+            historyContainer.addView(itemView)
+        }
+        
+        // Show/hide scroll indicator based on total items
+        binding.historyScrollIndicator.isVisible = historyItems.size > 3
+        binding.historyFadeOverlay.isVisible = historyItems.size > 3
     }
 
 
