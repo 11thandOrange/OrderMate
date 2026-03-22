@@ -42,7 +42,7 @@ class ProfileSettingsManager private constructor(context: Context) {
      */
     fun setThemeColor(hexColor: String) {
         if (isValidHexColor(hexColor)) {
-            prefs.edit { putString(KEY_THEME_COLOR, hexColor) }
+            prefs.edit().putString(KEY_THEME_COLOR, hexColor).commit()
         }
     }
 
@@ -71,9 +71,7 @@ class ProfileSettingsManager private constructor(context: Context) {
      * @param emoji Any emoji string
      */
     fun setAvatar(emoji: String) {
-        if (emoji.isNotEmpty()) {
-            prefs.edit { putString(KEY_AVATAR, emoji) }
-        }
+        prefs.edit().putString(KEY_AVATAR, emoji).commit()
     }
 
     /**
@@ -87,7 +85,7 @@ class ProfileSettingsManager private constructor(context: Context) {
      * Set avatar emoji
      */
     fun setAvatarEmoji(emoji: String) {
-        prefs.edit { putString(KEY_AVATAR, emoji) }
+        prefs.edit().putString(KEY_AVATAR, emoji).commit()
     }
 
     /**

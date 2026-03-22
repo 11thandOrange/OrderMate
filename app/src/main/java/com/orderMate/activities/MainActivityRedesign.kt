@@ -89,33 +89,33 @@ class MainActivityRedesign : AppCompatActivity() {
         setupNavigation()
         setupSideNav()
         
-        // Load profile settings from Firebase, then apply theme
-        loadAndApplyProfileSettings()
+        // Apply theme immediately from SharedPreferences
+        applyThemeSettings()
+        
+        // Also sync from Firebase in background (for cross-device sync)
+        syncProfileSettingsFromFirebase()
     }
     
     /**
-     * Load profile settings from Firebase and sync to SharedPreferences
-     * Then apply the theme to the UI
+     * Sync profile settings from Firebase to SharedPreferences
+     * Called on app start for cross-device synchronization
      */
-    private fun loadAndApplyProfileSettings() {
+    private fun syncProfileSettingsFromFirebase() {
         val merchantId = myApplication.getMerchantId()
         if (!merchantId.isNullOrEmpty()) {
             firebaseConfigManager.getProfileSettings(merchantId) { settings ->
-                // Sync Firebase data to SharedPreferences
-                profileSettingsManager.setThemeColor(settings.themeColor)
-                if (settings.avatar.isNotEmpty()) {
-                    profileSettingsManager.setAvatarEmoji(settings.avatar)
+                // Only update if Firebase has non-default values
+                if (settings.themeColor != "#3C4B80" || settings.avatar.isNotEmpty()) {
+                    profileSettingsManager.setThemeColor(settings.themeColor)
+                    if (settings.avatar.isNotEmpty()) {
+                        profileSettingsManager.setAvatarEmoji(settings.avatar)
+                    }
+                    
+                    // Re-apply theme with Firebase values
+                    runOnUiThread {
+                        applyThemeSettings()
+                    }
                 }
-                
-                // Apply theme on main thread
-                runOnUiThread {
-                    applyThemeSettings()
-                }
-            }
-        } else {
-            // No merchant ID, just apply current settings
-            rootLayout.post {
-                applyThemeSettings()
             }
         }
     }
