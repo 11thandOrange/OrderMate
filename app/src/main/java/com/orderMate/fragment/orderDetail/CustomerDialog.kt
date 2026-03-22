@@ -104,23 +104,25 @@ class CustomerDialog(
     
     /**
      * Launch Clover's customer editor/selector
-     * This uses the same Clover intent that Register app uses
+     * Uses Register app to edit customer on order (same as Clover Register flow)
      */
     private fun launchCloverCustomerEditor() {
         try {
-            // If we have an order, use the order-based customer intent
+            // Launch Register app with order - user can then add/edit customer
             if (!orderId.isNullOrEmpty()) {
-                val intent = Intent(Intents.ACTION_CUSTOMER_ADD_TO_ORDER).apply {
+                val intent = Intent(Intents.ACTION_START_REGISTER).apply {
                     putExtra(Intents.EXTRA_ORDER_ID, orderId)
                 }
                 startActivityForResult(intent, REQUEST_CUSTOMER_EDIT)
             } else {
-                // Otherwise launch customer selector
-                val intent = Intent(Intents.ACTION_CUSTOMER_SELECT)
+                // Fallback: launch Clover Customers app directly
+                val intent = Intent().apply {
+                    setClassName("com.clover.customers", "com.clover.customers.activities.CustomersActivity")
+                }
                 startActivityForResult(intent, REQUEST_CUSTOMER_SELECT)
             }
         } catch (e: Exception) {
-            // Fallback: launch Clover Customers app directly
+            // Try alternative customers activity
             try {
                 val intent = Intent().apply {
                     setClassName("com.clover.customers", "com.clover.customers.CustomerSelectActivity")
