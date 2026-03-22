@@ -23,6 +23,10 @@ class SharedFilterViewModel : ViewModel() {
     // Dates parsed from search or filter (for calendar highlighting)
     private val _searchedDates = MutableLiveData<List<Date>>(emptyList())
     val searchedDates: LiveData<List<Date>> = _searchedDates
+    
+    // Calendar view mode (day/week/month) - persists across navigation
+    private val _calendarViewMode = MutableLiveData("month")
+    val calendarViewMode: LiveData<String> = _calendarViewMode
 
     /**
      * Update the filter state
@@ -45,6 +49,13 @@ class SharedFilterViewModel : ViewModel() {
     fun setSearchedDates(dates: List<Date>) {
         _searchedDates.value = dates
     }
+    
+    /**
+     * Update calendar view mode (day/week/month)
+     */
+    fun setCalendarViewMode(mode: String) {
+        _calendarViewMode.value = mode
+    }
 
     /**
      * Reset all filters and search
@@ -53,6 +64,7 @@ class SharedFilterViewModel : ViewModel() {
         _filterState.value = FilterDialogFragment.FilterState()
         _searchQuery.value = ""
         _searchedDates.value = emptyList()
+        // Note: We don't reset view mode on filter clear
     }
 
     /**

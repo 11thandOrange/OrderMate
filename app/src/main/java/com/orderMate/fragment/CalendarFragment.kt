@@ -197,7 +197,52 @@ class CalendarFragment : Fragment() {
         sharedFilterViewModel.searchedDates.observe(viewLifecycleOwner) { dates ->
             searchedDates = dates
             updateViewModeButtonsState()
-            renderCalendar()
+            // Only render if views are initialized
+            if (view != null && calendarGrid != null) {
+                renderCalendar()
+            }
+        }
+        
+        // Observe calendar view mode (persists across navigation)
+        sharedFilterViewModel.calendarViewMode.observe(viewLifecycleOwner) { mode ->
+            if (mode != currentViewMode) {
+                currentViewMode = mode
+                updateViewModeButtonVisuals(mode)
+                // Only render if views are initialized
+                if (view != null && calendarGrid != null) {
+                    renderCalendar()
+                }
+            }
+        }
+    }
+    
+    /**
+     * Update view mode button visuals without triggering renderCalendar
+     */
+    private fun updateViewModeButtonVisuals(mode: String) {
+        val inactiveColor = ContextCompat.getColor(requireContext(), R.color.text_muted)
+        val activeColor = ContextCompat.getColor(requireContext(), R.color.text_primary)
+        
+        btnDay?.setBackgroundResource(0)
+        btnDay?.setTextColor(inactiveColor)
+        btnWeek?.setBackgroundResource(0)
+        btnWeek?.setTextColor(inactiveColor)
+        btnMonth?.setBackgroundResource(0)
+        btnMonth?.setTextColor(inactiveColor)
+        
+        when (mode) {
+            "day" -> {
+                btnDay?.setBackgroundResource(R.drawable.bg_view_mode_active)
+                btnDay?.setTextColor(activeColor)
+            }
+            "week" -> {
+                btnWeek?.setBackgroundResource(R.drawable.bg_view_mode_active)
+                btnWeek?.setTextColor(activeColor)
+            }
+            "month" -> {
+                btnMonth?.setBackgroundResource(R.drawable.bg_view_mode_active)
+                btnMonth?.setTextColor(activeColor)
+            }
         }
     }
     
@@ -458,6 +503,9 @@ class CalendarFragment : Fragment() {
                 
                 // Navigate calendar to this date
                 currentDate.set(year, month, day)
+                
+                // Sync filter state to shared ViewModel
+                sharedFilterViewModel.setFilterState(currentFilterState)
                 
                 // Apply filters and update pills
                 applyDialogFilters(currentFilterState)
@@ -803,30 +851,10 @@ class CalendarFragment : Fragment() {
     private fun setViewMode(mode: String) {
         currentViewMode = mode
         
-        val inactiveColor = ContextCompat.getColor(requireContext(), R.color.text_muted)
-        btnDay?.setBackgroundResource(0)
-        btnDay?.setTextColor(inactiveColor)
-        btnWeek?.setBackgroundResource(0)
-        btnWeek?.setTextColor(inactiveColor)
-        btnMonth?.setBackgroundResource(0)
-        btnMonth?.setTextColor(inactiveColor)
+        // Sync to shared ViewModel for persistence across navigation
+        sharedFilterViewModel.setCalendarViewMode(mode)
         
-        val activeColor = ContextCompat.getColor(requireContext(), R.color.text_primary)
-        when (mode) {
-            "day" -> {
-                btnDay?.setBackgroundResource(R.drawable.bg_view_mode_active)
-                btnDay?.setTextColor(activeColor)
-            }
-            "week" -> {
-                btnWeek?.setBackgroundResource(R.drawable.bg_view_mode_active)
-                btnWeek?.setTextColor(activeColor)
-            }
-            "month" -> {
-                btnMonth?.setBackgroundResource(R.drawable.bg_view_mode_active)
-                btnMonth?.setTextColor(activeColor)
-            }
-        }
-        
+        updateViewModeButtonVisuals(mode)
         renderCalendar()
     }
 
@@ -873,14 +901,14 @@ class CalendarFragment : Fragment() {
      * Render multiple searched dates side by side (matches HTML renderMultipleDaysView)
      */
     private fun renderSearchedDatesView() {
+        if (searchedDates.isEmpty()) {
+            renderMonthView()
+            return
+        }
+        
         // Hide the grid and show timeline
         calendarGrid?.visibility = View.GONE
         weekdayHeaders?.visibility = View.GONE
-        
-        // Use the first searched date as the start
-        val startDate = Calendar.getInstance().apply {
-            time = searchedDates.first()
-        }
         
         // Render timeline with searched dates
         renderTimelineViewForDates(searchedDates)
@@ -891,7 +919,9 @@ class CalendarFragment : Fragment() {
      * Uses XML-defined views for proper layout (fixed header height)
      */
     private fun renderTimelineViewForDates(dates: List<Date>) {
-        val context = requireContext()
+        if (dates.isEmpty()) return
+        
+        val context = context ?: return
         val today = Calendar.getInstance()
         val dayNamesShort = arrayOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
         val hourHeight = 60
@@ -1101,7 +1131,7 @@ class CalendarFragment : Fragment() {
      * Uses XML-defined views for proper layout (fixed header height)
      */
     private fun renderTimelineView(startDate: Calendar, numDays: Int) {
-        val context = requireContext()
+        val context = context ?: return
         val today = Calendar.getInstance()
         val dayNamesShort = arrayOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
         val hourHeight = 60 // dp per hour
