@@ -384,16 +384,14 @@ class CalendarFragment : Fragment() {
                 val sharedState = sharedFilterViewModel.filterState.value
                 if (sharedState != null && sharedState.hasActiveFilters()) {
                     currentFilterState = sharedState
-                    updateFilterPills(sharedState)
-                    // Apply filters synchronously to ensure correct order
+                    // applyFiltersSync handles pills and rendering
                     applyFiltersSync(sharedState)
                 } else if (restoredSearchedDates.isNotEmpty()) {
                     // We have searched dates but no active filters - need to filter by those dates
-                    // This can happen when dates were added but filter dialog wasn't used
                     currentFilterState = currentFilterState.copy(
                         dateSelections = mapOf(FilterCategoryBuilder.CLOVER_ORDER_DATE to restoredSearchedDates)
                     )
-                    updateFilterPills(currentFilterState)
+                    // applyFiltersSync handles pills and rendering
                     applyFiltersSync(currentFilterState)
                 } else {
                     renderCalendar()
@@ -404,9 +402,11 @@ class CalendarFragment : Fragment() {
     
     /**
      * Apply filters synchronously (on current thread)
-     * Used during initial load to avoid race conditions
+     * Used to avoid race conditions with async operations
      */
     private fun applyFiltersSync(filters: FilterDialogFragment.FilterState) {
+        if (!isAdded || view == null) return  // Safety check
+        
         filteredOrders.clear()
         
         allOrders.forEach { order ->
@@ -434,6 +434,7 @@ class CalendarFragment : Fragment() {
         sharedFilterViewModel.setSearchedDates(combinedDates)
         
         updateViewModeButtonsState()
+        updateFilterPills(filters)
         renderCalendar()
     }
     
@@ -678,45 +679,8 @@ class CalendarFragment : Fragment() {
     }
     
     private fun applyDialogFilters(filters: FilterDialogFragment.FilterState) {
-        runOnBackgroundThread {
-            filteredOrders.clear()
-
-            allOrders.forEach { order ->
-                if (orderMatchesFilters(order, filters)) {
-                    filteredOrders.add(order)
-                }
-            }
-            
-            filteredEvents = convertOrdersToEvents(filteredOrders)
-            
-            // Update searchedDates from filter state (matches HTML behavior)
-            // This triggers single/multiple day view when dates are selected via picker
-            val filterDates = filters.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE] ?: emptyList()
-            
-            // Also parse dates from search query if any
-            val queryDates = if (currentSearchQuery.isNotEmpty()) {
-                OrderSearchFilter.parseSearchDates(currentSearchQuery, currentDate.get(Calendar.YEAR))
-            } else {
-                emptyList()
-            }
-            
-            // Combine and deduplicate dates
-            val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
-            val combinedDates = (filterDates + queryDates)
-                .distinctBy { dateFormat.format(it) }
-                .sortedBy { it.time }
-            
-            searchedDates = combinedDates
-
-            runOnMainThread {
-                // Sync to shared ViewModel (must be on main thread)
-                sharedFilterViewModel.setSearchedDates(combinedDates)
-                
-                updateViewModeButtonsState()
-                renderCalendar()
-                updateFilterPills(filters)
-            }
-        }
+        // Use sync version to avoid race conditions
+        applyFiltersSync(filters)
     }
     
     /**
