@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Color Picker Dialog - Matches HTML <input type="color"> behavior -->
+<!-- Simple Color Picker - Tap anywhere on spectrum to choose color -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#B3000000">
@@ -18,7 +17,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="16dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -47,87 +46,24 @@
             </FrameLayout>
         </LinearLayout>
 
-        <!-- Color Preview (shows gradient like HTML) -->
+        <!-- Color Preview (shows selected color as gradient) -->
         <FrameLayout
             android:id="@+id/colorPreviewLarge"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_marginBottom="20dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/bg_color_preview" />
 
-        <!-- Red Slider -->
-        <LinearLayout
+        <!-- Color Spectrum (tap to select) -->
+        <ImageView
+            android:id="@+id/colorSpectrum"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_height="150dp"
+            android:layout_marginBottom="16dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/color_spectrum" />
 
-            <TextView
-                android:layout_width="24dp"
-                android:layout_height="wrap_content"
-                android:text="R"
-                android:textColor="#FF5555"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <SeekBar
-                android:id="@+id/seekBarRed"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:max="255"
-                android:progress="60"
-                android:progressTint="#FF5555"
-                android:thumbTint="#FF5555" />
-
-            <TextView
-                android:id="@+id/tvRedValue"
-                android:layout_width="36dp"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                android:text="60"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <!-- Green Slider -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="24dp"
-                android:layout_height="wrap_content"
-                android:text="G"
-                android:textColor="#55FF55"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <SeekBar
-                android:id="@+id/seekBarGreen"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:max="255"
-                android:progress="75"
-                android:progressTint="#55FF55"
-                android:thumbTint="#55FF55" />
-
-            <TextView
-                android:id="@+id/tvGreenValue"
-                android:layout_width="36dp"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                android:text="75"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <!-- Blue Slider -->
+        <!-- Brightness Slider -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -136,84 +72,41 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="24dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="B"
-                android:textColor="#5555FF"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:text="☀"
+                android:textSize="16sp" />
 
             <SeekBar
-                android:id="@+id/seekBarBlue"
+                android:id="@+id/brightnessSlider"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
                 android:layout_weight="1"
-                android:max="255"
-                android:progress="128"
-                android:progressTint="#5555FF"
-                android:thumbTint="#5555FF" />
+                android:max="100"
+                android:progress="100" />
 
             <TextView
-                android:id="@+id/tvBlueValue"
+                android:id="@+id/tvBrightness"
                 android:layout_width="36dp"
                 android:layout_height="wrap_content"
                 android:gravity="end"
-                android:text="128"
+                android:text="100%"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Hex Color Input -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="HEX:"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/etHexColor"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_hex_input"
-                android:gravity="center"
-                android:hint="#3C4B80"
-                android:inputType="text"
-                android:maxLength="7"
-                android:paddingHorizontal="12dp"
-                android:text="#3C4B80"
-                android:textColor="@color/text_primary"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <!-- Preset Colors (Quick Select) -->
+        <!-- Hex Display -->
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="Quick Select"
-            android:textColor="@color/text_secondary"
-            android:textSize="10sp"
-            android:textAllCaps="true"
-            android:textStyle="bold" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/colorGrid"
+            android:id="@+id/tvHexColor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            app:spanCount="8" />
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:text="#3C4B80"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:fontFamily="monospace" />
 
         <!-- Apply Button -->
         <TextView

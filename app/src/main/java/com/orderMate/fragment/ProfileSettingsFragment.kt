@@ -1,19 +1,18 @@
 package com.orderMate.fragment
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
@@ -116,10 +115,10 @@ class ProfileSettingsFragment : Fragment() {
     }
 
     /**
-     * Show color picker dialog with RGB sliders
-     * Matches HTML: <input type="color"> - allows choosing ANY color
-     * When selected: Creates gradient and applies to entire app background
+     * Show simple color picker dialog
+     * Tap on color spectrum to choose any color, adjust brightness with slider
      */
+    @SuppressLint("ClickableViewAccessibility")
     private fun showColorPickerDialog() {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -130,25 +129,33 @@ class ProfileSettingsFragment : Fragment() {
         
         // Get current color
         val currentColor = settingsManager.getThemeColor()
-        var selectedRed = Color.red(Color.parseColor(currentColor))
-        var selectedGreen = Color.green(Color.parseColor(currentColor))
-        var selectedBlue = Color.blue(Color.parseColor(currentColor))
+        var selectedHue = 0f
+        var selectedSaturation = 1f
+        var brightness = 1f
+        
+        // Parse current color to HSV
+        val hsv = FloatArray(3)
+        Color.colorToHSV(Color.parseColor(currentColor), hsv)
+        selectedHue = hsv[0]
+        selectedSaturation = hsv[1]
+        brightness = hsv[2]
         
         // UI Elements
         val colorPreviewLarge = view.findViewById<FrameLayout>(R.id.colorPreviewLarge)
-        val seekBarRed = view.findViewById<SeekBar>(R.id.seekBarRed)
-        val seekBarGreen = view.findViewById<SeekBar>(R.id.seekBarGreen)
-        val seekBarBlue = view.findViewById<SeekBar>(R.id.seekBarBlue)
-        val tvRedValue = view.findViewById<TextView>(R.id.tvRedValue)
-        val tvGreenValue = view.findViewById<TextView>(R.id.tvGreenValue)
-        val tvBlueValue = view.findViewById<TextView>(R.id.tvBlueValue)
-        val etHexColor = view.findViewById<EditText>(R.id.etHexColor)
+        val colorSpectrum = view.findViewById<ImageView>(R.id.colorSpectrum)
+        val brightnessSlider = view.findViewById<SeekBar>(R.id.brightnessSlider)
+        val tvBrightness = view.findViewById<TextView>(R.id.tvBrightness)
+        val tvHexColor = view.findViewById<TextView>(R.id.tvHexColor)
         val btnApply = view.findViewById<View>(R.id.btnApply)
-        val colorGrid = view.findViewById<RecyclerView>(R.id.colorGrid)
         
-        // Function to update preview with gradient
+        // Function to get current color
+        fun getCurrentColor(): Int {
+            return Color.HSVToColor(floatArrayOf(selectedHue, selectedSaturation, brightness))
+        }
+        
+        // Function to update preview
         fun updatePreview() {
-            val baseColor = Color.rgb(selectedRed, selectedGreen, selectedBlue)
+            val baseColor = getCurrentColor()
             val lighterColor = lightenColor(baseColor, 0.3f)
             val gradientDrawable = GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
@@ -157,108 +164,47 @@ class ProfileSettingsFragment : Fragment() {
             gradientDrawable.cornerRadius = 10f * resources.displayMetrics.density
             colorPreviewLarge.background = gradientDrawable
             
-            // Update hex field
-            val hexColor = String.format("#%02X%02X%02X", selectedRed, selectedGreen, selectedBlue)
-            if (etHexColor.text.toString().uppercase() != hexColor) {
-                etHexColor.setText(hexColor)
-                etHexColor.setSelection(hexColor.length)
-            }
+            // Update hex display
+            val hexColor = String.format("#%02X%02X%02X", 
+                Color.red(baseColor), Color.green(baseColor), Color.blue(baseColor))
+            tvHexColor.text = hexColor
         }
         
-        // Initialize sliders with current color
-        seekBarRed.progress = selectedRed
-        seekBarGreen.progress = selectedGreen
-        seekBarBlue.progress = selectedBlue
-        tvRedValue.text = selectedRed.toString()
-        tvGreenValue.text = selectedGreen.toString()
-        tvBlueValue.text = selectedBlue.toString()
+        // Initialize
+        brightnessSlider.progress = (brightness * 100).toInt()
+        tvBrightness.text = "${(brightness * 100).toInt()}%"
         updatePreview()
         
-        // Slider listeners
-        seekBarRed.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                selectedRed = progress
-                tvRedValue.text = progress.toString()
-                if (fromUser) updatePreview()
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-        
-        seekBarGreen.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                selectedGreen = progress
-                tvGreenValue.text = progress.toString()
-                if (fromUser) updatePreview()
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-        
-        seekBarBlue.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                selectedBlue = progress
-                tvBlueValue.text = progress.toString()
-                if (fromUser) updatePreview()
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-        
-        // Hex input listener
-        etHexColor.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                val hex = s.toString()
-                if (hex.matches(Regex("^#[0-9A-Fa-f]{6}$"))) {
-                    try {
-                        val color = Color.parseColor(hex)
-                        selectedRed = Color.red(color)
-                        selectedGreen = Color.green(color)
-                        selectedBlue = Color.blue(color)
-                        seekBarRed.progress = selectedRed
-                        seekBarGreen.progress = selectedGreen
-                        seekBarBlue.progress = selectedBlue
-                        tvRedValue.text = selectedRed.toString()
-                        tvGreenValue.text = selectedGreen.toString()
-                        tvBlueValue.text = selectedBlue.toString()
-                        
-                        // Update preview without changing text
-                        val baseColor = Color.rgb(selectedRed, selectedGreen, selectedBlue)
-                        val lighterColor = lightenColor(baseColor, 0.3f)
-                        val gradientDrawable = GradientDrawable(
-                            GradientDrawable.Orientation.TL_BR,
-                            intArrayOf(baseColor, lighterColor)
-                        )
-                        gradientDrawable.cornerRadius = 10f * resources.displayMetrics.density
-                        colorPreviewLarge.background = gradientDrawable
-                    } catch (e: Exception) {}
-                }
-            }
-        })
-        
-        // Quick select preset colors
-        val presetColors = listOf(
-            "#3C4B80", "#667eea", "#764ba2", "#f093fb",
-            "#f5576c", "#4facfe", "#43e97b", "#fee140"
-        )
-        colorGrid.layoutManager = GridLayoutManager(requireContext(), 8)
-        colorGrid.adapter = ColorAdapter(presetColors) { presetColor ->
-            val color = Color.parseColor(presetColor)
-            selectedRed = Color.red(color)
-            selectedGreen = Color.green(color)
-            selectedBlue = Color.blue(color)
-            seekBarRed.progress = selectedRed
-            seekBarGreen.progress = selectedGreen
-            seekBarBlue.progress = selectedBlue
+        // Tap on spectrum to pick color
+        colorSpectrum.setOnTouchListener { v, event ->
+            val x = event.x / v.width
+            val y = event.y / v.height
+            
+            // X = hue (0-360), Y = saturation (1 at top, 0 at bottom)
+            selectedHue = x * 360f
+            selectedSaturation = 1f - y
+            
             updatePreview()
+            true
         }
+        
+        // Brightness slider
+        brightnessSlider.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                brightness = progress / 100f
+                tvBrightness.text = "$progress%"
+                if (fromUser) updatePreview()
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
         
         // Apply button
         btnApply.setOnClickListener {
-            val finalColor = String.format("#%02X%02X%02X", selectedRed, selectedGreen, selectedBlue)
-            // Match HTML behavior:
+            val baseColor = getCurrentColor()
+            val finalColor = String.format("#%02X%02X%02X", 
+                Color.red(baseColor), Color.green(baseColor), Color.blue(baseColor))
+            
             applyThemeColor(finalColor)
             settingsManager.setThemeColor(finalColor)
             saveToFirebase()
