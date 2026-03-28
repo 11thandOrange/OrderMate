@@ -685,13 +685,17 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         // Check the actual data to determine if any note field is active
         // Excludes modal trigger options (same logic as isAllFieldDisabled)
         val data = preferenceManager.getJsonString()
+        android.util.Log.d("OrderDetail", "hasAddNoteAccess - types count: ${data.types.size}")
         data.types.forEach {
+            android.util.Log.d("OrderDetail", "Type: ${it.name}, isActive: ${it.isActive}")
             if (it.isActive &&
                 !it.name.equals(Constants.isCustomModalShown, true) &&
                 !it.name.equals(Constants.isCustomModalBasket, true)) {
+                android.util.Log.d("OrderDetail", "Found active type: ${it.name}")
                 return true
             }
         }
+        android.util.Log.d("OrderDetail", "No active note fields found")
         return false
     }
 
