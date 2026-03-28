@@ -28,7 +28,6 @@ import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.communicators.IShareEmailOrMessage
 import com.orderMate.databinding.FragmentOrderDetailBinding
 import com.orderMate.fragment.orderHistory.OrderHistoryFragment
-import com.orderMate.modals.CustomItemJson
 import com.orderMate.modals.ItemModal
 import com.orderMate.modals.ShareMessageJson
 import com.orderMate.modals.ShareSmsModal
@@ -683,18 +682,9 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     * @return : false when there is not any active option for the dialog
     * */
     private fun hasAddNoteAccess(): Boolean {
-
-        val data = preferenceManager.getJsonString()
-        // checks for if the provided data is null or not required JSON then we
-        // not show the dialog as rest of the data in dialog will also be not valid
-        // leads to irrelevant dialog
-        if (data !is CustomItemJson) {
-            return false
-        }
-        data.types.forEach {
-            if (it.isActive) return true
-        }
-        return false
+        // Use the pre-computed isAllFieldDisabled value which correctly excludes
+        // modal trigger options when determining if note fields are available
+        return !preferenceManager.getBoolean(Constants.isAllFieldDisabled)
     }
 
 

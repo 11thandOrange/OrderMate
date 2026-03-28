@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.orderMate.modals.CustomItemJson
+import com.orderMate.utils.defaultCustomDataForFirebase
 
 class PreferenceManager private constructor(context: Context) {
 
@@ -36,12 +37,17 @@ class PreferenceManager private constructor(context: Context) {
     }
 
 
-    fun getJsonString(): Any? {
+    fun getJsonString(): CustomItemJson {
         return try {
             val requiredJson = getString(Constants.customMenuJson)
-            Gson().fromJson(requiredJson, CustomItemJson::class.java)
+            if (requiredJson.isBlank()) {
+                defaultCustomDataForFirebase
+            } else {
+                Gson().fromJson(requiredJson, CustomItemJson::class.java)
+                    ?: defaultCustomDataForFirebase
+            }
         } catch (e: Exception) {
-            null
+            defaultCustomDataForFirebase
         }
     }
 

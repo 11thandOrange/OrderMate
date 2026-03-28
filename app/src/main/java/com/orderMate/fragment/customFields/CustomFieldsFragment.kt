@@ -82,11 +82,7 @@ class CustomFieldsFragment : Fragment() {
         }
         runOnBackgroundThread {
             val result = preferenceManager.getJsonString()
-            if (result is CustomItemJson) {
-                updateCustomData(result)
-            } else if (result == null) {
-                updateCustomData(defaultCustomDataForFirebase)
-            }
+            updateCustomData(result)
         }
     }
 

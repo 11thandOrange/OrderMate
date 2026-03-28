@@ -64,10 +64,7 @@ class CustomModalDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val requiredData = preferenceManager.getJsonString()
-        if (requiredData is CustomItemJson) {
-            customForData = requiredData
-        }
+        customForData = preferenceManager.getJsonString()
         dialog?.setCancelable(false)
 
         setUpDialog()
