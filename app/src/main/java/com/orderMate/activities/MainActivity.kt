@@ -13,18 +13,18 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import com.google.gson.Gson
 import com.orderMate.R
 import com.orderMate.fragment.orderHistory.OrderHistoryFragment
+import com.orderMate.modals.PopupSettings
 import com.orderMate.utils.Constants
+import com.orderMate.utils.DefaultWidgetFactory
 import com.orderMate.utils.FirebaseConfigManager
-import com.orderMate.utils.FirebaseRealtimeDataBaseManager
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.PermissionUtils
 import com.orderMate.utils.PreferenceManager
 import com.orderMate.utils.ProfileSettingsManager
+import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.createAndShowDialog
-import com.orderMate.utils.defaultCustomDataForFirebase
 import com.orderMate.utils.exceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,9 +39,6 @@ class MainActivity : AppCompatActivity() {
         PermissionUtils.getInstance()
     }
 
-    private val firebaseRealTimeManager: FirebaseRealtimeDataBaseManager by lazy {
-        FirebaseRealtimeDataBaseManager.getInstance()
-    }
     private val preferenceManager: PreferenceManager by lazy {
         PreferenceManager.getInstance(this)
     }
@@ -279,24 +276,11 @@ class MainActivity : AppCompatActivity() {
         // Refresh theme settings when returning from profile
         applyThemeSettings()
         
-        CoroutineScope(Dispatchers.IO).launch {
-          firebaseRealTimeManager.getData(
-                this@MainActivity,
-                MyApp.getInstance().getMerchantId() , true
-            ){
-                if (it) {
-                    Constants.notImplementedLog
-                } else {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        saveTheData()
-                    }
-
-                }
-            }
-
-
+        // V2: Load widget data from Firebase
+        val merchantId = MyApp.getInstance().getMerchantId()
+        if (merchantId.isNotEmpty()) {
+            loadWidgetData(merchantId)
         }
-
 
         // this permission is required for the Devices above api level 23
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -318,16 +302,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * V2: Load widget data - matches production flow:
+     * 1. Fetch from Firebase
+     * 2. If Firebase has data → save to cache
+     * 3. If Firebase empty → save defaults to cache
+     */
+    private fun loadWidgetData(merchantId: String) {
+        val widgetManager = WidgetManager.getInstance(this)
 
-    private fun saveTheData() {
-        defaultCustomDataForFirebase.let { it1 ->
-            val list = Gson().toJson(it1)
-            FirebaseRealtimeDataBaseManager.getInstance()
-                .saveData(this,list, myApplication.getMerchantId()){}
-            preferenceManager.saveJsonString(
-                Constants.customMenuJson,
-                it1
-            ) {}
+        CoroutineScope(Dispatchers.IO).launch {
+            firebaseConfigManager.getWidgets(merchantId) { widgets ->
+                firebaseConfigManager.getSettings(merchantId) { settings ->
+                    if (widgets.isNotEmpty()) {
+                        // Firebase has data → save to cache
+                        widgetManager.saveToCache(widgets, settings)
+                    } else {
+                        // Firebase empty → save defaults to cache
+                        val defaultWidgets = DefaultWidgetFactory.createDefaults()
+                        val defaultSettings = PopupSettings()
+                        widgetManager.saveToCache(defaultWidgets, defaultSettings)
+                        // Also push defaults to Firebase
+                        firebaseConfigManager.initializeMerchant(merchantId, defaultWidgets, defaultSettings) { _ -> }
+                    }
+                }
+            }
         }
     }
 
