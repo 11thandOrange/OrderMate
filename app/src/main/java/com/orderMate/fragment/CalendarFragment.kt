@@ -34,7 +34,6 @@ import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.OrderSearchFilter
 import com.orderMate.utils.exceptionHandlerWithReturn
 import com.orderMate.utils.getCustomerContactDetails
-import com.orderMate.utils.migrations.SchemaMigrator
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
 import com.orderMate.viewmodel.SharedFilterViewModel
@@ -81,9 +80,6 @@ class CalendarFragment : Fragment() {
     // Flag to track if initial filters have been applied after load
     private var isApplyingFilters = false
     private var ordersLoaded = false
-    
-    // Widget manager for dynamic filters (same as List tab)
-    private var widgetManager: WidgetManager? = null
     
     private val myApp by lazy { MyApp.getInstance() }
     
@@ -134,7 +130,6 @@ class CalendarFragment : Fragment() {
         setupCalendarNavigation()
         setupViewToggle()
         setupActionButtons()
-        initWidgetManager()
         observeSharedState()
         loadOrders()
     }
@@ -316,24 +311,6 @@ class CalendarFragment : Fragment() {
     private fun setupActionButtons() {
         btnToday?.setOnClickListener { goToToday() }
         btnNextFulfillment?.setOnClickListener { goToNextFulfillment() }
-    }
-    
-    /**
-     * Initialize widget manager for dynamic filters (same as List tab)
-     */
-    private fun initWidgetManager() {
-        val merchantId = myApp.getMerchantId() ?: return
-        
-        SchemaMigrator.migrateIfNeeded(merchantId) { success ->
-            if (success) {
-                widgetManager = WidgetManager(merchantId)
-                widgetManager?.load { loaded ->
-                    if (loaded) {
-                        android.util.Log.d("CalendarFragment", "Widget manager loaded: ${widgetManager?.getWidgetCount()} widgets")
-                    }
-                }
-            }
-        }
     }
     
     /**
@@ -652,7 +629,7 @@ class CalendarFragment : Fragment() {
     // ==================== Filters (same as List tab) ====================
     
     private fun showFilterDialog() {
-        val filterableWidgets = widgetManager?.filterableWidgets ?: emptyList()
+        val filterableWidgets = WidgetManager.getInstance(requireContext()).getFilterableWidgets() ?: emptyList()
         val categories = FilterCategoryBuilder.buildCategories(allOrders, filterableWidgets)
         
         val dialog = FilterDialogFragment.newInstance(
@@ -714,7 +691,7 @@ class CalendarFragment : Fragment() {
                 }
                 FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
                     val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
-                    val widget = widgetManager?.getWidgetById(widgetId ?: "") ?: continue
+                    val widget = WidgetManager.getInstance(requireContext()).getWidgetById(widgetId ?: "") ?: continue
                     val orderValues = extractWidgetValuesFromNotes(order.lineItems, widget.label)
                     if (!selectedValues.any { it in orderValues }) return false
                 }
@@ -813,7 +790,7 @@ class CalendarFragment : Fragment() {
                 else -> {
                     if (FilterCategoryBuilder.isWidgetFilter(categoryId)) {
                         val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
-                        widgetManager?.getWidgetById(widgetId ?: "")?.label ?: "Date"
+                        WidgetManager.getInstance(requireContext()).getWidgetById(widgetId ?: "")?.label ?: "Date"
                     } else "Date"
                 }
             }

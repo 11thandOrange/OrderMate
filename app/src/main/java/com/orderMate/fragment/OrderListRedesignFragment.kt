@@ -36,7 +36,6 @@ import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.exceptionHandlerWithReturn
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.hideView
-import com.orderMate.utils.migrations.SchemaMigrator
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
 import com.orderMate.utils.showView
@@ -114,9 +113,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     // Current filter state for dialog (synced with shared ViewModel)
     private var currentFilterState = FilterDialogFragment.FilterState()
     private var currentSearchQuery = ""
-    
-    // Widget manager for dynamic filters
-    private var widgetManager: WidgetManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,7 +133,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         initializeRecyclerView()
         setupClickListeners()
         setupSearchListener()
-        initWidgetManager()
         observeSharedState()
     }
     
@@ -485,7 +480,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     private fun showFilterDialog() {
         // Build dynamic filter categories from Clover orders + OrderMate widgets
-        val filterableWidgets = widgetManager?.filterableWidgets ?: emptyList()
+        val filterableWidgets = WidgetManager.getInstance(requireContext()).getFilterableWidgets() ?: emptyList()
         val categories = FilterCategoryBuilder.buildCategories(allItemList, filterableWidgets)
         
         val dialog = FilterDialogFragment.newInstance(
@@ -509,25 +504,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         })
         
         dialog.show(childFragmentManager, FilterDialogFragment.TAG)
-    }
-    
-    /**
-     * Initialize widget manager for dynamic filters
-     */
-    private fun initWidgetManager() {
-        val merchantId = myApp.getMerchantId() ?: return
-        
-        // First run migration if needed
-        SchemaMigrator.migrateIfNeeded(merchantId) { success ->
-            if (success) {
-                widgetManager = WidgetManager(merchantId)
-                widgetManager?.load { loaded ->
-                    if (loaded) {
-                        android.util.Log.d("OrderList", "Widget manager loaded: ${widgetManager?.getWidgetCount()} widgets")
-                    }
-                }
-            }
-        }
     }
 
     private fun applyDialogFilters(filters: FilterDialogFragment.FilterState) {
@@ -582,7 +558,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 // OrderMate widget filters
                 FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
                     val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
-                    val widget = widgetManager?.getWidgetById(widgetId ?: "") ?: continue
+                    val widget = WidgetManager.getInstance(requireContext()).getWidgetById(widgetId ?: "") ?: continue
                     val orderValues = extractWidgetValuesFromNotes(order.lineItems, widget.label)
                     if (!selectedValues.any { it in orderValues }) return false
                 }
@@ -608,7 +584,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 // Widget date filters (like Pickup Date from OrderMate widgets)
                 FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
                     val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
-                    val widget = widgetManager?.getWidgetById(widgetId ?: "") ?: continue
+                    val widget = WidgetManager.getInstance(requireContext()).getWidgetById(widgetId ?: "") ?: continue
                     val orderDateValues = extractWidgetValuesFromNotes(order.lineItems, widget.label)
                     
                     val matchesAny = dates.any { filterDate ->
@@ -676,7 +652,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 categoryId == FilterCategoryBuilder.CLOVER_ORDER_DATE -> "Order Date"
                 FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
                     val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
-                    widgetManager?.getWidgetById(widgetId ?: "")?.label ?: "Date"
+                    WidgetManager.getInstance(requireContext()).getWidgetById(widgetId ?: "")?.label ?: "Date"
                 }
                 else -> "Date"
             }
@@ -830,7 +806,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         notesFilter.clear()
         notesFilter[getString(R.string.all_orders)] = mutableListOf()
         
-        val filterableWidgets = widgetManager?.filterableWidgets ?: emptyList()
+        val filterableWidgets = WidgetManager.getInstance(requireContext()).getFilterableWidgets() ?: emptyList()
         filterableWidgets.forEach { widget ->
             if (widget.options.isNotEmpty()) {
                 val options = mutableListOf<String>()

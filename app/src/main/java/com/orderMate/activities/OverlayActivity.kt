@@ -27,7 +27,6 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
         ActivityOverlayBinding.inflate(layoutInflater)
     }
 
-    private var widgetManager: WidgetManager? = null
     private var orderData: Order? = null
     private var lineItemId: String? = null
 
@@ -36,13 +35,6 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
         super.onCreate(savedInstanceState)
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(binding.root)
-        
-        // Initialize WidgetManager
-        val merchantId = MyApp.getInstance().getMerchantId()
-        if (merchantId != null) {
-            widgetManager = WidgetManager(merchantId)
-        }
-        
         parseIntentData()
     }
 
@@ -74,26 +66,11 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
     fun updateOrderData(result: Order?, lineItem: String?, position: String?) {
         orderData = result
         lineItemId = lineItem
-        
-        // Load widgets then show dialog
-        widgetManager?.load { success ->
-            runOnUiThread {
-                if (success) {
-                    showItemNoteDialog()
-                } else {
-                    Log.e("OverlayActivity", "Failed to load widgets")
-                    finish()
-                }
-            }
-        } ?: run {
-            // No widget manager, close activity
-            Log.e("OverlayActivity", "No widget manager available")
-            finish()
-        }
+        runOnUiThread { showItemNoteDialog() }
     }
     
     private fun showItemNoteDialog() {
-        val enabledWidgets = widgetManager?.enabledWidgets ?: emptyList()
+        val enabledWidgets = WidgetManager.getInstance(this).getEnabledWidgets()
         
         if (enabledWidgets.isEmpty()) {
             Log.d("OverlayActivity", "No enabled widgets, closing")

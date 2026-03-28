@@ -46,9 +46,11 @@ import com.orderMate.modals.WidgetType as FirebaseWidgetType
 class SettingsFragment : Fragment() {
 
     private lateinit var settingsManager: SettingsManager
-    private var widgetManager: WidgetManager? = null
     private val firebase = FirebaseConfigManager.getInstance()
     private var merchantId: String? = null
+    
+    private val widgetManager: WidgetManager
+        get() = WidgetManager.getInstance(requireContext())
     
     // Sub-tabs
     private var tabGeneral: TextView? = null
@@ -102,10 +104,6 @@ class SettingsFragment : Fragment() {
         // Get merchantId from PreferenceManager
         val prefManager = PreferenceManager.getInstance(requireContext())
         merchantId = prefManager.getString("merchantId")
-        
-        if (merchantId != null) {
-            widgetManager = WidgetManager(merchantId!!)
-        }
         
         initViews(view)
         setupSubTabs()
@@ -190,7 +188,7 @@ class SettingsFragment : Fragment() {
             settingsManager.setUseOrderMateRegister(isChecked)
             
             // Save to Firebase V2 PopupSettings
-            widgetManager?.setShowOMButtonInRegister(isChecked) { success ->
+            widgetManager.setShowOMButtonInRegister(isChecked) { success ->
                 if (!success) {
                     activity?.runOnUiThread {
                         Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
@@ -230,7 +228,7 @@ class SettingsFragment : Fragment() {
                 val toPos = target.adapterPosition
                 firebaseWidgetAdapter?.moveWidget(fromPos, toPos)
                 // Save reordering to Firebase
-                widgetManager?.reorderWidgets(fromPos, toPos) { success ->
+                widgetManager.reorderWidgets(fromPos, toPos) { success ->
                     if (!success) {
                         activity?.runOnUiThread {
                             Toast.makeText(context, "Failed to save order", Toast.LENGTH_SHORT).show()
@@ -258,10 +256,10 @@ class SettingsFragment : Fragment() {
     }
     
     private fun loadWidgetsFromFirebase() {
-        widgetManager?.load { success ->
+        widgetManager.reload { success ->
             activity?.runOnUiThread {
                 if (success) {
-                    val widgets = widgetManager?.widgets ?: emptyList()
+                    val widgets = widgetManager.getWidgets()
                     firebaseWidgetAdapter?.setWidgets(widgets.toMutableList())
                 } else {
                     Toast.makeText(context, "Failed to load widgets", Toast.LENGTH_SHORT).show()
@@ -271,7 +269,7 @@ class SettingsFragment : Fragment() {
     }
     
     private fun saveWidgetToFirebase(widget: WidgetConfig) {
-        widgetManager?.updateWidget(widget) { success ->
+        widgetManager.updateWidget(widget) { success ->
             if (!success) {
                 activity?.runOnUiThread {
                     Toast.makeText(context, "Failed to save widget", Toast.LENGTH_SHORT).show()
@@ -281,7 +279,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showAddFirebaseWidgetDialog() {
-        val currentCount = widgetManager?.getWidgetCount() ?: 0
+        val currentCount = widgetManager.getWidgetCount()
         if (currentCount >= 7) {
             Toast.makeText(requireContext(), "Maximum 7 widgets allowed", Toast.LENGTH_SHORT).show()
             return
@@ -298,7 +296,7 @@ class SettingsFragment : Fragment() {
         android.app.AlertDialog.Builder(requireContext())
             .setTitle("Add Widget")
             .setItems(types) { _, which ->
-                widgetManager?.addWidget(typeEnums[which]) { newWidget ->
+                widgetManager.addWidget(typeEnums[which]) { newWidget ->
                     activity?.runOnUiThread {
                         if (newWidget != null) {
                             firebaseWidgetAdapter?.addWidget(newWidget)
@@ -317,7 +315,7 @@ class SettingsFragment : Fragment() {
             title = "Delete Widget?",
             message = "Are you sure you want to delete \"${widget.label}\"? This action cannot be undone.",
             onConfirm = {
-                widgetManager?.deleteWidget(widget.id) { success ->
+                widgetManager.deleteWidget(widget.id) { success ->
                     activity?.runOnUiThread {
                         if (success) {
                             firebaseWidgetAdapter?.removeWidget(widget)
@@ -522,10 +520,10 @@ class SettingsFragment : Fragment() {
     
     private fun loadPopupSettingsFromFirebase() {
         // Load PopupSettings from WidgetManager (which loads from Firebase)
-        widgetManager?.load { success ->
+        widgetManager.reload { success ->
             if (success) {
                 activity?.runOnUiThread {
-                    val settings = widgetManager?.settings
+                    val settings = widgetManager.getSettings()
                     if (settings != null) {
                         // Update switch based on Firebase value
                         switchUseInCloverRegister?.isChecked = settings.showOMButtonInRegister

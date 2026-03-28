@@ -84,9 +84,6 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         MyApp.getInstance()
     }
     private var appConnector: AppsConnector? = null
-    
-    // Widget manager for V2 schema
-    private var widgetManager: WidgetManager? = null
 
     private var lineItems: MutableList<ItemModal?> = mutableListOf()
     private var paymentItems: MutableList<Payment> = mutableListOf()
@@ -114,26 +111,6 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         setUpObserver()
         runOnBackgroundThread {
             appConnector = AppsConnector(requireContext(), myApp.getCloverAccount())
-        }
-        
-        // Initialize WidgetManager and load widgets (V2 schema)
-        initializeWidgetManager()
-    }
-    
-    /**
-     * Initialize WidgetManager with merchant ID and load widgets
-     */
-    private fun initializeWidgetManager() {
-        val merchantId = myApp.getMerchantId()
-        if (merchantId != null) {
-            widgetManager = WidgetManager(merchantId)
-            widgetManager?.load { success ->
-                if (success) {
-                    android.util.Log.d("OrderDetail", "Widgets loaded: ${widgetManager?.enabledWidgets?.size ?: 0} enabled")
-                } else {
-                    android.util.Log.e("OrderDetail", "Failed to load widgets")
-                }
-            }
         }
     }
 
@@ -685,8 +662,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             // Get existing note for this line item
             val existingNote = lineItems.getOrNull(orderPosition)?.order?.note
             
-            // Show new ItemNoteDialogFragment with V2 widgets
-            val enabledWidgets = widgetManager?.enabledWidgets ?: emptyList()
+            // Get widgets from singleton (reads from SharedPreferences synchronously)
+            val enabledWidgets = WidgetManager.getInstance(requireContext()).getEnabledWidgets()
             
             ItemNoteDialogFragment.newInstance(
                 widgets = enabledWidgets,
@@ -728,14 +705,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
 
-    /*
-    * @param : null
-    * @return : true when there is any enabled widget for the dialog (V2 schema)
-    * @return : false when there are no enabled widgets
-    * */
+    /**
+     * Check if any widgets are enabled.
+     * Reads from SharedPreferences synchronously (like production's getJsonString).
+     */
     private fun hasAddNoteAccess(): Boolean {
-        // Check if WidgetManager has any enabled widgets
-        return widgetManager?.enabledWidgets?.isNotEmpty() == true
+        return WidgetManager.getInstance(requireContext()).hasEnabledWidgets()
     }
 
 
