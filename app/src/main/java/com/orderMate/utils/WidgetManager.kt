@@ -1,5 +1,9 @@
 package com.orderMate.utils
 
+import android.content.Context
+import android.content.SharedPreferences
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.orderMate.modals.PopupSettings
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.modals.WidgetOption
@@ -7,7 +11,7 @@ import com.orderMate.modals.WidgetType
 
 /**
  * Business logic for widget operations
- * Manages widgets in memory and syncs with Firebase
+ * Loads from local cache synchronously, syncs with Firebase in background
  */
 class WidgetManager(private val merchantId: String) {
     
@@ -15,6 +19,24 @@ class WidgetManager(private val merchantId: String) {
     private var _widgets = mutableListOf<WidgetConfig>()
     private var _settings = PopupSettings()
     private var _isLoaded = false
+    
+    companion object {
+        private const val PREFS_NAME = "widget_cache"
+        private const val KEY_WIDGETS = "cached_widgets"
+        private const val KEY_SETTINGS = "cached_settings"
+        private val gson = Gson()
+        
+        private var prefs: SharedPreferences? = null
+        
+        fun init(context: Context) {
+            prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        }
+    }
+    
+    init {
+        // Load from local cache synchronously on init
+        loadFromCache()
+    }
     
     // ==================== Getters ====================
     
@@ -36,14 +58,54 @@ class WidgetManager(private val merchantId: String) {
     val isLoaded: Boolean 
         get() = _isLoaded
     
-    // ==================== Load ====================
+    // ==================== Local Cache ====================
     
+    private fun loadFromCache() {
+        try {
+            val widgetsJson = prefs?.getString(KEY_WIDGETS, null)
+            val settingsJson = prefs?.getString(KEY_SETTINGS, null)
+            
+            if (widgetsJson != null) {
+                val type = object : TypeToken<List<WidgetConfig>>() {}.type
+                _widgets = gson.fromJson<List<WidgetConfig>>(widgetsJson, type)?.toMutableList() 
+                    ?: mutableListOf()
+            }
+            
+            if (settingsJson != null) {
+                _settings = gson.fromJson(settingsJson, PopupSettings::class.java) ?: PopupSettings()
+            }
+            
+            _isLoaded = _widgets.isNotEmpty()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    
+    private fun saveToCache() {
+        try {
+            prefs?.edit()?.apply {
+                putString(KEY_WIDGETS, gson.toJson(_widgets))
+                putString(KEY_SETTINGS, gson.toJson(_settings))
+                apply()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    
+    // ==================== Load from Firebase ====================
+    
+    /**
+     * Load from Firebase and update local cache
+     * Call this in background to sync with server
+     */
     fun load(callback: (Boolean) -> Unit) {
         firebase.getWidgets(merchantId) { widgets ->
             firebase.getSettings(merchantId) { settings ->
                 _widgets = widgets.toMutableList()
                 _settings = settings
                 _isLoaded = true
+                saveToCache()
                 callback(true)
             }
         }
@@ -63,6 +125,7 @@ class WidgetManager(private val merchantId: String) {
         firebase.saveWidget(merchantId, widget) { success ->
             if (success) {
                 _widgets.add(widget)
+                saveToCache()
                 callback(widget)
             } else {
                 callback(null)
@@ -74,6 +137,7 @@ class WidgetManager(private val merchantId: String) {
         firebase.saveWidget(merchantId, widget) { success ->
             if (success) {
                 _widgets.add(widget)
+                saveToCache()
             }
             callback(success)
         }
@@ -86,6 +150,7 @@ class WidgetManager(private val merchantId: String) {
                 if (index >= 0) {
                     _widgets[index] = widget
                 }
+                saveToCache()
             }
             callback(success)
         }
@@ -126,6 +191,7 @@ class WidgetManager(private val merchantId: String) {
             if (success) {
                 _widgets.removeAll { it.id == widgetId }
                 reorderWidgetsInternal()
+                saveToCache()
             }
             callback(success)
         }
@@ -140,6 +206,7 @@ class WidgetManager(private val merchantId: String) {
         val widget = _widgets.removeAt(fromIndex)
         _widgets.add(toIndex, widget)
         reorderWidgetsInternal()
+        saveToCache()
         
         firebase.saveWidgetsBatch(merchantId, _widgets, callback)
     }

@@ -51,6 +51,7 @@ class MyApp : Application() {
         super.onCreate()
         instance = this
         FirebaseApp.initializeApp(applicationContext)
+        WidgetManager.init(applicationContext)
         storeIntoPreference()
     }
 
