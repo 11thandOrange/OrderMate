@@ -1,7 +1,6 @@
 package com.orderMate.activities
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import com.clover.sdk.v3.order.Order
@@ -10,7 +9,6 @@ import com.orderMate.databinding.ActivityOverlayBinding
 import com.orderMate.fragment.orderDetail.ItemNoteDialogFragment
 import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
-import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.exceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -70,21 +68,13 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
     }
     
     private fun showItemNoteDialog() {
-        val enabledWidgets = WidgetManager.getInstance(this).getEnabledWidgets()
-        
-        if (enabledWidgets.isEmpty()) {
-            Log.d("OverlayActivity", "No enabled widgets, closing")
-            finish()
-            return
-        }
-        
         // Get existing note for this line item
         val existingNote = orderData?.lineItems?.find { 
             it?.item?.id == lineItemId 
         }?.note
         
+        // Dialog reads widgets from WidgetManager directly (like production)
         ItemNoteDialogFragment.newInstance(
-            widgets = enabledWidgets,
             lineItemId = lineItemId,
             existingNote = existingNote
         ).apply {
