@@ -29,9 +29,12 @@ import com.orderMate.communicators.IShareEmailOrMessage
 import com.orderMate.databinding.FragmentOrderDetailBinding
 import com.orderMate.fragment.orderHistory.OrderHistoryFragment
 import com.orderMate.modals.ItemModal
+import com.orderMate.modals.PopupSettings
 import com.orderMate.modals.ShareMessageJson
 import com.orderMate.modals.ShareSmsModal
 import com.orderMate.utils.ConnectionManager
+import com.orderMate.utils.DefaultWidgetFactory
+import com.orderMate.utils.FirebaseConfigManager
 import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.PreferenceManager
@@ -718,7 +721,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         val defaultWidgets = DefaultWidgetFactory.createDefaults()
         val defaultSettings = PopupSettings()
         
-        firebase.initializeMerchant(merchantId, defaultSettings, defaultWidgets) { success ->
+        firebase.initializeMerchant(merchantId, defaultWidgets, defaultSettings) { success ->
             if (success) {
                 // Reload widgets and show dialog
                 widgetManager?.reload { loaded ->
