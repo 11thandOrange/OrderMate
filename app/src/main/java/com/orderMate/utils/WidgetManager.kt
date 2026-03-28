@@ -54,20 +54,21 @@ class WidgetManager private constructor(private val context: Context) {
     
     /**
      * Get widgets from local cache.
-     * Returns empty list if cache is empty (caller should handle this).
+     * Returns defaults if cache is empty - popup is never empty.
      */
     fun getWidgets(): List<WidgetConfig> {
         return try {
             val json = prefs.getString(KEY_WIDGETS, null)
             if (json != null) {
                 val type = object : TypeToken<List<WidgetConfig>>() {}.type
-                gson.fromJson<List<WidgetConfig>>(json, type) ?: emptyList()
+                gson.fromJson<List<WidgetConfig>>(json, type) ?: DefaultWidgetFactory.createDefaults()
             } else {
-                emptyList()
+                // Cache empty → return defaults (no saving needed)
+                DefaultWidgetFactory.createDefaults()
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            emptyList()
+            DefaultWidgetFactory.createDefaults()
         }
     }
     

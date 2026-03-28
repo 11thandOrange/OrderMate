@@ -276,10 +276,11 @@ class MainActivity : AppCompatActivity() {
         // Refresh theme settings when returning from profile
         applyThemeSettings()
         
-        // V2: Load widget data from Firebase
+        // V2: Sync widgets with Firebase if merchantId available
+        // (Defaults are guaranteed by Application.onCreate)
         val merchantId = MyApp.getInstance().getMerchantId()
         if (!merchantId.isNullOrEmpty()) {
-            loadWidgetData(merchantId)
+            syncWidgetsFromFirebase(merchantId)
         }
 
         // this permission is required for the Devices above api level 23
@@ -303,23 +304,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * V2: Load widget data - ensures popup is never empty:
-     * 1. If cache empty → save defaults immediately (sync)
-     * 2. Then fetch from Firebase (async)
-     * 3. If Firebase has data → update cache
-     * 4. If Firebase empty → push defaults to Firebase
+     * V2: Sync widgets with Firebase in background.
+     * If Firebase has data → update cache.
+     * If Firebase empty → push defaults to Firebase.
      */
-    private fun loadWidgetData(merchantId: String) {
+    private fun syncWidgetsFromFirebase(merchantId: String) {
         val widgetManager = WidgetManager.getInstance(this)
 
-        // SYNC: Ensure defaults in cache first so popup is never empty
-        if (!widgetManager.hasEnabledWidgets()) {
-            val defaultWidgets = DefaultWidgetFactory.createDefaults()
-            val defaultSettings = PopupSettings()
-            widgetManager.saveToCache(defaultWidgets, defaultSettings)
-        }
-
-        // ASYNC: Sync with Firebase in background
         CoroutineScope(Dispatchers.IO).launch {
             firebaseConfigManager.getWidgets(merchantId) { widgets ->
                 firebaseConfigManager.getSettings(merchantId) { settings ->
@@ -327,10 +318,12 @@ class MainActivity : AppCompatActivity() {
                         // Firebase has data → update cache
                         widgetManager.saveToCache(widgets, settings)
                     } else {
-                        // Firebase empty → push defaults to Firebase
-                        val defaultWidgets = DefaultWidgetFactory.createDefaults()
-                        val defaultSettings = PopupSettings()
-                        firebaseConfigManager.initializeMerchant(merchantId, defaultWidgets, defaultSettings) { _ -> }
+                        // Firebase empty → push current cache to Firebase
+                        val currentWidgets = widgetManager.getWidgets()
+                        val currentSettings = widgetManager.getSettings()
+                        if (currentWidgets.isNotEmpty()) {
+                            firebaseConfigManager.initializeMerchant(merchantId, currentWidgets, currentSettings) { _ -> }
+                        }
                     }
                 }
             }
