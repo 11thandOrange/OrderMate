@@ -278,7 +278,7 @@ class MainActivity : AppCompatActivity() {
         
         // V2: Load widget data from Firebase
         val merchantId = MyApp.getInstance().getMerchantId()
-        if (merchantId.isNotEmpty()) {
+        if (!merchantId.isNullOrEmpty()) {
             loadWidgetData(merchantId)
         }
 
