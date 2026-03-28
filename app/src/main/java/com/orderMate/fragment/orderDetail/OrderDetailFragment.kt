@@ -682,9 +682,17 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     * @return : false when there is not any active option for the dialog
     * */
     private fun hasAddNoteAccess(): Boolean {
-        // Use the pre-computed isAllFieldDisabled value which correctly excludes
-        // modal trigger options when determining if note fields are available
-        return !preferenceManager.getBoolean(Constants.isAllFieldDisabled)
+        // Check the actual data to determine if any note field is active
+        // Excludes modal trigger options (same logic as isAllFieldDisabled)
+        val data = preferenceManager.getJsonString()
+        data.types.forEach {
+            if (it.isActive &&
+                !it.name.equals(Constants.isCustomModalShown, true) &&
+                !it.name.equals(Constants.isCustomModalBasket, true)) {
+                return true
+            }
+        }
+        return false
     }
 
 
