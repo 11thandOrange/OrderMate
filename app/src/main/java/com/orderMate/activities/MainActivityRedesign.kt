@@ -314,33 +314,27 @@ class MainActivityRedesign : AppCompatActivity() {
     }
 
     /**
-     * Load widget data from Firebase and save to cache.
-     * Always ensures defaults are in cache immediately so popup is never empty.
-     * Then syncs with Firebase in background.
+     * Load widget data - EXACTLY matches production flow:
+     * 1. Fetch from Firebase
+     * 2. If Firebase has data → save to cache IMMEDIATELY in callback
+     * 3. If Firebase empty → save DEFAULTS to cache
      */
     private fun loadWidgetData(merchantId: String) {
         val widgetManager = WidgetManager.getInstance(this)
         
-        // ALWAYS ensure defaults are in cache first (synchronous)
-        // This guarantees popup is never empty on first load
-        if (!widgetManager.hasEnabledWidgets()) {
-            val defaultWidgets = DefaultWidgetFactory.createDefaults()
-            val defaultSettings = PopupSettings()
-            widgetManager.saveToCache(defaultWidgets, defaultSettings)
-        }
-        
-        // Then sync with Firebase in background
         CoroutineScope(Dispatchers.IO).launch {
             firebaseConfigManager.getWidgets(merchantId) { widgets ->
                 firebaseConfigManager.getSettings(merchantId) { settings ->
-                    if (widgets.isEmpty()) {
-                        // No data in Firebase - push defaults to Firebase
+                    if (widgets.isNotEmpty()) {
+                        // Firebase has data → save to cache IMMEDIATELY
+                        widgetManager.saveToCache(widgets, settings)
+                    } else {
+                        // Firebase empty → save DEFAULTS to cache
                         val defaultWidgets = DefaultWidgetFactory.createDefaults()
                         val defaultSettings = PopupSettings()
+                        widgetManager.saveToCache(defaultWidgets, defaultSettings)
+                        // Also push defaults to Firebase
                         firebaseConfigManager.initializeMerchant(merchantId, defaultWidgets, defaultSettings) { _ -> }
-                    } else {
-                        // Data exists in Firebase - update cache with Firebase data
-                        widgetManager.saveToCache(widgets, settings)
                     }
                 }
             }

@@ -35,7 +35,6 @@ import com.orderMate.utils.ConnectionManager
 import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.PreferenceManager
-import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.changeColorAsPerPaymentStatus
 import com.orderMate.utils.convertToSymbol
 import com.orderMate.utils.countElementsByUniqueKeys
@@ -659,12 +658,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         // Get existing note for this line item
         val existingNote = lineItems.getOrNull(orderPosition)?.order?.note
         
-        // Get widgets from singleton (reads from SharedPreferences synchronously)
-        // Always show popup even if empty - user can still save empty note
-        val enabledWidgets = WidgetManager.getInstance(requireContext()).getEnabledWidgets()
-        
+        // Dialog reads widgets from WidgetManager directly (like production)
         ItemNoteDialogFragment.newInstance(
-            widgets = enabledWidgets,
             lineItemId = lineItemId,
             existingNote = existingNote
         ).apply {

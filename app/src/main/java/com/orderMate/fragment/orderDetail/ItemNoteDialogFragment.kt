@@ -14,13 +14,12 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.textfield.TextInputEditText
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.orderMate.R
 import com.orderMate.databinding.DialogItemNoteBinding
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.modals.WidgetOption
 import com.orderMate.modals.WidgetType
+import com.orderMate.utils.WidgetManager
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -54,7 +53,6 @@ class ItemNoteDialogFragment : DialogFragment() {
     private val textInputViews = mutableMapOf<String, TextInputEditText>()
 
     private val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
-    private val gson = Gson()
 
     interface ItemNoteListener {
         fun onNoteSaved(lineItemId: String?, note: String)
@@ -65,19 +63,10 @@ class ItemNoteDialogFragment : DialogFragment() {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NO_FRAME, R.style.Theme_OrderMate_Dialog)
         
-        // Restore arguments - this is critical for fragment lifecycle
+        // Restore simple arguments
         arguments?.let { args ->
             lineItemId = args.getString(ARG_LINE_ITEM_ID)
             existingNote = args.getString(ARG_EXISTING_NOTE)
-            args.getString(ARG_WIDGETS)?.let { json ->
-                try {
-                    val type = object : TypeToken<List<WidgetConfig>>() {}.type
-                    widgets = gson.fromJson(json, type) ?: emptyList()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    widgets = emptyList()
-                }
-            }
         }
     }
 
@@ -119,6 +108,9 @@ class ItemNoteDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Read widgets from WidgetManager (like production reads from PreferenceManager)
+        widgets = WidgetManager.getInstance(requireContext()).getEnabledWidgets()
+        
         setupButtons()
         buildNoteSections()
         parseExistingNote()
@@ -143,7 +135,17 @@ class ItemNoteDialogFragment : DialogFragment() {
     private fun buildNoteSections() {
         binding.noteSectionsContainer.removeAllViews()
 
-        widgets.filter { it.isEnabled }.sortedBy { it.order }.forEach { widget ->
+        val enabledWidgets = widgets.filter { it.isEnabled }.sortedBy { it.order }
+        
+        if (enabledWidgets.isEmpty()) {
+            // Show empty state message and disable save button
+            addEmptyStateMessage()
+            binding.btnSave.isEnabled = false
+            binding.btnSave.alpha = 0.5f
+            return
+        }
+        
+        enabledWidgets.forEach { widget ->
             when (widget.type) {
                 WidgetType.SINGLE_SELECT -> addSingleSelectSection(widget)
                 WidgetType.MULTI_SELECT -> addMultiSelectSection(widget)
@@ -151,6 +153,20 @@ class ItemNoteDialogFragment : DialogFragment() {
                 WidgetType.TEXT_BOX -> addTextBoxSection(widget)
             }
         }
+    }
+    
+    /**
+     * Show empty state when no widgets are enabled
+     */
+    private fun addEmptyStateMessage() {
+        val emptyView = TextView(requireContext()).apply {
+            text = "0 Enabled Widgets. Update Pop Up Settings."
+            textSize = 16f
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.text_muted))
+            textAlignment = View.TEXT_ALIGNMENT_CENTER
+            setPadding(0, dpToPx(48), 0, dpToPx(48))
+        }
+        binding.noteSectionsContainer.addView(emptyView)
     }
 
     /**
@@ -457,19 +473,15 @@ class ItemNoteDialogFragment : DialogFragment() {
 
     companion object {
         const val TAG = "ItemNoteDialogFragment"
-        private const val ARG_WIDGETS = "arg_widgets"
         private const val ARG_LINE_ITEM_ID = "arg_line_item_id"
         private const val ARG_EXISTING_NOTE = "arg_existing_note"
 
         fun newInstance(
-            widgets: List<WidgetConfig>,
             lineItemId: String? = null,
             existingNote: String? = null
         ): ItemNoteDialogFragment {
             return ItemNoteDialogFragment().apply {
                 arguments = Bundle().apply {
-                    // Serialize widgets to JSON for Bundle storage
-                    putString(ARG_WIDGETS, Gson().toJson(widgets))
                     putString(ARG_LINE_ITEM_ID, lineItemId)
                     putString(ARG_EXISTING_NOTE, existingNote)
                 }

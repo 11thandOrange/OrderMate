@@ -25,21 +25,19 @@ import com.clover.sdk.v3.order.LineItem
 import com.clover.sdk.v3.order.Order
 import com.clover.sdk.v3.payments.Payment
 import com.google.android.material.textview.MaterialTextView
-import com.google.gson.Gson
 import com.orderMate.R
 import com.orderMate.adapters.OrderAdapter
 import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.communicators.InterCommunication
 import com.orderMate.databinding.FragmentOrderHistoryBinding
-import com.orderMate.modals.CustomItemJson
 import com.orderMate.utils.Constants
+import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.Constants.Companion.fbCategory
 import com.orderMate.utils.Constants.Companion.fbStatus
 import com.orderMate.utils.Constants.Companion.fbSubcategory
 import com.orderMate.utils.Constants.Companion.fbType
 import com.orderMate.utils.Constants.Companion.notImplementedLog
 import com.orderMate.utils.FilterCategories
-import com.orderMate.utils.FirebaseRealtimeDataBaseManager
 import com.orderMate.utils.ModalDialogCategories
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.MyApp.Companion.filterArray
@@ -701,9 +699,8 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
                 }
 
                 exceptionHandler {
-                    val data = preferenceManager.getString(Constants.customMenuJson)
-                    val result = Gson().fromJson(data, CustomItemJson::class.java)
-                    addDataIntoNotesArray(result)
+                    // V2: Read widgets from WidgetManager instead of V1 CustomItemJson
+                    addDataIntoNotesArray()
                 }
             }
         runOnMainThread {
@@ -741,19 +738,24 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
         }
     }
 
-    private fun addDataIntoNotesArray(result: CustomItemJson?) {
+    /**
+     * V2: Populate filter arrays from WidgetManager instead of V1 CustomItemJson
+     */
+    private fun addDataIntoNotesArray() {
         notesFilter.clear()
         notesFilter[getString(R.string.all_orders)] = mutableListOf()
-        for (it in result?.types ?: emptyList()) {
-            if (it.list.isEmpty()) {
+        
+        val widgets = WidgetManager.getInstance(requireContext()).getFilterableWidgets()
+        for (widget in widgets) {
+            if (widget.options.isEmpty()) {
                 continue
             }
             val resultant: MutableList<String> = mutableListOf()
             resultant.add(getString(R.string.all_orders))
-            it.list.forEach { key ->
-                resultant.add(key)
+            widget.options.forEach { option ->
+                resultant.add(option.label)
             }
-            notesFilter[it.name.trim()] = resultant
+            notesFilter[widget.label.trim()] = resultant
         }
     }
 
@@ -789,10 +791,7 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
             * Every time from the firebase realtime database we will check that
             * */
             menuButton.setOnClickListener {
-                runOnBackgroundThread {
-                    FirebaseRealtimeDataBaseManager.getInstance()
-                        .getData(requireContext(), myApp.getMerchantId()) {}
-                }
+                // V2: Widget data is loaded by MainActivityRedesign, no need to refresh here
                 popupMenu?.show()
             }
             recyclerHeader.apply {
