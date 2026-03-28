@@ -367,6 +367,12 @@ class WidgetManager private constructor(private val context: Context) {
      * Force reload from Firebase (e.g., after settings change)
      */
     fun reload(callback: ((Boolean) -> Unit)? = null) {
-        merchantId?.let { init(it, callback) }
+        val mid = merchantId ?: return
+        firebase.getWidgets(mid) { widgets ->
+            firebase.getSettings(mid) { settings ->
+                saveToCache(widgets, settings)
+                callback?.invoke(true)
+            }
+        }
     }
 }
