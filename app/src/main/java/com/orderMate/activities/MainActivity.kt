@@ -303,26 +303,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * V2: Load widget data - matches production flow:
-     * 1. Fetch from Firebase
-     * 2. If Firebase has data → save to cache
-     * 3. If Firebase empty → save defaults to cache
+     * V2: Load widget data - ensures popup is never empty:
+     * 1. If cache empty → save defaults immediately (sync)
+     * 2. Then fetch from Firebase (async)
+     * 3. If Firebase has data → update cache
+     * 4. If Firebase empty → push defaults to Firebase
      */
     private fun loadWidgetData(merchantId: String) {
         val widgetManager = WidgetManager.getInstance(this)
 
+        // SYNC: Ensure defaults in cache first so popup is never empty
+        if (!widgetManager.hasEnabledWidgets()) {
+            val defaultWidgets = DefaultWidgetFactory.createDefaults()
+            val defaultSettings = PopupSettings()
+            widgetManager.saveToCache(defaultWidgets, defaultSettings)
+        }
+
+        // ASYNC: Sync with Firebase in background
         CoroutineScope(Dispatchers.IO).launch {
             firebaseConfigManager.getWidgets(merchantId) { widgets ->
                 firebaseConfigManager.getSettings(merchantId) { settings ->
                     if (widgets.isNotEmpty()) {
-                        // Firebase has data → save to cache
+                        // Firebase has data → update cache
                         widgetManager.saveToCache(widgets, settings)
                     } else {
-                        // Firebase empty → save defaults to cache
+                        // Firebase empty → push defaults to Firebase
                         val defaultWidgets = DefaultWidgetFactory.createDefaults()
                         val defaultSettings = PopupSettings()
-                        widgetManager.saveToCache(defaultWidgets, defaultSettings)
-                        // Also push defaults to Firebase
                         firebaseConfigManager.initializeMerchant(merchantId, defaultWidgets, defaultSettings) { _ -> }
                     }
                 }
