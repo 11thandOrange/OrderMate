@@ -49,7 +49,7 @@ import com.orderMate.utils.hideView
 import com.orderMate.utils.onBackPressed
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
-import com.orderMate.utils.showSnackBar
+
 import com.orderMate.utils.showView
 import com.orderMate.utils.toDoubleFloatPoint
 import kotlinx.coroutines.CoroutineScope
@@ -654,63 +654,49 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
 
-    // when user click on the add note button
-    // if all the options are disabled by admin then this will not work
-    // if a single option is available then it will show
+    // When user clicks on an item row, open the OrderMate popup to add/edit notes
     override fun onOrderItemClick(orderPosition: Int, lineItemId: String?) {
-        if (hasAddNoteAccess()) {
-            // Get existing note for this line item
-            val existingNote = lineItems.getOrNull(orderPosition)?.order?.note
-            
-            // Get widgets from singleton (reads from SharedPreferences synchronously)
-            val enabledWidgets = WidgetManager.getInstance(requireContext()).getEnabledWidgets()
-            
-            ItemNoteDialogFragment.newInstance(
-                widgets = enabledWidgets,
-                lineItemId = lineItemId,
-                existingNote = existingNote
-            ).apply {
-                setListener(object : ItemNoteDialogFragment.ItemNoteListener {
-                    override fun onNoteSaved(itemId: String?, note: String) {
-                        // Update the line item note in UI
-                        updateNoteInTheLineItemOfOrder(itemId, note, orderPosition)
-                        
-                        // Save to Clover via OrderConnector
-                        runOnBackgroundThread {
-                            exceptionHandler {
-                                val orderId = orderArguments?.id ?: return@exceptionHandler
-                                val allLineItems = orderArguments?.lineItems ?: return@exceptionHandler
-                                
-                                // Update note for matching line items
-                                allLineItems.forEach { lineItem ->
-                                    if (lineItem?.item?.id == itemId) {
-                                        lineItem.note = note
-                                    }
+        // Get existing note for this line item
+        val existingNote = lineItems.getOrNull(orderPosition)?.order?.note
+        
+        // Get widgets from singleton (reads from SharedPreferences synchronously)
+        // Always show popup even if empty - user can still save empty note
+        val enabledWidgets = WidgetManager.getInstance(requireContext()).getEnabledWidgets()
+        
+        ItemNoteDialogFragment.newInstance(
+            widgets = enabledWidgets,
+            lineItemId = lineItemId,
+            existingNote = existingNote
+        ).apply {
+            setListener(object : ItemNoteDialogFragment.ItemNoteListener {
+                override fun onNoteSaved(itemId: String?, note: String) {
+                    // Update the line item note in UI
+                    updateNoteInTheLineItemOfOrder(itemId, note, orderPosition)
+                    
+                    // Save to Clover via OrderConnector
+                    runOnBackgroundThread {
+                        exceptionHandler {
+                            val orderId = orderArguments?.id ?: return@exceptionHandler
+                            val allLineItems = orderArguments?.lineItems ?: return@exceptionHandler
+                            
+                            // Update note for matching line items
+                            allLineItems.forEach { lineItem ->
+                                if (lineItem?.item?.id == itemId) {
+                                    lineItem.note = note
                                 }
-                                
-                                // Save to Clover
-                                myApp.getOrderConnector().updateLineItems(orderId, allLineItems)
                             }
+                            
+                            // Save to Clover
+                            myApp.getOrderConnector().updateLineItems(orderId, allLineItems)
                         }
                     }
-                    
-                    override fun onNoteCancelled() {
-                        // Do nothing
-                    }
-                })
-            }.show(parentFragmentManager, ItemNoteDialogFragment.TAG)
-        } else {
-            binding.root.showSnackBar(getString(R.string.no_access))
-        }
-    }
-
-
-    /**
-     * Check if any widgets are enabled.
-     * Reads from SharedPreferences synchronously (like production's getJsonString).
-     */
-    private fun hasAddNoteAccess(): Boolean {
-        return WidgetManager.getInstance(requireContext()).hasEnabledWidgets()
+                }
+                
+                override fun onNoteCancelled() {
+                    // Do nothing
+                }
+            })
+        }.show(parentFragmentManager, ItemNoteDialogFragment.TAG)
     }
 
 

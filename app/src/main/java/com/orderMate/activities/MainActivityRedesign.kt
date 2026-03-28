@@ -315,28 +315,31 @@ class MainActivityRedesign : AppCompatActivity() {
 
     /**
      * Load widget data from Firebase and save to cache.
-     * If Firebase is empty, save defaults to Firebase AND cache.
-     * Matches production's getData() + saveTheData() pattern.
+     * Always ensures defaults are in cache immediately so popup is never empty.
+     * Then syncs with Firebase in background.
      */
     private fun loadWidgetData(merchantId: String) {
         val widgetManager = WidgetManager.getInstance(this)
         
+        // ALWAYS ensure defaults are in cache first (synchronous)
+        // This guarantees popup is never empty on first load
+        if (!widgetManager.hasEnabledWidgets()) {
+            val defaultWidgets = DefaultWidgetFactory.createDefaults()
+            val defaultSettings = PopupSettings()
+            widgetManager.saveToCache(defaultWidgets, defaultSettings)
+        }
+        
+        // Then sync with Firebase in background
         CoroutineScope(Dispatchers.IO).launch {
             firebaseConfigManager.getWidgets(merchantId) { widgets ->
                 firebaseConfigManager.getSettings(merchantId) { settings ->
                     if (widgets.isEmpty()) {
-                        // No data in Firebase - save defaults to Firebase AND cache
+                        // No data in Firebase - push defaults to Firebase
                         val defaultWidgets = DefaultWidgetFactory.createDefaults()
                         val defaultSettings = PopupSettings()
-                        
-                        firebaseConfigManager.initializeMerchant(merchantId, defaultWidgets, defaultSettings) { success ->
-                            if (success) {
-                                // Save to cache
-                                widgetManager.saveToCache(defaultWidgets, defaultSettings)
-                            }
-                        }
+                        firebaseConfigManager.initializeMerchant(merchantId, defaultWidgets, defaultSettings) { _ -> }
                     } else {
-                        // Data exists - save to cache
+                        // Data exists in Firebase - update cache with Firebase data
                         widgetManager.saveToCache(widgets, settings)
                     }
                 }
