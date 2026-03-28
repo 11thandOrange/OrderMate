@@ -29,6 +29,11 @@ import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
 
 
+/**
+ * @deprecated Use ItemNoteDialogFragment instead.
+ * This dialog uses the V1 schema (CustomItemJson/ModalData) which is being replaced by V2 (WidgetConfig).
+ */
+@Deprecated("Use ItemNoteDialogFragment instead", ReplaceWith("ItemNoteDialogFragment"))
 class CustomModalDialog(
     private val lineItemId: String?,
     private val orderData: Order?,

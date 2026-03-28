@@ -22,7 +22,6 @@ import com.orderMate.R
 import com.orderMate.adapters.OrderCardRedesignAdapter
 import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.databinding.FragmentOrderListRedesignBinding
-import com.orderMate.modals.CustomItemJson
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FilterCategories
 import com.orderMate.utils.FilterCategoryBuilder
@@ -820,24 +819,24 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             employeeName?.let { orderEmployeeType.add(it) }
         }
 
-        // Load custom notes filters
-        exceptionHandler {
-            val data = preferenceManager.getString(Constants.customMenuJson)
-            val result = Gson().fromJson(data, CustomItemJson::class.java)
-            loadNotesFilters(result)
-        }
+        // Load custom notes filters from V2 WidgetManager
+        loadNotesFiltersV2()
     }
 
-    private fun loadNotesFilters(result: CustomItemJson?) {
+    /**
+     * Load notes filters from V2 WidgetManager (filterableWidgets)
+     */
+    private fun loadNotesFiltersV2() {
         notesFilter.clear()
         notesFilter[getString(R.string.all_orders)] = mutableListOf()
         
-        result?.types?.forEach { type ->
-            if (type.list.isNotEmpty()) {
+        val filterableWidgets = widgetManager?.filterableWidgets ?: emptyList()
+        filterableWidgets.forEach { widget ->
+            if (widget.options.isNotEmpty()) {
                 val options = mutableListOf<String>()
                 options.add(getString(R.string.all_orders))
-                type.list.forEach { options.add(it) }
-                notesFilter[type.name.trim()] = options
+                widget.options.forEach { option -> options.add(option.label) }
+                notesFilter[widget.label.trim()] = options
             }
         }
     }

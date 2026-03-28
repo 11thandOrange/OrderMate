@@ -32,6 +32,11 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 
+/**
+ * @deprecated Use SettingsFragment with the PopUp tab instead.
+ * This fragment uses the V1 schema (CustomItemJson) which is being replaced by V2 (WidgetConfig).
+ */
+@Deprecated("Use SettingsFragment PopUp tab instead", ReplaceWith("SettingsFragment"))
 class CustomFieldsFragment : Fragment() {
 
     companion object {

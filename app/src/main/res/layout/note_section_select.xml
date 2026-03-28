@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Note Section for SINGLE_SELECT and MULTI_SELECT widgets -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="16dp">
+
+    <!-- Section Label -->
+    <TextView
+        android:id="@+id/sectionLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/text_light"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Select Option" />
+
+    <!-- Options Container (chips) -->
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/optionsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:flexWrap="wrap"
+        app:alignItems="flex_start"
+        app:justifyContent="flex_start" />
+
+</LinearLayout>

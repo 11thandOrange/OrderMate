@@ -15,6 +15,10 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 
+/**
+ * @deprecated Use [DefaultWidgetFactory.createDefaults] instead for V2 schema.
+ */
+@Deprecated("Use DefaultWidgetFactory.createDefaults() for V2 schema")
 private val modalData: ArrayList<ModalData> = arrayListOf(
     ModalData(
         Constants.isCustomModalShown,
@@ -75,6 +79,11 @@ private val modalData: ArrayList<ModalData> = arrayListOf(
 )
 
 
+/**
+ * @deprecated Use [DefaultWidgetFactory.createDefaults] instead for V2 schema.
+ * This V1 data structure is being replaced by the WidgetConfig/PopupSettings schema.
+ */
+@Deprecated("Use DefaultWidgetFactory.createDefaults() for V2 schema")
 val defaultCustomDataForFirebase = CustomItemJson(modalData)
 
 fun getCustomerContactDetails(customer: Customer?): Pair<String, String> {

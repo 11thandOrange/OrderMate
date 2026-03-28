@@ -35,6 +35,7 @@ import com.orderMate.utils.ConnectionManager
 import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.PreferenceManager
+import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.changeColorAsPerPaymentStatus
 import com.orderMate.utils.convertToSymbol
 import com.orderMate.utils.countElementsByUniqueKeys
@@ -83,6 +84,9 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         MyApp.getInstance()
     }
     private var appConnector: AppsConnector? = null
+    
+    // Widget manager for V2 schema
+    private var widgetManager: WidgetManager? = null
 
     private var lineItems: MutableList<ItemModal?> = mutableListOf()
     private var paymentItems: MutableList<Payment> = mutableListOf()
@@ -110,6 +114,26 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         setUpObserver()
         runOnBackgroundThread {
             appConnector = AppsConnector(requireContext(), myApp.getCloverAccount())
+        }
+        
+        // Initialize WidgetManager and load widgets (V2 schema)
+        initializeWidgetManager()
+    }
+    
+    /**
+     * Initialize WidgetManager with merchant ID and load widgets
+     */
+    private fun initializeWidgetManager() {
+        val merchantId = myApp.getMerchantId()
+        if (merchantId != null) {
+            widgetManager = WidgetManager(merchantId)
+            widgetManager?.load { success ->
+                if (success) {
+                    android.util.Log.d("OrderDetail", "Widgets loaded: ${widgetManager?.enabledWidgets?.size ?: 0} enabled")
+                } else {
+                    android.util.Log.e("OrderDetail", "Failed to load widgets")
+                }
+            }
         }
     }
 
@@ -657,19 +681,47 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     // if all the options are disabled by admin then this will not work
     // if a single option is available then it will show
     override fun onOrderItemClick(orderPosition: Int, lineItemId: String?) {
-
-
         if (hasAddNoteAccess()) {
-            CustomModalDialog(
-                lineItemId,
-                data?.orderData,
-                orderArguments?.id,
-                orderPosition,
-                this@OrderDetailFragment,
-            ).show(
-                parentFragmentManager,
-                Constants.defaultString,
-            )
+            // Get existing note for this line item
+            val existingNote = lineItems.getOrNull(orderPosition)?.order?.note
+            
+            // Show new ItemNoteDialogFragment with V2 widgets
+            val enabledWidgets = widgetManager?.enabledWidgets ?: emptyList()
+            
+            ItemNoteDialogFragment.newInstance(
+                widgets = enabledWidgets,
+                lineItemId = lineItemId,
+                existingNote = existingNote
+            ).apply {
+                setListener(object : ItemNoteDialogFragment.ItemNoteListener {
+                    override fun onNoteSaved(itemId: String?, note: String) {
+                        // Update the line item note in UI
+                        updateNoteInTheLineItemOfOrder(itemId, note, orderPosition)
+                        
+                        // Save to Clover via OrderConnector
+                        runOnBackgroundThread {
+                            exceptionHandler {
+                                val orderId = orderArguments?.id ?: return@exceptionHandler
+                                val allLineItems = orderArguments?.lineItems ?: return@exceptionHandler
+                                
+                                // Update note for matching line items
+                                allLineItems.forEach { lineItem ->
+                                    if (lineItem?.item?.id == itemId) {
+                                        lineItem.note = note
+                                    }
+                                }
+                                
+                                // Save to Clover
+                                myApp.getOrderConnector().updateLineItems(orderId, allLineItems)
+                            }
+                        }
+                    }
+                    
+                    override fun onNoteCancelled() {
+                        // Do nothing
+                    }
+                })
+            }.show(parentFragmentManager, ItemNoteDialogFragment.TAG)
         } else {
             binding.root.showSnackBar(getString(R.string.no_access))
         }
@@ -678,21 +730,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
 
     /*
     * @param : null
-    * @return : true when there is  any active option for the dialog
-    * @return : false when there is not any active option for the dialog
+    * @return : true when there is any enabled widget for the dialog (V2 schema)
+    * @return : false when there are no enabled widgets
     * */
     private fun hasAddNoteAccess(): Boolean {
-        // Check the actual data to determine if any note field is active
-        // Excludes modal trigger options (same logic as isAllFieldDisabled)
-        val data = preferenceManager.getJsonString()
-        data.types.forEach {
-            if (it.isActive &&
-                !it.name.equals(Constants.isCustomModalShown, true) &&
-                !it.name.equals(Constants.isCustomModalBasket, true)) {
-                return true
-            }
-        }
-        return false
+        // Check if WidgetManager has any enabled widgets
+        return widgetManager?.enabledWidgets?.isNotEmpty() == true
     }
 
 

@@ -1,5 +1,6 @@
 package com.orderMate.fragment
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -185,25 +186,35 @@ class SettingsFragment : Fragment() {
     
     private fun setupGeneralPanel() {
         switchUseInCloverRegister?.setOnCheckedChangeListener { _, isChecked ->
+            // Save to local settings
             settingsManager.setUseOrderMateRegister(isChecked)
-            // This enables/disables the OrderMate button in Clover Register
-            // When clicked, that button opens the OrderMate popup
+            
+            // Save to Firebase V2 PopupSettings
+            widgetManager?.setShowOMButtonInRegister(isChecked) { success ->
+                if (!success) {
+                    activity?.runOnUiThread {
+                        Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
     }
 
     // ==================== Pop Up Panel ====================
     
+    // Firebase-backed widget adapter
+    private var firebaseWidgetAdapter: FirebaseWidgetEditorAdapter? = null
+    
     private fun setupPopUpPanel() {
-        // Setup RecyclerView
-        widgetAdapter = WidgetEditorAdapter(
-            widgets = settingsManager.getWidgets().toMutableList(),
-            onWidgetUpdate = { widget -> settingsManager.updateWidget(widget) },
-            onWidgetDelete = { widget -> showDeleteWidgetDialog(widget) }
+        // Setup RecyclerView with Firebase-backed adapter
+        firebaseWidgetAdapter = FirebaseWidgetEditorAdapter(
+            onWidgetUpdate = { widget -> saveWidgetToFirebase(widget) },
+            onWidgetDelete = { widget -> showDeleteFirebaseWidgetDialog(widget) }
         )
         
         widgetRecyclerView?.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = widgetAdapter
+            adapter = firebaseWidgetAdapter
         }
         
         // Setup drag-and-drop
@@ -217,8 +228,15 @@ class SettingsFragment : Fragment() {
             ): Boolean {
                 val fromPos = viewHolder.adapterPosition
                 val toPos = target.adapterPosition
-                widgetAdapter?.moveWidget(fromPos, toPos)
-                settingsManager.reorderWidgets(fromPos, toPos)
+                firebaseWidgetAdapter?.moveWidget(fromPos, toPos)
+                // Save reordering to Firebase
+                widgetManager?.reorderWidgets(fromPos, toPos) { success ->
+                    if (!success) {
+                        activity?.runOnUiThread {
+                            Toast.makeText(context, "Failed to save order", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
                 return true
             }
 
@@ -228,36 +246,92 @@ class SettingsFragment : Fragment() {
         })
         
         itemTouchHelper.attachToRecyclerView(widgetRecyclerView)
-        widgetAdapter?.setDragHelper(itemTouchHelper)
+        firebaseWidgetAdapter?.setDragHelper(itemTouchHelper)
         
         // Add widget button
         btnAddWidget?.setOnClickListener {
-            showAddWidgetDialog()
+            showAddFirebaseWidgetDialog()
+        }
+        
+        // Load widgets from Firebase
+        loadWidgetsFromFirebase()
+    }
+    
+    private fun loadWidgetsFromFirebase() {
+        widgetManager?.load { success ->
+            activity?.runOnUiThread {
+                if (success) {
+                    val widgets = widgetManager?.widgets ?: emptyList()
+                    firebaseWidgetAdapter?.setWidgets(widgets.toMutableList())
+                } else {
+                    Toast.makeText(context, "Failed to load widgets", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    
+    private fun saveWidgetToFirebase(widget: WidgetConfig) {
+        widgetManager?.updateWidget(widget) { success ->
+            if (!success) {
+                activity?.runOnUiThread {
+                    Toast.makeText(context, "Failed to save widget", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
-    private fun showAddWidgetDialog() {
-        val widgets = settingsManager.getWidgets()
-        if (widgets.size >= SettingsManager.MAX_WIDGETS) {
-            Toast.makeText(requireContext(), "Maximum ${SettingsManager.MAX_WIDGETS} widgets allowed", Toast.LENGTH_SHORT).show()
+    private fun showAddFirebaseWidgetDialog() {
+        val currentCount = widgetManager?.getWidgetCount() ?: 0
+        if (currentCount >= 7) {
+            Toast.makeText(requireContext(), "Maximum 7 widgets allowed", Toast.LENGTH_SHORT).show()
             return
         }
 
         val types = arrayOf("Calendar", "Single Select", "Multi Select", "Text Box")
-        val typeEnums = arrayOf(WidgetType.CALENDAR, WidgetType.SINGLE_SELECT, WidgetType.MULTI_SELECT, WidgetType.TEXT_BOX)
+        val typeEnums = arrayOf(
+            FirebaseWidgetType.CALENDAR, 
+            FirebaseWidgetType.SINGLE_SELECT, 
+            FirebaseWidgetType.MULTI_SELECT, 
+            FirebaseWidgetType.TEXT_BOX
+        )
         
         android.app.AlertDialog.Builder(requireContext())
             .setTitle("Add Widget")
             .setItems(types) { _, which ->
-                val newWidget = settingsManager.addWidget(typeEnums[which])
-                if (newWidget != null) {
-                    widgetAdapter?.addWidget(newWidget)
+                widgetManager?.addWidget(typeEnums[which]) { newWidget ->
+                    activity?.runOnUiThread {
+                        if (newWidget != null) {
+                            firebaseWidgetAdapter?.addWidget(newWidget)
+                        } else {
+                            Toast.makeText(context, "Failed to add widget", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
     
+    private fun showDeleteFirebaseWidgetDialog(widget: WidgetConfig) {
+        showDeleteConfirmationDialog(
+            title = "Delete Widget?",
+            message = "Are you sure you want to delete \"${widget.label}\"? This action cannot be undone.",
+            onConfirm = {
+                widgetManager?.deleteWidget(widget.id) { success ->
+                    activity?.runOnUiThread {
+                        if (success) {
+                            firebaseWidgetAdapter?.removeWidget(widget)
+                            Toast.makeText(context, "Widget deleted", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Failed to delete widget", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        )
+    }
+    
+    // Legacy support for old SettingsManager widgets - TODO: Remove after migration
     private fun showDeleteWidgetDialog(widget: PopUpWidget) {
         showDeleteConfirmationDialog(
             title = "Delete Widget?",
@@ -443,6 +517,23 @@ class SettingsFragment : Fragment() {
         
         // Then sync from Firebase (authoritative)
         loadAdvancedSettingsFromFirebase()
+        loadPopupSettingsFromFirebase()
+    }
+    
+    private fun loadPopupSettingsFromFirebase() {
+        // Load PopupSettings from WidgetManager (which loads from Firebase)
+        widgetManager?.load { success ->
+            if (success) {
+                activity?.runOnUiThread {
+                    val settings = widgetManager?.settings
+                    if (settings != null) {
+                        // Update switch based on Firebase value
+                        switchUseInCloverRegister?.isChecked = settings.showOMButtonInRegister
+                        settingsManager.setUseOrderMateRegister(settings.showOMButtonInRegister)
+                    }
+                }
+            }
+        }
     }
     
     private fun loadAdvancedSettingsFromFirebase() {
@@ -457,7 +548,6 @@ class SettingsFragment : Fragment() {
                     settingsManager.setUseOrderMateRegister(settings.useOrderMateInRegister)
                     
                     // Update UI
-                    switchUseInCloverRegister?.isChecked = settings.useOrderMateInRegister
                     inputNotificationDays?.setText(settings.notificationDays.toString())
                     inputNotificationMinutes?.setText(settings.notificationMinutes.toString())
                     inputReceiptDays?.setText(settings.receiptDays.toString())
@@ -749,6 +839,249 @@ class WidgetEditorAdapter(
             }
             
             // Animate chevron rotation
+            expandChevron.animate()
+                .rotation(if (expanding) 180f else 0f)
+                .setDuration(200)
+                .start()
+        }
+    }
+}
+
+// ==================== Firebase-backed Widget Editor Adapter ====================
+
+class FirebaseWidgetEditorAdapter(
+    private val onWidgetUpdate: (WidgetConfig) -> Unit,
+    private val onWidgetDelete: (WidgetConfig) -> Unit
+) : RecyclerView.Adapter<FirebaseWidgetEditorAdapter.ViewHolder>() {
+
+    private var itemTouchHelper: ItemTouchHelper? = null
+    private val widgets = mutableListOf<WidgetConfig>()
+    private val expandedIds = mutableSetOf<String>()
+
+    fun setDragHelper(helper: ItemTouchHelper) {
+        itemTouchHelper = helper
+    }
+    
+    fun setWidgets(newWidgets: MutableList<WidgetConfig>) {
+        widgets.clear()
+        widgets.addAll(newWidgets)
+        notifyDataSetChanged()
+    }
+
+    fun addWidget(widget: WidgetConfig) {
+        widgets.add(widget)
+        notifyItemInserted(widgets.size - 1)
+    }
+
+    fun removeWidget(widget: WidgetConfig) {
+        val index = widgets.indexOfFirst { it.id == widget.id }
+        if (index >= 0) {
+            widgets.removeAt(index)
+            expandedIds.remove(widget.id)
+            notifyItemRemoved(index)
+        }
+    }
+
+    fun moveWidget(from: Int, to: Int) {
+        Collections.swap(widgets, from, to)
+        notifyItemMoved(from, to)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_widget_editor, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(widgets[position])
+    }
+
+    override fun getItemCount() = widgets.size
+
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val widgetCard: CardView = itemView.findViewById(R.id.widgetCard)
+        private val widgetContainer: View = itemView.findViewById(R.id.widgetContainer)
+        private val dragHandle: View = itemView.findViewById(R.id.dragHandle)
+        private val widgetIconContainer: View = itemView.findViewById(R.id.widgetIconContainer)
+        private val widgetIcon: ImageView = itemView.findViewById(R.id.widgetIcon)
+        private val widgetTitle: TextView = itemView.findViewById(R.id.widgetTitle)
+        private val widgetType: TextView = itemView.findViewById(R.id.widgetType)
+        private val widgetToggle: Switch = itemView.findViewById(R.id.widgetToggle)
+        private val expandChevron: ImageView = itemView.findViewById(R.id.expandChevron)
+        private val widgetHeader: View = itemView.findViewById(R.id.widgetHeader)
+        private val widgetBody: View = itemView.findViewById(R.id.widgetBody)
+        private val inputWidgetLabel: EditText = itemView.findViewById(R.id.inputWidgetLabel)
+        private val optionsContainer: View = itemView.findViewById(R.id.optionsContainer)
+        private val inputAddOption: EditText = itemView.findViewById(R.id.inputAddOption)
+        private val valuesContainer: FlexboxLayout = itemView.findViewById(R.id.valuesContainer)
+        private val btnDeleteWidget: View = itemView.findViewById(R.id.btnDeleteWidget)
+        
+        private var currentWidgetTintColor: Int = 0xFFFFFFFF.toInt()
+        private var saveHandler = android.os.Handler(android.os.Looper.getMainLooper())
+        private var saveRunnable: Runnable? = null
+
+        @SuppressLint("ClickableViewAccessibility")
+        fun bind(widget: WidgetConfig) {
+            widgetTitle.text = widget.label
+            widgetType.text = widget.type.displayName
+            widgetToggle.isChecked = widget.isEnabled
+            inputWidgetLabel.setText(widget.label)
+
+            // Set icon and colors based on type
+            val (iconRes, bgRes, tintColor) = when (widget.type) {
+                com.orderMate.modals.WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, 0xFF64B5F6.toInt())
+                com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, 0xFFCE93D8.toInt())
+                com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, 0xFF81C784.toInt())
+                com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, 0xFFFFB74D.toInt())
+            }
+            widgetIcon.setImageResource(iconRes)
+            widgetIcon.setColorFilter(tintColor)
+            widgetIconContainer.setBackgroundResource(bgRes)
+            currentWidgetTintColor = tintColor
+
+            // Show/hide options for select types
+            val hasOptions = widget.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
+                            widget.type == com.orderMate.modals.WidgetType.MULTI_SELECT
+            optionsContainer.visibility = if (hasOptions) View.VISIBLE else View.GONE
+
+            // Setup values
+            setupValues(widget)
+
+            // Expand/collapse using widget ID
+            val isExpanded = expandedIds.contains(widget.id)
+            widgetBody.visibility = if (isExpanded) View.VISIBLE else View.GONE
+            expandChevron.rotation = if (isExpanded) 180f else 0f
+
+            // Header click to expand/collapse
+            widgetHeader.setOnClickListener {
+                val expanding = !expandedIds.contains(widget.id)
+                if (expanding) {
+                    expandedIds.add(widget.id)
+                } else {
+                    expandedIds.remove(widget.id)
+                }
+                animateExpand(expanding)
+            }
+
+            // Toggle enabled
+            widgetToggle.setOnCheckedChangeListener { _, isChecked ->
+                widget.isEnabled = isChecked
+                scheduleSave(widget)
+            }
+
+            // Label change
+            inputWidgetLabel.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                    val newLabel = s?.toString() ?: ""
+                    widget.label = newLabel
+                    widgetTitle.text = newLabel
+                    scheduleSave(widget)
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
+
+            // Add option
+            inputAddOption.setOnEditorActionListener { _, actionId, event ->
+                if (actionId == EditorInfo.IME_ACTION_DONE || 
+                    (event?.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN)) {
+                    val value = inputAddOption.text.toString().trim()
+                    if (value.isNotEmpty()) {
+                        val newOption = com.orderMate.modals.WidgetOption(
+                            id = java.util.UUID.randomUUID().toString(),
+                            label = value,
+                            value = value
+                        )
+                        widget.options.add(newOption)
+                        inputAddOption.text.clear()
+                        setupValues(widget)
+                        scheduleSave(widget)
+                    }
+                    true
+                } else false
+            }
+
+            // Delete widget
+            btnDeleteWidget.setOnClickListener {
+                onWidgetDelete(widget)
+            }
+
+            // Drag handle
+            dragHandle.setOnTouchListener { _, event ->
+                if (event.actionMasked == android.view.MotionEvent.ACTION_DOWN) {
+                    itemTouchHelper?.startDrag(this)
+                }
+                false
+            }
+        }
+        
+        private fun scheduleSave(widget: WidgetConfig) {
+            saveRunnable?.let { saveHandler.removeCallbacks(it) }
+            saveRunnable = Runnable { onWidgetUpdate(widget) }
+            saveHandler.postDelayed(saveRunnable!!, 500) // Debounce 500ms
+        }
+
+        private fun setupValues(widget: WidgetConfig) {
+            valuesContainer.removeAllViews()
+            val density = itemView.context.resources.displayMetrics.density
+
+            widget.options.forEach { option ->
+                val pill = createValuePill(option.label, density) {
+                    widget.options.removeAll { it.id == option.id }
+                    setupValues(widget)
+                    scheduleSave(widget)
+                }
+                valuesContainer.addView(pill)
+            }
+        }
+
+        private fun createValuePill(text: String, density: Float, onRemove: () -> Unit): LinearLayout {
+            return LinearLayout(itemView.context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                setBackgroundResource(R.drawable.bg_value_pill)
+                setPadding((8 * density).toInt(), (4 * density).toInt(), (6 * density).toInt(), (4 * density).toInt())
+                
+                val params = ViewGroup.MarginLayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                params.setMargins(0, 0, (8 * density).toInt(), (8 * density).toInt())
+                layoutParams = params
+
+                addView(TextView(context).apply {
+                    this.text = text
+                    setTextColor(ContextCompat.getColor(context, R.color.text_light))
+                    textSize = 12f
+                })
+
+                addView(TextView(context).apply {
+                    this.text = "×"
+                    setTextColor(currentWidgetTintColor)
+                    textSize = 14f
+                    setPadding((8 * density).toInt(), 0, (2 * density).toInt(), 0)
+                    setOnClickListener { onRemove() }
+                })
+            }
+        }
+        
+        private fun animateExpand(expanding: Boolean) {
+            if (expanding) {
+                widgetBody.visibility = View.VISIBLE
+                widgetBody.alpha = 0f
+                widgetBody.animate()
+                    .alpha(1f)
+                    .setDuration(200)
+                    .start()
+            } else {
+                widgetBody.animate()
+                    .alpha(0f)
+                    .setDuration(150)
+                    .withEndAction { widgetBody.visibility = View.GONE }
+                    .start()
+            }
+            
             expandChevron.animate()
                 .rotation(if (expanding) 180f else 0f)
                 .setDuration(200)

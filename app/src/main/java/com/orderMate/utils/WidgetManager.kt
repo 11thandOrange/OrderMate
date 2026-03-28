@@ -230,8 +230,8 @@ class WidgetManager(private val merchantId: String) {
         updateSettings(newSettings, callback)
     }
     
-    fun setTriggerFromBasket(enabled: Boolean, callback: (Boolean) -> Unit) {
-        val newSettings = _settings.copy(triggerFromBasket = enabled)
+    fun setShowOMButtonInRegister(enabled: Boolean, callback: (Boolean) -> Unit) {
+        val newSettings = _settings.copy(showOMButtonInRegister = enabled)
         updateSettings(newSettings, callback)
     }
     

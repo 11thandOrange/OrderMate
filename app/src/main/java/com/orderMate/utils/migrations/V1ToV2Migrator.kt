@@ -127,7 +127,7 @@ object V1ToV2Migrator {
      */
     private fun extractSettings(legacy: LegacyCustomItemJson): PopupSettings {
         var triggerOnAdd = false
-        var triggerFromBasket = false
+        var showOMButtonInRegister = true // Default to true for existing users
         
         legacy.types.forEach { modalData ->
             when (modalData.type) {
@@ -135,17 +135,17 @@ object V1ToV2Migrator {
                     triggerOnAdd = modalData.isActive
                 }
                 ModalDialogCategories.BasketShown -> {
-                    triggerFromBasket = modalData.isActive
+                    showOMButtonInRegister = modalData.isActive
                 }
                 else -> { /* Skip other types */ }
             }
         }
         
-        android.util.Log.d(TAG, "Extracted settings: triggerOnAdd=$triggerOnAdd, triggerFromBasket=$triggerFromBasket")
+        android.util.Log.d(TAG, "Extracted settings: triggerOnAdd=$triggerOnAdd, showOMButtonInRegister=$showOMButtonInRegister")
         
         return PopupSettings(
             triggerOnItemAdd = triggerOnAdd,
-            triggerFromBasket = triggerFromBasket
+            showOMButtonInRegister = showOMButtonInRegister
         )
     }
 }

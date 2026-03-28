@@ -13,18 +13,15 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import com.google.gson.Gson
 import com.orderMate.R
 import com.orderMate.fragment.orderHistory.OrderHistoryFragment
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FirebaseConfigManager
-import com.orderMate.utils.FirebaseRealtimeDataBaseManager
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.PermissionUtils
 import com.orderMate.utils.PreferenceManager
 import com.orderMate.utils.ProfileSettingsManager
 import com.orderMate.utils.createAndShowDialog
-import com.orderMate.utils.defaultCustomDataForFirebase
 import com.orderMate.utils.exceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,9 +41,6 @@ class MainActivityRedesign : AppCompatActivity() {
         PermissionUtils.getInstance()
     }
 
-    private val firebaseRealTimeManager: FirebaseRealtimeDataBaseManager by lazy {
-        FirebaseRealtimeDataBaseManager.getInstance()
-    }
     private val preferenceManager: PreferenceManager by lazy {
         PreferenceManager.getInstance(this)
     }
@@ -289,16 +283,15 @@ class MainActivityRedesign : AppCompatActivity() {
         // Refresh theme settings when returning from profile
         applyThemeSettings()
         
-        CoroutineScope(Dispatchers.IO).launch {
-            firebaseRealTimeManager.getData(
-                this@MainActivityRedesign,
-                MyApp.getInstance().getMerchantId(), true
-            ) {
-                if (it) {
-                    Constants.notImplementedLog
-                } else {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        saveTheData()
+        // Load V2 data via FirebaseConfigManager (schema migration handles V1 -> V2)
+        val merchantId = MyApp.getInstance().getMerchantId()
+        if (merchantId != null) {
+            CoroutineScope(Dispatchers.IO).launch {
+                // Check if merchant exists in V2 schema
+                firebaseConfigManager.merchantExists(merchantId) { exists ->
+                    if (!exists) {
+                        // Initialize with default widgets if merchant doesn't exist
+                        initializeDefaultWidgets(merchantId)
                     }
                 }
             }
@@ -324,15 +317,22 @@ class MainActivityRedesign : AppCompatActivity() {
         }
     }
 
-    private fun saveTheData() {
-        defaultCustomDataForFirebase.let { it1 ->
-            val list = Gson().toJson(it1)
-            FirebaseRealtimeDataBaseManager.getInstance()
-                .saveData(this, list, myApplication.getMerchantId()) {}
-            preferenceManager.saveJsonString(
-                Constants.customMenuJson,
-                it1
-            ) {}
+    /**
+     * Initialize default widgets for new merchants using V2 schema
+     */
+    private fun initializeDefaultWidgets(merchantId: String) {
+        val defaultWidgets = com.orderMate.utils.DefaultWidgetFactory.createDefaults()
+        val defaultSettings = com.orderMate.modals.PopupSettings(
+            triggerOnItemAdd = false,
+            showOMButtonInRegister = true
+        )
+        
+        firebaseConfigManager.initializeMerchant(merchantId, defaultWidgets, defaultSettings) { success ->
+            if (success) {
+                android.util.Log.d("MainActivityRedesign", "Initialized default widgets for merchant")
+            } else {
+                android.util.Log.e("MainActivityRedesign", "Failed to initialize default widgets")
+            }
         }
     }
 

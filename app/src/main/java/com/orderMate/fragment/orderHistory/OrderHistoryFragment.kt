@@ -147,7 +147,8 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
         popupMenu?.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.customMenu -> {
-                    navigate(R.id.action_orderHistoryFragment_to_customFieldsFragment)
+                    // Navigate to Settings instead of deprecated CustomFieldsFragment
+                    navigate(R.id.settingsFragment)
                     true
                 }
 

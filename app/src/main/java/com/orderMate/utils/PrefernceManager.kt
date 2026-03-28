@@ -29,6 +29,10 @@ class PreferenceManager private constructor(context: Context) {
         editor = sharedPreferences?.edit()
     }
 
+    /**
+     * @deprecated Use WidgetManager for V2 schema persistence.
+     */
+    @Deprecated("Use WidgetManager for V2 schema persistence")
     @Synchronized
     fun saveJsonString(key: String, value: Any, task: () -> Unit) {
         val gson = Gson().toJson(value)
@@ -37,16 +41,22 @@ class PreferenceManager private constructor(context: Context) {
     }
 
 
+    /**
+     * @deprecated Use WidgetManager.widgets for V2 schema data.
+     */
+    @Deprecated("Use WidgetManager.widgets for V2 schema data")
     fun getJsonString(): CustomItemJson {
         return try {
             val requiredJson = getString(Constants.customMenuJson)
             if (requiredJson.isBlank()) {
+                @Suppress("DEPRECATION")
                 defaultCustomDataForFirebase
             } else {
                 Gson().fromJson(requiredJson, CustomItemJson::class.java)
-                    ?: defaultCustomDataForFirebase
+                    ?: @Suppress("DEPRECATION") defaultCustomDataForFirebase
             }
         } catch (e: Exception) {
+            @Suppress("DEPRECATION")
             defaultCustomDataForFirebase
         }
     }
