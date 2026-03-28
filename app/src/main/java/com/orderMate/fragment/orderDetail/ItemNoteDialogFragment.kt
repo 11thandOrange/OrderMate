@@ -14,6 +14,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.textfield.TextInputEditText
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.orderMate.R
 import com.orderMate.databinding.DialogItemNoteBinding
 import com.orderMate.modals.WidgetConfig
@@ -52,6 +54,7 @@ class ItemNoteDialogFragment : DialogFragment() {
     private val textInputViews = mutableMapOf<String, TextInputEditText>()
 
     private val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+    private val gson = Gson()
 
     interface ItemNoteListener {
         fun onNoteSaved(lineItemId: String?, note: String)
@@ -61,6 +64,21 @@ class ItemNoteDialogFragment : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NO_FRAME, R.style.Theme_OrderMate_Dialog)
+        
+        // Restore arguments - this is critical for fragment lifecycle
+        arguments?.let { args ->
+            lineItemId = args.getString(ARG_LINE_ITEM_ID)
+            existingNote = args.getString(ARG_EXISTING_NOTE)
+            args.getString(ARG_WIDGETS)?.let { json ->
+                try {
+                    val type = object : TypeToken<List<WidgetConfig>>() {}.type
+                    widgets = gson.fromJson(json, type) ?: emptyList()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    widgets = emptyList()
+                }
+            }
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -439,6 +457,9 @@ class ItemNoteDialogFragment : DialogFragment() {
 
     companion object {
         const val TAG = "ItemNoteDialogFragment"
+        private const val ARG_WIDGETS = "arg_widgets"
+        private const val ARG_LINE_ITEM_ID = "arg_line_item_id"
+        private const val ARG_EXISTING_NOTE = "arg_existing_note"
 
         fun newInstance(
             widgets: List<WidgetConfig>,
@@ -446,9 +467,12 @@ class ItemNoteDialogFragment : DialogFragment() {
             existingNote: String? = null
         ): ItemNoteDialogFragment {
             return ItemNoteDialogFragment().apply {
-                this.widgets = widgets
-                this.lineItemId = lineItemId
-                this.existingNote = existingNote
+                arguments = Bundle().apply {
+                    // Serialize widgets to JSON for Bundle storage
+                    putString(ARG_WIDGETS, Gson().toJson(widgets))
+                    putString(ARG_LINE_ITEM_ID, lineItemId)
+                    putString(ARG_EXISTING_NOTE, existingNote)
+                }
             }
         }
     }
