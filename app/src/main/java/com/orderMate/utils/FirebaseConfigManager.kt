@@ -269,7 +269,7 @@ class FirebaseConfigManager private constructor() {
         
         // Settings
         updates["${FirebasePaths.settings(merchantId)}/triggerOnItemAdd"] = settings.triggerOnItemAdd
-        updates["${FirebasePaths.settings(merchantId)}/triggerFromBasket"] = settings.triggerFromBasket
+        updates["${FirebasePaths.settings(merchantId)}/showOMButtonInRegister"] = settings.showOMButtonInRegister
         
         // Widgets
         widgets.forEach { widget ->
