@@ -71,14 +71,14 @@ object DefaultWidgetFactory {
     fun createOrderLevelDefaults(): List<WidgetConfig> = listOf(
         createWidget(
             type = WidgetType.CALENDAR,
-            label = "Due Date",
+            label = "Deadline",
             level = NoteLevel.ORDER,
             isEnabled = false,
             order = 0
         ),
         createWidget(
             type = WidgetType.SINGLE_SELECT,
-            label = "Category",
+            label = "Group",
             level = NoteLevel.ORDER,
             isEnabled = false,
             order = 1,
@@ -102,7 +102,7 @@ object DefaultWidgetFactory {
         ),
         createWidget(
             type = WidgetType.TEXT_BOX,
-            label = "Description",
+            label = "Details",
             level = NoteLevel.ORDER,
             isEnabled = false,
             showInFilter = false,
