@@ -316,21 +316,12 @@ class SettingsFragment : Fragment() {
     // ==================== Shared Widget Methods ====================
     
     private fun loadWidgetsFromFirebase() {
-        widgetManager.reload { success ->
-            activity?.runOnUiThread {
-                if (success) {
-                    // Load item-level widgets
-                    val itemWidgets = widgetManager.getAllItemLevelWidgets()
-                    itemLevelWidgetAdapter?.setWidgets(itemWidgets.toMutableList())
-                    
-                    // Load order-level widgets
-                    val orderWidgets = widgetManager.getAllOrderLevelWidgets()
-                    orderLevelWidgetAdapter?.setWidgets(orderWidgets.toMutableList())
-                } else {
-                    Toast.makeText(context, "Failed to load widgets", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
+        // Read directly from cache (MainActivityRedesign already populated it)
+        val itemWidgets = widgetManager.getAllItemLevelWidgets()
+        itemLevelWidgetAdapter?.setWidgets(itemWidgets.toMutableList())
+
+        val orderWidgets = widgetManager.getAllOrderLevelWidgets()
+        orderLevelWidgetAdapter?.setWidgets(orderWidgets.toMutableList())
     }
     
     private fun saveWidgetToFirebase(widget: WidgetConfig) {
