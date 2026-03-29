@@ -116,4 +116,20 @@
     
     <!-- Ripple and clickable effects -->
     <color name="glass_ripple">#40FFFFFF</color>
+    
+    <!-- Order-level note colors (#93 requirement) - distinct from item-level -->
+    <color name="order_pill_bg">#E8D5F0</color>
+    <color name="order_pill_text">#6B3FA0</color>
+    <color name="order_pill_border">#D4A8E8</color>
+    <color name="order_pill_icon">#9B59B6</color>
+    
+    <!-- Item-level note colors (existing, for clarity) -->
+    <color name="item_pill_bg">#D0E8D8</color>
+    <color name="item_pill_text">#2D5A3D</color>
+    <color name="item_pill_border">#A8D4B8</color>
+    <color name="item_pill_icon">#27AE60</color>
+    
+    <!-- Order note dialog accent -->
+    <color name="order_dialog_accent">#9B59B6</color>
+    <color name="item_dialog_accent">#27AE60</color>
 </resources>
