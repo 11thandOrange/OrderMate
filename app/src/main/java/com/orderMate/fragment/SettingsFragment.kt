@@ -409,7 +409,7 @@ class SettingsFragment : Fragment() {
             message = "Are you sure you want to delete \"${widget.label}\"? This action cannot be undone.",
             onConfirm = {
                 settingsManager.removeWidget(widget.id)
-                widgetAdapter?.removeWidget(widget)
+                // Note: Legacy widgetAdapter removed - use itemLevelWidgetAdapter or orderLevelWidgetAdapter
                 Toast.makeText(context, "Widget deleted", Toast.LENGTH_SHORT).show()
             }
         )
@@ -662,16 +662,20 @@ class SettingsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         tabGeneral = null
-        tabPopUp = null
+        tabItemLevelNotes = null
+        tabOrderLevelNotes = null
         tabNotification = null
         tabAdvanced = null
         panelGeneral = null
-        panelPopUp = null
+        panelItemLevelNotes = null
+        panelOrderLevelNotes = null
         panelNotification = null
         panelAdvanced = null
         switchUseInCloverRegister = null
-        widgetRecyclerView = null
-        btnAddWidget = null
+        itemLevelWidgetRecyclerView = null
+        orderLevelWidgetRecyclerView = null
+        btnAddItemLevelWidget = null
+        btnAddOrderLevelWidget = null
         templateRecyclerView = null
         btnAddTemplate = null
         inputNotificationDays = null
