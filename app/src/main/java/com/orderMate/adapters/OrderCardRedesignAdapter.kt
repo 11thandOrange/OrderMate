@@ -270,16 +270,12 @@ class OrderCardRedesignAdapter(
                 textSize = 12f
                 chipMinHeight = 28f.dpToPx()
                 chipCornerRadius = 6f.dpToPx()
+                chipStrokeWidth = 0f
                 isClickable = false
                 
                 // Light bg with dark text
                 setChipBackgroundColorResource(R.color.list_chip_bg)
                 setTextColor(ContextCompat.getColor(context, R.color.list_chip_text))
-                
-                // Border color matches widget type
-                val borderColor = getColorForLabel(noteItem.label)
-                chipStrokeWidth = 1f.dpToPx()
-                chipStrokeColor = android.content.res.ColorStateList.valueOf(borderColor)
                 
                 // Add spacing between chips
                 val params = ViewGroup.MarginLayoutParams(
@@ -295,15 +291,6 @@ class OrderCardRedesignAdapter(
                     maxLines = 1
                     ellipsize = android.text.TextUtils.TruncateAt.END
                 }
-            }
-        }
-        
-        private fun getColorForLabel(label: String): Int {
-            return when {
-                label.contains("date") || label.contains("pickup") -> 0xFF64B5F6.toInt()
-                label.contains("type") || label.contains("status") -> 0xFFCE93D8.toInt()
-                label.contains("category") || label.contains("tag") -> 0xFF81C784.toInt()
-                else -> 0xFFFFB74D.toInt()
             }
         }
     }
