@@ -261,8 +261,6 @@ class SettingsFragment : Fragment() {
         btnAddItemLevelWidget?.setOnClickListener {
             showAddWidgetDialog(NoteLevel.ITEM)
         }
-        
-        loadWidgetsFromFirebase()
     }
     
     // ==================== Order Level Notes Panel ====================
@@ -309,6 +307,9 @@ class SettingsFragment : Fragment() {
         btnAddOrderLevelWidget?.setOnClickListener {
             showAddWidgetDialog(NoteLevel.ORDER)
         }
+        
+        // Load widgets AFTER both adapters are created
+        loadWidgetsFromFirebase()
     }
     
     // ==================== Shared Widget Methods ====================
