@@ -202,8 +202,10 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             // Reuse existing adapter to avoid rebinding all items on back navigation
             if (orderAdapter == null) {
                 orderAdapter = OrderCardRedesignAdapter(orderItems, this@OrderListRedesignFragment)
+                adapter = orderAdapter
+            } else if (adapter !== orderAdapter) {
+                adapter = orderAdapter
             }
-            adapter = orderAdapter
         }
     }
 

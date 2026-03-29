@@ -100,7 +100,8 @@ class ItemAdapter(
         }
 
         private fun setupNotePills(context: Context, noteString: String?) {
-            binding.itemNotesContainer.removeAllViews()
+            val container = binding.itemNotesContainer
+            container.removeAllViews()
             
             if (noteString.isNullOrEmpty() || noteString.trim().isEmpty()) return
 
@@ -115,54 +116,36 @@ class ItemAdapter(
                 
                 if (value.isEmpty()) return@forEach
                 
-                // For multi-select values (comma-separated), create separate pills
-                val values = if (label.contains("tag") || label.contains("category")) {
-                    value.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                } else {
-                    listOf(value)
-                }
+                // Split comma-separated values into separate pills (consistent for all types)
+                val values = value.split(",").map { it.trim() }.filter { it.isNotEmpty() }
                 
                 values.forEach { displayText ->
                     val pillView = LayoutInflater.from(context)
-                        .inflate(R.layout.item_note_pill, binding.itemNotesContainer, false) as LinearLayout
+                        .inflate(R.layout.item_note_pill, container, false) as LinearLayout
                     
                     val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
                     val pillText = pillView.findViewById<TextView>(R.id.pillText)
                     
-                    // Apply fixed mapping based on label
-                    val (iconRes, color) = getIconAndColorForLabel(label)
+                    // No icon, just colored text and background
+                    pillIcon.visibility = View.GONE
+                    val color = getColorForLabel(label)
                     val bgColor = (color and 0x00FFFFFF) or 0x26000000
                     
                     pillText.text = displayText
                     pillText.setTextColor(color)
-                    pillIcon.setImageResource(iconRes)
-                    pillIcon.setColorFilter(color)
                     pillView.backgroundTintList = android.content.res.ColorStateList.valueOf(bgColor)
                     
-                    binding.itemNotesContainer.addView(pillView)
+                    container.addView(pillView)
                 }
             }
         }
         
-        /**
-         * Fixed mapping: label -> (icon, color)
-         * - CALENDAR (date/pickup): ic_calendar, #64B5F6 (blue)
-         * - SINGLE_SELECT (type/status): ic_check_box, #CE93D8 (purple)
-         * - MULTI_SELECT (category/tag): ic_label, #81C784 (green)
-         * - TEXT_BOX (description/note): ic_edit, #FFB74D (orange)
-         * - Default: ic_label, #FFB74D (orange)
-         */
-        private fun getIconAndColorForLabel(label: String): Pair<Int, Int> {
+        private fun getColorForLabel(label: String): Int {
             return when {
-                label.contains("date") || label.contains("pickup") -> 
-                    Pair(R.drawable.ic_calendar, 0xFF64B5F6.toInt())
-                label.contains("type") || label.contains("status") -> 
-                    Pair(R.drawable.ic_check_box, 0xFFCE93D8.toInt())
-                label.contains("category") || label.contains("tag") -> 
-                    Pair(R.drawable.ic_label, 0xFF81C784.toInt())
-                label.contains("description") || label.contains("note") -> 
-                    Pair(R.drawable.ic_edit, 0xFFFFB74D.toInt())
-                else -> Pair(R.drawable.ic_label, 0xFFFFB74D.toInt())
+                label.contains("date") || label.contains("pickup") -> 0xFF64B5F6.toInt()
+                label.contains("type") || label.contains("status") -> 0xFFCE93D8.toInt()
+                label.contains("category") || label.contains("tag") -> 0xFF81C784.toInt()
+                else -> 0xFFFFB74D.toInt()
             }
         }
     }
