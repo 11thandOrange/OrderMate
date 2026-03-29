@@ -145,9 +145,14 @@ class ItemAdapter(
                     
                     // Whole pill matches widget color (bg with 15% opacity, text/icon with full color)
                     if (tintColor != 0) {
-                        // Create semi-transparent background from widget color
-                        val bgColor = (tintColor and 0x00FFFFFF) or 0x26000000  // 15% opacity
-                        pillView.setBackgroundColor(bgColor)
+                        // Create rounded background with widget color at 15% opacity
+                        val bgColor = (tintColor and 0x00FFFFFF) or 0x26000000
+                        val drawable = android.graphics.drawable.GradientDrawable().apply {
+                            shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                            cornerRadius = 10f * context.resources.displayMetrics.density
+                            setColor(bgColor)
+                        }
+                        pillView.background = drawable
                         pillText.setTextColor(tintColor)
                     } else {
                         // Default fallback
