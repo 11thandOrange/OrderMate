@@ -299,6 +299,21 @@ class OrderCardRedesignAdapter(
                     chipIconSize = 16f.dpToPx()
                     iconStartPadding = 4f.dpToPx()
                 }
+                
+                // Add spacing between chips
+                val params = ViewGroup.MarginLayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                params.setMargins(0, 0, 8.dpToPx().toInt(), 8.dpToPx().toInt())
+                layoutParams = params
+                
+                // Truncate text widgets to single line
+                val isTextWidget = noteItem.label.contains("description") || noteItem.label.contains("note")
+                if (isTextWidget) {
+                    maxLines = 1
+                    ellipsize = android.text.TextUtils.TruncateAt.END
+                }
             }
         }
         
