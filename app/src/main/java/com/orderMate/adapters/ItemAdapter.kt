@@ -2,7 +2,10 @@ package com.orderMate.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -120,22 +123,66 @@ class ItemAdapter(
                 }
                 
                 values.forEach { displayText ->
-                    val pill = LayoutInflater.from(context)
-                        .inflate(R.layout.item_note_pill, binding.itemNotesContainer, false) as TextView
+                    val pillView = LayoutInflater.from(context)
+                        .inflate(R.layout.item_note_pill, binding.itemNotesContainer, false) as LinearLayout
                     
-                    pill.text = displayText
+                    val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
+                    val pillText = pillView.findViewById<TextView>(R.id.pillText)
                     
-                    val isCategory = label.contains("category")
-                    if (isCategory) {
-                        pill.setBackgroundResource(R.drawable.bg_note_chip_category)
-                        pill.setTextColor(ContextCompat.getColor(context, R.color.tag_category_text))
+                    pillText.text = displayText
+                    
+                    // Get icon and color based on widget type
+                    val (iconRes, tintColor) = getIconAndColorForLabel(label)
+                    
+                    // Set icon
+                    if (iconRes != 0) {
+                        pillIcon.setImageResource(iconRes)
+                        pillIcon.setColorFilter(tintColor)
+                        pillIcon.visibility = View.VISIBLE
                     } else {
-                        pill.setBackgroundResource(R.drawable.bg_note_chip_tag)
-                        pill.setTextColor(ContextCompat.getColor(context, R.color.tag_pill_text))
+                        pillIcon.visibility = View.GONE
                     }
                     
-                    binding.itemNotesContainer.addView(pill)
+                    // Whole pill matches widget color (bg with 15% opacity, text/icon with full color)
+                    if (tintColor != 0) {
+                        // Create semi-transparent background from widget color
+                        val bgColor = (tintColor and 0x00FFFFFF) or 0x26000000  // 15% opacity
+                        pillView.setBackgroundColor(bgColor)
+                        pillText.setTextColor(tintColor)
+                    } else {
+                        // Default fallback
+                        pillView.setBackgroundResource(R.drawable.bg_note_chip_tag)
+                        pillText.setTextColor(ContextCompat.getColor(context, R.color.tag_pill_text))
+                    }
+                    
+                    binding.itemNotesContainer.addView(pillView)
                 }
+            }
+        }
+        
+        /**
+         * Maps label to icon and color based on widget type:
+         * - CALENDAR (date/pickup): ic_calendar, #64B5F6 (blue)
+         * - SINGLE_SELECT (type/status): ic_check_box, #CE93D8 (purple)
+         * - MULTI_SELECT (category/tag): ic_label, #81C784 (green)
+         * - TEXT_BOX (description/note): ic_edit, #FFB74D (orange)
+         */
+        private fun getIconAndColorForLabel(label: String): Pair<Int, Int> {
+            return when {
+                // Calendar widget - blue
+                label.contains("date") || label.contains("pickup") -> 
+                    Pair(R.drawable.ic_calendar, 0xFF64B5F6.toInt())
+                // Single select widget - purple (checkbox icon)
+                label.contains("type") || label.contains("status") -> 
+                    Pair(R.drawable.ic_check_box, 0xFFCE93D8.toInt())
+                // Multi select widget - green (tag icon)
+                label.contains("category") || label.contains("tag") -> 
+                    Pair(R.drawable.ic_label, 0xFF81C784.toInt())
+                // Text widget - orange (pencil icon)
+                label.contains("description") || label.contains("note") -> 
+                    Pair(R.drawable.ic_edit, 0xFFFFB74D.toInt())
+                // Default - no icon
+                else -> Pair(0, 0)
             }
         }
     }

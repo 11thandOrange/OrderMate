@@ -269,16 +269,11 @@ class OrderCardRedesignAdapter(
                     val value = part.substring(colonIndex + 1).trim()
                     
                     if (value.isNotBlank()) {
-                        val type = when {
-                            label.contains("category") -> NoteType.CATEGORY
-                            label.contains("tag") -> NoteType.TAG
-                            else -> NoteType.TEXT
-                        }
-                        notes.add(NoteItem(value, type))
+                        notes.add(NoteItem(value, label))
                     }
                 } else if (part.isNotBlank()) {
                     // No colon, treat as plain text
-                    notes.add(NoteItem(part, NoteType.TEXT))
+                    notes.add(NoteItem(part, ""))
                 }
             }
         }
@@ -292,16 +287,47 @@ class OrderCardRedesignAdapter(
                 chipStrokeWidth = 0f
                 isClickable = false
                 
-                // Glass-style background for all chips
-                setChipBackgroundColorResource(R.color.note_chip_bg)
-                setTextColor(ContextCompat.getColor(context, R.color.text_light))
+                // Light bg with dark text (matches design)
+                setChipBackgroundColorResource(R.color.list_chip_bg)
+                setTextColor(ContextCompat.getColor(context, R.color.list_chip_text))
+                
+                // Set icon and color based on widget type mapping
+                val (iconRes, tintColor) = getIconAndColorForLabel(noteItem.label)
+                if (iconRes != 0) {
+                    chipIcon = ContextCompat.getDrawable(context, iconRes)
+                    chipIconTint = android.content.res.ColorStateList.valueOf(tintColor)
+                    chipIconSize = 16f.dpToPx()
+                    iconStartPadding = 4f.dpToPx()
+                }
+            }
+        }
+        
+        /**
+         * Maps label to icon and color based on widget type:
+         * - CALENDAR (date/pickup): ic_calendar, #64B5F6 (blue)
+         * - SINGLE_SELECT (type/status): ic_check_box, #CE93D8 (purple)
+         * - MULTI_SELECT (category/tag): ic_label, #81C784 (green)
+         * - TEXT_BOX (description/note): ic_edit, #FFB74D (orange)
+         */
+        private fun getIconAndColorForLabel(label: String): Pair<Int, Int> {
+            return when {
+                // Calendar widget - blue
+                label.contains("date") || label.contains("pickup") -> 
+                    Pair(R.drawable.ic_calendar, 0xFF64B5F6.toInt())
+                // Single select widget - purple (checkbox icon)
+                label.contains("type") || label.contains("status") -> 
+                    Pair(R.drawable.ic_check_box, 0xFFCE93D8.toInt())
+                // Multi select widget - green (tag icon)
+                label.contains("category") || label.contains("tag") -> 
+                    Pair(R.drawable.ic_label, 0xFF81C784.toInt())
+                // Text widget - orange (pencil icon)
+                label.contains("description") || label.contains("note") -> 
+                    Pair(R.drawable.ic_edit, 0xFFFFB74D.toInt())
+                // Default - orange (text)
+                else -> Pair(R.drawable.ic_edit, 0xFFFFB74D.toInt())
             }
         }
     }
 
-    private enum class NoteType {
-        CATEGORY, TAG, TEXT
-    }
-
-    private data class NoteItem(val text: String, val type: NoteType)
+    private data class NoteItem(val text: String, val label: String)
 }
