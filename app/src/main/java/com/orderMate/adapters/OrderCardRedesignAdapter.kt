@@ -14,7 +14,6 @@ import com.orderMate.databinding.ItemOrderCardRedesignBinding
 import com.orderMate.utils.Constants
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.toDoubleFloatPoint
-import org.json.JSONObject
 
 /**
  * iOS-style Order Card Adapter (#80, #81 requirement)
@@ -259,27 +258,26 @@ class OrderCardRedesignAdapter(
         }
 
         private fun parseNotes(noteString: String, notes: MutableList<NoteItem>) {
-            // Try to parse as JSON first
-            try {
-                val json = JSONObject(noteString)
-                json.keys().forEach { key ->
-                    val value = json.optString(key)
+            // Parse format: "Label:Value • Label:Value • ..."
+            val parts = noteString.split("•").map { it.trim() }.filter { it.isNotEmpty() }
+            
+            parts.forEach { part ->
+                val colonIndex = part.indexOf(':')
+                if (colonIndex > 0) {
+                    val label = part.substring(0, colonIndex).trim().lowercase()
+                    val value = part.substring(colonIndex + 1).trim()
+                    
                     if (value.isNotBlank()) {
-                        // Determine note type based on key pattern
                         val type = when {
-                            key.contains("category", ignoreCase = true) -> NoteType.CATEGORY
-                            key.contains("tag", ignoreCase = true) -> NoteType.TAG
+                            label.contains("category") -> NoteType.CATEGORY
+                            label.contains("tag") -> NoteType.TAG
                             else -> NoteType.TEXT
                         }
                         notes.add(NoteItem(value, type))
                     }
-                }
-            } catch (e: Exception) {
-                // Not JSON, treat as plain text
-                if (noteString.length <= 30) {
-                    notes.add(NoteItem(noteString, NoteType.TEXT))
-                } else {
-                    notes.add(NoteItem(noteString.take(27) + "...", NoteType.TEXT))
+                } else if (part.isNotBlank()) {
+                    // No colon, treat as plain text
+                    notes.add(NoteItem(part, NoteType.TEXT))
                 }
             }
         }

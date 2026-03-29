@@ -406,7 +406,7 @@ class ItemNoteDialogFragment : DialogFragment() {
             }
         }
 
-        return parts.joinToString(" | ")
+        return parts.joinToString(" • ")
     }
 
     /**
@@ -415,8 +415,8 @@ class ItemNoteDialogFragment : DialogFragment() {
     private fun parseExistingNote() {
         if (existingNote.isNullOrEmpty()) return
 
-        // Parse format: "Label:Value | Label:Value1,Value2 | ..."
-        existingNote?.split("|")?.forEach { part ->
+        // Parse format: "Label:Value • Label:Value1,Value2 • ..."
+        existingNote?.split("•")?.forEach { part ->
             val trimmed = part.trim()
             val colonIndex = trimmed.indexOf(':')
             if (colonIndex > 0) {
