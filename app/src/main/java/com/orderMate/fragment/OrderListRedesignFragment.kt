@@ -195,7 +195,10 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     private fun initializeRecyclerView() {
         binding.ordersRecycler.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            orderAdapter = OrderCardRedesignAdapter(orderItems, this@OrderListRedesignFragment)
+            // Reuse existing adapter to avoid rebinding all items on back navigation
+            if (orderAdapter == null) {
+                orderAdapter = OrderCardRedesignAdapter(orderItems, this@OrderListRedesignFragment)
+            }
             adapter = orderAdapter
         }
     }
