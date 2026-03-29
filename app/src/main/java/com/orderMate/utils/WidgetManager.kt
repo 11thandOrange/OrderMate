@@ -448,13 +448,7 @@ class WidgetManager private constructor(private val context: Context) {
         val mid = merchantId ?: return
         firebase.getWidgets(mid) { widgets ->
             firebase.getSettings(mid) { settings ->
-                // Use defaults if Firebase returns empty widgets
-                val widgetsToSave = if (widgets.isEmpty()) {
-                    DefaultWidgetFactory.createDefaults()
-                } else {
-                    widgets
-                }
-                saveToCache(widgetsToSave, settings)
+                saveToCache(widgets, settings)
                 callback?.invoke(true)
             }
         }

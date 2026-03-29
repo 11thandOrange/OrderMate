@@ -114,6 +114,7 @@ class SettingsFragment : Fragment() {
         // Get merchantId from PreferenceManager
         val prefManager = PreferenceManager.getInstance(requireContext())
         merchantId = prefManager.getString("merchantId")
+        merchantId?.let { widgetManager.setMerchantId(it) }
         
         initViews(view)
         setupSubTabs()
