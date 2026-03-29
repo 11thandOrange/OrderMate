@@ -131,7 +131,13 @@ class ItemAdapter(
                 pillText.setTextColor(color)
                 pillIcon.setImageResource(iconRes)
                 pillIcon.setColorFilter(color)
-                pillView.backgroundTintList = android.content.res.ColorStateList.valueOf(bgColor)
+                
+                // Set background with 15% opacity widget color
+                val bg = android.graphics.drawable.GradientDrawable()
+                bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                bg.cornerRadius = 10f * context.resources.displayMetrics.density
+                bg.setColor(bgColor)
+                pillView.background = bg
                 
                 container.addView(pillView)
             }

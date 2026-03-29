@@ -12,7 +12,7 @@
     android:paddingVertical="3dp"
     android:layout_marginEnd="6dp"
     android:layout_marginBottom="4dp"
-    android:background="@drawable/bg_note_chip_tag">
+    android:background="@drawable/bg_pill_neutral">
 
     <ImageView
         android:id="@+id/pillIcon"

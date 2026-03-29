@@ -257,9 +257,13 @@ class OrderCardRedesignAdapter(
                 pillText.setTextColor(ContextCompat.getColor(context, R.color.list_chip_text))
                 pillIcon.setImageResource(iconRes)
                 pillIcon.setColorFilter(iconColor)
-                pillView.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    ContextCompat.getColor(context, R.color.list_chip_bg)
-                )
+                
+                // Set solid background color
+                val bg = android.graphics.drawable.GradientDrawable()
+                bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                bg.cornerRadius = 10f * context.resources.displayMetrics.density
+                bg.setColor(ContextCompat.getColor(context, R.color.list_chip_bg))
+                pillView.background = bg
                 
                 container.addView(pillView)
             }
