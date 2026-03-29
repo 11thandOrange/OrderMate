@@ -6,6 +6,7 @@ import com.google.firebase.database.ServerValue
 import com.google.gson.Gson
 import com.orderMate.modals.LegacyCustomItemJson
 import com.orderMate.modals.MerchantMeta
+import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.PopupSettings
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.modals.WidgetOption
@@ -124,6 +125,14 @@ class FirebaseConfigManager private constructor() {
             options.add(WidgetOption(optId, optLabel, optValue, isDefault, color))
         }
         
+        // Parse level field, default to ITEM for backward compatibility
+        val levelStr = snapshot.child("level").getValue(String::class.java)
+        val level = try {
+            NoteLevel.valueOf(levelStr ?: "ITEM")
+        } catch (e: Exception) {
+            NoteLevel.ITEM
+        }
+        
         return WidgetConfig(
             id = id,
             type = WidgetType.fromString(typeStr),
@@ -132,7 +141,8 @@ class FirebaseConfigManager private constructor() {
             isRequired = snapshot.child("isRequired").getValue(Boolean::class.java) ?: false,
             showInFilter = snapshot.child("showInFilter").getValue(Boolean::class.java) ?: true,
             options = options,
-            order = snapshot.child("order").getValue(Int::class.java) ?: 0
+            order = snapshot.child("order").getValue(Int::class.java) ?: 0,
+            level = level
         )
     }
     

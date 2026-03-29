@@ -3,6 +3,14 @@ package com.orderMate.modals
 import java.util.UUID
 
 /**
+ * Note level for widgets - distinguishes item-level vs order-level notes
+ */
+enum class NoteLevel {
+    ITEM,   // Notes attached to line items (LineItem.note)
+    ORDER   // Notes attached to orders (Order.note)
+}
+
+/**
  * Widget configuration stored in Firebase
  * Path: merchants/{merchantId}/widgets/{widgetId}
  */
@@ -14,13 +22,15 @@ data class WidgetConfig(
     var isRequired: Boolean = false,
     var showInFilter: Boolean = true,
     var options: MutableList<WidgetOption> = mutableListOf(),
-    var order: Int = 0
+    var order: Int = 0,
+    var level: NoteLevel = NoteLevel.ITEM
 ) {
     // Firebase requires no-arg constructor
     constructor() : this(
         id = UUID.randomUUID().toString(),
         type = WidgetType.TEXT_BOX,
-        label = ""
+        label = "",
+        level = NoteLevel.ITEM
     )
     
     fun toMap(): Map<String, Any?> = mapOf(
@@ -30,6 +40,7 @@ data class WidgetConfig(
         "isRequired" to isRequired,
         "showInFilter" to showInFilter,
         "order" to order,
+        "level" to level.name,
         "options" to options.associate { it.id to it.toMap() }
     )
 }
