@@ -253,7 +253,12 @@ class OrderCardRedesignAdapter(
                 val iconRes = getIconForLabel(noteItem.label)
                 val iconColor = getColorForLabel(noteItem.label)
                 
-                pillText.text = noteItem.text
+                // Truncate to 12 chars, single line, no newlines
+                val displayText = noteItem.text.replace("\n", " ").take(12).let {
+                    if (noteItem.text.length > 12) "$it..." else it
+                }
+                pillText.text = displayText
+                pillText.maxLines = 1
                 pillText.setTextColor(ContextCompat.getColor(context, R.color.list_chip_text))
                 pillIcon.setImageResource(iconRes)
                 pillIcon.setColorFilter(iconColor)

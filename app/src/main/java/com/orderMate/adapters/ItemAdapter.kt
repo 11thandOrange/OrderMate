@@ -127,7 +127,12 @@ class ItemAdapter(
                 val color = getColorForLabel(label)
                 val bgColor = (color and 0x00FFFFFF) or 0x26000000  // 15% opacity
                 
-                pillText.text = value
+                // Truncate to 12 chars, single line, no newlines
+                val displayText = value.replace("\n", " ").take(12).let {
+                    if (value.length > 12) "$it..." else it
+                }
+                pillText.text = displayText
+                pillText.maxLines = 1
                 pillText.setTextColor(color)
                 pillIcon.setImageResource(iconRes)
                 pillIcon.setColorFilter(color)
