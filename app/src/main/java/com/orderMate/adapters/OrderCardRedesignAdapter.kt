@@ -3,11 +3,13 @@ package com.orderMate.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.clover.sdk.v3.order.Order
-import com.google.android.material.chip.Chip
 import com.orderMate.R
 import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.databinding.ItemOrderCardRedesignBinding
@@ -239,8 +241,25 @@ class OrderCardRedesignAdapter(
             binding.notesSection.visibility = View.VISIBLE
             container.removeAllViews()
             
+            val context = binding.root.context
             notes.forEach { noteItem ->
-                container.addView(createNoteChip(noteItem))
+                val pillView = LayoutInflater.from(context)
+                    .inflate(R.layout.item_note_pill, container, false) as LinearLayout
+                
+                val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
+                val pillText = pillView.findViewById<TextView>(R.id.pillText)
+                
+                // Hide icon on list tab, just show text
+                pillIcon.visibility = View.GONE
+                
+                // Light bg with dark text for list tab
+                pillText.text = noteItem.text
+                pillText.setTextColor(ContextCompat.getColor(context, R.color.list_chip_text))
+                pillView.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    ContextCompat.getColor(context, R.color.list_chip_bg)
+                )
+                
+                container.addView(pillView)
             }
         }
 
@@ -260,36 +279,6 @@ class OrderCardRedesignAdapter(
                     }
                 } else if (part.isNotBlank()) {
                     notes.add(NoteItem(part, ""))
-                }
-            }
-        }
-
-        private fun createNoteChip(noteItem: NoteItem): Chip {
-            return Chip(binding.root.context).apply {
-                text = noteItem.text
-                textSize = 12f
-                chipMinHeight = 28f.dpToPx()
-                chipCornerRadius = 6f.dpToPx()
-                chipStrokeWidth = 0f
-                isClickable = false
-                
-                // Light bg with dark text
-                setChipBackgroundColorResource(R.color.list_chip_bg)
-                setTextColor(ContextCompat.getColor(context, R.color.list_chip_text))
-                
-                // Add spacing between chips
-                val params = ViewGroup.MarginLayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-                params.setMargins(0, 0, 8f.dpToPx().toInt(), 8f.dpToPx().toInt())
-                layoutParams = params
-                
-                // Truncate text widgets to single line
-                val isTextWidget = noteItem.label.contains("description") || noteItem.label.contains("note")
-                if (isTextWidget) {
-                    maxLines = 1
-                    ellipsize = android.text.TextUtils.TruncateAt.END
                 }
             }
         }
