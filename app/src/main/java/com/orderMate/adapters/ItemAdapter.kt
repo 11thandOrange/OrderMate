@@ -122,28 +122,37 @@ class ItemAdapter(
                 val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
                 val pillText = pillView.findViewById<TextView>(R.id.pillText)
                 
-                val (iconRes, color) = getIconAndColorForLabel(label)
-                val bgColor = (color and 0x00FFFFFF) or 0x26000000
+                // Light bg with dark text, icon with widget color
+                val iconRes = getIconForLabel(label)
+                val iconColor = getColorForLabel(label)
                 
                 pillText.text = value
-                pillText.setTextColor(color)
+                pillText.setTextColor(ContextCompat.getColor(context, R.color.list_chip_text))
                 pillIcon.setImageResource(iconRes)
-                pillIcon.setColorFilter(color)
-                pillView.backgroundTintList = android.content.res.ColorStateList.valueOf(bgColor)
+                pillIcon.setColorFilter(iconColor)
+                pillView.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    ContextCompat.getColor(context, R.color.list_chip_bg)
+                )
                 
                 container.addView(pillView)
             }
         }
         
-        private fun getIconAndColorForLabel(label: String): Pair<Int, Int> {
+        private fun getIconForLabel(label: String): Int {
             return when {
-                label.contains("date") || label.contains("pickup") -> 
-                    Pair(R.drawable.ic_calendar, 0xFF64B5F6.toInt())
-                label.contains("type") || label.contains("status") -> 
-                    Pair(R.drawable.ic_check_box, 0xFFCE93D8.toInt())
-                label.contains("category") || label.contains("tag") -> 
-                    Pair(R.drawable.ic_label, 0xFF81C784.toInt())
-                else -> Pair(R.drawable.ic_edit, 0xFFFFB74D.toInt())
+                label.contains("date") || label.contains("pickup") -> R.drawable.ic_calendar
+                label.contains("type") || label.contains("status") -> R.drawable.ic_check_box
+                label.contains("category") || label.contains("tag") -> R.drawable.ic_label
+                else -> R.drawable.ic_edit
+            }
+        }
+        
+        private fun getColorForLabel(label: String): Int {
+            return when {
+                label.contains("date") || label.contains("pickup") -> 0xFF64B5F6.toInt()
+                label.contains("type") || label.contains("status") -> 0xFFCE93D8.toInt()
+                label.contains("category") || label.contains("tag") -> 0xFF81C784.toInt()
+                else -> 0xFFFFB74D.toInt()
             }
         }
     }
