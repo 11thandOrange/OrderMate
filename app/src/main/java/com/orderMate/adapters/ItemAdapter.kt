@@ -101,31 +101,41 @@ class ItemAdapter(
             
             if (noteString.isNullOrEmpty() || noteString.trim().isEmpty()) return
 
-            // Parse note string format: "category: X • Tag1 • Tag2"
-            val parts = noteString.split("•").map { it.trim() }.filter { it.isNotEmpty() }
+            // Parse note string format: "Label:Value • Label:Value" (or legacy "|" delimiter)
+            val delimiter = if (noteString.contains("•")) "•" else "|"
+            val parts = noteString.split(delimiter).map { it.trim() }.filter { it.isNotEmpty() }
             
             parts.forEach { part ->
-                val pill = LayoutInflater.from(context)
-                    .inflate(R.layout.item_note_pill, binding.itemNotesContainer, false) as TextView
+                val colonIndex = part.indexOf(':')
+                val label = if (colonIndex > 0) part.substring(0, colonIndex).trim().lowercase() else ""
+                val value = if (colonIndex > 0) part.substring(colonIndex + 1).trim() else part
                 
-                val isCategory = part.lowercase().startsWith("category:")
-                val displayText = if (isCategory) {
-                    part.replace(Regex("^category:\\s*", RegexOption.IGNORE_CASE), "")
+                if (value.isEmpty()) return@forEach
+                
+                // For multi-select values (comma-separated), create separate pills
+                val values = if (label.contains("tag") || label.contains("category")) {
+                    value.split(",").map { it.trim() }.filter { it.isNotEmpty() }
                 } else {
-                    part
+                    listOf(value)
                 }
                 
-                pill.text = displayText
-                
-                if (isCategory) {
-                    pill.setBackgroundResource(R.drawable.bg_note_chip_category)
-                    pill.setTextColor(ContextCompat.getColor(context, R.color.tag_category_text))
-                } else {
-                    pill.setBackgroundResource(R.drawable.bg_note_chip_tag)
-                    pill.setTextColor(ContextCompat.getColor(context, R.color.tag_pill_text))
+                values.forEach { displayText ->
+                    val pill = LayoutInflater.from(context)
+                        .inflate(R.layout.item_note_pill, binding.itemNotesContainer, false) as TextView
+                    
+                    pill.text = displayText
+                    
+                    val isCategory = label.contains("category")
+                    if (isCategory) {
+                        pill.setBackgroundResource(R.drawable.bg_note_chip_category)
+                        pill.setTextColor(ContextCompat.getColor(context, R.color.tag_category_text))
+                    } else {
+                        pill.setBackgroundResource(R.drawable.bg_note_chip_tag)
+                        pill.setTextColor(ContextCompat.getColor(context, R.color.tag_pill_text))
+                    }
+                    
+                    binding.itemNotesContainer.addView(pill)
                 }
-                
-                binding.itemNotesContainer.addView(pill)
             }
         }
     }
