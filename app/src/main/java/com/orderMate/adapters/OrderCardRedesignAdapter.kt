@@ -305,7 +305,7 @@ class OrderCardRedesignAdapter(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-                params.setMargins(0, 0, 8.dpToPx().toInt(), 8.dpToPx().toInt())
+                params.setMargins(0, 0, 8f.dpToPx().toInt(), 8f.dpToPx().toInt())
                 layoutParams = params
                 
                 // Truncate text widgets to single line
