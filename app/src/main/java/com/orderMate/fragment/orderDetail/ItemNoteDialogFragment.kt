@@ -415,8 +415,9 @@ class ItemNoteDialogFragment : DialogFragment() {
     private fun parseExistingNote() {
         if (existingNote.isNullOrEmpty()) return
 
-        // Parse format: "Label:Value • Label:Value1,Value2 • ..."
-        existingNote?.split("•")?.forEach { part ->
+        // Parse format: "Label:Value • Label:Value" (or legacy "|" delimiter)
+        val delimiter = if (existingNote!!.contains("•")) "•" else "|"
+        existingNote?.split(delimiter)?.forEach { part ->
             val trimmed = part.trim()
             val colonIndex = trimmed.indexOf(':')
             if (colonIndex > 0) {

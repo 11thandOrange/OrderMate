@@ -258,8 +258,9 @@ class OrderCardRedesignAdapter(
         }
 
         private fun parseNotes(noteString: String, notes: MutableList<NoteItem>) {
-            // Parse format: "Label:Value • Label:Value • ..."
-            val parts = noteString.split("•").map { it.trim() }.filter { it.isNotEmpty() }
+            // Parse format: "Label:Value • Label:Value" (or legacy "|" delimiter)
+            val delimiter = if (noteString.contains("•")) "•" else "|"
+            val parts = noteString.split(delimiter).map { it.trim() }.filter { it.isNotEmpty() }
             
             parts.forEach { part ->
                 val colonIndex = part.indexOf(':')

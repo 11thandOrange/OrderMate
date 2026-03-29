@@ -86,8 +86,9 @@ class OrderDetailItemAdapter(
             val noteString = item.note?.trim()
             if (noteString.isNullOrEmpty()) return
 
-            // Parse note string format: "category: X • Tag1 • Tag2"
-            val parts = noteString.split("•").map { it.trim() }.filter { it.isNotEmpty() }
+            // Parse note string format: "Label:Value • Label:Value" (or legacy "|" delimiter)
+            val delimiter = if (noteString.contains("•")) "•" else "|"
+            val parts = noteString.split(delimiter).map { it.trim() }.filter { it.isNotEmpty() }
             
             parts.forEach { part ->
                 val pill = LayoutInflater.from(context)
