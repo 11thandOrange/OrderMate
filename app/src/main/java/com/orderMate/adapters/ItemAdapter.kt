@@ -122,17 +122,16 @@ class ItemAdapter(
                 val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
                 val pillText = pillView.findViewById<TextView>(R.id.pillText)
                 
-                // Light bg with dark text, icon with widget color
+                // Whole pill matches widget color (bg 15% opacity, text + icon full color)
                 val iconRes = getIconForLabel(label)
-                val iconColor = getColorForLabel(label)
+                val color = getColorForLabel(label)
+                val bgColor = (color and 0x00FFFFFF) or 0x26000000  // 15% opacity
                 
                 pillText.text = value
-                pillText.setTextColor(ContextCompat.getColor(context, R.color.list_chip_text))
+                pillText.setTextColor(color)
                 pillIcon.setImageResource(iconRes)
-                pillIcon.setColorFilter(iconColor)
-                pillView.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    ContextCompat.getColor(context, R.color.list_chip_bg)
-                )
+                pillIcon.setColorFilter(color)
+                pillView.backgroundTintList = android.content.res.ColorStateList.valueOf(bgColor)
                 
                 container.addView(pillView)
             }

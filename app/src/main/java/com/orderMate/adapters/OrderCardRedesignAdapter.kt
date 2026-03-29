@@ -249,17 +249,37 @@ class OrderCardRedesignAdapter(
                 val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
                 val pillText = pillView.findViewById<TextView>(R.id.pillText)
                 
-                // Hide icon on list tab, just show text
-                pillIcon.visibility = View.GONE
+                // Light bg with dark text, icon with widget color
+                val iconRes = getIconForLabel(noteItem.label)
+                val iconColor = getColorForLabel(noteItem.label)
                 
-                // Light bg with dark text for list tab
                 pillText.text = noteItem.text
                 pillText.setTextColor(ContextCompat.getColor(context, R.color.list_chip_text))
+                pillIcon.setImageResource(iconRes)
+                pillIcon.setColorFilter(iconColor)
                 pillView.backgroundTintList = android.content.res.ColorStateList.valueOf(
                     ContextCompat.getColor(context, R.color.list_chip_bg)
                 )
                 
                 container.addView(pillView)
+            }
+        }
+        
+        private fun getIconForLabel(label: String): Int {
+            return when {
+                label.contains("date") || label.contains("pickup") -> R.drawable.ic_calendar
+                label.contains("type") || label.contains("status") -> R.drawable.ic_check_box
+                label.contains("category") || label.contains("tag") -> R.drawable.ic_label
+                else -> R.drawable.ic_edit
+            }
+        }
+        
+        private fun getColorForLabel(label: String): Int {
+            return when {
+                label.contains("date") || label.contains("pickup") -> 0xFF64B5F6.toInt()
+                label.contains("type") || label.contains("status") -> 0xFFCE93D8.toInt()
+                label.contains("category") || label.contains("tag") -> 0xFF81C784.toInt()
+                else -> 0xFFFFB74D.toInt()
             }
         }
 
