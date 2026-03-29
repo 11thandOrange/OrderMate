@@ -301,9 +301,10 @@ class OrderCardRedesignAdapter(
                 val colonIndex = part.indexOf(':')
                 if (colonIndex > 0) {
                     val label = part.substring(0, colonIndex).trim().lowercase()
-                    val value = part.substring(colonIndex + 1).trim()
+                    val rawValue = part.substring(colonIndex + 1).trim()
                     
-                    if (value.isNotBlank()) {
+                    // Split comma-separated values into separate pills
+                    rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { value ->
                         notes.add(NoteItem(value, label))
                     }
                 } else if (part.isNotBlank()) {

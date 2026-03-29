@@ -112,39 +112,44 @@ class ItemAdapter(
             parts.forEach { part ->
                 val colonIndex = part.indexOf(':')
                 val label = if (colonIndex > 0) part.substring(0, colonIndex).trim().lowercase() else ""
-                val value = if (colonIndex > 0) part.substring(colonIndex + 1).trim() else part
+                val rawValue = if (colonIndex > 0) part.substring(colonIndex + 1).trim() else part
                 
-                if (value.isEmpty()) return@forEach
+                if (rawValue.isEmpty()) return@forEach
                 
-                val pillView = LayoutInflater.from(context)
-                    .inflate(R.layout.item_note_pill, container, false) as LinearLayout
+                // Split comma-separated values into separate pills
+                val values = rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }
                 
-                val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-                val pillText = pillView.findViewById<TextView>(R.id.pillText)
-                
-                // Whole pill matches widget color (bg 15% opacity, text + icon full color)
-                val iconRes = getIconForLabel(label)
-                val color = getColorForLabel(label)
-                val bgColor = (color and 0x00FFFFFF) or 0x26000000  // 15% opacity
-                
-                // Truncate to 12 chars, single line, no newlines
-                val displayText = value.replace("\n", " ").take(12).let {
-                    if (value.length > 12) "$it..." else it
+                values.forEach { value ->
+                    val pillView = LayoutInflater.from(context)
+                        .inflate(R.layout.item_note_pill, container, false) as LinearLayout
+                    
+                    val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
+                    val pillText = pillView.findViewById<TextView>(R.id.pillText)
+                    
+                    // Whole pill matches widget color (bg 15% opacity, text + icon full color)
+                    val iconRes = getIconForLabel(label)
+                    val color = getColorForLabel(label)
+                    val bgColor = (color and 0x00FFFFFF) or 0x26000000  // 15% opacity
+                    
+                    // Truncate to 12 chars, single line, no newlines
+                    val displayText = value.replace("\n", " ").take(12).let {
+                        if (value.length > 12) "$it..." else it
+                    }
+                    pillText.text = displayText
+                    pillText.maxLines = 1
+                    pillText.setTextColor(color)
+                    pillIcon.setImageResource(iconRes)
+                    pillIcon.setColorFilter(color)
+                    
+                    // Set background with 15% opacity widget color
+                    val bg = android.graphics.drawable.GradientDrawable()
+                    bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                    bg.cornerRadius = 10f * context.resources.displayMetrics.density
+                    bg.setColor(bgColor)
+                    pillView.background = bg
+                    
+                    container.addView(pillView)
                 }
-                pillText.text = displayText
-                pillText.maxLines = 1
-                pillText.setTextColor(color)
-                pillIcon.setImageResource(iconRes)
-                pillIcon.setColorFilter(color)
-                
-                // Set background with 15% opacity widget color
-                val bg = android.graphics.drawable.GradientDrawable()
-                bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                bg.cornerRadius = 10f * context.resources.displayMetrics.density
-                bg.setColor(bgColor)
-                pillView.background = bg
-                
-                container.addView(pillView)
             }
         }
         
