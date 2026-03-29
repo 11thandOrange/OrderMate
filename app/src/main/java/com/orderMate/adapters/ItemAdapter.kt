@@ -116,8 +116,13 @@ class ItemAdapter(
                 
                 if (rawValue.isEmpty()) return@forEach
                 
-                // Split comma-separated values into separate pills
-                val values = rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                // Only split multi-select fields (category/tag) by comma
+                val isMultiSelect = label.contains("category") || label.contains("tag")
+                val values = if (isMultiSelect) {
+                    rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                } else {
+                    listOf(rawValue)
+                }
                 
                 values.forEach { value ->
                     val pillView = LayoutInflater.from(context)

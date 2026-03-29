@@ -303,9 +303,14 @@ class OrderCardRedesignAdapter(
                     val label = part.substring(0, colonIndex).trim().lowercase()
                     val rawValue = part.substring(colonIndex + 1).trim()
                     
-                    // Split comma-separated values into separate pills
-                    rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { value ->
-                        notes.add(NoteItem(value, label))
+                    // Only split multi-select fields (category/tag) by comma
+                    val isMultiSelect = label.contains("category") || label.contains("tag")
+                    if (isMultiSelect) {
+                        rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { value ->
+                            notes.add(NoteItem(value, label))
+                        }
+                    } else if (rawValue.isNotBlank()) {
+                        notes.add(NoteItem(rawValue, label))
                     }
                 } else if (part.isNotBlank()) {
                     notes.add(NoteItem(part, ""))
