@@ -239,21 +239,8 @@ class OrderCardRedesignAdapter(
             binding.notesSection.visibility = View.VISIBLE
             container.removeAllViews()
             
-            // Add chips for each note (limit to 5)
-            notes.take(5).forEach { noteItem ->
+            notes.forEach { noteItem ->
                 container.addView(createNoteChip(noteItem))
-            }
-            
-            // Add "+X more" chip if needed
-            if (notes.size > 5) {
-                container.addView(Chip(binding.root.context).apply {
-                    text = "+${notes.size - 5} more"
-                    setChipBackgroundColorResource(R.color.bg_glass)
-                    setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
-                    textSize = 11f
-                    chipMinHeight = 24f.dpToPx()
-                    isClickable = false
-                })
             }
         }
 
@@ -269,10 +256,7 @@ class OrderCardRedesignAdapter(
                     val value = part.substring(colonIndex + 1).trim()
                     
                     if (value.isNotBlank()) {
-                        // Split comma-separated values into separate pills
-                        value.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach {
-                            notes.add(NoteItem(it, label))
-                        }
+                        notes.add(NoteItem(value, label))
                     }
                 } else if (part.isNotBlank()) {
                     notes.add(NoteItem(part, ""))
@@ -286,12 +270,16 @@ class OrderCardRedesignAdapter(
                 textSize = 12f
                 chipMinHeight = 28f.dpToPx()
                 chipCornerRadius = 6f.dpToPx()
-                chipStrokeWidth = 0f
                 isClickable = false
                 
                 // Light bg with dark text
                 setChipBackgroundColorResource(R.color.list_chip_bg)
                 setTextColor(ContextCompat.getColor(context, R.color.list_chip_text))
+                
+                // Border color matches widget type
+                val borderColor = getColorForLabel(noteItem.label)
+                chipStrokeWidth = 1f.dpToPx()
+                chipStrokeColor = android.content.res.ColorStateList.valueOf(borderColor)
                 
                 // Add spacing between chips
                 val params = ViewGroup.MarginLayoutParams(
@@ -307,6 +295,15 @@ class OrderCardRedesignAdapter(
                     maxLines = 1
                     ellipsize = android.text.TextUtils.TruncateAt.END
                 }
+            }
+        }
+        
+        private fun getColorForLabel(label: String): Int {
+            return when {
+                label.contains("date") || label.contains("pickup") -> 0xFF64B5F6.toInt()
+                label.contains("type") || label.contains("status") -> 0xFFCE93D8.toInt()
+                label.contains("category") || label.contains("tag") -> 0xFF81C784.toInt()
+                else -> 0xFFFFB74D.toInt()
             }
         }
     }
