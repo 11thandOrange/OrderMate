@@ -143,6 +143,10 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     private fun observeSharedState() {
         // Observe filter state - update pills and apply if orders loaded
         sharedFilterViewModel.filterState.observe(viewLifecycleOwner) { state ->
+            // Skip if state hasn't changed (prevents flash on back navigation)
+            if (state == currentFilterState) {
+                return@observe
+            }
             currentFilterState = state
             // Always update pills for visual consistency
             if (_binding != null) {

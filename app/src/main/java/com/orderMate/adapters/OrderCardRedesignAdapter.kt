@@ -217,8 +217,6 @@ class OrderCardRedesignAdapter(
         }
 
         private fun setupNotesPills(order: Order) {
-            binding.notesChipsContainer.removeAllViews()
-            
             val notes = mutableListOf<NoteItem>()
             
             // Extract notes from line items
@@ -230,30 +228,58 @@ class OrderCardRedesignAdapter(
                 }
             }
 
+            val container = binding.notesChipsContainer
+            
             if (notes.isEmpty()) {
                 binding.notesSection.visibility = View.GONE
+                container.removeAllViews()
                 return
             }
 
             binding.notesSection.visibility = View.VISIBLE
             
-            // Add chips for each note (limit to 5 to avoid overflow)
-            notes.take(5).forEach { noteItem ->
-                val chip = createNoteChip(noteItem)
-                binding.notesChipsContainer.addView(chip)
+            val displayNotes = notes.take(5)
+            val hasMoreChip = notes.size > 5
+            val targetCount = displayNotes.size + if (hasMoreChip) 1 else 0
+            
+            // Remove excess views from the end
+            while (container.childCount > targetCount) {
+                container.removeViewAt(container.childCount - 1)
             }
-
-            // Add "+X more" if there are more notes
-            if (notes.size > 5) {
-                val moreChip = Chip(binding.root.context).apply {
-                    text = "+${notes.size - 5} more"
-                    setChipBackgroundColorResource(R.color.bg_glass)
-                    setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
-                    textSize = 11f
-                    chipMinHeight = 24f.dpToPx()
-                    isClickable = false
+            
+            // Update existing or add new chips
+            displayNotes.forEachIndexed { index, noteItem ->
+                if (index < container.childCount) {
+                    // Update existing chip
+                    (container.getChildAt(index) as? Chip)?.apply {
+                        text = noteItem.text
+                        val (iconRes, tintColor) = getIconAndColorForLabel(noteItem.label)
+                        if (iconRes != 0) {
+                            chipIcon = ContextCompat.getDrawable(context, iconRes)
+                            chipIconTint = android.content.res.ColorStateList.valueOf(tintColor)
+                        }
+                    }
+                } else {
+                    // Add new chip
+                    container.addView(createNoteChip(noteItem))
                 }
-                binding.notesChipsContainer.addView(moreChip)
+            }
+            
+            // Handle "+X more" chip
+            if (hasMoreChip) {
+                val moreIndex = displayNotes.size
+                if (moreIndex < container.childCount) {
+                    (container.getChildAt(moreIndex) as? Chip)?.text = "+${notes.size - 5} more"
+                } else {
+                    container.addView(Chip(binding.root.context).apply {
+                        text = "+${notes.size - 5} more"
+                        setChipBackgroundColorResource(R.color.bg_glass)
+                        setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
+                        textSize = 11f
+                        chipMinHeight = 24f.dpToPx()
+                        isClickable = false
+                    })
+                }
             }
         }
 
