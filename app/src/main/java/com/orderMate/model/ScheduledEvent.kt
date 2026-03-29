@@ -18,7 +18,8 @@ data class ScheduledEvent(
     val note: String? = null,
     val gmailEventId: String? = null,
     val notificationScheduled: Boolean = false,
-    val lineItems: List<LineItemPreview> = emptyList()
+    val lineItems: List<LineItemPreview> = emptyList(),
+    val orderNote: String? = null  // Order-level note from Order.note (#93)
 ) {
     // For backwards compatibility
     val lineItemNames: List<String>

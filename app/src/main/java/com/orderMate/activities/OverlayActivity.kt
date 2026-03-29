@@ -8,6 +8,8 @@ import com.clover.sdk.v3.order.Order
 import com.orderMate.communicators.ILineItemUpdateListener
 import com.orderMate.databinding.ActivityOverlayBinding
 import com.orderMate.fragment.orderDetail.ItemNoteDialogFragment
+import com.orderMate.fragment.orderDetail.OrderNoteDialogFragment
+import com.orderMate.repository.CloverRepository
 import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.exceptionHandler
@@ -19,8 +21,16 @@ import kotlinx.coroutines.launch
 /**
  *  This is the activity class having dialog as theme which is used to show the overlay
  *  on the clover register app when any line item is added to update the notes for the item.
+ *  
+ *  (#93) Also supports order-level notes via OVERLAY_MODE_ORDER_NOTE mode.
  */
 class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
+
+    companion object {
+        const val OVERLAY_MODE_ITEM_NOTE = "item_note"
+        const val OVERLAY_MODE_ORDER_NOTE = "order_note"
+        const val EXTRA_OVERLAY_MODE = "overlay_mode"
+    }
 
     private val binding: ActivityOverlayBinding by lazy {
         ActivityOverlayBinding.inflate(layoutInflater)
@@ -28,6 +38,7 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
 
     private var orderData: Order? = null
     private var lineItemId: String? = null
+    private var overlayMode: String = OVERLAY_MODE_ITEM_NOTE
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +53,10 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
      */
     private fun parseIntentData() {
         if (intent == null) return
+        
+        // Check overlay mode (#93)
+        overlayMode = intent.getStringExtra(EXTRA_OVERLAY_MODE) ?: OVERLAY_MODE_ITEM_NOTE
+        
         val data = intent.getStringExtra(Constants.overlayIntentExtraOrder)
         val lineItem = intent.getStringExtra(Constants.overlayIntentExtraLineItemId)
         val position = intent.getStringExtra(Constants.overlayIntentExtraLinePosition)
@@ -65,7 +80,12 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
     fun updateOrderData(result: Order?, lineItem: String?, position: String?) {
         orderData = result
         lineItemId = lineItem
-        runOnUiThread { showItemNoteDialog() }
+        runOnUiThread { 
+            when (overlayMode) {
+                OVERLAY_MODE_ORDER_NOTE -> showOrderNoteDialog()
+                else -> showItemNoteDialog()
+            }
+        }
     }
     
     private fun showItemNoteDialog() {
@@ -106,6 +126,34 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
                 }
             })
         }.show(supportFragmentManager, ItemNoteDialogFragment.TAG)
+    }
+    
+    /**
+     * Show order-level note dialog (#93)
+     */
+    private fun showOrderNoteDialog() {
+        val existingNote = orderData?.note
+        
+        OrderNoteDialogFragment.newInstance(
+            orderId = orderData?.id,
+            existingNote = existingNote
+        ).apply {
+            setListener(object : OrderNoteDialogFragment.OrderNoteListener {
+                override fun onOrderNoteSaved(orderId: String?, note: String) {
+                    if (orderId != null) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            CloverRepository.getInstance(this@OverlayActivity)
+                                .saveOrderNote(orderId, note)
+                        }
+                    }
+                    finish()
+                }
+                
+                override fun onOrderNoteCancelled() {
+                    finish()
+                }
+            })
+        }.show(supportFragmentManager, OrderNoteDialogFragment.TAG)
     }
 
 
