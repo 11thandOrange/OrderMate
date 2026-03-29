@@ -12,15 +12,15 @@
     android:paddingVertical="3dp"
     android:layout_marginEnd="6dp"
     android:layout_marginBottom="4dp"
-    tools:background="@drawable/bg_note_chip_tag">
+    android:background="@drawable/bg_note_chip_tag">
 
     <ImageView
         android:id="@+id/pillIcon"
         android:layout_width="12dp"
         android:layout_height="12dp"
         android:layout_marginEnd="4dp"
-        app:tint="@color/text_light"
-        tools:src="@drawable/ic_label"/>
+        android:src="@drawable/ic_label"
+        app:tint="@color/text_light"/>
 
     <TextView
         android:id="@+id/pillText"
