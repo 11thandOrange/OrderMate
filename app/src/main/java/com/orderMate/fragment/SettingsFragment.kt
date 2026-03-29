@@ -1070,7 +1070,9 @@ class FirebaseWidgetEditorAdapter(
                 } else false
             }
 
-            // Delete widget
+            // Delete widget - disable if last widget
+            btnDeleteWidget.isEnabled = widgets.size > 1
+            btnDeleteWidget.alpha = if (widgets.size > 1) 1.0f else 0.3f
             btnDeleteWidget.setOnClickListener {
                 onWidgetDelete(widget)
             }
