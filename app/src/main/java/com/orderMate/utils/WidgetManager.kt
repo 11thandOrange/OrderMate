@@ -63,9 +63,16 @@ class WidgetManager private constructor(private val context: Context) {
             val json = prefs.getString(KEY_WIDGETS, null)
             if (json != null) {
                 val type = object : TypeToken<List<WidgetConfig>>() {}.type
-                gson.fromJson<List<WidgetConfig>>(json, type) ?: DefaultWidgetFactory.createDefaults()
+                val widgets = gson.fromJson<List<WidgetConfig>>(json, type)
+                if (widgets.isNullOrEmpty()) {
+                    DefaultWidgetFactory.createDefaults()
+                } else {
+                    // Normalize: set level to ITEM if null (backward compatibility)
+                    widgets.forEach { if (it.level == null) it.level = NoteLevel.ITEM }
+                    widgets
+                }
             } else {
-                // Cache empty → return defaults (no saving needed)
+                // Cache empty → return defaults
                 DefaultWidgetFactory.createDefaults()
             }
         } catch (e: Exception) {
