@@ -474,6 +474,42 @@
                             android:textAllCaps="true" />
                     </LinearLayout>
 
+                    <!-- Order-level Notes Section (#93 requirement) -->
+                    <LinearLayout
+                        android:id="@+id/orderNotesSection"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="12dp"
+                        android:visibility="gone">
+                        
+                        <!-- Order Notes Pills Container -->
+                        <com.google.android.flexbox.FlexboxLayout
+                            android:id="@+id/orderNotesPillsContainer"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            app:flexWrap="wrap"
+                            app:alignItems="center"
+                            app:justifyContent="flex_start" />
+                        
+                        <!-- Add/Edit Order Note Button -->
+                        <ImageView
+                            android:id="@+id/btnAddOrderNote"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_marginStart="8dp"
+                            android:src="@drawable/ic_edit"
+                            android:padding="6dp"
+                            android:background="@drawable/bg_filter_option"
+                            app:tint="@color/order_dialog_accent"
+                            android:contentDescription="@string/add_note"
+                            android:clickable="true"
+                            android:focusable="true" />
+                    </LinearLayout>
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"

@@ -51,6 +51,11 @@ import com.orderMate.utils.runOnMainThread
 
 import com.orderMate.utils.showView
 import com.orderMate.utils.toDoubleFloatPoint
+import com.orderMate.repository.CloverRepository
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -283,6 +288,99 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         showThePaymentData()
         showTheDiscountAndTaxData()
         populateHistoryCard()
+        setupOrderNotesPills()
+    }
+    
+    /**
+     * Setup order-level notes pills display (#93)
+     */
+    private fun setupOrderNotesPills() {
+        val orderNote = orderArguments?.note
+        val container = binding.orderNotesPillsContainer
+        val section = binding.orderNotesSection
+        
+        container.removeAllViews()
+        
+        // Always show section so user can add notes
+        section.visibility = View.VISIBLE
+        
+        if (orderNote.isNullOrBlank()) {
+            // Show placeholder text when no notes
+            val placeholder = TextView(requireContext()).apply {
+                text = "No order notes"
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_muted))
+                textSize = 13f
+            }
+            container.addView(placeholder)
+            return
+        }
+        
+        // Parse and display notes
+        val notes = parseOrderNote(orderNote)
+        notes.forEach { noteItem ->
+            val pillView = layoutInflater.inflate(R.layout.item_note_pill, container, false) as LinearLayout
+            
+            val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
+            val pillText = pillView.findViewById<TextView>(R.id.pillText)
+            
+            pillText.text = noteItem.text
+            pillText.maxLines = 1
+            pillText.setTextColor(ContextCompat.getColor(requireContext(), R.color.order_pill_text))
+            
+            val iconRes = getIconForLabel(noteItem.label)
+            pillIcon.setImageResource(iconRes)
+            pillIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.order_pill_icon))
+            
+            // Purple background for order-level notes
+            val bg = android.graphics.drawable.GradientDrawable()
+            bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+            bg.cornerRadius = 10f * resources.displayMetrics.density
+            bg.setColor(ContextCompat.getColor(requireContext(), R.color.order_pill_bg))
+            bg.setStroke(
+                (1 * resources.displayMetrics.density).toInt(),
+                ContextCompat.getColor(requireContext(), R.color.order_pill_border)
+            )
+            pillView.background = bg
+            
+            container.addView(pillView)
+        }
+    }
+    
+    private data class NoteItem(val text: String, val label: String)
+    
+    private fun parseOrderNote(noteString: String): List<NoteItem> {
+        val notes = mutableListOf<NoteItem>()
+        val delimiter = if (noteString.contains("•")) "•" else "|"
+        val parts = noteString.split(delimiter).map { it.trim() }.filter { it.isNotEmpty() }
+        
+        parts.forEach { part ->
+            val colonIndex = part.indexOf(':')
+            if (colonIndex > 0) {
+                val label = part.substring(0, colonIndex).trim().lowercase()
+                val rawValue = part.substring(colonIndex + 1).trim()
+                
+                val isMultiSelect = label.contains("category") || label.contains("tag")
+                if (isMultiSelect) {
+                    rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { value ->
+                        notes.add(NoteItem(value, label))
+                    }
+                } else if (rawValue.isNotBlank()) {
+                    notes.add(NoteItem(rawValue, label))
+                }
+            } else if (part.isNotBlank()) {
+                notes.add(NoteItem(part, ""))
+            }
+        }
+        return notes
+    }
+    
+    private fun getIconForLabel(label: String): Int {
+        return when {
+            label.contains("date") || label.contains("pickup") -> R.drawable.ic_calendar
+            label.contains("type") || label.contains("status") -> R.drawable.ic_check_box
+            label.contains("category") || label.contains("tag") -> R.drawable.ic_label
+            else -> R.drawable.ic_edit
+        }
     }
     
     private fun populateHistoryCard() {
@@ -606,7 +704,41 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                         .show(parentFragmentManager, OrderHistoryDialog.TAG)
                 }
             }
+            
+            // Add/Edit Order Note button (#93 requirement)
+            btnAddOrderNote.setOnClickListener {
+                openOrderNoteDialog()
+            }
         }
+    }
+    
+    /**
+     * Open order note dialog for editing order-level notes (#93)
+     */
+    private fun openOrderNoteDialog() {
+        val existingNote = orderArguments?.note
+        OrderNoteDialogFragment.newInstance(
+            orderId = orderArguments?.id,
+            existingNote = existingNote
+        ).apply {
+            setListener(object : OrderNoteDialogFragment.OrderNoteListener {
+                override fun onOrderNoteSaved(orderId: String?, note: String) {
+                    if (orderId != null) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val success = CloverRepository.getInstance(requireContext())
+                                .saveOrderNote(orderId, note)
+                            if (success) {
+                                refreshUI()
+                            }
+                        }
+                    }
+                }
+                
+                override fun onOrderNoteCancelled() {
+                    // No action needed
+                }
+            })
+        }.show(parentFragmentManager, OrderNoteDialogFragment.TAG)
     }
 
 
