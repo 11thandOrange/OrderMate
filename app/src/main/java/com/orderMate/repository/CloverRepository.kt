@@ -283,4 +283,65 @@ class CloverRepository private constructor(private val context: Context) {
             false
         }
     }
+    
+    // ==================== Order Notes (#93) ====================
+    
+    /**
+     * Save order-level note to Order.note field
+     * Format: "Label:Value • Label:Value"
+     */
+    suspend fun saveOrderNote(orderId: String, note: String): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val orderConnector = myApp.getOrderConnector()
+            
+            // Get current order
+            val order = orderConnector.getOrder(orderId) ?: return@withContext false
+            
+            // Update the note field
+            order.setNote(note)
+            orderConnector.updateOrder(order)
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+    
+    /**
+     * Get order-level note from Order.note field
+     */
+    fun getOrderNote(orderId: String): String? {
+        return try {
+            val orderConnector = myApp.getOrderConnector()
+            val order = orderConnector.getOrder(orderId)
+            order?.note
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+    
+    /**
+     * Get order-level note from an Order object
+     */
+    fun getOrderNote(order: com.clover.sdk.v3.order.Order): String? {
+        return order.note
+    }
+    
+    /**
+     * Clear order-level note
+     */
+    suspend fun clearOrderNote(orderId: String): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val orderConnector = myApp.getOrderConnector()
+            val order = orderConnector.getOrder(orderId) ?: return@withContext false
+            
+            order.setNote(null)
+            orderConnector.updateOrder(order)
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
 }
