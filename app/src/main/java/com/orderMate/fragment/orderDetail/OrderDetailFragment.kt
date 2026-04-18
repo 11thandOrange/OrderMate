@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.clover.sdk.v1.Intents
 import com.clover.sdk.v1.Intents.EXTRA_ORDER_ID
 import com.clover.sdk.v3.apps.AppsConnector
@@ -284,6 +285,9 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             itemRecycler.layoutManager = LinearLayoutManager(requireContext())
             val adapter = ItemAdapter(lineItems, this@OrderDetailFragment)
             itemRecycler.adapter = adapter
+            
+            // #61: Setup scroll indicator for item list
+            setupScrollIndicator()
 
             transactionRecycler.layoutManager = LinearLayoutManager(requireContext())
             val transactionAdapter = TransactionAdapter(paymentItems)
@@ -292,6 +296,37 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             refundRecycler.layoutManager = LinearLayoutManager(requireContext())
             val refundAdapter = RefundAdapter(refundItems)
             refundRecycler.adapter = refundAdapter
+        }
+    }
+    
+    /**
+     * #61: Setup scroll indicator (carrot) that shows when more items are below
+     */
+    private fun setupScrollIndicator() {
+        binding.apply {
+            // Add scroll listener to show/hide indicator
+            itemRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    updateScrollIndicatorVisibility()
+                }
+            })
+            
+            // Initial check after layout
+            itemRecycler.post {
+                updateScrollIndicatorVisibility()
+            }
+        }
+    }
+    
+    /**
+     * #61: Update scroll indicator visibility based on scroll state
+     */
+    private fun updateScrollIndicatorVisibility() {
+        binding.apply {
+            // Show indicator if can scroll down (more content below)
+            val canScrollDown = itemRecycler.canScrollVertically(1)
+            scrollIndicator.visibility = if (canScrollDown) View.VISIBLE else View.GONE
         }
     }
 

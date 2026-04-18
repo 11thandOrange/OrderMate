@@ -112,4 +112,8 @@ dependencies {
     
     // CardView for card-based layouts
     implementation("androidx.cardview:cardview:1.0.0")
+    
+    // Glide for image loading (#59 - dynamic item icons from Clover)
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    kapt("com.github.bumptech.glide:compiler:4.15.1")
 }

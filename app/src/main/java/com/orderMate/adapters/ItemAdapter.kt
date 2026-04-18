@@ -9,11 +9,15 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.orderMate.R
 import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.databinding.ItemOrderDetailItemBinding
 import com.orderMate.fragment.orderDetail.OrderDetailFragment
 import com.orderMate.modals.ItemModal
+import com.orderMate.utils.MyApp
 import com.orderMate.utils.convertToSymbol
 import com.orderMate.utils.convertToTwoDecimal
 import com.orderMate.utils.toDoubleFloatPoint
@@ -24,10 +28,12 @@ import com.orderMate.utils.toDoubleFloatPoint
  * - Clickable rows with chevron indicator
  * - Note pills for categories and tags
  * - Opens OrderMate popup on click
+ * - #59: Dynamic item icons from Clover (fallback to misc icon)
  */
 class ItemAdapter(
     private val data: MutableList<ItemModal?>,
-    private val listener: IOrderItemClickListener
+    private val listener: IOrderItemClickListener,
+    private val merchantId: String? = null
 ) : RecyclerView.Adapter<ItemAdapter.MyViewBinder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewBinder {
@@ -84,9 +90,8 @@ class ItemAdapter(
                 totalPrice.toDoubleFloatPoint().toString().convertToTwoDecimal()
             )
 
-            // Icon based on item name
-            val iconRes = getIconForItem(item?.order?.name ?: "")
-            binding.itemIcon.setImageResource(iconRes)
+            // #59: Load item icon from Clover if available, otherwise use generic misc icon
+            loadItemIcon(context, item?.order?.item?.id, binding.itemIcon)
 
             // Note pills
             setupNotePills(context, item?.order?.note)
@@ -97,16 +102,27 @@ class ItemAdapter(
             }
         }
 
-        private fun getIconForItem(name: String): Int {
-            val nameLower = name.lowercase()
-            return when {
-                nameLower.contains("cake") || nameLower.contains("chocolate") -> R.drawable.ic_item_cake
-                nameLower.contains("cookie") || nameLower.contains("cupcake") -> R.drawable.ic_item_cookie
-                nameLower.contains("coffee") || nameLower.contains("latte") || nameLower.contains("espresso") -> R.drawable.ic_item_coffee
-                nameLower.contains("muffin") || nameLower.contains("pastry") || nameLower.contains("pastries") -> R.drawable.ic_item_cookie
-                nameLower.contains("bread") || nameLower.contains("croissant") || nameLower.contains("bagel") -> R.drawable.ic_item_cookie
-                nameLower.contains("tart") || nameLower.contains("fruit") -> R.drawable.ic_item_cookie
-                else -> R.drawable.ic_item_box
+        /**
+         * #59: Load item icon from Clover image URL if available
+         * Falls back to generic misc icon if no image or on error
+         */
+        private fun loadItemIcon(context: Context, itemId: String?, imageView: ImageView) {
+            val mId = merchantId ?: MyApp.getInstance().getMerchantId()
+            
+            if (mId != null && !itemId.isNullOrEmpty()) {
+                // Clover item image URL pattern
+                val imageUrl = "https://www.clover.com/p/items/$mId/$itemId/image_120.jpg"
+                
+                Glide.with(context)
+                    .load(imageUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.ic_category_misc)
+                    .error(R.drawable.ic_category_misc)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(imageView)
+            } else {
+                // No merchantId or itemId - use fallback icon
+                imageView.setImageResource(R.drawable.ic_category_misc)
             }
         }
 

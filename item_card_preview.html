@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6D Item Card - Issue #59, #60, #61 Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .preview-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 30px;
+        }
+
+        .feature-list {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .feature-badge {
+            background: rgba(255,255,255,0.15);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feature-badge.done {
+            background: rgba(60, 205, 121, 0.3);
+            border: 1px solid rgba(60, 205, 121, 0.5);
+        }
+
+        /* Item Card - matches fragment_order_detail.xml */
+        .item-card {
+            background: rgba(255,255,255,0.15);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card-header .icon-bg {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .card-header .title {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Items Container with scroll */
+        .items-container {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 8px 16px;
+            position: relative;
+        }
+
+        /* Item Row - matches item_order_detail_item.xml */
+        .item-row {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            gap: 12px;
+        }
+
+        .item-row:hover {
+            background: rgba(0,0,0,0.3);
+            transform: translateX(2px);
+        }
+
+        .item-row:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Item Icon - #59 Dynamic Icons */
+        .item-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .item-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .item-icon .fallback {
+            font-size: 24px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Item Info */
+        .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .item-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .item-modifiers {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 6px;
+        }
+
+        /* Note Pills */
+        .note-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .note-pill {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        .note-pill.date {
+            background: rgba(100, 181, 246, 0.15);
+            color: #64B5F6;
+        }
+
+        .note-pill.category {
+            background: rgba(129, 199, 132, 0.15);
+            color: #81C784;
+        }
+
+        .note-pill.type {
+            background: rgba(206, 147, 216, 0.15);
+            color: #CE93D8;
+        }
+
+        /* Quantity Badge */
+        .qty-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* Price */
+        .item-price {
+            font-size: 14px;
+            font-weight: 600;
+            width: 70px;
+            text-align: right;
+        }
+
+        /* Chevron */
+        .chevron {
+            width: 16px;
+            height: 16px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* #61 Scroll Indicator */
+        .scroll-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 24px;
+            background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.2));
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .scroll-indicator.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .scroll-indicator svg {
+            width: 16px;
+            height: 16px;
+            color: rgba(255,255,255,0.5);
+            animation: bounce 1.5s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(4px); }
+        }
+
+        /* Summary Section */
+        .summary-section {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 16px 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .summary-row .label {
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+        }
+
+        .summary-row .value {
+            font-size: 14px;
+        }
+
+        .summary-row.total {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 8px;
+            padding-top: 16px;
+        }
+
+        .summary-row.total .label,
+        .summary-row.total .value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Modal - #60 Item Note Popup - Matches dialog_item_note.xml */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* bg_dialog.xml: #CC292D3E with 20dp radius, 1dp #1AFFFFFF stroke */
+        .modal {
+            background: rgba(41, 45, 62, 0.8);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 520px;
+            max-height: 85vh;
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 24px;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        /* Header - Title row with quantity badge */
+        .modal-header {
+            margin-bottom: 24px;
+        }
+
+        .modal-header-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 4px;
+        }
+
+        /* bg_qty_badge style - muted background */
+        .modal-header .qty-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .modal-header .item-name {
+            font-size: 20px;
+            font-weight: 500;
+            font-family: sans-serif;
+        }
+
+        .modal-header .item-modifiers {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            padding-bottom: 12px;
+        }
+
+        .modal-header .header-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            margin-top: 12px;
+        }
+
+        /* Scrollable content area */
+        .modal-body {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        /* Widget Section - Matches note_section_select.xml */
+        .widget-section {
+            padding-bottom: 16px;
+        }
+
+        .widget-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 8px;
+            font-family: sans-serif;
+        }
+
+        /* Chips - FlexboxLayout with wrap */
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* Chip styling from createChip() and updateChipState() */
+        .chip {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.9);
+            border: 1px solid transparent;
+        }
+
+        .chip:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* Selected state - border + background at 20% opacity */
+        .chip.selected {
+            border-width: 1px;
+            border-style: solid;
+        }
+
+        /* WidgetColorUtils colors */
+        .chip.selected.blue {
+            background: rgba(100, 181, 246, 0.2);
+            color: #64B5F6;
+            border-color: #64B5F6;
+        }
+
+        .chip.selected.green {
+            background: rgba(129, 199, 132, 0.2);
+            color: #81C784;
+            border-color: #81C784;
+        }
+
+        .chip.selected.purple {
+            background: rgba(206, 147, 216, 0.2);
+            color: #CE93D8;
+            border-color: #CE93D8;
+        }
+
+        .chip.selected.orange {
+            background: rgba(255, 183, 77, 0.2);
+            color: #FFB74D;
+            border-color: #FFB74D;
+        }
+
+        /* Date Input - note_section_calendar.xml */
+        .date-input-container {
+            position: relative;
+        }
+
+        .date-input {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 14px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: #64B5F6;
+        }
+
+        /* Text Input - note_section_textbox.xml */
+        .text-input {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 14px;
+            width: 100%;
+            min-height: 80px;
+            resize: vertical;
+            font-family: sans-serif;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #FFB74D;
+        }
+
+        .text-input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* Footer buttons - horizontal, right-aligned */
+        .modal-footer {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        /* Cancel button - TextButton style */
+        .btn {
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn.secondary {
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .btn.secondary:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Save button - accent_orange background */
+        .btn.primary {
+            background: #FF9F43;
+            color: white;
+            border-radius: 4px;
+        }
+
+        .btn.primary:hover {
+            background: #e68a2e;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .info-box h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.5;
+        }
+
+        .info-box code {
+            background: rgba(0,0,0,0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <h1>📦 6D: Item Card</h1>
+        <p class="subtitle">Issue #43 - Order Details Page Refinements</p>
+
+        <div class="feature-list">
+            <div class="feature-badge done">✅ #59: Dynamic Item Icons</div>
+            <div class="feature-badge done">✅ #60: Item Row Opens Popup</div>
+            <div class="feature-badge done">✅ #61: Scroll Indicator</div>
+        </div>
+
+        <!-- Info Boxes -->
+        <div class="info-box">
+            <h3>🖼️ #59: Dynamic Item Icons</h3>
+            <p>
+                Icons are loaded from Clover via URL: <code>https://www.clover.com/p/items/{mId}/{itemId}/image_120.jpg</code><br>
+                If no image exists or on error, falls back to generic <code>ic_category_misc.xml</code> icon (📦).
+            </p>
+        </div>
+
+        <div class="info-box">
+            <h3>👆 #60: Item Row Click</h3>
+            <p>
+                Click any item row to open the <strong>ItemNoteDialogFragment</strong> popup.<br>
+                Shows item name, modifiers, quantity, and widget-based note editors.
+            </p>
+        </div>
+
+        <div class="info-box">
+            <h3>⬇️ #61: Scroll Indicator</h3>
+            <p>
+                When items overflow, a bouncing chevron appears at the bottom.<br>
+                Indicator hides when scrolled to bottom via <code>canScrollVertically(1)</code>.
+            </p>
+        </div>
+
+        <!-- Item Card Demo -->
+        <div class="item-card">
+            <div class="card-header">
+                <div class="icon-bg">📦</div>
+                <div class="title">Items (5)</div>
+            </div>
+
+            <div class="items-container" id="itemsContainer">
+                <!-- Item 1 - With Clover Image -->
+                <div class="item-row" onclick="openItemModal('Custom Birthday Cake', 'Vanilla, Extra Frosting', 1, 85.00, true)">
+                    <div class="item-icon">
+                        <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=120&h=120&fit=crop" alt="Cake">
+                    </div>
+                    <div class="item-info">
+                        <div class="item-name">Custom Birthday Cake</div>
+                        <div class="item-modifiers">Vanilla, Extra Frosting</div>
+                        <div class="note-pills">
+                            <span class="note-pill date">📅 Apr 20</span>
+                            <span class="note-pill category">🏷️ Birthday</span>
+                        </div>
+                    </div>
+                    <div class="qty-badge">x1</div>
+                    <div class="item-price">$85.00</div>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </div>
+
+                <!-- Item 2 - With Clover Image -->
+                <div class="item-row" onclick="openItemModal('Espresso', 'Double Shot', 2, 4.50, true)">
+                    <div class="item-icon">
+                        <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=120&h=120&fit=crop" alt="Coffee">
+                    </div>
+                    <div class="item-info">
+                        <div class="item-name">Espresso</div>
+                        <div class="item-modifiers">Double Shot</div>
+                        <div class="note-pills">
+                            <span class="note-pill type">☕ Hot</span>
+                        </div>
+                    </div>
+                    <div class="qty-badge">x2</div>
+                    <div class="item-price">$9.00</div>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </div>
+
+                <!-- Item 3 - No Image (Fallback Icon) -->
+                <div class="item-row" onclick="openItemModal('Gift Wrapping', '', 1, 5.00, false)">
+                    <div class="item-icon">
+                        <span class="fallback">📦</span>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-name">Gift Wrapping</div>
+                        <div class="note-pills">
+                            <span class="note-pill category">🎁 Gift</span>
+                        </div>
+                    </div>
+                    <div class="qty-badge">x1</div>
+                    <div class="item-price">$5.00</div>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </div>
+
+                <!-- Item 4 - No Image (Fallback Icon) -->
+                <div class="item-row" onclick="openItemModal('Delivery Fee', '', 1, 3.00, false)">
+                    <div class="item-icon">
+                        <span class="fallback">📦</span>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-name">Delivery Fee</div>
+                    </div>
+                    <div class="qty-badge">x1</div>
+                    <div class="item-price">$3.00</div>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </div>
+
+                <!-- Item 5 - With Image -->
+                <div class="item-row" onclick="openItemModal('Chocolate Chip Cookies', '12 Pack', 1, 12.00, true)">
+                    <div class="item-icon">
+                        <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=120&h=120&fit=crop" alt="Cookies">
+                    </div>
+                    <div class="item-info">
+                        <div class="item-name">Chocolate Chip Cookies</div>
+                        <div class="item-modifiers">12 Pack</div>
+                    </div>
+                    <div class="qty-badge">x1</div>
+                    <div class="item-price">$12.00</div>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- #61 Scroll Indicator -->
+            <div class="scroll-indicator" id="scrollIndicator" onclick="scrollToBottom()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6 6-6"/>
+                </svg>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="summary-section">
+                <div class="summary-row">
+                    <span class="label">Subtotal</span>
+                    <span class="value">$114.00</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Tax</span>
+                    <span class="value">$9.12</span>
+                </div>
+                <div class="summary-row total">
+                    <span class="label">Total</span>
+                    <span class="value">$123.12</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- #60 Item Note Modal - Matches dialog_item_note.xml -->
+    <div class="modal-overlay" id="itemModal">
+        <div class="modal">
+            <!-- Header with bottom border - matches dialog_item_note.xml structure -->
+            <div class="modal-header">
+                <!-- Title row with quantity badge and item name -->
+                <div class="modal-header-row">
+                    <div class="qty-badge" id="modalQty">x1</div>
+                    <div class="item-name" id="modalItemName">Custom Birthday Cake</div>
+                </div>
+                <!-- Subtitle for modifiers -->
+                <div class="item-modifiers" id="modalModifiers">Vanilla, Extra Frosting</div>
+                <!-- Header bottom border -->
+                <div class="header-divider"></div>
+            </div>
+
+            <!-- Scrollable content - noteSectionsContainer -->
+            <div class="modal-body">
+                <!-- Pickup Date Widget - note_section_calendar.xml -->
+                <div class="widget-section">
+                    <div class="widget-label">Pickup Date</div>
+                    <input type="text" class="date-input" value="Apr 20, 2026" readonly onclick="this.value = 'Apr 21, 2026'">
+                </div>
+
+                <!-- Order Type Widget (Single Select) - note_section_select.xml -->
+                <div class="widget-section">
+                    <div class="widget-label">Order Type</div>
+                    <div class="chip-container">
+                        <div class="chip selected purple" onclick="selectChip(this, 'purple')">Pickup</div>
+                        <div class="chip" onclick="selectChip(this, 'purple')">Delivery</div>
+                        <div class="chip" onclick="selectChip(this, 'purple')">Dine-in</div>
+                    </div>
+                </div>
+
+                <!-- Category Widget (Multi Select) - note_section_select.xml -->
+                <div class="widget-section">
+                    <div class="widget-label">Category</div>
+                    <div class="chip-container">
+                        <div class="chip selected green" onclick="toggleChip(this, 'green')">Birthday</div>
+                        <div class="chip" onclick="toggleChip(this, 'green')">Wedding</div>
+                        <div class="chip" onclick="toggleChip(this, 'green')">Corporate</div>
+                        <div class="chip" onclick="toggleChip(this, 'green')">Holiday</div>
+                    </div>
+                </div>
+
+                <!-- Notes Widget (Text) - note_section_textbox.xml -->
+                <div class="widget-section">
+                    <div class="widget-label">Notes</div>
+                    <textarea class="text-input" placeholder="Add custom notes...">Happy Birthday message on top</textarea>
+                </div>
+            </div>
+
+            <!-- Bottom buttons - horizontal, right-aligned -->
+            <div class="modal-footer">
+                <button class="btn secondary" onclick="closeItemModal()">CANCEL</button>
+                <button class="btn primary" onclick="saveItemNote()">SAVE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Item Modal
+        function openItemModal(name, modifiers, qty, price, hasImage) {
+            document.getElementById('modalItemName').textContent = name;
+            document.getElementById('modalModifiers').textContent = modifiers || '';
+            document.getElementById('modalModifiers').style.display = modifiers ? 'block' : 'none';
+            document.getElementById('modalQty').textContent = 'x' + qty;
+            document.getElementById('itemModal').classList.add('active');
+        }
+
+        function closeItemModal() {
+            document.getElementById('itemModal').classList.remove('active');
+        }
+
+        function saveItemNote() {
+            alert('Note saved!\n\nThis updates LineItem.note in Clover via OrderConnector.updateLineItems()');
+            closeItemModal();
+        }
+
+        // Chip selection (single select)
+        function selectChip(chip, color) {
+            const container = chip.parentElement;
+            container.querySelectorAll('.chip').forEach(c => {
+                c.classList.remove('selected', 'blue', 'green', 'purple', 'orange');
+            });
+            chip.classList.add('selected', color);
+        }
+
+        // Chip toggle (multi select)
+        function toggleChip(chip, color) {
+            if (chip.classList.contains('selected')) {
+                chip.classList.remove('selected', color);
+            } else {
+                chip.classList.add('selected', color);
+            }
+        }
+
+        // #61 Scroll Indicator
+        const container = document.getElementById('itemsContainer');
+        const indicator = document.getElementById('scrollIndicator');
+
+        function updateScrollIndicator() {
+            const canScroll = container.scrollHeight > container.clientHeight;
+            const atBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 10;
+            
+            if (canScroll && !atBottom) {
+                indicator.classList.remove('hidden');
+            } else {
+                indicator.classList.add('hidden');
+            }
+        }
+
+        function scrollToBottom() {
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        container.addEventListener('scroll', updateScrollIndicator);
+        window.addEventListener('resize', updateScrollIndicator);
+        
+        // Initial check
+        setTimeout(updateScrollIndicator, 100);
+
+        // Close modal on overlay click
+        document.getElementById('itemModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeItemModal();
+            }
+        });
+    </script>
+</body>
+</html>
