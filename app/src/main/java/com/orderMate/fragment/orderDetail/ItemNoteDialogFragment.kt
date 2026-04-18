@@ -45,6 +45,7 @@ class ItemNoteDialogFragment : DialogFragment() {
     private var existingNote: String? = null
     private var itemName: String? = null
     private var itemModifiers: String? = null
+    private var itemQuantity: Int = 1
 
     // Selections: widgetId -> selected values
     private val singleSelections = mutableMapOf<String, String?>()
@@ -72,6 +73,7 @@ class ItemNoteDialogFragment : DialogFragment() {
             existingNote = args.getString(ARG_EXISTING_NOTE)
             itemName = args.getString(ARG_ITEM_NAME)
             itemModifiers = args.getString(ARG_ITEM_MODIFIERS)
+            itemQuantity = args.getInt(ARG_ITEM_QUANTITY, 1)
         }
     }
 
@@ -123,9 +125,19 @@ class ItemNoteDialogFragment : DialogFragment() {
     }
     
     private fun setupHeader() {
-        // Set item name as title, modifiers as subtitle
+        // Set quantity badge
+        binding.dialogQtyBadge.text = "x$itemQuantity"
+        
+        // Set item name
         binding.dialogTitle.text = itemName ?: "Item"
-        binding.dialogSubtitle.text = itemModifiers ?: "Item variants/modifiers"
+        
+        // Show modifiers if available, hide subtitle if empty
+        if (itemModifiers.isNullOrBlank()) {
+            binding.dialogSubtitle.visibility = View.GONE
+        } else {
+            binding.dialogSubtitle.text = itemModifiers
+            binding.dialogSubtitle.visibility = View.VISIBLE
+        }
     }
 
     private fun setupButtons() {
@@ -496,6 +508,10 @@ class ItemNoteDialogFragment : DialogFragment() {
     fun setItemModifiers(modifiers: String?) {
         this.itemModifiers = modifiers
     }
+    
+    fun setItemQuantity(quantity: Int) {
+        this.itemQuantity = quantity
+    }
 
     companion object {
         const val TAG = "ItemNoteDialogFragment"
@@ -503,12 +519,14 @@ class ItemNoteDialogFragment : DialogFragment() {
         private const val ARG_EXISTING_NOTE = "arg_existing_note"
         private const val ARG_ITEM_NAME = "arg_item_name"
         private const val ARG_ITEM_MODIFIERS = "arg_item_modifiers"
+        private const val ARG_ITEM_QUANTITY = "arg_item_quantity"
 
         fun newInstance(
             lineItemId: String? = null,
             existingNote: String? = null,
             itemName: String? = null,
-            itemModifiers: String? = null
+            itemModifiers: String? = null,
+            itemQuantity: Int = 1
         ): ItemNoteDialogFragment {
             return ItemNoteDialogFragment().apply {
                 arguments = Bundle().apply {
@@ -516,6 +534,7 @@ class ItemNoteDialogFragment : DialogFragment() {
                     putString(ARG_EXISTING_NOTE, existingNote)
                     putString(ARG_ITEM_NAME, itemName)
                     putString(ARG_ITEM_MODIFIERS, itemModifiers)
+                    putInt(ARG_ITEM_QUANTITY, itemQuantity)
                 }
             }
         }

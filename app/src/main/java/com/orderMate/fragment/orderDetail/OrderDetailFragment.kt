@@ -787,13 +787,25 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
 
     // When user clicks on an item row, open the OrderMate popup to add/edit notes
     override fun onOrderItemClick(orderPosition: Int, lineItemId: String?) {
-        // Get existing note for this line item
-        val existingNote = lineItems.getOrNull(orderPosition)?.order?.note
+        // Get line item data
+        val lineItemGroup = lineItems.getOrNull(orderPosition)
+        val lineItem = lineItemGroup?.order
+        val existingNote = lineItem?.note
+        val itemName = lineItem?.name ?: lineItem?.item?.name
+        val itemQuantity = lineItemGroup?.count ?: lineItem?.unitQty?.toInt() ?: 1
+        
+        // Build modifiers string from modifications
+        val modifiersString = lineItem?.modifications?.mapNotNull { it?.name }
+            ?.joinToString(", ")
+            ?.takeIf { it.isNotBlank() }
         
         // Dialog reads widgets from WidgetManager directly (like production)
         ItemNoteDialogFragment.newInstance(
             lineItemId = lineItemId,
-            existingNote = existingNote
+            existingNote = existingNote,
+            itemName = itemName,
+            itemModifiers = modifiersString,
+            itemQuantity = itemQuantity
         ).apply {
             setListener(object : ItemNoteDialogFragment.ItemNoteListener {
                 override fun onNoteSaved(itemId: String?, note: String) {

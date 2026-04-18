@@ -55,6 +55,17 @@ class ItemAdapter(
             // Item name
             binding.itemName.text = item?.order?.name ?: "-"
 
+            // Item modifiers (from Clover)
+            val modifiersString = item?.order?.modifications?.mapNotNull { it?.name }
+                ?.joinToString(", ")
+                ?.takeIf { it.isNotBlank() }
+            if (modifiersString != null) {
+                binding.itemModifiers.text = modifiersString
+                binding.itemModifiers.visibility = View.VISIBLE
+            } else {
+                binding.itemModifiers.visibility = View.GONE
+            }
+
             // Quantity badge
             val qty = item?.itemCount ?: 1
             binding.itemQty.text = "x$qty"

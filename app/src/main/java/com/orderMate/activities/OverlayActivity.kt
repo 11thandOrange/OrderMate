@@ -89,15 +89,24 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
     }
     
     private fun showItemNoteDialog() {
-        // Get existing note for this line item
-        val existingNote = orderData?.lineItems?.find { 
-            it?.item?.id == lineItemId 
-        }?.note
+        // Get line item data
+        val lineItem = orderData?.lineItems?.find { it?.item?.id == lineItemId }
+        val existingNote = lineItem?.note
+        val itemName = lineItem?.name ?: lineItem?.item?.name
+        val itemQuantity = lineItem?.unitQty?.toInt() ?: 1
+        
+        // Build modifiers string from modifications
+        val modifiersString = lineItem?.modifications?.mapNotNull { it?.name }
+            ?.joinToString(", ")
+            ?.takeIf { it.isNotBlank() }
         
         // Dialog reads widgets from WidgetManager directly (like production)
         ItemNoteDialogFragment.newInstance(
             lineItemId = lineItemId,
-            existingNote = existingNote
+            existingNote = existingNote,
+            itemName = itemName,
+            itemModifiers = modifiersString,
+            itemQuantity = itemQuantity
         ).apply {
             setListener(object : ItemNoteDialogFragment.ItemNoteListener {
                 override fun onNoteSaved(itemId: String?, note: String) {
