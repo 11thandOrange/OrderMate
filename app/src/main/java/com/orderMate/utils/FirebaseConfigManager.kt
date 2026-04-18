@@ -329,7 +329,8 @@ class FirebaseConfigManager private constructor() {
                         val id = child.key ?: return@forEach
                         val name = child.child("name").getValue(String::class.java) ?: "Untitled"
                         val content = child.child("content").getValue(String::class.java) ?: ""
-                        templates.add(NotificationTemplate(id, name, content))
+                        val subject = child.child("subject").getValue(String::class.java) ?: ""  // #64
+                        templates.add(NotificationTemplate(id, name, content, subject))
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -345,7 +346,8 @@ class FirebaseConfigManager private constructor() {
     fun saveTemplate(merchantId: String, template: NotificationTemplate, callback: (Boolean) -> Unit) {
         val data = mapOf(
             "name" to template.name,
-            "content" to template.content
+            "content" to template.content,
+            "subject" to template.subject  // #64: Save email subject line
         )
         db.getReference(FirebasePaths.template(merchantId, template.id))
             .setValue(data)
@@ -456,14 +458,16 @@ class FirebaseConfigManager private constructor() {
 data class NotificationTemplate(
     val id: String,
     var name: String,
-    var content: String
+    var content: String,
+    var subject: String = ""  // #64: Email subject line field
 ) {
     companion object {
-        fun create(name: String = "New Template", content: String = ""): NotificationTemplate {
+        fun create(name: String = "New Template", content: String = "", subject: String = ""): NotificationTemplate {
             return NotificationTemplate(
                 id = java.util.UUID.randomUUID().toString(),
                 name = name,
-                content = content
+                content = content,
+                subject = subject
             )
         }
     }

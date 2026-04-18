@@ -157,7 +157,12 @@ class SendNotificationDialog(
             override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (position > 0 && position <= templates.size) {
                     val selectedTemplate = templates[position - 1]
+                    // #63: Auto-fill content
                     binding.etNotes.setText(selectedTemplate.content)
+                    // #64: Auto-fill subject for email (use template subject, not name)
+                    if (!isSmsEnabled && selectedTemplate.subject.isNotBlank()) {
+                        binding.subject.setText(selectedTemplate.subject)
+                    }
                 }
             }
             override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}

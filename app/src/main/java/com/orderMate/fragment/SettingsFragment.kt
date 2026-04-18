@@ -1310,12 +1310,14 @@ class FirebaseTemplateAdapter(
         private val expandChevron: ImageView = itemView.findViewById(R.id.expandChevron)
         private val templateBody: View = itemView.findViewById(R.id.templateBody)
         private val inputTemplateName: EditText = itemView.findViewById(R.id.inputTemplateName)
+        private val inputTemplateSubject: EditText = itemView.findViewById(R.id.inputTemplateSubject)  // #64
         private val inputTemplateContent: EditText = itemView.findViewById(R.id.inputTemplateContent)
         private val charCount: TextView = itemView.findViewById(R.id.charCount)
         private val btnDeleteTemplate: View = itemView.findViewById(R.id.btnDeleteTemplate)
         
         private var currentTextWatcher: TextWatcher? = null
         private var currentNameWatcher: TextWatcher? = null
+        private var currentSubjectWatcher: TextWatcher? = null  // #64
         private var saveHandler = android.os.Handler(android.os.Looper.getMainLooper())
         private var saveRunnable: Runnable? = null
 
@@ -1327,8 +1329,10 @@ class FirebaseTemplateAdapter(
             // Remove previous watchers
             currentTextWatcher?.let { inputTemplateContent.removeTextChangedListener(it) }
             currentNameWatcher?.let { inputTemplateName.removeTextChangedListener(it) }
+            currentSubjectWatcher?.let { inputTemplateSubject.removeTextChangedListener(it) }  // #64
             
             inputTemplateName.setText(template.name)
+            inputTemplateSubject.setText(template.subject)  // #64
             inputTemplateContent.setText(template.content)
             updateCharCount(template.content.length)
 
@@ -1362,6 +1366,18 @@ class FirebaseTemplateAdapter(
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             }
             inputTemplateName.addTextChangedListener(currentNameWatcher)
+
+            // #64: Debounced save for subject changes
+            currentSubjectWatcher = object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                    val subject = s?.toString() ?: ""
+                    template.subject = subject
+                    scheduleSave(template)
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            }
+            inputTemplateSubject.addTextChangedListener(currentSubjectWatcher)
 
             // Debounced save for content changes
             currentTextWatcher = object : TextWatcher {

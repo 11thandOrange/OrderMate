@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6E: Send Notification Popup - Issue #62-65 Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .preview-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 30px;
+        }
+
+        .feature-list {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .feature-badge {
+            background: rgba(255,255,255,0.15);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feature-badge.done {
+            background: rgba(60, 205, 121, 0.3);
+            border: 1px solid rgba(60, 205, 121, 0.5);
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-box h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.5;
+        }
+
+        .info-box code {
+            background: rgba(0,0,0,0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 800px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .column-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Dialog - matches bg_dialog.xml #CC292D3E */
+        .dialog {
+            background: rgba(41, 45, 62, 0.8);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        /* Dialog Header */
+        .dialog-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .dialog-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* Dialog Body */
+        .dialog-body {
+            padding: 24px;
+        }
+
+        /* Tab Selector - SMS / Email */
+        .tab-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* Tab - matches bg_filter_option.xml and bg_filter_option_selected.xml */
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-size: 14sp;
+            font-weight: 700;
+            border-radius: 20px;  /* matches cornerRadius="20dp" */
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        /* bg_filter_option.xml: #1AFFFFFF bg, #33FFFFFF stroke */
+        .tab.inactive {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* bg_filter_option_selected.xml: orange_accent solid */
+        .tab.active {
+            background: #FF9F43;
+            color: #fff;
+            border: none;
+        }
+
+        .tab:hover {
+            opacity: 0.9;
+        }
+
+        /* Form Section */
+        .form-section {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        /* Input - matches bg_modal_input */
+        .form-input {
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* Select dropdown */
+        .form-select {
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+
+        .form-select option {
+            background: #292D3E;
+            color: #fff;
+        }
+
+        /* Textarea */
+        .form-textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 16px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .form-textarea:focus {
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .form-textarea::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* Subject section - hidden by default (SMS mode) */
+        .subject-section {
+            display: none;
+        }
+
+        .subject-section.visible {
+            display: block;
+        }
+
+        /* Dialog Footer */
+        .dialog-footer {
+            padding: 16px 24px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn.secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .btn.secondary:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .btn.primary {
+            background: #FF9F43;
+            color: #fff;
+        }
+
+        .btn.primary:hover {
+            background: #e68a2e;
+        }
+
+        /* Auto-fill indicator */
+        .autofill-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: #81C784;
+            margin-left: 8px;
+        }
+
+        /* Template highlight */
+        .template-highlight {
+            animation: highlight 0.5s ease;
+        }
+
+        @keyframes highlight {
+            0% { background: rgba(255, 159, 67, 0.3); }
+            100% { background: rgba(255,255,255,0.1); }
+        }
+
+        /* ==================== Settings Template Editor ==================== */
+        
+        .settings-panel {
+            background: rgba(41, 45, 62, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
+        }
+
+        .settings-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Template Item - matches bg_template_item.xml */
+        /* #4D000000 = rgba(0,0,0,0.3), stroke #1AFFFFFF, radius 10dp */
+        .template-item {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .template-header {
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .template-header:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .template-info {
+            flex: 1;
+        }
+
+        .template-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .template-preview {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 280px;
+        }
+
+        .template-chevron {
+            width: 20px;
+            height: 20px;
+            color: rgba(255,255,255,0.5);
+            transition: transform 0.2s;
+        }
+
+        .template-item.expanded .template-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Template Body (expandable) */
+        .template-body {
+            display: none;
+            padding: 0 12px 12px;
+        }
+
+        .template-item.expanded .template-body {
+            display: block;
+        }
+
+        .template-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            margin-bottom: 12px;
+        }
+
+        .template-field {
+            margin-bottom: 12px;
+        }
+
+        .template-field-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 6px;
+        }
+
+        .template-input {
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .template-input:focus {
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .template-input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        .template-textarea {
+            min-height: 70px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .template-variables {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            line-height: 1.6;
+            margin-top: 8px;
+        }
+
+        .template-footer {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .char-count {
+            flex: 1;
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .delete-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: #EF4444;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Add Template Button */
+        .add-template-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px dashed rgba(255,255,255,0.2);
+            border-radius: 10px;
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .add-template-btn:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.3);
+            color: #fff;
+        }
+
+        /* New badge for subject field */
+        .new-badge {
+            background: #FF9F43;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            text-transform: uppercase;
+        }
+
+        /* Arrow indicator between panels */
+        .flow-arrow {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.3);
+            font-size: 24px;
+        }
+
+        @media (min-width: 800px) {
+            .flow-arrow {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <h1>📤 6E: Send Notification Popup</h1>
+        <p class="subtitle">Issue #43 - Order Details Page Refinements</p>
+
+        <div class="feature-list">
+            <div class="feature-badge done">✅ #62: Templates from Settings</div>
+            <div class="feature-badge done">✅ #63: Template Auto-Fill</div>
+            <div class="feature-badge done">✅ #64: Template Subject Line</div>
+            <div class="feature-badge done">✅ #65: History Tracking</div>
+        </div>
+
+        <!-- Info Boxes -->
+        <div class="info-box">
+            <h3>📋 #62: Templates Pull from Settings</h3>
+            <p>
+                Templates load from Firebase via <code>FirebaseConfigManager.getTemplates(merchantId)</code>.<br>
+                Stored at: <code>merchants/{merchantId}/templates</code>
+            </p>
+        </div>
+
+        <div class="info-box">
+            <h3>✨ #63 & #64: Template Auto-Fill</h3>
+            <p>
+                When a template is selected:<br>
+                • <strong>Content</strong> auto-fills message box<br>
+                • <strong>Subject</strong> auto-fills subject field (email mode only)<br>
+                • Customer phone/email comes from <strong>order data</strong>, not template
+            </p>
+        </div>
+
+        <div class="info-box">
+            <h3>📜 #65: Notification History</h3>
+            <p>
+                Each sent notification includes <code>reference: "order-{orderId}"</code> for tracking.<br>
+                Notifications appear in Order History card via Bird API.
+            </p>
+        </div>
+
+        <!-- Two Column Layout: Settings → Send Dialog -->
+        <div class="two-column">
+            <!-- Left: Settings Template Editor -->
+            <div>
+                <div class="column-header">⚙️ Settings → Notification Templates</div>
+                <div class="settings-panel">
+                    <div class="settings-section-title">
+                        📝 Templates
+                    </div>
+
+                    <!-- Template 1: Order Ready (expanded) -->
+                    <div class="template-item expanded" id="template1">
+                        <div class="template-header" onclick="toggleTemplate('template1')">
+                            <div class="template-info">
+                                <div class="template-name">Order Ready</div>
+                                <div class="template-preview">Your order from {{merchant_name}} is ready...</div>
+                            </div>
+                            <svg class="template-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 9l6 6 6-6"/>
+                            </svg>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-divider"></div>
+                            
+                            <div class="template-field">
+                                <div class="template-field-label">Template Name</div>
+                                <input type="text" class="template-input" value="Order Ready" 
+                                       onchange="updateTemplateName('1', this.value)">
+                            </div>
+
+                            <div class="template-field">
+                                <div class="template-field-label">
+                                    Email Subject (optional)
+                                    <span class="new-badge">#64 New</span>
+                                </div>
+                                <input type="text" class="template-input" 
+                                       value="Your order is ready for pickup!"
+                                       placeholder="Enter email subject line"
+                                       onchange="updateTemplateSubject('1', this.value)">
+                            </div>
+
+                            <div class="template-field">
+                                <div class="template-field-label">Message Content</div>
+                                <textarea class="template-input template-textarea"
+                                          onchange="updateTemplateContent('1', this.value)">Hi {{customer_name}}, your order #{{order_id}} from {{merchant_name}} is ready for pickup! Please come by at your earliest convenience.</textarea>
+                            </div>
+
+                            <div class="template-variables">
+                                Variables: {{merchant_name}}, {{order_id}}, {{customer_name}}, {{due_date}}, {{due_time}}, {{order_total}}
+                            </div>
+
+                            <div class="template-footer">
+                                <span class="char-count">124/250</span>
+                                <button class="delete-btn" onclick="alert('Delete template')">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Template 2: Pickup Reminder (collapsed) -->
+                    <div class="template-item" id="template2">
+                        <div class="template-header" onclick="toggleTemplate('template2')">
+                            <div class="template-info">
+                                <div class="template-name">Pickup Reminder</div>
+                                <div class="template-preview">Friendly reminder: Your order #{{order_id}}...</div>
+                            </div>
+                            <svg class="template-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 9l6 6 6-6"/>
+                            </svg>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-divider"></div>
+                            
+                            <div class="template-field">
+                                <div class="template-field-label">Template Name</div>
+                                <input type="text" class="template-input" value="Pickup Reminder">
+                            </div>
+
+                            <div class="template-field">
+                                <div class="template-field-label">
+                                    Email Subject (optional)
+                                    <span class="new-badge">#64 New</span>
+                                </div>
+                                <input type="text" class="template-input" 
+                                       value="Reminder: Order pickup today"
+                                       placeholder="Enter email subject line">
+                            </div>
+
+                            <div class="template-field">
+                                <div class="template-field-label">Message Content</div>
+                                <textarea class="template-input template-textarea">Friendly reminder: Your order #{{order_id}} is scheduled for pickup today at {{due_time}}. We look forward to seeing you!</textarea>
+                            </div>
+
+                            <div class="template-variables">
+                                Variables: {{merchant_name}}, {{order_id}}, {{customer_name}}, {{due_date}}, {{due_time}}, {{order_total}}
+                            </div>
+
+                            <div class="template-footer">
+                                <span class="char-count">98/250</span>
+                                <button class="delete-btn">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Template Button -->
+                    <button class="add-template-btn" onclick="alert('Add new template')">
+                        ➕ Add Template
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right: Send Notification Dialog -->
+            <div>
+                <div class="column-header">📤 Order Details → Send Notification</div>
+                <div class="dialog">
+            <div class="dialog-header">
+                <h2>Send Notification</h2>
+            </div>
+
+            <div class="dialog-body">
+                <!-- Tab Selector -->
+                <div class="tab-selector">
+                    <div class="tab active" id="smsTab" onclick="switchTab('sms')">SMS</div>
+                    <div class="tab inactive" id="emailTab" onclick="switchTab('email')">Email</div>
+                </div>
+
+                <!-- Template Dropdown - #62 -->
+                <div class="form-section">
+                    <div class="form-label">
+                        Template
+                        <span class="autofill-indicator" id="templateIndicator" style="display: none;">
+                            ✓ Auto-filled
+                        </span>
+                    </div>
+                    <select class="form-select" id="templateSelect" onchange="selectTemplate()">
+                        <option value="">Select template...</option>
+                        <option value="1">Order Ready</option>
+                        <option value="2">Pickup Reminder</option>
+                        <option value="3">Thank You</option>
+                    </select>
+                </div>
+
+                <!-- Customer Number/Email -->
+                <div class="form-section">
+                    <div class="form-label" id="contactLabel">Customer Number</div>
+                    <input type="text" class="form-input" id="contactInput" 
+                           placeholder="Enter the customer number" 
+                           value="+1 (555) 123-4567">
+                </div>
+
+                <!-- Subject Section (Email only) - #64 -->
+                <div class="form-section subject-section" id="subjectSection">
+                    <div class="form-label">
+                        Subject
+                        <span class="autofill-indicator" id="subjectIndicator" style="display: none;">
+                            ✓ From template
+                        </span>
+                    </div>
+                    <input type="text" class="form-input" id="subjectInput" 
+                           placeholder="Enter the subject">
+                </div>
+
+                <!-- Message -->
+                <div class="form-section">
+                    <div class="form-label">
+                        Message
+                        <span class="autofill-indicator" id="messageIndicator" style="display: none;">
+                            ✓ From template
+                        </span>
+                    </div>
+                    <textarea class="form-textarea" id="messageInput" 
+                              placeholder="Enter your message here..."></textarea>
+                </div>
+            </div>
+
+            <div class="dialog-footer">
+                <button class="btn secondary" onclick="closeDialog()">Cancel</button>
+                <button class="btn primary" onclick="sendNotification()">Send</button>
+            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Template data - simulates Firebase templates with subject field (#64)
+        const templates = {
+            '1': {
+                name: 'Order Ready',
+                subject: 'Your order is ready for pickup!',
+                content: 'Hi {{customer_name}}, your order #{{order_id}} from {{merchant_name}} is ready for pickup! Please come by at your earliest convenience.'
+            },
+            '2': {
+                name: 'Pickup Reminder',
+                subject: 'Reminder: Order pickup today',
+                content: 'Friendly reminder: Your order #{{order_id}} is scheduled for pickup today at {{due_time}}. We look forward to seeing you!'
+            },
+            '3': {
+                name: 'Thank You',
+                subject: 'Thank you for your order!',
+                content: 'Thank you for choosing {{merchant_name}}! Your order #{{order_id}} for {{order_total}} has been confirmed. We appreciate your business!'
+            }
+        };
+
+        let isEmailMode = false;
+
+        function switchTab(mode) {
+            isEmailMode = mode === 'email';
+            
+            // Update tab styles
+            document.getElementById('smsTab').className = isEmailMode ? 'tab inactive' : 'tab active';
+            document.getElementById('emailTab').className = isEmailMode ? 'tab active' : 'tab inactive';
+            
+            // Show/hide subject section
+            document.getElementById('subjectSection').className = isEmailMode 
+                ? 'form-section subject-section visible' 
+                : 'form-section subject-section';
+            
+            // Update contact label and placeholder
+            const contactLabel = document.getElementById('contactLabel');
+            const contactInput = document.getElementById('contactInput');
+            
+            if (isEmailMode) {
+                contactLabel.textContent = 'Customer Email';
+                contactInput.placeholder = 'Enter the customer email address';
+                contactInput.value = 'customer@example.com';
+                contactInput.type = 'email';
+            } else {
+                contactLabel.textContent = 'Customer Number';
+                contactInput.placeholder = 'Enter the customer number';
+                contactInput.value = '+1 (555) 123-4567';
+                contactInput.type = 'tel';
+            }
+
+            // Re-apply template if one is selected
+            const templateId = document.getElementById('templateSelect').value;
+            if (templateId) {
+                applyTemplate(templateId);
+            }
+        }
+
+        function selectTemplate() {
+            const templateId = document.getElementById('templateSelect').value;
+            if (templateId) {
+                applyTemplate(templateId);
+            } else {
+                // Clear fields
+                document.getElementById('messageInput').value = '';
+                document.getElementById('subjectInput').value = '';
+                hideIndicators();
+            }
+        }
+
+        function applyTemplate(templateId) {
+            const template = templates[templateId];
+            if (!template) return;
+
+            // #63: Auto-fill content
+            const messageInput = document.getElementById('messageInput');
+            messageInput.value = template.content;
+            messageInput.classList.add('template-highlight');
+            setTimeout(() => messageInput.classList.remove('template-highlight'), 500);
+            
+            // Show message indicator
+            document.getElementById('messageIndicator').style.display = 'inline-flex';
+            document.getElementById('templateIndicator').style.display = 'inline-flex';
+
+            // #64: Auto-fill subject for email mode
+            if (isEmailMode && template.subject) {
+                const subjectInput = document.getElementById('subjectInput');
+                subjectInput.value = template.subject;
+                subjectInput.classList.add('template-highlight');
+                setTimeout(() => subjectInput.classList.remove('template-highlight'), 500);
+                document.getElementById('subjectIndicator').style.display = 'inline-flex';
+            }
+        }
+
+        function hideIndicators() {
+            document.getElementById('templateIndicator').style.display = 'none';
+            document.getElementById('messageIndicator').style.display = 'none';
+            document.getElementById('subjectIndicator').style.display = 'none';
+        }
+
+        function closeDialog() {
+            alert('Dialog closed');
+        }
+
+        function sendNotification() {
+            const mode = isEmailMode ? 'Email' : 'SMS';
+            const contact = document.getElementById('contactInput').value;
+            const message = document.getElementById('messageInput').value;
+            const subject = isEmailMode ? document.getElementById('subjectInput').value : '';
+            
+            let details = `Mode: ${mode}\nTo: ${contact}\n`;
+            if (isEmailMode) details += `Subject: ${subject}\n`;
+            details += `Message: ${message.substring(0, 50)}...`;
+            details += '\n\n#65: This notification will be tracked in Order History with reference "order-{orderId}"';
+            
+            alert('Notification Sent!\n\n' + details);
+        }
+
+        // Initialize - hide indicators
+        hideIndicators();
+
+        // ==================== Settings Template Functions ====================
+
+        function toggleTemplate(templateId) {
+            const item = document.getElementById(templateId);
+            item.classList.toggle('expanded');
+        }
+
+        function updateTemplateName(id, value) {
+            templates[id].name = value;
+            console.log('Template', id, 'name updated to:', value);
+        }
+
+        function updateTemplateSubject(id, value) {
+            templates[id].subject = value;
+            console.log('Template', id, 'subject updated to:', value);
+        }
+
+        function updateTemplateContent(id, value) {
+            templates[id].content = value;
+            console.log('Template', id, 'content updated to:', value);
+        }
+    </script>
+</body>
+</html>
