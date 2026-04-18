@@ -15,6 +15,7 @@ import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.databinding.ItemOrderCardRedesignBinding
 import com.orderMate.utils.Constants
 import com.orderMate.utils.exceptionHandler
+import com.orderMate.utils.formatPaymentState
 import com.orderMate.utils.toDoubleFloatPoint
 
 /**
@@ -105,58 +106,34 @@ class OrderCardRedesignAdapter(
         private fun setupOrderStatusBadge(order: Order) {
             val context = binding.root.context
             val state = order.state?.toString() ?: "OPEN"
+            val displayText = formatPaymentState(state)
             
-            when (state.uppercase()) {
-                "OPEN" -> {
-                    binding.orderStatusBadge.text = "Open"
-                    binding.orderStatusBadge.setBackgroundResource(R.drawable.bg_badge_open)
-                    binding.orderStatusBadge.setTextColor(ContextCompat.getColor(context, R.color.open_status_color))
-                }
-                "LOCKED" -> {
-                    binding.orderStatusBadge.text = "Locked"
-                    binding.orderStatusBadge.setBackgroundResource(R.drawable.bg_badge_closed)
-                    binding.orderStatusBadge.setTextColor(ContextCompat.getColor(context, R.color.closed_status_color))
-                }
-                else -> {
-                    binding.orderStatusBadge.text = state.lowercase().replaceFirstChar { it.uppercase() }
-                    binding.orderStatusBadge.setBackgroundResource(R.drawable.bg_badge_open)
-                    binding.orderStatusBadge.setTextColor(ContextCompat.getColor(context, R.color.open_status_color))
-                }
+            val (bgRes, textColorRes) = when (state.uppercase()) {
+                "LOCKED" -> Pair(R.drawable.bg_badge_closed, R.color.closed_status_color)
+                else -> Pair(R.drawable.bg_badge_open, R.color.open_status_color)
             }
+            
+            binding.orderStatusBadge.text = displayText
+            binding.orderStatusBadge.setBackgroundResource(bgRes)
+            binding.orderStatusBadge.setTextColor(ContextCompat.getColor(context, textColorRes))
         }
 
         private fun setupPaymentStatusBadge(order: Order) {
             val context = binding.root.context
             val paymentState = order.paymentState?.name ?: "NOT_PAID"
+            val displayText = formatPaymentState(paymentState)
 
-            when (paymentState) {
-                "PAID" -> {
-                    binding.paymentStatusBadge.text = "Paid"
-                    binding.paymentStatusBadge.setBackgroundResource(R.drawable.bg_badge_paid)
-                    binding.paymentStatusBadge.setTextColor(ContextCompat.getColor(context, R.color.paid_status_color))
-                }
-                "NOT_PAID" -> {
-                    binding.paymentStatusBadge.text = "Unpaid"
-                    binding.paymentStatusBadge.setBackgroundResource(R.drawable.bg_badge_unpaid)
-                    binding.paymentStatusBadge.setTextColor(ContextCompat.getColor(context, R.color.unpaid_status_color))
-                }
-                "PARTIALLY_PAID" -> {
-                    binding.paymentStatusBadge.text = "Partial"
-                    binding.paymentStatusBadge.setBackgroundResource(R.drawable.bg_badge_unpaid)
-                    binding.paymentStatusBadge.setTextColor(ContextCompat.getColor(context, R.color.orange_accent))
-                }
-                "REFUNDED" -> {
-                    binding.paymentStatusBadge.text = "Refunded"
-                    binding.paymentStatusBadge.setBackgroundResource(R.drawable.bg_badge_closed)
-                    binding.paymentStatusBadge.setTextColor(ContextCompat.getColor(context, R.color.closed_status_color))
-                }
-                else -> {
-                    binding.paymentStatusBadge.text = paymentState.replace("_", " ")
-                        .lowercase().replaceFirstChar { it.uppercase() }
-                    binding.paymentStatusBadge.setBackgroundResource(R.drawable.bg_badge_open)
-                    binding.paymentStatusBadge.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
-                }
+            val (bgRes, textColorRes) = when (paymentState.uppercase()) {
+                "PAID" -> Pair(R.drawable.bg_badge_paid, R.color.paid_status_color)
+                "NOT_PAID" -> Pair(R.drawable.bg_badge_unpaid, R.color.unpaid_status_color)
+                "PARTIALLY_PAID" -> Pair(R.drawable.bg_badge_unpaid, R.color.orange_accent)
+                "REFUNDED", "PARTIALLY_REFUNDED" -> Pair(R.drawable.bg_badge_closed, R.color.closed_status_color)
+                else -> Pair(R.drawable.bg_badge_open, R.color.text_secondary)
             }
+
+            binding.paymentStatusBadge.text = displayText
+            binding.paymentStatusBadge.setBackgroundResource(bgRes)
+            binding.paymentStatusBadge.setTextColor(ContextCompat.getColor(context, textColorRes))
         }
 
         private fun getCustomerName(order: Order): String {

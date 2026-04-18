@@ -103,16 +103,38 @@ fun getCustomerContactDetails(customer: Customer?): Pair<String, String> {
     return Pair(resultNumber, resultEmail)
 }
 
-fun Context.getThePaymentState(order: Order? ):String{
-    if(order?.paymentState !=null){
-        return order.paymentState.name
+/**
+ * Formats Clover payment state to human-readable text.
+ * 
+ * Mapping:
+ * - OPEN → Open
+ * - PAID → Paid
+ * - NOT_PAID → Unpaid
+ * - PARTIALLY_PAID → Partially Paid
+ * - PARTIALLY_REFUNDED → Partially Refunded
+ * - REFUNDED → Refunded
+ * - LOCKED → Closed
+ */
+fun formatPaymentState(state: String?): String {
+    if (state.isNullOrEmpty()) return "Open"
+    
+    return when (state.uppercase()) {
+        "OPEN" -> "Open"
+        "PAID" -> "Paid"
+        "NOT_PAID" -> "Unpaid"
+        "PARTIALLY_PAID" -> "Partially Paid"
+        "PARTIALLY_REFUNDED" -> "Partially Refunded"
+        "REFUNDED" -> "Refunded"
+        "LOCKED" -> "Closed"
+        else -> state.replace("_", " ")
+            .lowercase()
+            .replaceFirstChar { it.uppercase() }
     }
+}
 
-    if(order?.state != null){
-        return order.state
-    }
-
-    return getString(R.string.dash)
+fun Context.getThePaymentState(order: Order?): String {
+    val state = order?.paymentState?.name ?: order?.state
+    return if (state != null) formatPaymentState(state) else getString(R.string.dash)
 }
 
 

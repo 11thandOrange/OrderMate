@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Toggle switch thumb (circle) - matches HTML 20x20 white circle -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <solid android:color="#FFFFFF" />
-    <size
+<!-- Toggle switch thumb - perfect circle (20x20) with inset to prevent stretching -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
         android:width="20dp"
-        android:height="20dp" />
-</shape>
+        android:height="20dp"
+        android:gravity="center">
+        <shape android:shape="oval">
+            <solid android:color="#FFFFFF" />
+            <size
+                android:width="20dp"
+                android:height="20dp" />
+        </shape>
+    </item>
+</layer-list>

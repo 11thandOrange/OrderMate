@@ -31,7 +31,7 @@ import com.orderMate.utils.ProfileSettingsManager
  * Profile Settings Fragment (Issue #85)
  * 
  * Allows users to:
- * - Change theme color (single color → gradient)
+ * - Change theme color (flat solid color, no gradient)
  * - Change profile avatar (emoji picker)
  * - Avatar renders as profile icon in side nav
  * 
@@ -111,7 +111,7 @@ class ProfileSettingsFragment : Fragment() {
         applyThemeColor(themeColor)
         
         // Also apply to app background in case it wasn't applied
-        applyGradientToAppBackground(themeColor)
+        applyColorToAppBackground(themeColor)
         
         // Load avatar
         updateAvatarDisplay()
@@ -160,16 +160,13 @@ class ProfileSettingsFragment : Fragment() {
             return Color.HSVToColor(floatArrayOf(selectedHue, selectedSaturation, brightness))
         }
         
-        // Function to update preview
+        // Function to update preview with solid color (no gradient)
         fun updatePreview() {
             val baseColor = getCurrentColor()
-            val lighterColor = lightenColor(baseColor, 0.3f)
-            val gradientDrawable = GradientDrawable(
-                GradientDrawable.Orientation.TL_BR,
-                intArrayOf(baseColor, lighterColor)
-            )
-            gradientDrawable.cornerRadius = 10f * resources.displayMetrics.density
-            colorPreviewLarge.background = gradientDrawable
+            val solidDrawable = GradientDrawable()
+            solidDrawable.setColor(baseColor)
+            solidDrawable.cornerRadius = 10f * resources.displayMetrics.density
+            colorPreviewLarge.background = solidDrawable
             
             // Update hex display
             val hexColor = String.format("#%02X%02X%02X", 
@@ -215,7 +212,7 @@ class ProfileSettingsFragment : Fragment() {
             applyThemeColor(finalColor)
             settingsManager.setThemeColor(finalColor)
             saveToFirebase()
-            applyGradientToAppBackground(finalColor)
+            applyColorToAppBackground(finalColor)
             showToast("Theme color updated!")
             dialog.dismiss()
         }
@@ -265,53 +262,30 @@ class ProfileSettingsFragment : Fragment() {
     }
 
     /**
-     * Apply theme color and generate gradient
-     * Matches HTML: linear-gradient(135deg, baseColor 0%, lighterColor 100%)
+     * Apply theme color as flat solid color (no gradient)
      */
     private fun applyThemeColor(hexColor: String) {
         val baseColor = Color.parseColor(hexColor)
-        val lighterColor = lightenColor(baseColor, 0.3f)
         
-        // Update color preview with gradient
-        val gradientDrawable = GradientDrawable(
-            GradientDrawable.Orientation.TL_BR,
-            intArrayOf(baseColor, lighterColor)
-        )
-        gradientDrawable.cornerRadius = 10f * resources.displayMetrics.density
-        binding.colorPreview.background = gradientDrawable
-        
-        // TODO: Apply gradient to app background
-        // This would require updating the Activity's background
-    }
-
-    /**
-     * Lighten a color by percentage (matches HTML lightenColor function)
-     */
-    private fun lightenColor(color: Int, percent: Float): Int {
-        val r = Math.min(255, (Color.red(color) + 255 * percent).toInt())
-        val g = Math.min(255, (Color.green(color) + 255 * percent).toInt())
-        val b = Math.min(255, (Color.blue(color) + 255 * percent).toInt())
-        return Color.rgb(r, g, b)
+        // Update color preview with solid color
+        val solidDrawable = GradientDrawable()
+        solidDrawable.setColor(baseColor)
+        solidDrawable.cornerRadius = 10f * resources.displayMetrics.density
+        binding.colorPreview.background = solidDrawable
     }
     
     /**
-     * Apply gradient to entire app background immediately
-     * Matches HTML: document.body.style.background = gradient
+     * Apply flat solid color to entire app background immediately
      */
-    private fun applyGradientToAppBackground(hexColor: String) {
+    private fun applyColorToAppBackground(hexColor: String) {
         val baseColor = Color.parseColor(hexColor)
-        val lighterColor = lightenColor(baseColor, 0.3f)
-        
-        val gradientDrawable = GradientDrawable(
-            GradientDrawable.Orientation.TL_BR,
-            intArrayOf(baseColor, lighterColor)
-        )
+        val colorDrawable = ColorDrawable(baseColor)
         
         // Apply to activity's root layout (like document.body)
         activity?.let { act ->
-            act.window?.decorView?.background = gradientDrawable
+            act.window?.decorView?.background = colorDrawable
             // Also try to update root layout if available
-            act.findViewById<View>(R.id.rootLayout)?.background = gradientDrawable
+            act.findViewById<View>(R.id.rootLayout)?.background = colorDrawable
         }
     }
 
@@ -352,20 +326,17 @@ class ProfileSettingsFragment : Fragment() {
     }
     
     /**
-     * Apply theme color gradient to nav profile button background
+     * Apply theme color (flat solid) to nav profile button background
      */
     private fun updateNavProfileBackground(navProfile: View) {
         val themeColor = settingsManager.getThemeColor()
         val baseColor = Color.parseColor(themeColor)
-        val lighterColor = lightenColor(baseColor, 0.3f)
         
-        val gradientDrawable = GradientDrawable(
-            GradientDrawable.Orientation.TL_BR,
-            intArrayOf(baseColor, lighterColor)
-        )
-        gradientDrawable.cornerRadius = 22f * resources.displayMetrics.density
+        val solidDrawable = GradientDrawable()
+        solidDrawable.setColor(baseColor)
+        solidDrawable.cornerRadius = 22f * resources.displayMetrics.density
         
-        navProfile.background = gradientDrawable
+        navProfile.background = solidDrawable
     }
 
     private fun updateAvatarDisplay() {
@@ -406,8 +377,8 @@ class ProfileSettingsFragment : Fragment() {
         applyThemeColor(DEFAULT_THEME_COLOR)
         settingsManager.setThemeColor(DEFAULT_THEME_COLOR)
         
-        // Apply gradient to entire app background immediately
-        applyGradientToAppBackground(DEFAULT_THEME_COLOR)
+        // Apply flat color to entire app background immediately
+        applyColorToAppBackground(DEFAULT_THEME_COLOR)
         
         // Reset avatar to default
         settingsManager.setAvatarEmoji(DEFAULT_AVATAR)
@@ -455,7 +426,7 @@ class ProfileSettingsFragment : Fragment() {
     }
 
     /**
-     * Color adapter for color picker grid
+     * Color adapter for color picker grid (solid colors, no gradient)
      */
     inner class ColorAdapter(
         private val colors: List<String>,
@@ -475,14 +446,11 @@ class ProfileSettingsFragment : Fragment() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val color = colors[position]
             val baseColor = Color.parseColor(color)
-            val lighterColor = lightenColor(baseColor, 0.3f)
             
-            val gradientDrawable = GradientDrawable(
-                GradientDrawable.Orientation.TL_BR,
-                intArrayOf(baseColor, lighterColor)
-            )
-            gradientDrawable.cornerRadius = 8f * holder.itemView.resources.displayMetrics.density
-            holder.colorView.background = gradientDrawable
+            val solidDrawable = GradientDrawable()
+            solidDrawable.setColor(baseColor)
+            solidDrawable.cornerRadius = 8f * holder.itemView.resources.displayMetrics.density
+            holder.colorView.background = solidDrawable
             
             holder.colorView.setOnClickListener {
                 onColorSelected(color)
