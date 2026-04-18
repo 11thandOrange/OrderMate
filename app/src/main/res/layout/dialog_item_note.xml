@@ -19,10 +19,19 @@
             android:id="@+id/dialogTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add Note"
+            android:text="Item Name"
             android:textColor="@color/text_light"
             android:textSize="20sp"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="sans-serif-medium"/>
+
+        <TextView
+            android:id="@+id/dialogSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Item variants/modifiers"
+            android:textColor="@color/text_muted"
+            android:textSize="14sp"
+            android:paddingTop="4dp"
             android:paddingBottom="16dp"/>
 
         <!-- Header bottom border -->

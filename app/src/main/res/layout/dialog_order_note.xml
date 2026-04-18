@@ -19,17 +19,26 @@
             android:id="@+id/dialogTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add Order Note"
+            android:text="Order Notes"
             android:textColor="@color/text_light"
             android:textSize="20sp"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="sans-serif-medium"/>
+
+        <TextView
+            android:id="@+id/dialogSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edit order level notes"
+            android:textColor="@color/text_muted"
+            android:textSize="14sp"
+            android:paddingTop="4dp"
             android:paddingBottom="16dp"/>
 
-        <!-- Header bottom border - purple tint for order level -->
+        <!-- Header bottom border -->
         <View
             android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/order_dialog_accent"/>
+            android:layout_height="1dp"
+            android:background="#1AFFFFFF"/>
     </LinearLayout>
 
     <!-- Scrollable content -->

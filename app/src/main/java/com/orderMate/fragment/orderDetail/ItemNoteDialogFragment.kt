@@ -43,6 +43,8 @@ class ItemNoteDialogFragment : DialogFragment() {
     private var listener: ItemNoteListener? = null
     private var lineItemId: String? = null
     private var existingNote: String? = null
+    private var itemName: String? = null
+    private var itemModifiers: String? = null
 
     // Selections: widgetId -> selected values
     private val singleSelections = mutableMapOf<String, String?>()
@@ -68,6 +70,8 @@ class ItemNoteDialogFragment : DialogFragment() {
         arguments?.let { args ->
             lineItemId = args.getString(ARG_LINE_ITEM_ID)
             existingNote = args.getString(ARG_EXISTING_NOTE)
+            itemName = args.getString(ARG_ITEM_NAME)
+            itemModifiers = args.getString(ARG_ITEM_MODIFIERS)
         }
     }
 
@@ -112,9 +116,16 @@ class ItemNoteDialogFragment : DialogFragment() {
         // Read item-level widgets only (not order-level)
         widgets = WidgetManager.getInstance(requireContext()).getItemLevelWidgets()
         
+        setupHeader()
         setupButtons()
         buildNoteSections()
         parseExistingNote()
+    }
+    
+    private fun setupHeader() {
+        // Set item name as title, modifiers as subtitle
+        binding.dialogTitle.text = itemName ?: "Item"
+        binding.dialogSubtitle.text = itemModifiers ?: "Item variants/modifiers"
     }
 
     private fun setupButtons() {
@@ -477,20 +488,34 @@ class ItemNoteDialogFragment : DialogFragment() {
     fun setExistingNote(note: String?) {
         this.existingNote = note
     }
+    
+    fun setItemName(name: String?) {
+        this.itemName = name
+    }
+    
+    fun setItemModifiers(modifiers: String?) {
+        this.itemModifiers = modifiers
+    }
 
     companion object {
         const val TAG = "ItemNoteDialogFragment"
         private const val ARG_LINE_ITEM_ID = "arg_line_item_id"
         private const val ARG_EXISTING_NOTE = "arg_existing_note"
+        private const val ARG_ITEM_NAME = "arg_item_name"
+        private const val ARG_ITEM_MODIFIERS = "arg_item_modifiers"
 
         fun newInstance(
             lineItemId: String? = null,
-            existingNote: String? = null
+            existingNote: String? = null,
+            itemName: String? = null,
+            itemModifiers: String? = null
         ): ItemNoteDialogFragment {
             return ItemNoteDialogFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_LINE_ITEM_ID, lineItemId)
                     putString(ARG_EXISTING_NOTE, existingNote)
+                    putString(ARG_ITEM_NAME, itemName)
+                    putString(ARG_ITEM_MODIFIERS, itemModifiers)
                 }
             }
         }
