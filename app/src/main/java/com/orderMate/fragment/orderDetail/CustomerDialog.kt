@@ -177,10 +177,10 @@ class CustomerDialog(
             try {
                 val repository = CloverRepository.getInstance(requireContext())
                 
-                // Create or update customer object
+                // Create or update customer in Clover (#67: Persist to Clover)
                 val updatedCustomer = if (customer?.id != null) {
-                    // Update existing customer
-                    repository.updateCustomer(
+                    // Update existing customer in Clover
+                    repository.updateCustomerInClover(
                         customerId = customer!!.id,
                         firstName = firstName,
                         lastName = lastName,
@@ -188,8 +188,8 @@ class CustomerDialog(
                         email = email
                     )
                 } else {
-                    // Create new customer
-                    repository.createCustomer(
+                    // Create new customer and save to Clover
+                    repository.createAndSaveCustomerToClover(
                         firstName = firstName,
                         lastName = lastName,
                         phone = phone,
