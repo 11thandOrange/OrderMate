@@ -5,7 +5,9 @@ import java.util.Date
 /**
  * Scheduled Event model (Issue #82)
  * 
- * Represents a scheduled order event for the calendar
+ * Represents a scheduled order event for the calendar.
+ * #30: customTags - Order-level tags from widgets where level=ORDER,
+ *      type=SINGLE_SELECT/MULTI_SELECT/CALENDAR parsed from order.note
  */
 data class ScheduledEvent(
     val id: Long,
@@ -19,7 +21,8 @@ data class ScheduledEvent(
     val gmailEventId: String? = null,
     val notificationScheduled: Boolean = false,
     val lineItems: List<LineItemPreview> = emptyList(),
-    val orderNote: String? = null  // Order-level note from Order.note (#93)
+    val orderNote: String? = null,  // Order-level note from Order.note (#93)
+    val customTags: List<String> = emptyList()  // (#30) Order-level tags for event preview
 ) {
     // For backwards compatibility
     val lineItemNames: List<String>

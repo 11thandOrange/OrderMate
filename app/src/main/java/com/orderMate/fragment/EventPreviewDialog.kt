@@ -161,30 +161,37 @@ class EventPreviewDialog : DialogFragment() {
     }
     
     /**
-     * Setup order-level notes pills display (#93)
+     * (#30) Setup order-level notes pills display.
+     * Uses pre-parsed customTags from ScheduledEvent (widget-based parsing done in CalendarFragment).
+     * Falls back to legacy parsing if customTags is empty.
      */
     private fun setupOrderNotesPills(view: View, event: ScheduledEvent) {
         val container = view.findViewById<FlexboxLayout>(R.id.orderNotesPillsContainer)
         container.removeAllViews()
         
-        val orderNote = event.orderNote
-        if (orderNote.isNullOrBlank()) {
-            container.visibility = View.GONE
-            return
+        // (#30) Use pre-parsed customTags if available
+        val tags = if (event.customTags.isNotEmpty()) {
+            event.customTags
+        } else {
+            // Legacy fallback: parse orderNote directly
+            val orderNote = event.orderNote
+            if (orderNote.isNullOrBlank()) {
+                emptyList()
+            } else {
+                parseOrderNote(orderNote).map { it.text }
+            }
         }
         
-        // Parse order notes
-        val notes = parseOrderNote(orderNote)
-        if (notes.isEmpty()) {
+        if (tags.isEmpty()) {
             container.visibility = View.GONE
             return
         }
         
         container.visibility = View.VISIBLE
         
-        notes.forEach { noteItem ->
+        tags.forEach { tagText ->
             val pill = TextView(requireContext()).apply {
-                text = noteItem.text
+                text = tagText
                 setBackgroundResource(R.drawable.bg_order_note_pill)
                 setTextColor(ContextCompat.getColor(requireContext(), R.color.order_pill_text))
                 textSize = 11f

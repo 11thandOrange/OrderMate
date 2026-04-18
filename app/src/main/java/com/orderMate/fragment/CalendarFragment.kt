@@ -31,12 +31,14 @@ import com.orderMate.utils.Constants
 import com.orderMate.utils.FilterCategoryBuilder
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.OrderDueDateResolver
+import com.orderMate.utils.OrderNoteParser
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.OrderSearchFilter
 import com.orderMate.utils.exceptionHandlerWithReturn
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
+import com.orderMate.modals.NoteLevel
 import com.orderMate.viewmodel.SharedFilterViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -423,12 +425,18 @@ class CalendarFragment : Fragment() {
      * Convert Clover orders to calendar events
      */
     private fun convertOrdersToEvents(orders: List<Order?>): List<ScheduledEvent> {
+        // Get widgets for widget-based parsing (#29, #30)
+        val widgets = WidgetManager.getCachedWidgets()
+        
         return orders.mapNotNull { order ->
             order ?: return@mapNotNull null
             
-            // Use OrderDueDateResolver for due date priority (#93)
-            // Priority: 1) Order-level Due Date, 2) Item-level Due Date, 3) Order created
-            val dueDate = OrderDueDateResolver.resolveDueDate(order) ?: return@mapNotNull null
+            // (#29) Use widget-based due date resolution
+            val dueDate = if (widgets.isNotEmpty()) {
+                OrderDueDateResolver.resolveDueDate(order, widgets)
+            } else {
+                OrderDueDateResolver.resolveDueDate(order)  // Legacy fallback
+            } ?: return@mapNotNull null
             
             val customerName = try {
                 val customer = order.customers?.firstOrNull()
@@ -459,6 +467,9 @@ class CalendarFragment : Fragment() {
             // Determine event type based on order data
             val eventType = determineEventType(order)
             
+            // (#30) Extract order-level tags for event preview
+            val customTags = extractOrderLevelTags(order.note, widgets)
+            
             ScheduledEvent(
                 id = order.id?.hashCode()?.toLong() ?: System.currentTimeMillis(),
                 orderId = order.id ?: "",
@@ -469,9 +480,21 @@ class CalendarFragment : Fragment() {
                 itemCount = itemCount,
                 note = null,
                 lineItems = lineItems,
-                orderNote = order.note  // Include order-level note for EventPreviewDialog (#93)
+                orderNote = order.note,
+                customTags = customTags  // (#30) Add custom tags for event preview
             )
         }
+    }
+    
+    /**
+     * (#30) Extract order-level tags from order.note using widget configuration.
+     * Returns list of formatted "Label: Value" strings.
+     */
+    private fun extractOrderLevelTags(orderNote: String?, widgets: List<com.orderMate.modals.WidgetConfig>): List<String> {
+        if (orderNote.isNullOrBlank() || widgets.isEmpty()) return emptyList()
+        
+        val tags = OrderNoteParser.extractTagsFromNote(orderNote, widgets, NoteLevel.ORDER)
+        return tags.map { "${it.label}: ${it.value}" }
     }
     
     private fun determineEventType(order: Order): EventType {
@@ -1154,7 +1177,15 @@ class CalendarFragment : Fragment() {
         
         calendarGrid?.adapter = CalendarDayAdapter(days) { day ->
             if (day.hasEvents) {
-                showDayEventsDialog(day)
+                // (#26, #27) Multi-event day opens day view, single event opens preview
+                if (day.events.size > 1) {
+                    // (#26) Multi-event: switch to day view
+                    currentDate.set(Calendar.DAY_OF_MONTH, day.dayNumber)
+                    setViewMode("day")
+                } else {
+                    // (#27) Single event: open preview modal directly
+                    showDayEventsDialog(day)
+                }
             }
         }
     }
@@ -1359,11 +1390,61 @@ class CalendarFragment : Fragment() {
         
         timelineBody?.addView(columnsContainer)
         
-        // Scroll to current time if viewing today
-        val nowHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        // (#21) Auto-scroll to first event of the selected day, or current time if no events
         timelineScrollView?.post {
-            timelineScrollView?.scrollTo(0, ((nowHour - 1).coerceAtLeast(0) * hourHeightPx))
+            val scrollPosition = calculateAutoScrollPosition(startDate, numDays, hourHeightPx)
+            timelineScrollView?.scrollTo(0, scrollPosition)
         }
+    }
+    
+    /**
+     * (#21) Calculate scroll position for timeline view.
+     * Priority:
+     * 1. First event of the selected day(s)
+     * 2. Current time if viewing today
+     * 3. Start of business hours (8 AM)
+     */
+    private fun calculateAutoScrollPosition(startDate: Calendar, numDays: Int, hourHeightPx: Int): Int {
+        // Get events for the visible date range
+        val endDate = Calendar.getInstance().apply {
+            time = startDate.time
+            add(Calendar.DAY_OF_MONTH, numDays - 1)
+        }
+        
+        val visibleEvents = filteredEvents.filter { event ->
+            val eventCal = Calendar.getInstance().apply { time = event.dueDate }
+            val eventDate = eventCal.time
+            eventDate >= startDate.time && eventDate <= endDate.time.let {
+                Calendar.getInstance().apply {
+                    time = endDate.time
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                }.time
+            }
+        }.sortedBy { it.dueDate }
+        
+        // If there are events, scroll to the first one
+        if (visibleEvents.isNotEmpty()) {
+            val firstEvent = visibleEvents.first()
+            val eventCal = Calendar.getInstance().apply { time = firstEvent.dueDate }
+            val eventHour = eventCal.get(Calendar.HOUR_OF_DAY)
+            // Scroll to 1 hour before the event to show context
+            return ((eventHour - 1).coerceAtLeast(0) * hourHeightPx)
+        }
+        
+        // If viewing today and no events, scroll to current time
+        val today = Calendar.getInstance()
+        val isViewingToday = (startDate.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                startDate.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
+                startDate.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH))
+        
+        if (isViewingToday) {
+            val nowHour = today.get(Calendar.HOUR_OF_DAY)
+            return ((nowHour - 1).coerceAtLeast(0) * hourHeightPx)
+        }
+        
+        // Default: scroll to 8 AM (typical business hours start)
+        return (7 * hourHeightPx)
     }
     
     private fun createTimelineEventView(context: android.content.Context, event: ScheduledEvent): View {
@@ -1615,8 +1696,19 @@ class CalendarFragment : Fragment() {
         return days
     }
     
+    /**
+     * (#23) Navigate calendar based on current view mode.
+     * - Day view: +/- 1 day
+     * - Week view: +/- 1 week
+     * - Month view: +/- 1 month
+     */
     fun navigateMonth(direction: Int) {
-        currentDate.add(Calendar.MONTH, direction)
+        when (currentViewMode) {
+            "day" -> currentDate.add(Calendar.DAY_OF_MONTH, direction)
+            "week" -> currentDate.add(Calendar.WEEK_OF_YEAR, direction)
+            "month" -> currentDate.add(Calendar.MONTH, direction)
+            else -> currentDate.add(Calendar.MONTH, direction)
+        }
         sharedFilterViewModel.setSelectedDate(currentDate.time)
         renderCalendar()
     }

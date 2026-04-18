@@ -94,12 +94,13 @@
     <!-- Calendar colors -->
     <color name="calendar_weekday_bg">#33000000</color>
     <color name="calendar_today_bg">#1AFF9F43</color>
+    <color name="calendar_grid_line">#1AFFFFFF</color>  <!-- #25: Grid lines (10% white) -->
     <color name="event_pickup">#81c784</color>
-    <color name="event_pickup_bg">#334CAF50</color>
+    <color name="event_pickup_bg">#804CAF50</color>  <!-- #24: Increased opacity from 33% to 50% -->
     <color name="event_delivery">#64b5f6</color>
-    <color name="event_delivery_bg">#332196F3</color>
+    <color name="event_delivery_bg">#802196F3</color>  <!-- #24: Increased opacity from 33% to 50% -->
     <color name="event_preorder">#ce93d8</color>
-    <color name="event_preorder_bg">#339C27B0</color>
+    <color name="event_preorder_bg">#809C27B0</color>  <!-- #24: Increased opacity from 33% to 50% -->
     <color name="today_highlight_bg">#1AFF9F43</color>
     
     <!-- Event preview note pill colors (matches HTML) -->
