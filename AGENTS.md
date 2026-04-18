@@ -1,0 +1,95 @@
+# OrderMate Agent Guide
+
+## Project Overview
+OrderMate is an Android application built with Kotlin that integrates with Clover POS systems. It provides order management, calendar scheduling, and customizable notification features for merchants.
+
+## Tech Stack
+- **Language**: Kotlin
+- **Platform**: Android (Min SDK not specified, targets Clover devices)
+- **Build System**: Gradle (Kotlin DSL)
+- **Backend**: Firebase Realtime Database for configuration storage
+- **POS Integration**: Clover SDK v3
+
+## Project Structure
+```
+app/src/main/java/com/orderMate/
+├── activities/       # MainActivity, OverlayActivity (register overlay)
+├── adapters/         # RecyclerView adapters for lists
+├── broadcast/        # Broadcast receivers
+├── communicators/    # Interface definitions for component communication
+├── fragment/         # UI fragments organized by feature
+│   ├── orderDetail/  # Order detail screens and dialogs
+│   ├── orderHistory/ # Order history view
+│   └── customFields/ # Custom fields configuration
+├── modals/           # Data models (WidgetConfig, PopupSettings, etc.)
+├── model/            # Additional models (ScheduledEvent)
+├── networkManager/   # API and Retrofit setup
+├── repository/       # CloverRepository for Clover API
+├── services/         # Background services
+├── utils/            # Utility classes and managers
+└── viewmodel/        # ViewModels (SharedFilterViewModel)
+```
+
+## Key Files
+- `CommonFunctions.kt` - Utility functions including `getThePaymentState()`
+- `ProfileSettingsFragment.kt` - Theme color picker and avatar management
+- `CalendarFragment.kt` - Calendar view with day/week/month modes
+- `OrderListRedesignFragment.kt` - Redesigned order list view
+- `OrderCardRedesignAdapter.kt` - Order card UI with pill badges
+- `SettingsFragment.kt` - App settings with multiple tabs
+- `OrderDetailFragment.kt` - Order detail page with customer/item/history cards
+- `WidgetManager.kt` - Widget configuration management (V2 schema)
+- `FirebaseConfigManager.kt` - Firebase configuration persistence
+
+## Widget System (V2)
+The app uses a V2 widget schema defined in:
+- `WidgetConfig.kt` - Widget type, label, options, colors
+- `PopupSettings.kt` - Order/item-level popup configurations
+- `DefaultWidgetFactory.kt` - Creates default widget sets
+
+## Color System
+Colors are defined in `res/values/colors.xml` with categories:
+- Glass morphism UI colors (`glass_background`, `card_background`)
+- Tag/pill colors (`tag_category_bg`, `tag_pill_bg`)
+- Calendar event colors (`event_pickup_bg`, `event_delivery_bg`)
+- Status colors (`status_open_bg`, `status_paid_bg`)
+
+## Build Commands
+```bash
+# Build debug APK
+./gradlew assembleDebug
+
+# Run unit tests
+./gradlew test
+
+# Build release APK
+./gradlew assembleRelease
+```
+
+## Testing
+Unit tests located in `app/src/test/java/com/orderMate/`
+
+## Branches
+- `main` - Production branch
+- `complete_redesign_logic` - V2 redesign with iOS-style UI
+- `complete_v2_redesign_2` - Working branch for ticket implementation
+
+## GitHub Issues Structure
+Parent tickets organize work into 7 areas:
+1. #7: General/Global UI Refinements
+2. #11: Main Header Refinements
+3. #16: List Page UI Refinements  
+4. #20: Calendar Page Refinements & Bug Fixes
+5. #31: Settings Page Refinements
+6. #43: Order Details Page Refinements
+7. #69: Stretch Goals / Future Enhancements
+
+## Clover Tag Mapping
+| Clover API Value | Human Readable |
+|------------------|----------------|
+| OPEN | Open |
+| PAID | Paid |
+| PARTIALLY_PAID | Partially Paid |
+| PARTIALLY_REFUNDED | Partially Refunded |
+| REFUNDED | Refunded |
+| LOCKED | Closed |
