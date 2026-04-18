@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Large customer avatar matching HTML .customer-view-avatar -->
+<!-- #53: Large customer avatar - pill-shaped for dynamic initials -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
+    android:shape="rectangle">
     <solid android:color="@color/orange_accent"/>
-    <size android:width="64dp" android:height="64dp"/>
+    <corners android:radius="35dp"/>
 </shape>

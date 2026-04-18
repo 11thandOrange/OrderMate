@@ -199,6 +199,116 @@ class CloverRepository private constructor(private val context: Context) {
             null
         }
     }
+    
+    /**
+     * #48: Create and save a new customer to Clover
+     * Persists the customer to Clover's customer database
+     */
+    suspend fun createAndSaveCustomerToClover(
+        firstName: String?,
+        lastName: String?,
+        phone: String?,
+        email: String?
+    ): Customer? = withContext(Dispatchers.IO) {
+        try {
+            val customerConnector = myApp.getCustomerConnector() ?: return@withContext null
+            
+            // Create v1 customer (required for CustomerConnector.createCustomer)
+            val v1Customer = V1Customer()
+            v1Customer.firstName = firstName ?: ""
+            v1Customer.lastName = lastName ?: ""
+            
+            // Create customer in Clover
+            val createdV1Customer = customerConnector.createCustomer(v1Customer) ?: return@withContext null
+            
+            // Add phone number if provided
+            if (!phone.isNullOrBlank()) {
+                val v1Phone = com.clover.sdk.v1.customer.PhoneNumber()
+                v1Phone.phoneNumber = phone
+                customerConnector.addPhoneNumber(createdV1Customer.id, v1Phone)
+            }
+            
+            // Add email if provided
+            if (!email.isNullOrBlank()) {
+                val v1Email = com.clover.sdk.v1.customer.EmailAddress()
+                v1Email.emailAddress = email
+                customerConnector.addEmailAddress(createdV1Customer.id, v1Email)
+            }
+            
+            // Convert to v3 Customer for return
+            convertV1ToV3Customer(createdV1Customer)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Fallback to in-memory customer if Clover save fails
+            createCustomer(firstName, lastName, phone, email)
+        }
+    }
+    
+    /**
+     * #48: Get customer by ID from Clover
+     */
+    suspend fun getCustomerById(customerId: String): Customer? = withContext(Dispatchers.IO) {
+        try {
+            val customerConnector = myApp.getCustomerConnector() ?: return@withContext null
+            val v1Customer = customerConnector.getCustomer(customerId) ?: return@withContext null
+            convertV1ToV3Customer(v1Customer)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+    
+    /**
+     * #48: Update an existing customer in Clover
+     */
+    suspend fun updateCustomerInClover(
+        customerId: String,
+        firstName: String?,
+        lastName: String?,
+        phone: String?,
+        email: String?
+    ): Customer? = withContext(Dispatchers.IO) {
+        try {
+            val customerConnector = myApp.getCustomerConnector() ?: return@withContext null
+            
+            // Get existing customer
+            val existingCustomer = customerConnector.getCustomer(customerId) ?: return@withContext null
+            
+            // Update basic info
+            existingCustomer.firstName = firstName ?: ""
+            existingCustomer.lastName = lastName ?: ""
+            
+            // Update customer in Clover
+            customerConnector.setName(customerId, existingCustomer.firstName, existingCustomer.lastName)
+            
+            // Update phone - delete existing and add new
+            if (!phone.isNullOrBlank()) {
+                existingCustomer.phoneNumbers?.firstOrNull()?.let { existingPhone ->
+                    customerConnector.deletePhoneNumber(customerId, existingPhone.id)
+                }
+                val v1Phone = com.clover.sdk.v1.customer.PhoneNumber()
+                v1Phone.phoneNumber = phone
+                customerConnector.addPhoneNumber(customerId, v1Phone)
+            }
+            
+            // Update email - delete existing and add new
+            if (!email.isNullOrBlank()) {
+                existingCustomer.emailAddresses?.firstOrNull()?.let { existingEmail ->
+                    customerConnector.deleteEmailAddress(customerId, existingEmail.id)
+                }
+                val v1Email = com.clover.sdk.v1.customer.EmailAddress()
+                v1Email.emailAddress = email
+                customerConnector.addEmailAddress(customerId, v1Email)
+            }
+            
+            // Get updated customer and convert
+            val updatedCustomer = customerConnector.getCustomer(customerId)
+            updatedCustomer?.let { convertV1ToV3Customer(it) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 
     /**
      * Update an existing customer object

@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details Page Refinements - Issue #43 Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .preview-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .section-title .badge {
+            background: #FF9F43;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        /* Header Demo */
+        .header-demo {
+            background: rgba(0,0,0,0.1);
+            padding: 16px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .order-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+            min-width: 150px;
+        }
+
+        .action-btn {
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .action-btn.secondary {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        .action-btn.secondary:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .action-btn.primary {
+            background: #FF9F43;
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: #e68a2e;
+        }
+
+        .action-btn.danger {
+            background: #ea2c2f;
+            color: white;
+        }
+
+        .action-btn.danger:hover {
+            background: #c92428;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-right: 8px;
+        }
+
+        .status-badge.open {
+            background: rgba(238, 208, 19, 0.5);
+            color: #FFF59D;
+        }
+
+        .status-badge.closed {
+            background: rgba(115, 103, 240, 0.5);
+            color: #B39DDB;
+        }
+
+        .status-badge.paid {
+            background: rgba(60, 205, 121, 0.5);
+            color: #A5D6A7;
+        }
+
+        .status-badge.unpaid {
+            background: rgba(234, 44, 47, 0.5);
+            color: #EF9A9A;
+        }
+
+        .status-badge.partial {
+            background: rgba(255, 159, 67, 0.5);
+            color: #FFCC80;
+        }
+
+        /* Card */
+        .card {
+            background: rgba(255,255,255,0.15);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card-header .icon-bg {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .card-header .title {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .card-header .view-all-btn {
+            background: rgba(0,0,0,0.2);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+
+        .card-header .view-all-btn:hover {
+            background: rgba(0,0,0,0.3);
+        }
+
+        .card-body {
+            padding: 12px 20px 20px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-row .label {
+            flex: 1;
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+        }
+
+        .info-row .value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Customer Row - Clickable */
+        .customer-row {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 4px -12px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .customer-row:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* Avatar */
+        .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #FF9F43;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            min-width: 24px;
+            height: 24px;
+            padding: 0 6px;
+            border-radius: 12px;
+        }
+
+        .avatar.large {
+            font-size: 24px;
+            min-width: 70px;
+            height: 70px;
+            padding: 0 16px;
+            border-radius: 35px;
+        }
+
+        /* Tags */
+        .tags-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+
+        .tag.category {
+            background: rgba(206, 147, 216, 0.5);
+            color: #E1BEE7;
+        }
+
+        .tag.type {
+            background: rgba(100, 181, 246, 0.5);
+            color: #BBDEFB;
+        }
+
+        .tag.status {
+            background: rgba(255, 183, 77, 0.5);
+            color: #FFE0B2;
+        }
+
+        .tag.default {
+            background: rgba(129, 199, 132, 0.5);
+            color: #C8E6C9;
+        }
+
+        /* Chevron */
+        .chevron {
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid rgba(255,255,255,0.5);
+            border-bottom: 2px solid rgba(255,255,255,0.5);
+            transform: rotate(-45deg);
+            margin-left: 8px;
+        }
+
+        .chevron.down {
+            transform: rotate(45deg);
+        }
+
+        /* History Item */
+        .history-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .history-content {
+            flex: 1;
+        }
+
+        .history-title {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .history-time {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 2px;
+        }
+
+        /* Main Layout */
+        .order-detail-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .order-detail-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Item Row */
+        .item-row {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .item-row:hover {
+            background: rgba(0,0,0,0.3);
+        }
+
+        .item-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 12px;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .item-mods {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .item-qty {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            margin-right: 12px;
+        }
+
+        .item-price {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 8px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            max-width: 420px;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #FF9F43;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .avatar-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .issue-ref {
+            color: #FF9F43;
+            font-weight: 600;
+        }
+
+        /* Explanation Box */
+        .explanation-box {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .explanation-box h4 {
+            font-size: 13px;
+            color: #FF9F43;
+            margin-bottom: 8px;
+        }
+
+        .explanation-box p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.5;
+        }
+
+        .explanation-box code {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .code-block {
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin-top: 8px;
+        }
+
+        .code-block .comment {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .code-block .keyword {
+            color: #FF9F43;
+        }
+
+        .code-block .string {
+            color: #3ccd79;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <h1>🎨 Order Details Page - Live Preview</h1>
+        <p class="subtitle">Issue #43 - Section 6A (Header) & 6B (Order Details Card) • Click customer row to see dialog!</p>
+
+        <!-- Live Demo Section -->
+        <div class="section">
+            <div class="section-title">
+                📱 Interactive Demo
+                <span class="badge">Live Preview</span>
+            </div>
+
+            <!-- Header -->
+            <div class="header-demo">
+                <div class="back-btn">←</div>
+                <div class="order-title">Order #7X4K9M</div>
+                <button class="action-btn secondary">💳 Add Payment</button>
+                <button class="action-btn secondary">🔄 Re-Open</button>
+                <button class="action-btn primary">📤 Send Notification</button>
+                <button class="action-btn danger" onclick="alert('Order deleted! (Safe navigation ensures no crash)')">🗑️ Delete</button>
+            </div>
+
+            <!-- Main Content -->
+            <div class="order-detail-layout">
+                <!-- Left Column - Items Card -->
+                <div class="left-column">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="icon-bg">📦</div>
+                            <div class="title">Items (4)</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="item-row" onclick="alert('Item clicked - opens OrderMate popup (#60)')">
+                                <div class="item-icon">🎂</div>
+                                <div class="item-details">
+                                    <div class="item-name">Birthday Cake</div>
+                                    <div class="item-mods">Chocolate, 2 layers</div>
+                                </div>
+                                <div class="item-qty">x1</div>
+                                <div class="item-price">$45.00</div>
+                                <div class="chevron"></div>
+                            </div>
+                            <div class="item-row">
+                                <div class="item-icon">🧁</div>
+                                <div class="item-details">
+                                    <div class="item-name">Cupcakes</div>
+                                    <div class="item-mods">Vanilla, Assorted</div>
+                                </div>
+                                <div class="item-qty">x12</div>
+                                <div class="item-price">$36.00</div>
+                                <div class="chevron"></div>
+                            </div>
+                            <div class="item-row">
+                                <div class="item-icon">🍪</div>
+                                <div class="item-details">
+                                    <div class="item-name">Cookies</div>
+                                    <div class="item-mods">Chocolate Chip</div>
+                                </div>
+                                <div class="item-qty">x24</div>
+                                <div class="item-price">$18.00</div>
+                                <div class="chevron"></div>
+                            </div>
+                            <div class="item-row">
+                                <div class="item-icon">☕</div>
+                                <div class="item-details">
+                                    <div class="item-name">Coffee</div>
+                                    <div class="item-mods">Large, Oat Milk</div>
+                                </div>
+                                <div class="item-qty">x2</div>
+                                <div class="item-price">$8.00</div>
+                                <div class="chevron"></div>
+                            </div>
+                            <div class="scroll-indicator">
+                                Scroll for more <div class="chevron down"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Order Details, Customer & History -->
+                <div class="right-column">
+                    <!-- Order Details Card - Clickable to open order notes popup -->
+                    <div class="card" style="cursor: pointer;" onclick="openOrderNoteModal()">
+                        <div class="card-header">
+                            <div class="icon-bg">📋</div>
+                            <div class="title">Order Details</div>
+                            <span class="status-badge open">OPEN</span>
+                            <span class="status-badge paid">PAID</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-row">
+                                <span class="label">Order Date</span>
+                                <span class="value">Apr 18, 2026 2:30 PM</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Due Date</span>
+                                <span class="value">Apr 20, 2026 10:00 AM</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Order Tags</span>
+                                <div class="tags-container">
+                                    <span class="tag category">Birthday</span>
+                                    <span class="tag type">Pickup</span>
+                                    <span class="tag status">Rush</span>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Description</span>
+                                <span class="value">Happy Birthday message</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Employee</span>
+                                <span class="value">John Smith</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Card - Separate card, no header, just button -->
+                    <div class="card" style="cursor: pointer;" onclick="openCustomerModal()">
+                        <div class="customer-row" style="margin: 0; padding: 16px 20px; background: transparent;">
+                            <span class="label" style="flex: 1;">Customer</span>
+                            <div class="avatar" id="customerAvatarSmall">ED</div>
+                            <span style="margin-left: 8px; font-weight: 600;" id="customerNameDisplay">Edward Don…</span>
+                            <div class="chevron"></div>
+                        </div>
+                    </div>
+
+                    <!-- Order History Card - Entire card clickable, no scroll -->
+                    <div class="card" style="cursor: pointer;" onclick="openHistoryModal()">
+                        <div class="card-header">
+                            <div class="icon-bg">📜</div>
+                            <div class="title">Order History</div>
+                            <div class="chevron"></div>
+                        </div>
+                        <div class="card-body" style="padding: 12px 20px;">
+                            <div class="history-item">
+                                <div class="history-icon">✉️</div>
+                                <div class="history-content">
+                                    <div class="history-title">Notification Sent</div>
+                                    <div class="history-time">Today at 2:45 PM</div>
+                                </div>
+                            </div>
+                            <div class="history-item">
+                                <div class="history-icon">💳</div>
+                                <div class="history-content">
+                                    <div class="history-title">Payment Received - $107.00</div>
+                                    <div class="history-time">Today at 2:35 PM</div>
+                                </div>
+                            </div>
+                            <div class="history-item">
+                                <div class="history-icon">➕</div>
+                                <div class="history-content">
+                                    <div class="history-title">Order Created</div>
+                                    <div class="history-time">Today at 2:30 PM</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- #45 Explanation -->
+        <div class="section">
+            <div class="section-title">
+                <span class="issue-ref">#45</span>
+                Clover Tags vs OrderMate Tags - Logic Explained
+            </div>
+            <div class="explanation-box">
+                <h4>Header shows Clover Tags (order.state + order.paymentState):</h4>
+                <p>
+                    • <code>orderPlacedStatusValue</code> → <strong>order.state</strong>: OPEN or CLOSED (LOCKED)<br>
+                    • <code>paymentStatusBadge</code> → <strong>order.paymentState</strong>: PAID, UNPAID, PARTIALLY PAID, PARTIALLY REFUNDED, REFUNDED
+                </p>
+            </div>
+            <div class="explanation-box" style="margin-top: 12px;">
+                <h4>Tags Row shows Custom OrderMate Tags (from order.note):</h4>
+                <p>
+                    Custom tags extracted from order notes like: <code>Category: Birthday • Type: Pickup • Tag: Rush</code>
+                </p>
+            </div>
+            
+            <div style="display: flex; gap: 24px; margin-top: 16px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 280px;">
+                    <h4 style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">Order State (order.state):</h4>
+                    <div style="margin-bottom: 8px;">
+                        <span class="status-badge open">OPEN</span>
+                        <span style="font-size: 12px; color: rgba(255,255,255,0.5);"> - Order is active</span>
+                    </div>
+                    <div>
+                        <span class="status-badge closed">CLOSED</span>
+                        <span style="font-size: 12px; color: rgba(255,255,255,0.5);"> - Order is locked/finalized</span>
+                    </div>
+                </div>
+                <div style="flex: 1; min-width: 280px;">
+                    <h4 style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">Payment State (order.paymentState):</h4>
+                    <div style="margin-bottom: 6px;">
+                        <span class="status-badge paid">PAID</span>
+                        <span style="font-size: 12px; color: rgba(255,255,255,0.5);"> - Fully paid</span>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                        <span class="status-badge unpaid">UNPAID</span>
+                        <span style="font-size: 12px; color: rgba(255,255,255,0.5);"> - No payment (NOT_PAID)</span>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                        <span class="status-badge partial">PARTIALLY PAID</span>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                        <span class="status-badge partial">PARTIALLY REFUNDED</span>
+                    </div>
+                    <div>
+                        <span class="status-badge closed">REFUNDED</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 16px;">
+                <h4 style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">Example Header Combinations:</h4>
+                <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                    <div style="margin-bottom: 8px;">
+                        <span class="status-badge open">OPEN</span>
+                        <span class="status-badge paid">PAID</span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <span class="status-badge open">OPEN</span>
+                        <span class="status-badge unpaid">UNPAID</span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <span class="status-badge open">OPEN</span>
+                        <span class="status-badge partial">PARTIALLY PAID</span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <span class="status-badge closed">CLOSED</span>
+                        <span class="status-badge paid">PAID</span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <span class="status-badge closed">CLOSED</span>
+                        <span class="status-badge closed">REFUNDED</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 16px;">
+                <h4 style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">OrderMate Custom Tags (in Tags Row):</h4>
+                <div class="tags-container">
+                    <span class="tag category">Birthday</span>
+                    <span class="tag category">Wedding</span>
+                    <span class="tag type">Pickup</span>
+                    <span class="tag type">Delivery</span>
+                    <span class="tag status">Rush</span>
+                    <span class="tag status">VIP</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- #46 Explanation -->
+        <div class="section">
+            <div class="section-title">
+                <span class="issue-ref">#46</span>
+                Order Notes Data - Description Row
+            </div>
+            <div class="explanation-box">
+                <h4>Description row styling:</h4>
+                <p>
+                    The description row uses the <strong>same styling as other rows</strong> - no special background color.
+                    It displays text extracted from order notes (specifically the "text:" or "description:" field).
+                </p>
+            </div>
+            <div class="card" style="margin-top: 16px; max-width: 400px;">
+                <div class="card-header">
+                    <div class="icon-bg">📋</div>
+                    <div class="title">Order Details</div>
+                </div>
+                <div class="card-body">
+                    <div class="info-row">
+                        <span class="label">Order Tags</span>
+                        <div class="tags-container">
+                            <span class="tag category">Birthday</span>
+                            <span class="tag type">Pickup</span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Description</span>
+                        <span class="value">Happy Birthday message on top</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Employee</span>
+                        <span class="value">John Smith</span>
+                    </div>
+                </div>
+            </div>
+            <p style="margin-top: 12px; font-size: 13px; color: rgba(255,255,255,0.6);">
+                ↑ Description row has consistent styling with other rows (no different background)
+            </p>
+        </div>
+
+        <!-- Summary -->
+        <div class="section" style="background: rgba(60, 205, 121, 0.1); border-color: rgba(60, 205, 121, 0.3);">
+            <div class="section-title">
+                ✅ All 10 Issues Implemented
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                <div>
+                    <div style="font-size: 13px; margin-bottom: 4px;">✅ <span class="issue-ref">#44</span> Delete button crash fix</div>
+                    <div style="font-size: 13px; margin-bottom: 4px;">✅ <span class="issue-ref">#45</span> Duplicate labels (Order vs Payment state)</div>
+                    <div style="font-size: 13px; margin-bottom: 4px;">✅ <span class="issue-ref">#46</span> Order notes + tags</div>
+                    <div style="font-size: 13px; margin-bottom: 4px;">✅ <span class="issue-ref">#47</span> Customer button padding/radius</div>
+                    <div style="font-size: 13px; margin-bottom: 4px;">✅ <span class="issue-ref">#48</span> Clover API integration</div>
+                </div>
+                <div>
+                    <div style="font-size: 13px; margin-bottom: 4px;">✅ <span class="issue-ref">#49</span> Tag colors</div>
+                    <div style="font-size: 13px; margin-bottom: 4px;">✅ <span class="issue-ref">#50</span> Customer row darker background</div>
+                    <div style="font-size: 13px; margin-bottom: 4px;">✅ <span class="issue-ref">#51</span> Reduced card header spacing</div>
+                    <div style="font-size: 13px; margin-bottom: 4px;">✅ <span class="issue-ref">#52</span> Customer name 10-char truncation</div>
+                    <div style="font-size: 13px; margin-bottom: 4px;">✅ <span class="issue-ref">#53</span> Dynamic pill-shaped avatar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Modal -->
+    <div class="modal-overlay" id="customerModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Customer Details</h3>
+            </div>
+            <div class="modal-body">
+                <div class="avatar-container">
+                    <div class="avatar large" id="customerAvatarLarge">ED</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">First Name</label>
+                    <input type="text" class="form-input" id="inputFirstName" placeholder="Enter first name" value="Edward">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" class="form-input" id="inputLastName" placeholder="Enter last name" value="Donaldson">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" id="inputPhone" placeholder="Enter phone number" value="(555) 123-4567">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="inputEmail" placeholder="Enter email" value="edward@example.com">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn secondary" onclick="alert('Opens Customer Search Dialog (#68)')">🔍 Search</button>
+                <button class="action-btn secondary" onclick="closeCustomerModal()">Cancel</button>
+                <button class="action-btn primary" onclick="saveCustomer()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Note Modal -->
+    <div class="modal-overlay" id="orderNoteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>📝 Order Notes</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <input type="text" class="form-input" placeholder="e.g., Birthday, Wedding" value="Birthday">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <input type="text" class="form-input" placeholder="e.g., Pickup, Delivery" value="Pickup">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-input" placeholder="Additional notes" value="Happy Birthday message on top">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn secondary" onclick="closeOrderNoteModal()">Cancel</button>
+                <button class="action-btn primary" onclick="closeOrderNoteModal(); alert('Order notes saved!')">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>📜 Order History</h3>
+            </div>
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                <div class="history-item">
+                    <div class="history-icon">✉️</div>
+                    <div class="history-content">
+                        <div class="history-title">Notification Sent</div>
+                        <div class="history-time">Today at 2:45 PM</div>
+                        <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 4px;">
+                            "Your order is ready for pickup!"
+                        </div>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-icon">💳</div>
+                    <div class="history-content">
+                        <div class="history-title">Payment Received - $107.00</div>
+                        <div class="history-time">Today at 2:35 PM</div>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-icon">✏️</div>
+                    <div class="history-content">
+                        <div class="history-title">Order Modified</div>
+                        <div class="history-time">Today at 2:32 PM</div>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-icon">➕</div>
+                    <div class="history-content">
+                        <div class="history-title">Order Created</div>
+                        <div class="history-time">Today at 2:30 PM</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn secondary" onclick="closeHistoryModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Customer Modal
+        function openCustomerModal() {
+            document.getElementById('customerModal').classList.add('active');
+        }
+
+        function closeCustomerModal() {
+            document.getElementById('customerModal').classList.remove('active');
+        }
+
+        // Order Note Modal
+        function openOrderNoteModal() {
+            document.getElementById('orderNoteModal').classList.add('active');
+        }
+
+        function closeOrderNoteModal() {
+            document.getElementById('orderNoteModal').classList.remove('active');
+        }
+
+        // History Modal
+        function openHistoryModal() {
+            document.getElementById('historyModal').classList.add('active');
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.remove('active');
+        }
+
+        function updateAvatar() {
+            const firstName = document.getElementById('inputFirstName').value;
+            const lastName = document.getElementById('inputLastName').value;
+            const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || '?';
+            
+            document.getElementById('customerAvatarLarge').textContent = initials;
+            document.getElementById('customerAvatarSmall').textContent = initials;
+        }
+
+        function saveCustomer() {
+            const firstName = document.getElementById('inputFirstName').value;
+            const lastName = document.getElementById('inputLastName').value;
+            const fullName = (firstName + ' ' + lastName).trim();
+            
+            // #52: Truncate to 10 chars
+            const truncatedName = fullName.length > 10 ? fullName.substring(0, 10) + '…' : fullName;
+            
+            // #53: Update avatar initials
+            const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || '?';
+            
+            document.getElementById('customerNameDisplay').textContent = truncatedName || '—';
+            document.getElementById('customerAvatarSmall').textContent = initials;
+            
+            alert('Customer saved to Clover! (#48 API integration)\n\nName: ' + fullName + '\nDisplay: ' + truncatedName + '\nAvatar: ' + initials);
+            closeCustomerModal();
+        }
+
+        // Update avatar as user types
+        document.getElementById('inputFirstName').addEventListener('input', updateAvatar);
+        document.getElementById('inputLastName').addEventListener('input', updateAvatar);
+
+        // Close modals on overlay click
+        ['customerModal', 'orderNoteModal', 'historyModal'].forEach(function(id) {
+            document.getElementById(id).addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Clickable row background matching HTML .detail-info-row.clickable -->
-<!-- More rounded border for iOS-style appearance -->
+<!-- #50: Clickable row background matching item card background -->
+<!-- Darker background to match item_row_background -->
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
     android:color="@color/glass_ripple">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#14FFFFFF"/>
+            <solid android:color="@color/item_row_background"/>
             <corners android:radius="12dp"/>
         </shape>
     </item>

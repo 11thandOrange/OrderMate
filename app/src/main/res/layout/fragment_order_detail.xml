@@ -393,13 +393,15 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <!-- Order Details Card - matches HTML .detail-card -->
-            <!-- background: rgba(255,255,255,0.15), border-radius: 16px, border: 1px solid rgba(255,255,255,0.1) -->
+            <!-- Order Details Card - clickable to open order-level popup -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/orderDetailsCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 app:cardBackgroundColor="@color/glass_background"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
@@ -516,13 +518,14 @@
                         android:layout_marginHorizontal="16dp"
                         android:background="#1AFFFFFF" />
 
-                    <!-- Order Info Rows - matches HTML .detail-card-body -->
-                    <!-- padding: 20px -->
+                    <!-- #51: Order Info Rows - reduced padding -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="20dp">
+                        android:paddingHorizontal="20dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp">
 
                         <!-- Order Date - matches HTML .detail-info-row -->
                         <!-- padding: 12px 0, border-bottom: 1px solid rgba(255,255,255,0.05) -->
@@ -607,6 +610,41 @@
                             android:layout_height="1dp"
                             android:background="#0DFFFFFF" />
 
+                        <!-- #46: Description Row (from order notes) -->
+                        <LinearLayout
+                            android:id="@+id/descriptionRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="12dp"
+                            android:visibility="gone">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/description"
+                                android:textColor="@color/text_muted"
+                                android:textSize="13sp" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/orderDescriptionValue"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="2"
+                                android:gravity="end"
+                                android:textColor="@color/text_light"
+                                android:textSize="14sp"
+                                android:maxLines="2"
+                                android:ellipsize="end" />
+                        </LinearLayout>
+                        
+                        <View
+                            android:id="@+id/descriptionDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#0DFFFFFF"
+                            android:visibility="gone" />
+
                         <!-- Employee -->
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -630,65 +668,6 @@
                                 android:textStyle="bold" />
                         </LinearLayout>
                         
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#0DFFFFFF" />
-
-                        <!-- Customer (Clickable) - matches HTML .detail-info-row.clickable -->
-                        <!-- HTML: margin: 0 -12px extends beyond parent padding, padding: 12px -->
-                        <LinearLayout
-                            android:id="@+id/customerRow"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:background="@drawable/bg_clickable_row"
-                            android:paddingVertical="12dp"
-                            android:paddingHorizontal="12dp"
-                            android:layout_marginHorizontal="-12dp"
-                            android:layout_marginTop="4dp"
-                            android:clickable="true"
-                            android:focusable="true">
-                            <com.google.android.material.textview.MaterialTextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/customer"
-                                android:textColor="@color/text_muted"
-                                android:textSize="13sp" />
-                            
-                            <!-- Customer inline avatar with initials - matches HTML .customer-inline-avatar -->
-                            <!-- 24x24, border-radius: 50%, background: orange-accent -->
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/customerAvatar"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:background="@drawable/bg_customer_avatar_inline"
-                                android:gravity="center"
-                                android:text="ED"
-                                android:textColor="@color/white"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-                            
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/orderPlacedCustomerValue"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:textColor="@color/text_light"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-                            
-                            <!-- Chevron icon - matches HTML .chevron-icon -->
-                            <ImageView
-                                android:layout_width="12dp"
-                                android:layout_height="12dp"
-                                android:layout_marginStart="8dp"
-                                android:src="@drawable/ic_chevron_right"
-                                app:tint="@color/text_muted"
-                                android:contentDescription="@string/view_customer" />
-                        </LinearLayout>
                     </LinearLayout>
                     
                     <!-- Hidden description field for backward compatibility -->
@@ -700,12 +679,81 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Order History Card - matches HTML .detail-card -->
-            <!-- Scrollable with fade at bottom and scroll indicator -->
+            <!-- Customer Card - separate card with just the customer button, no header -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/customerCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="@color/glass_background"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/nav_border"
+                app:strokeWidth="1dp">
+
+                <!-- Customer Row - clickable to open customer dialog -->
+                <LinearLayout
+                    android:id="@+id/customerRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_clickable_row"
+                    android:paddingVertical="16dp"
+                    android:paddingHorizontal="20dp"
+                    android:clickable="true"
+                    android:focusable="true">
+                    
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/customer"
+                        android:textColor="@color/text_muted"
+                        android:textSize="13sp" />
+                    
+                    <!-- Customer avatar - pill-shaped for dynamic initials -->
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/customerAvatar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="24dp"
+                        android:minWidth="24dp"
+                        android:paddingHorizontal="6dp"
+                        android:background="@drawable/bg_customer_avatar_inline"
+                        android:gravity="center"
+                        android:text="?"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                    
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/orderPlacedCustomerValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:textColor="@color/text_light"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                    
+                    <!-- Chevron icon -->
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:layout_marginStart="8dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_muted"
+                        android:contentDescription="@string/view_customer" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Order History Card - entire card clickable to open history popup -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/orderHistoryCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 app:cardBackgroundColor="@color/glass_background"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
@@ -717,7 +765,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Card Header - matches HTML .detail-card-header -->
+                    <!-- Card Header -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -726,7 +774,7 @@
                         android:paddingHorizontal="20dp"
                         android:paddingVertical="16dp">
 
-                        <!-- Icon with background - matches HTML .detail-card-title i -->
+                        <!-- Icon with background -->
                         <FrameLayout
                             android:layout_width="32dp"
                             android:layout_height="32dp"
@@ -751,34 +799,13 @@
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
-                        <!-- View All button with chevron - matches HTML .detail-card-action -->
-                        <LinearLayout
-                            android:id="@+id/viewAllHistoryButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:background="@drawable/bg_view_all_button"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="6dp"
-                            android:clickable="true"
-                            android:focusable="true">
-                            
-                            <com.google.android.material.textview.MaterialTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/view_all"
-                                android:textColor="@color/text_light"
-                                android:textSize="12sp" />
-                            
-                            <ImageView
-                                android:layout_width="12dp"
-                                android:layout_height="12dp"
-                                android:layout_marginStart="6dp"
-                                android:src="@drawable/ic_chevron_right"
-                                app:tint="@color/text_light"
-                                android:contentDescription="@string/view_all" />
-                        </LinearLayout>
+                        <!-- Chevron to indicate clickable -->
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="@color/text_muted"
+                            android:contentDescription="@string/view_all" />
                     </LinearLayout>
 
                     <View
@@ -787,72 +814,38 @@
                         android:layout_marginHorizontal="16dp"
                         android:background="#1AFFFFFF" />
 
-                    <!-- Scrollable History Items Container with fade overlay -->
-                    <FrameLayout
+                    <!-- History Items Container - no scroll, just shows items -->
+                    <LinearLayout
+                        android:id="@+id/historyContainer"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        
-                        <!-- Scrollable History Items -->
-                        <ScrollView
-                            android:id="@+id/historyScrollView"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:maxHeight="180dp"
-                            android:scrollbars="none"
-                            android:fillViewport="true"
-                            android:clipToPadding="false">
-
-                            <!-- Dynamic history container - populated by fragment -->
-                            <LinearLayout
-                                android:id="@+id/historyContainer"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingHorizontal="20dp"
-                                android:paddingTop="20dp"
-                                android:paddingBottom="40dp" />
-                            
-                        </ScrollView>
-                        
-                        <!-- Fade gradient overlay at bottom -->
-                        <View
-                            android:id="@+id/historyFadeOverlay"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:layout_gravity="bottom"
-                            android:background="@drawable/bg_scroll_fade_bottom" />
-                        
-                        <!-- Scroll indicator with chevron -->
-                        <LinearLayout
-                            android:id="@+id/historyScrollIndicator"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="bottom|center_horizontal"
-                            android:layout_marginBottom="8dp"
-                            android:orientation="horizontal"
-                            android:gravity="center"
-                            android:background="@drawable/bg_scroll_indicator_container"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="6dp">
-                            
-                            <com.google.android.material.textview.MaterialTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/scroll_for_more"
-                                android:textColor="@color/text_muted"
-                                android:textSize="10sp" />
-                            
-                            <ImageView
-                                android:layout_width="12dp"
-                                android:layout_height="12dp"
-                                android:layout_marginStart="4dp"
-                                android:src="@drawable/ic_chevron_down"
-                                app:tint="@color/text_muted"
-                                android:contentDescription="@string/scroll_down" />
-                        </LinearLayout>
-                    </FrameLayout>
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="12dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+            
+            <!-- Hidden views for backward compatibility -->
+            <ScrollView
+                android:id="@+id/historyScrollView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+            <View
+                android:id="@+id/historyFadeOverlay"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+            <LinearLayout
+                android:id="@+id/historyScrollIndicator"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+            <LinearLayout
+                android:id="@+id/viewAllHistoryButton"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 

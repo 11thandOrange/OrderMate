@@ -18,6 +18,13 @@
     <color name="back">#03CDB8</color>
     <color name="closed_status_color">#7367F0</color>
     
+    <!-- Tone-on-tone text colors for Clover badges (lighter shade of bg color) -->
+    <color name="open_status_text">#FFF59D</color>
+    <color name="paid_status_text">#A5D6A7</color>
+    <color name="unpaid_status_text">#EF9A9A</color>
+    <color name="partial_status_text">#FFCC80</color>
+    <color name="closed_status_text">#B39DDB</color>
+    
     <!-- iOS-style redesign colors (#80 requirement) -->
     <color name="gradient_start">#667eea</color>
     <color name="gradient_end">#764ba2</color>
@@ -112,14 +119,15 @@
     <color name="note_pill_text_text">#ffb74d</color>
     
     <!-- Custom order tag colors (#19) -->
-    <color name="tag_category_bg">#33CE93D8</color>
-    <color name="tag_category_text">#CE93D8</color>
-    <color name="tag_type_bg">#3364B5F6</color>
-    <color name="tag_type_text">#64B5F6</color>
-    <color name="tag_status_bg">#33FFB74D</color>
-    <color name="tag_status_text">#FFB74D</color>
-    <color name="tag_default_bg">#3381C784</color>
-    <color name="tag_default_text">#81C784</color>
+    <!-- OrderMate custom tags - dark backgrounds (50% opacity) with matching lighter text (tone on tone) -->
+    <color name="tag_category_bg">#80CE93D8</color>
+    <color name="tag_category_text">#E1BEE7</color>
+    <color name="tag_type_bg">#8064B5F6</color>
+    <color name="tag_type_text">#BBDEFB</color>
+    <color name="tag_status_bg">#80FFB74D</color>
+    <color name="tag_status_text">#FFE0B2</color>
+    <color name="tag_default_bg">#8081C784</color>
+    <color name="tag_default_text">#C8E6C9</color>
     
     <!-- Glassmorphism event preview -->
     <color name="event_preview_bg">#26FFFFFF</color>

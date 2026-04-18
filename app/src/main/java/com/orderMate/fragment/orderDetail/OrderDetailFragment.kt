@@ -42,6 +42,7 @@ import com.orderMate.utils.createAndShowDialog
 import com.orderMate.utils.debugSnackBar
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatMillisToDateTime
+import com.orderMate.utils.formatPaymentState
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.getThePaymentState
 import com.orderMate.utils.hideView
@@ -180,11 +181,25 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                     createdTime?.formatMillisToDateTime(Constants.yearFormat)
                 binding.merchantName.text = preferenceManager.getString(Constants.merchantName)
 
-                binding.orderPlacedStatusValue.text =
-                    requireContext().getThePaymentState(orderArguments)
-                binding.orderPlacedStatusValue.changeColorAsPerPaymentStatus(
-                    orderArguments
+                // #45: Clover tags in header - show ORDER state and PAYMENT state separately
+                // orderPlacedStatusValue shows order.state (OPEN or LOCKED/CLOSED)
+                // Dark background with tone-on-tone text
+                val orderState = orderArguments?.state?.uppercase() ?: "OPEN"
+                val isOrderOpen = orderState == "OPEN"
+                binding.orderPlacedStatusValue.text = if (isOrderOpen) "OPEN" else "CLOSED"
+                binding.orderPlacedStatusValue.setTextColor(
+                    ContextCompat.getColor(requireContext(), 
+                        if (isOrderOpen) R.color.open_status_text else R.color.closed_status_text)
                 )
+                binding.orderPlacedStatusValue.setBackgroundResource(
+                    if (isOrderOpen) R.drawable.badge_background_open else R.drawable.badge_background_closed
+                )
+                
+                // paymentStatusBadge shows order.paymentState (PAID, NOT_PAID, PARTIALLY_PAID, etc.)
+                val paymentState = orderArguments?.paymentState?.name ?: "NOT_PAID"
+                binding.paymentStatusBadge.text = formatPaymentState(paymentState).uppercase()
+                updatePaymentBadgeStyle(paymentState)
+                
                 if (isStatusOpen()) {
                     binding.reOpenButton.isVisible = true
                     binding.deleteButton.isVisible = true
@@ -197,19 +212,36 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                     binding.reIssueReceiptButton.isVisible = true
                 }
                 exceptionHandler {
-
                     if (customers?.isNotEmpty() == true) {
-                        getString(
+                        val customer = customers[0]
+                        val fullName = getString(
                             R.string.getFullName,
-                            customers[0]?.firstName,
-                            customers[0]?.lastName
-                        ).also {
-                            binding.orderPlacedCustomerValue.text = it
+                            customer?.firstName ?: "",
+                            customer?.lastName ?: ""
+                        ).trim()
+                        
+                        // #52: Truncate to 10 characters with ellipsis
+                        val truncatedName = if (fullName.length > 10) {
+                            fullName.take(10) + "…"
+                        } else {
+                            fullName
                         }
-                        val result = getCustomerContactDetails(customers[0])
+                        binding.orderPlacedCustomerValue.text = truncatedName
+                        
+                        // #53: Update customer avatar with initials or "?"
+                        val initials = buildString {
+                            customer?.firstName?.firstOrNull()?.let { append(it.uppercaseChar()) }
+                            customer?.lastName?.firstOrNull()?.let { append(it.uppercaseChar()) }
+                        }.ifEmpty { "?" }
+                        binding.customerAvatar.text = initials
+                        
+                        val result = getCustomerContactDetails(customer)
                         binding.orderPlacedCustomerNumberValue.text = result.first
                         binding.orderPlacedCustomerEmailValue.text = result.second
-
+                    } else {
+                        // #53: No customer - show "?" in avatar
+                        binding.orderPlacedCustomerValue.text = getString(R.string.dash)
+                        binding.customerAvatar.text = "?"
                     }
                 }
 
@@ -289,7 +321,136 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         showTheDiscountAndTaxData()
         populateHistoryCard()
         setupOrderNotesPills()
+        populateDescriptionRow()  // #46
+        populateOrderTags()       // #46
     }
+    
+    /**
+     * #46: Populate description row from order notes
+     */
+    private fun populateDescriptionRow() {
+        val orderNote = orderArguments?.note
+        val descriptionRow = binding.descriptionRow
+        val descriptionDivider = binding.descriptionDivider
+        val descriptionValue = binding.orderDescriptionValue
+        
+        // Extract description text from note (text after "text:" label)
+        val description = extractDescriptionFromNote(orderNote)
+        
+        if (description.isNullOrBlank()) {
+            descriptionRow.visibility = View.GONE
+            descriptionDivider.visibility = View.GONE
+        } else {
+            descriptionRow.visibility = View.VISIBLE
+            descriptionDivider.visibility = View.VISIBLE
+            descriptionValue.text = description
+        }
+    }
+    
+    private fun extractDescriptionFromNote(noteString: String?): String? {
+        if (noteString.isNullOrBlank()) return null
+        
+        val delimiter = if (noteString.contains("•")) "•" else "|"
+        val parts = noteString.split(delimiter).map { it.trim() }
+        
+        for (part in parts) {
+            val colonIndex = part.indexOf(':')
+            if (colonIndex > 0) {
+                val label = part.substring(0, colonIndex).trim().lowercase()
+                val value = part.substring(colonIndex + 1).trim()
+                if (label == "text" || label == "note" || label == "description") {
+                    return value.takeIf { it.isNotBlank() }
+                }
+            }
+        }
+        // If no labeled text, return the whole note as description
+        return if (!noteString.contains(":")) noteString else null
+    }
+    
+    /**
+     * #46: Populate custom order tags in the tags container
+     */
+    private fun populateOrderTags() {
+        val tagsContainer = binding.tagsContainer
+        tagsContainer.removeAllViews()
+        
+        val orderNote = orderArguments?.note
+        val tags = extractTagsFromNote(orderNote)
+        
+        if (tags.isEmpty()) {
+            // Add a dash or placeholder
+            val placeholder = TextView(requireContext()).apply {
+                text = "—"
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_muted))
+                textSize = 14f
+            }
+            tagsContainer.addView(placeholder)
+            return
+        }
+        
+        tags.forEachIndexed { index, tag ->
+            val tagView = createTagView(tag.text, tag.type)
+            tagsContainer.addView(tagView)
+            
+            // Add spacing between tags
+            if (index < tags.size - 1) {
+                val spacer = View(requireContext()).apply {
+                    layoutParams = LinearLayout.LayoutParams(8.dpToPx(), 1)
+                }
+                tagsContainer.addView(spacer)
+            }
+        }
+    }
+    
+    private data class OrderTag(val text: String, val type: String)
+    
+    private fun extractTagsFromNote(noteString: String?): List<OrderTag> {
+        if (noteString.isNullOrBlank()) return emptyList()
+        
+        val tags = mutableListOf<OrderTag>()
+        val delimiter = if (noteString.contains("•")) "•" else "|"
+        val parts = noteString.split(delimiter).map { it.trim() }
+        
+        for (part in parts) {
+            val colonIndex = part.indexOf(':')
+            if (colonIndex > 0) {
+                val label = part.substring(0, colonIndex).trim().lowercase()
+                val value = part.substring(colonIndex + 1).trim()
+                
+                if (label.contains("tag") || label.contains("category") || label.contains("type")) {
+                    // Split multiple values (comma-separated)
+                    value.split(",").map { it.trim() }.filter { it.isNotBlank() }.forEach {
+                        tags.add(OrderTag(it, label))
+                    }
+                }
+            }
+        }
+        return tags
+    }
+    
+    private fun createTagView(text: String, type: String): TextView {
+        val (bgColor, textColor) = when {
+            type.contains("category") -> Pair(R.color.tag_category_bg, R.color.tag_category_text)
+            type.contains("type") -> Pair(R.color.tag_type_bg, R.color.tag_type_text)
+            type.contains("status") -> Pair(R.color.tag_status_bg, R.color.tag_status_text)
+            else -> Pair(R.color.tag_default_bg, R.color.tag_default_text)
+        }
+        
+        return TextView(requireContext()).apply {
+            this.text = text
+            textSize = 11f
+            setTextColor(ContextCompat.getColor(requireContext(), textColor))
+            setPadding(8.dpToPx(), 4.dpToPx(), 8.dpToPx(), 4.dpToPx())
+            
+            val bg = android.graphics.drawable.GradientDrawable()
+            bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+            bg.cornerRadius = 12f * resources.displayMetrics.density
+            bg.setColor(ContextCompat.getColor(requireContext(), bgColor))
+            background = bg
+        }
+    }
+    
+    private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
     
     /**
      * Setup order-level notes pills display (#93)
@@ -649,15 +810,21 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                     runOnBackgroundThread {
                         if (deleteTheOrder()) {
                             runOnMainThread {
-                                findNavController().popBackStack()
+                                // #44: Safe navigation - verify fragment is still attached before navigating
+                                try {
+                                    if (isAdded && activity != null && view != null) {
+                                        findNavController().navigateUp()
+                                    }
+                                } catch (e: Exception) {
+                                    // Navigation failed - fragment may be destroyed, ignore
+                                }
                             }
-                            exceptionHandler {
-                                // update the dashboard after the order is delay
-                                Handler(Looper.getMainLooper()).postDelayed(
-                                    { OrderHistoryFragment.getInstance().getTheOrderData(true) }, 1000
-                                )
-
-                            }
+                            // Update the dashboard after the order is deleted
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                exceptionHandler {
+                                    OrderHistoryFragment.getInstance().getTheOrderData(true)
+                                }
+                            }, 1000)
                         }
                     }
                 }
@@ -697,7 +864,20 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 ).show(parentFragmentManager, CustomerDialog.TAG)
             }
             
-            // View All History button - opens order history dialog
+            // Order Details Card click - opens order-level notes popup
+            orderDetailsCard.setOnClickListener {
+                openOrderNoteDialog()
+            }
+            
+            // Order History Card click - opens order history dialog
+            orderHistoryCard.setOnClickListener {
+                orderArguments?.let { order ->
+                    OrderHistoryDialog.newInstance(order)
+                        .show(parentFragmentManager, OrderHistoryDialog.TAG)
+                }
+            }
+            
+            // View All History button (hidden but kept for compatibility)
             viewAllHistoryButton.setOnClickListener {
                 orderArguments?.let { order ->
                     OrderHistoryDialog.newInstance(order)
@@ -883,5 +1063,22 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
 
     override fun shareSms(data: ShareSmsModal) {
         viewModel.shareSms(data)
+    }
+    
+    /**
+     * #45: Update payment badge style based on payment state
+     */
+    private fun updatePaymentBadgeStyle(paymentState: String?) {
+        // Dark background with tone-on-tone text
+        val (textColorRes, bgRes) = when (paymentState?.uppercase()) {
+            "PAID" -> Pair(R.color.paid_status_text, R.drawable.badge_background_paid)
+            "NOT_PAID" -> Pair(R.color.unpaid_status_text, R.drawable.badge_background_unpaid)
+            "PARTIALLY_PAID" -> Pair(R.color.partial_status_text, R.drawable.badge_background_partial)
+            "PARTIALLY_REFUNDED" -> Pair(R.color.partial_status_text, R.drawable.badge_background_partial)
+            "REFUNDED" -> Pair(R.color.closed_status_text, R.drawable.badge_background_closed)
+            else -> Pair(R.color.open_status_text, R.drawable.badge_background_open)
+        }
+        binding.paymentStatusBadge.setTextColor(ContextCompat.getColor(requireContext(), textColorRes))
+        binding.paymentStatusBadge.setBackgroundResource(bgRes)
     }
 }
