@@ -47,49 +47,63 @@
                 <!-- Order Number -->
                 <TextView
                     android:id="@+id/orderNumber"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_marginEnd="12dp"
                     android:textColor="@color/text_light"
                     android:textSize="18sp"
                     android:fontFamily="sans-serif-medium"
                     tools:text="#ORD-001A"/>
 
-                <!-- Status Badges -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
+                <!-- Status Badges and Custom Tags Container (#19) -->
+                <HorizontalScrollView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_weight="1"
+                    android:scrollbars="none"
+                    android:fadingEdge="horizontal"
+                    android:fadingEdgeLength="16dp">
 
-                    <!-- Order Status Badge -->
-                    <TextView
-                        android:id="@+id/orderStatusBadge"
+                    <LinearLayout
+                        android:id="@+id/tagsContainer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="4dp"
-                        android:background="@drawable/bg_badge_open"
-                        android:textColor="@color/open_status_color"
-                        android:textSize="11sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textAllCaps="true"
-                        tools:text="Open"/>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
-                    <!-- Payment Status Badge -->
-                    <TextView
-                        android:id="@+id/paymentStatusBadge"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="4dp"
-                        android:background="@drawable/bg_badge_paid"
-                        android:textColor="@color/paid_status_color"
-                        android:textSize="11sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textAllCaps="true"
-                        tools:text="Paid"/>
-                </LinearLayout>
+                        <!-- Order Status Badge -->
+                        <TextView
+                            android:id="@+id/orderStatusBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="4dp"
+                            android:background="@drawable/bg_badge_open"
+                            android:textColor="@color/open_status_color"
+                            android:textSize="11sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:textAllCaps="true"
+                            tools:text="Open"/>
+
+                        <!-- Payment Status Badge -->
+                        <TextView
+                            android:id="@+id/paymentStatusBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="4dp"
+                            android:background="@drawable/bg_badge_paid"
+                            android:textColor="@color/paid_status_color"
+                            android:textSize="11sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:textAllCaps="true"
+                            tools:text="Paid"/>
+
+                        <!-- Custom Tags will be added here programmatically (#19) -->
+
+                    </LinearLayout>
+                </HorizontalScrollView>
             </LinearLayout>
 
             <!-- Card Details Grid (4 columns) -->
@@ -222,6 +236,20 @@
                         tools:text="$125.00"/>
                 </LinearLayout>
             </LinearLayout>
+
+            <!-- Order Description (#18) -->
+            <TextView
+                android:id="@+id/orderDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textColor="@color/text_muted"
+                android:textSize="13sp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:text="Special instructions for this order - handle with care"/>
 
             <!-- Notes Section (with top border) -->
             <LinearLayout

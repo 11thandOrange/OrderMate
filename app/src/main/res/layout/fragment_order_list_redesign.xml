@@ -63,17 +63,26 @@
                     android:inputType="text"
                     android:maxLines="1"/>
 
-                <ImageView
-                    android:id="@+id/calendarIcon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:padding="2dp"
-                    android:src="@drawable/ic_calender"
+                <!-- Calendar Icon with expanded touch target (#14) -->
+                <FrameLayout
+                    android:id="@+id/calendarIconContainer"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="-12dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Pick date"
-                    app:tint="@color/text_muted"
                     android:clickable="true"
-                    android:focusable="true"/>
+                    android:focusable="true">
+
+                    <ImageView
+                        android:id="@+id/calendarIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_calender"
+                        android:contentDescription="Pick date"
+                        app:tint="@color/text_muted"/>
+                </FrameLayout>
             </LinearLayout>
 
             <!-- Filter Button -->
@@ -132,6 +141,35 @@
                     android:textSize="14sp"/>
             </LinearLayout>
 
+            <!-- Sync Button (#15) -->
+            <LinearLayout
+                android:id="@+id/syncButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_header_button"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/syncIcon"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_sync"
+                    app:tint="@color/text_light"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Sync"
+                    android:textColor="@color/text_light"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
             <!-- Syncing Indicator -->
             <LinearLayout
                 android:id="@+id/syncingContainer"
@@ -162,16 +200,105 @@
 
         </LinearLayout>
 
+        <!-- Date Pills Row (#12) - Order Date and Due Date -->
+        <LinearLayout
+            android:id="@+id/datePillsRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            app:layout_constraintTop_toBottomOf="@id/headerTopRow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Order Date Pill -->
+            <LinearLayout
+                android:id="@+id/orderDatePill"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingHorizontal="14dp"
+                android:background="@drawable/bg_date_pill"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_calender"
+                    app:tint="@color/text_light"/>
+
+                <TextView
+                    android:id="@+id/orderDateText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Order Date"
+                    android:textColor="@color/text_light"
+                    android:textSize="13sp"/>
+
+                <ImageView
+                    android:id="@+id/orderDateClear"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_close"
+                    android:visibility="gone"
+                    app:tint="@color/text_muted"/>
+            </LinearLayout>
+
+            <!-- Due Date Pill -->
+            <LinearLayout
+                android:id="@+id/dueDatePill"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="10dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingHorizontal="14dp"
+                android:background="@drawable/bg_date_pill"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_calender"
+                    app:tint="@color/orange_accent"/>
+
+                <TextView
+                    android:id="@+id/dueDateText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Due Date"
+                    android:textColor="@color/text_light"
+                    android:textSize="13sp"/>
+
+                <ImageView
+                    android:id="@+id/dueDateClear"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_close"
+                    android:visibility="gone"
+                    app:tint="@color/text_muted"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
         <!-- Filter Pills Row -->
         <HorizontalScrollView
             android:id="@+id/filterPillsScroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="12dp"
             android:scrollbars="none"
             android:visibility="gone"
             tools:visibility="visible"
-            app:layout_constraintTop_toBottomOf="@id/headerTopRow"
+            app:layout_constraintTop_toBottomOf="@id/datePillsRow"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 

@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Widget toggle thumb - smaller (16x16 vs 20x20) -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <solid android:color="#FFFFFF" />
-    <size
+<!-- Widget toggle thumb - perfect circle (16x16) with inset to prevent stretching -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
         android:width="16dp"
-        android:height="16dp" />
-</shape>
+        android:height="16dp"
+        android:gravity="center">
+        <shape android:shape="oval">
+            <solid android:color="#FFFFFF" />
+            <size
+                android:width="16dp"
+                android:height="16dp" />
+        </shape>
+    </item>
+</layer-list>

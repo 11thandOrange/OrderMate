@@ -54,7 +54,8 @@ object FilterCategoryBuilder {
     }
     
     // Clover filter IDs (prefixed to avoid collision with widget IDs)
-    const val CLOVER_ORDER_DATE = "clover_order_date"  // Always shown, not editable
+    const val CLOVER_ORDER_DATE = "clover_order_date"  // Order creation date
+    const val CLOVER_DUE_DATE = "clover_due_date"      // Due/pickup date (#12)
     const val CLOVER_PAYMENT_STATUS = "clover_payment_status"
     const val CLOVER_ORDER_STATUS = "clover_order_status"
     const val CLOVER_PAYMENT_TYPE = "clover_payment_type"
