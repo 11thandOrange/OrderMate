@@ -430,6 +430,32 @@ class WidgetManager private constructor(private val context: Context) {
         updateSettings(newSettings, callback)
     }
     
+    /**
+     * Enable/disable item-level notes (#34)
+     */
+    fun setItemNotesEnabled(enabled: Boolean, callback: (Boolean) -> Unit) {
+        val newSettings = getSettings().copy(itemNotesEnabled = enabled)
+        updateSettings(newSettings, callback)
+    }
+    
+    /**
+     * Enable/disable order-level notes (#34)
+     */
+    fun setOrderNotesEnabled(enabled: Boolean, callback: (Boolean) -> Unit) {
+        val newSettings = getSettings().copy(orderNotesEnabled = enabled)
+        updateSettings(newSettings, callback)
+    }
+    
+    /**
+     * Check if item-level notes are enabled (#34)
+     */
+    fun isItemNotesEnabled(): Boolean = getSettings().itemNotesEnabled
+    
+    /**
+     * Check if order-level notes are enabled (#34)
+     */
+    fun isOrderNotesEnabled(): Boolean = getSettings().orderNotesEnabled
+    
     // ==================== Helpers ====================
     
     fun getWidgetById(widgetId: String): WidgetConfig? {

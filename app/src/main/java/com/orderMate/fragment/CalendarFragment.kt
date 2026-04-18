@@ -859,7 +859,11 @@ class CalendarFragment : Fragment() {
     }
     
     private fun formatOrderStatus(status: String): String {
-        return status.lowercase().replaceFirstChar { it.uppercase() }
+        return when (status.lowercase()) {
+            "open" -> "Open"
+            "locked" -> "Closed"
+            else -> status.lowercase().replaceFirstChar { it.uppercase() }
+        }
     }
     
     private fun removeSelectionFilter(categoryId: String, value: String) {

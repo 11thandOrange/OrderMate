@@ -70,11 +70,15 @@ class SettingsFragment : Fragment() {
     // General Panel
     private var switchUseInCloverRegister: Switch? = null
     
-    // Item Level Notes Panel
+    // Item Level Notes Panel (#34)
+    private var switchItemNotesEnabled: Switch? = null
+    private var itemLevelEditorCard: View? = null
     private var itemLevelWidgetRecyclerView: RecyclerView? = null
     private var btnAddItemLevelWidget: View? = null
     
-    // Order Level Notes Panel
+    // Order Level Notes Panel (#34)
+    private var switchOrderNotesEnabled: Switch? = null
+    private var orderLevelEditorCard: View? = null
     private var orderLevelWidgetRecyclerView: RecyclerView? = null
     private var btnAddOrderLevelWidget: View? = null
     
@@ -147,11 +151,15 @@ class SettingsFragment : Fragment() {
         // General Panel
         switchUseInCloverRegister = view.findViewById(R.id.switchUseInCloverRegister)
         
-        // Item Level Notes Panel
+        // Item Level Notes Panel (#34)
+        switchItemNotesEnabled = view.findViewById(R.id.switchItemNotesEnabled)
+        itemLevelEditorCard = view.findViewById(R.id.itemLevelEditorCard)
         itemLevelWidgetRecyclerView = view.findViewById(R.id.itemLevelWidgetRecyclerView)
         btnAddItemLevelWidget = view.findViewById(R.id.btnAddItemLevelWidget)
         
-        // Order Level Notes Panel
+        // Order Level Notes Panel (#34)
+        switchOrderNotesEnabled = view.findViewById(R.id.switchOrderNotesEnabled)
+        orderLevelEditorCard = view.findViewById(R.id.orderLevelEditorCard)
         orderLevelWidgetRecyclerView = view.findViewById(R.id.orderLevelWidgetRecyclerView)
         btnAddOrderLevelWidget = view.findViewById(R.id.btnAddOrderLevelWidget)
         
@@ -221,6 +229,22 @@ class SettingsFragment : Fragment() {
     // ==================== Item Level Notes Panel ====================
     
     private fun setupItemLevelNotesPanel() {
+        // Setup enable/disable toggle (#34)
+        switchItemNotesEnabled?.setOnCheckedChangeListener { _, isChecked ->
+            // Update editor card visibility based on toggle
+            itemLevelEditorCard?.alpha = if (isChecked) 1.0f else 0.5f
+            btnAddItemLevelWidget?.isEnabled = isChecked
+            
+            // Save to Firebase
+            widgetManager.setItemNotesEnabled(isChecked) { success ->
+                if (!success) {
+                    activity?.runOnUiThread {
+                        Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+        
         itemLevelWidgetAdapter = FirebaseWidgetEditorAdapter(
             onWidgetUpdate = { widget -> saveWidgetToFirebase(widget) },
             onWidgetDelete = { widget -> showDeleteWidgetDialog(widget, NoteLevel.ITEM) }
@@ -267,6 +291,22 @@ class SettingsFragment : Fragment() {
     // ==================== Order Level Notes Panel ====================
     
     private fun setupOrderLevelNotesPanel() {
+        // Setup enable/disable toggle (#34)
+        switchOrderNotesEnabled?.setOnCheckedChangeListener { _, isChecked ->
+            // Update editor card visibility based on toggle
+            orderLevelEditorCard?.alpha = if (isChecked) 1.0f else 0.5f
+            btnAddOrderLevelWidget?.isEnabled = isChecked
+            
+            // Save to Firebase
+            widgetManager.setOrderNotesEnabled(isChecked) { success ->
+                if (!success) {
+                    activity?.runOnUiThread {
+                        Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+        
         orderLevelWidgetAdapter = FirebaseWidgetEditorAdapter(
             onWidgetUpdate = { widget -> saveWidgetToFirebase(widget) },
             onWidgetDelete = { widget -> showDeleteWidgetDialog(widget, NoteLevel.ORDER) }
@@ -341,35 +381,56 @@ class SettingsFragment : Fragment() {
             return
         }
 
-        val types = arrayOf("Calendar", "Single Select", "Multi Select", "Text Box")
-        val typeEnums = arrayOf(
-            FirebaseWidgetType.CALENDAR, 
-            FirebaseWidgetType.SINGLE_SELECT, 
-            FirebaseWidgetType.MULTI_SELECT, 
-            FirebaseWidgetType.TEXT_BOX
-        )
+        // Create styled dialog matching filter modal (#36)
+        val dialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.dialog_add_widget, null)
         
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+        
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        
+        // Set title based on level
         val title = if (level == NoteLevel.ITEM) "Add Item Widget" else "Add Order Widget"
+        dialogView.findViewById<android.widget.TextView>(R.id.dialogTitle)?.text = title
         
-        android.app.AlertDialog.Builder(requireContext())
-            .setTitle(title)
-            .setItems(types) { _, which ->
-                widgetManager.addWidget(typeEnums[which], level) { newWidget ->
-                    activity?.runOnUiThread {
-                        if (newWidget != null) {
-                            if (level == NoteLevel.ITEM) {
-                                itemLevelWidgetAdapter?.addWidget(newWidget)
-                            } else {
-                                orderLevelWidgetAdapter?.addWidget(newWidget)
-                            }
+        // Helper function to add widget and dismiss dialog
+        fun addWidgetOfType(type: FirebaseWidgetType) {
+            widgetManager.addWidget(type, level) { newWidget ->
+                activity?.runOnUiThread {
+                    if (newWidget != null) {
+                        if (level == NoteLevel.ITEM) {
+                            itemLevelWidgetAdapter?.addWidget(newWidget)
                         } else {
-                            Toast.makeText(context, "Failed to add widget", Toast.LENGTH_SHORT).show()
+                            orderLevelWidgetAdapter?.addWidget(newWidget)
                         }
+                    } else {
+                        Toast.makeText(context, "Failed to add widget", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+            dialog.dismiss()
+        }
+        
+        // Setup click listeners for widget type options
+        dialogView.findViewById<View>(R.id.optionCalendar)?.setOnClickListener {
+            addWidgetOfType(FirebaseWidgetType.CALENDAR)
+        }
+        dialogView.findViewById<View>(R.id.optionSingleSelect)?.setOnClickListener {
+            addWidgetOfType(FirebaseWidgetType.SINGLE_SELECT)
+        }
+        dialogView.findViewById<View>(R.id.optionMultiSelect)?.setOnClickListener {
+            addWidgetOfType(FirebaseWidgetType.MULTI_SELECT)
+        }
+        dialogView.findViewById<View>(R.id.optionTextBox)?.setOnClickListener {
+            addWidgetOfType(FirebaseWidgetType.TEXT_BOX)
+        }
+        dialogView.findViewById<View>(R.id.btnCancel)?.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        dialog.show()
     }
     
     private fun showDeleteWidgetDialog(widget: WidgetConfig, level: NoteLevel) {
@@ -502,10 +563,16 @@ class SettingsFragment : Fragment() {
             handler.postDelayed(saveJob!!, 500) // Debounce 500ms
         }
         
-        // Notification time listeners (days and minutes)
+        // Notification time listeners (days/hours and minutes) with validation (#40, #41)
         inputNotificationDays?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                s?.toString()?.toIntOrNull()?.let { 
+                val value = s?.toString()?.toIntOrNull()
+                if (value != null && (value < 0 || value > 24)) {
+                    inputNotificationDays?.error = "Must be 0-24"
+                    return
+                }
+                inputNotificationDays?.error = null
+                value?.let { 
                     settingsManager.setNotificationDays(it)
                     scheduleAdvancedSettingsSave()
                 }
@@ -516,7 +583,13 @@ class SettingsFragment : Fragment() {
         
         inputNotificationMinutes?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                s?.toString()?.toIntOrNull()?.let { 
+                val value = s?.toString()?.toIntOrNull()
+                if (value != null && (value < 0 || value > 60)) {
+                    inputNotificationMinutes?.error = "Must be 0-60"
+                    return
+                }
+                inputNotificationMinutes?.error = null
+                value?.let { 
                     settingsManager.setNotificationMinutes(it)
                     scheduleAdvancedSettingsSave()
                 }
@@ -525,10 +598,16 @@ class SettingsFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
         
-        // Receipt time listeners (days and minutes)
+        // Receipt time listeners (days/hours and minutes) with validation (#40, #41)
         inputReceiptDays?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                s?.toString()?.toIntOrNull()?.let { 
+                val value = s?.toString()?.toIntOrNull()
+                if (value != null && (value < 0 || value > 24)) {
+                    inputReceiptDays?.error = "Must be 0-24"
+                    return
+                }
+                inputReceiptDays?.error = null
+                value?.let { 
                     settingsManager.setReceiptDays(it)
                     scheduleAdvancedSettingsSave()
                 }
@@ -539,7 +618,13 @@ class SettingsFragment : Fragment() {
         
         inputReceiptMinutes?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                s?.toString()?.toIntOrNull()?.let { 
+                val value = s?.toString()?.toIntOrNull()
+                if (value != null && (value < 0 || value > 60)) {
+                    inputReceiptMinutes?.error = "Must be 0-60"
+                    return
+                }
+                inputReceiptMinutes?.error = null
+                value?.let { 
                     settingsManager.setReceiptMinutes(it)
                     scheduleAdvancedSettingsSave()
                 }
@@ -594,6 +679,16 @@ class SettingsFragment : Fragment() {
                         // Update switch based on Firebase value
                         switchUseInCloverRegister?.isChecked = settings.showOMButtonInRegister
                         settingsManager.setUseOrderMateRegister(settings.showOMButtonInRegister)
+                        
+                        // Update item/order notes toggles (#34)
+                        switchItemNotesEnabled?.isChecked = settings.itemNotesEnabled
+                        switchOrderNotesEnabled?.isChecked = settings.orderNotesEnabled
+                        
+                        // Update editor card visibility based on toggle state
+                        itemLevelEditorCard?.alpha = if (settings.itemNotesEnabled) 1.0f else 0.5f
+                        btnAddItemLevelWidget?.isEnabled = settings.itemNotesEnabled
+                        orderLevelEditorCard?.alpha = if (settings.orderNotesEnabled) 1.0f else 0.5f
+                        btnAddOrderLevelWidget?.isEnabled = settings.orderNotesEnabled
                     }
                 }
             }

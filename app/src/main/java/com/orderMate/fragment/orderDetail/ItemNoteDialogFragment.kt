@@ -19,6 +19,7 @@ import com.orderMate.databinding.DialogItemNoteBinding
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.modals.WidgetOption
 import com.orderMate.modals.WidgetType
+import com.orderMate.utils.WidgetColorUtils
 import com.orderMate.utils.WidgetManager
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -241,6 +242,7 @@ class ItemNoteDialogFragment : DialogFragment() {
 
     /**
      * Setup SINGLE_SELECT chips - only one can be selected
+     * Uses purple color coding via WidgetColorUtils
      */
     private fun setupSingleSelectOptions(container: FlexboxLayout, widget: WidgetConfig) {
         container.removeAllViews()
@@ -251,24 +253,25 @@ class ItemNoteDialogFragment : DialogFragment() {
         }
 
         val chipViews = mutableListOf<TextView>()
+        val widgetColor = WidgetColorUtils.getColorForWidgetType(widget.type)
 
         widget.options.forEach { option ->
             val isSelected = singleSelections[widget.id] == option.value
-            val chip = createChip(option.label, option.value, isSelected)
+            val chip = createChip(option.label, option.value, isSelected, widgetColor)
             chipViews.add(chip)
 
             chip.setOnClickListener {
                 // Deselect all other chips
-                chipViews.forEach { other -> updateChipState(other, false) }
+                chipViews.forEach { other -> updateChipState(other, false, widgetColor) }
                 
                 // Toggle this chip
                 val wasSelected = singleSelections[widget.id] == option.value
                 if (wasSelected) {
                     singleSelections[widget.id] = null
-                    updateChipState(chip, false)
+                    updateChipState(chip, false, widgetColor)
                 } else {
                     singleSelections[widget.id] = option.value
-                    updateChipState(chip, true)
+                    updateChipState(chip, true, widgetColor)
                 }
             }
 
@@ -278,6 +281,7 @@ class ItemNoteDialogFragment : DialogFragment() {
 
     /**
      * Setup MULTI_SELECT chips - multiple can be selected
+     * Uses green color coding via WidgetColorUtils
      */
     private fun setupMultiSelectOptions(container: FlexboxLayout, widget: WidgetConfig) {
         container.removeAllViews()
@@ -287,18 +291,19 @@ class ItemNoteDialogFragment : DialogFragment() {
             multiSelections[widget.id] = mutableSetOf()
         }
         val selectedValues = multiSelections[widget.id]!!
+        val widgetColor = WidgetColorUtils.getColorForWidgetType(widget.type)
 
         widget.options.forEach { option ->
             val isSelected = selectedValues.contains(option.value)
-            val chip = createChip(option.label, option.value, isSelected)
+            val chip = createChip(option.label, option.value, isSelected, widgetColor)
 
             chip.setOnClickListener {
                 if (selectedValues.contains(option.value)) {
                     selectedValues.remove(option.value)
-                    updateChipState(chip, false)
+                    updateChipState(chip, false, widgetColor)
                 } else {
                     selectedValues.add(option.value)
-                    updateChipState(chip, true)
+                    updateChipState(chip, true, widgetColor)
                 }
             }
 
@@ -335,9 +340,9 @@ class ItemNoteDialogFragment : DialogFragment() {
     }
 
     /**
-     * Create a chip view
+     * Create a chip view with widget-specific color coding
      */
-    private fun createChip(label: String, value: String, isSelected: Boolean): TextView {
+    private fun createChip(label: String, value: String, isSelected: Boolean, widgetColor: Int): TextView {
         return TextView(requireContext()).apply {
             text = label
             tag = value
@@ -353,19 +358,20 @@ class ItemNoteDialogFragment : DialogFragment() {
             textSize = 13f
             typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
 
-            updateChipState(this, isSelected)
+            updateChipState(this, isSelected, widgetColor)
         }
     }
 
     /**
-     * Update chip visual state
+     * Update chip visual state with widget-specific color coding
      */
-    private fun updateChipState(chip: TextView, isSelected: Boolean) {
+    private fun updateChipState(chip: TextView, isSelected: Boolean, widgetColor: Int) {
+        val density = resources.displayMetrics.density
         if (isSelected) {
-            chip.setBackgroundResource(R.drawable.bg_filter_option_selected)
-            chip.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
+            chip.background = WidgetColorUtils.createChipBackground(widgetColor, true, 8f, density)
+            chip.setTextColor(widgetColor)
         } else {
-            chip.setBackgroundResource(R.drawable.bg_filter_option)
+            chip.background = WidgetColorUtils.createChipBackground(widgetColor, false, 8f, density)
             chip.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_light))
         }
     }

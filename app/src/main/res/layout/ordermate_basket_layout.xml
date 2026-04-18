@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Register Drawer - Redesigned to match Event Preview (#42) -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,15 +8,14 @@
     android:layout_height="wrap_content"
     android:layout_gravity="end"
     android:background="@android:color/transparent"
-    app:cardBackgroundColor="@color/dark_orange_bar"
     app:layout_constraintHorizontal_weight="1">
 
-
+    <!-- Semi-transparent overlay when drawer is open -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/transparentContainer"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:alpha="0.3"
+        android:alpha="0.5"
         android:background="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/container"
@@ -23,6 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- OrderMate floating button (collapsed state) -->
     <androidx.cardview.widget.CardView
         android:id="@+id/orderMateButton"
         android:layout_width="wrap_content"
@@ -52,7 +53,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textview.MaterialTextView
-
                 android:id="@+id/orderMateText"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -66,180 +66,313 @@
                 app:layout_constraintStart_toEndOf="@id/addButton"
                 app:layout_constraintTop_toTopOf="@id/addButton" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-
     </androidx.cardview.widget.CardView>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Main Drawer Container - Glassmorphism style, full screen height (#42) -->
+    <LinearLayout
         android:id="@+id/container"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:background="@color/white"
+        android:layout_width="320dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_event_preview_glass"
+        android:orientation="vertical"
+        android:padding="20dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_weight="0.4"
-        app:layout_constraintStart_toEndOf="@id/transparentContainer"
         app:layout_constraintTop_toTopOf="parent">
 
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <!-- Header: Close + Order Title + Edit Order Notes Button -->
+        <LinearLayout
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/header_blue"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/dividerLeft"
-            app:layout_constraintTop_toTopOf="parent">
+            <!-- Close Button -->
+            <ImageView
+                android:id="@+id/cancelButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_close"
+                app:tint="@color/text_muted"
+                android:contentDescription="Close drawer"/>
 
-            <View
-                android:id="@+id/dividerTop"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/_2sdp"
-                android:background="@color/orange_bar"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/orderMateTextHeader"
+            <!-- Order Title -->
+            <TextView
+                android:id="@+id/orderTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="@dimen/_4sdp"
-                android:paddingVertical="@dimen/_5sdp"
-                android:paddingTop="@dimen/_2sdp"
-                android:paddingBottom="@dimen/_1sdp"
-                android:text="@string/app_name"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_8ssp"
-                app:layout_constraintEnd_toStartOf="@id/cancelButton"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dividerTop"
-                app:textAllCaps="true" />
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:text="Order"
+                android:textColor="@color/text_light"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif-medium"/>
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/customerName"
-                android:layout_width="match_parent"
+            <!-- Edit Order Notes Button (#42) -->
+            <LinearLayout
+                android:id="@+id/btnEditOrderNotes"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/app_name"
-                android:paddingHorizontal="@dimen/_4sdp"
-                android:textColor="@color/darker_gray"
-                android:textSize="@dimen/_6ssp"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="@id/orderMateTextHeader"
-                app:layout_constraintTop_toBottomOf="@id/orderMateTextHeader" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp"
+                android:background="@drawable/bg_button_primary_rounded"
+                android:clickable="true"
+                android:focusable="true">
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/orderId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="@dimen/_4sdp"
-                android:text="@string/app_name"
-                android:textColor="@color/darker_gray"
-                android:textSize="@dimen/_6ssp"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/customerName" />
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_edit"
+                    app:tint="@color/text_primary"/>
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/itemCount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/_2sdp"
-                android:paddingHorizontal="@dimen/_4sdp"
-                android:text="@string/app_name"
-                android:textColor="@color/darker_gray"
-                android:textSize="@dimen/_6ssp"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/orderId" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="Order Notes"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"/>
+            </LinearLayout>
+        </LinearLayout>
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/cancelButton"
-                android:layout_width="@dimen/_12sdp"
-                android:layout_height="@dimen/_12sdp"
-                android:layout_marginHorizontal="@dimen/_5sdp"
-                android:src="@drawable/ic_cancel"
-                app:layout_constraintBottom_toBottomOf="@id/orderMateTextHeader"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/orderMateTextHeader"
-                app:layout_constraintTop_toTopOf="@id/orderMateTextHeader" />
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/cartEmpty"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:src="@drawable/ic_cart"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/cartEmptyText"
+        <!-- Order-level Notes Pills Container (#42) -->
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/orderNotesPillsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/cart_is_empty"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_8ssp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cartEmpty" />
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            app:flexWrap="wrap"
+            app:alignItems="center"
+            app:justifyContent="flex_start"/>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <!-- Order Details Section (matches Event Preview) -->
+        <LinearLayout
+            android:id="@+id/orderDetailsSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <!-- Customer Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="12dp">
+
+                <FrameLayout
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_detail_icon">
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_user"
+                        app:tint="@color/text_muted"/>
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CUSTOMER"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:textAllCaps="true"/>
+
+                    <TextView
+                        android:id="@+id/customerName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textColor="@color/text_light"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#1AFFFFFF"/>
+
+            <!-- Total Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="12dp">
+
+                <FrameLayout
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_detail_icon">
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_dollar"
+                        app:tint="@color/text_muted"/>
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TOTAL"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:textAllCaps="true"/>
+
+                    <TextView
+                        android:id="@+id/orderTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="$0.00"
+                        android:textColor="@color/text_light"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#1AFFFFFF"/>
+
+            <!-- Items Count Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="12dp">
+
+                <FrameLayout
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_detail_icon">
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_box"
+                        app:tint="@color/text_muted"/>
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ITEMS"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:textAllCaps="true"/>
+
+                    <TextView
+                        android:id="@+id/itemCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 items"
+                        android:textColor="@color/text_light"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Line Items Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Line Items"
+            android:textColor="@color/text_muted"
+            android:textSize="11sp"
+            android:textAllCaps="true"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Progress Indicator -->
+        <FrameLayout
             android:id="@+id/progressLayout"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@color/white"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/dividerLeft"
-            app:layout_constraintTop_toBottomOf="@id/header">
+            android:layout_height="100dp"
+            android:visibility="gone">
 
             <ProgressBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/text_muted"/>
+        </FrameLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Empty Cart State -->
+        <LinearLayout
+            android:id="@+id/emptyStateContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingVertical="40dp"
+            android:visibility="gone">
 
+            <ImageView
+                android:id="@+id/cartEmpty"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_cart"
+                app:tint="@color/text_muted"/>
 
+            <TextView
+                android:id="@+id/cartEmptyText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/cart_is_empty"
+                android:textColor="@color/text_muted"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <!-- Line Items List -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/itemRecycler"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginVertical="@dimen/_2sdp"
-            android:paddingHorizontal="@dimen/_2sdp"
-            android:background="@color/white"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp"
             android:scrollbars="vertical"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/dividerLeft"
-            app:layout_constraintTop_toBottomOf="@id/header"
             tools:itemCount="6"
             tools:listitem="@layout/listitem_order" />
-        <View
-            android:id="@+id/dividerLeft"
-            android:layout_width="@dimen/_2sdp"
-            android:layout_height="match_parent"
-            android:background="@color/orange_bar"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

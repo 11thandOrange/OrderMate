@@ -11,8 +11,11 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.clover.sdk.v3.order.Order
+import com.google.android.flexbox.FlexboxLayout
 import com.orderMate.R
 import com.orderMate.activities.OverlayActivity
 import com.orderMate.adapters.ItemAdapter
@@ -104,23 +107,141 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     @Synchronized
     private fun setupRecyclerView(result: List<ItemModal>?, order: Order? ) {
         binding?.apply {
-            if (result?.isEmpty() == false) {
-                val data = result[0]
-                orderId.text = binding?.root?.context?.getString(
-                    R.string.order_id_value,
-                    data.order?.id.toString()
-                )
-                getCustomerName(binding?.root?.context, order, binding?.customerName)
-                itemCount.text =
-                    binding?.root?.context?.getString(R.string.order, getItemCount(result))
-            }
+            // Update order title (#42)
+            val shortId = order?.id?.takeLast(4)?.uppercase() ?: ""
+            orderTitle.text = "Order #$shortId"
+            
+            // Update customer name (#42)
+            val customerNameStr = order?.customers?.firstOrNull()?.let { customer ->
+                listOfNotNull(customer.firstName, customer.lastName)
+                    .filter { it.isNotBlank() }
+                    .joinToString(" ")
+                    .ifBlank { null }
+            } ?: "-"
+            customerName.text = customerNameStr
+            
+            // Update order total (#42)
+            val totalCents = order?.total ?: 0L
+            orderTotal.text = "$${String.format("%.2f", totalCents / 100.0)}"
+            
+            // Update item count (#42)
+            val itemCountNum = result?.sumOf { it.itemCount } ?: 0
+            itemCount.text = "$itemCountNum items"
+            
+            // Setup order notes pills (#42)
+            setupOrderNotesPills(order)
+            
+            // Hide empty state, show items
+            emptyStateContainer.hideView()
+            progressLayout.hideView()
+            
             itemRecycler.layoutManager = LinearLayoutManager(this@FloatingWidgetService)
             val adapter = ItemAdapter(lineItems, this@FloatingWidgetService)
             itemRecycler.adapter = adapter
             itemRecycler.showView()
-            itemCount.showView()
-            orderId.showView()
         }
+    }
+    
+    /**
+     * Setup order-level notes pills (#42)
+     * Parses order note and displays as pills with widget-specific color coding
+     */
+    private fun setupOrderNotesPills(order: Order?) {
+        val container = binding?.orderNotesPillsContainer ?: return
+        container.removeAllViews()
+        
+        val orderNote = order?.note
+        if (orderNote.isNullOrBlank()) {
+            container.visibility = View.GONE
+            return
+        }
+        
+        // Parse order note with labels preserved for color coding
+        val parsedNotes = parseOrderNoteWithLabels(orderNote)
+        
+        if (parsedNotes.isEmpty()) {
+            container.visibility = View.GONE
+            return
+        }
+        
+        container.visibility = View.VISIBLE
+        
+        parsedNotes.forEach { (label, value) ->
+            // Get widget-specific color based on label
+            val color = getColorForLabel(label)
+            val bgColor = (color and 0x00FFFFFF) or 0x26000000  // 15% opacity
+            
+            val pill = TextView(this).apply {
+                text = value
+                textSize = 11f
+                setTextColor(color)
+                setPadding(dpToPx(10), dpToPx(4), dpToPx(10), dpToPx(4))
+                
+                // Create background with widget-specific color
+                val bg = android.graphics.drawable.GradientDrawable()
+                bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                bg.cornerRadius = 12f * resources.displayMetrics.density
+                bg.setColor(bgColor)
+                background = bg
+                
+                val lp = FlexboxLayout.LayoutParams(
+                    FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                    FlexboxLayout.LayoutParams.WRAP_CONTENT
+                )
+                lp.setMargins(0, 0, dpToPx(6), dpToPx(4))
+                layoutParams = lp
+            }
+            container.addView(pill)
+        }
+    }
+    
+    /**
+     * Parse order note preserving labels for color coding
+     */
+    private fun parseOrderNoteWithLabels(noteString: String): List<Pair<String, String>> {
+        val notes = mutableListOf<Pair<String, String>>()
+        val delimiter = if (noteString.contains("•")) "•" else "|"
+        val parts = noteString.split(delimiter).map { it.trim() }.filter { it.isNotEmpty() }
+        
+        parts.forEach { part ->
+            val colonIndex = part.indexOf(':')
+            if (colonIndex > 0) {
+                val label = part.substring(0, colonIndex).trim().lowercase()
+                val rawValue = part.substring(colonIndex + 1).trim()
+                
+                val isMultiSelect = label.contains("category") || label.contains("tag")
+                if (isMultiSelect) {
+                    rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { value ->
+                        notes.add(label to value)
+                    }
+                } else if (rawValue.isNotBlank()) {
+                    notes.add(label to rawValue)
+                }
+            } else if (part.isNotBlank()) {
+                notes.add("text" to part)
+            }
+        }
+        return notes
+    }
+    
+    /**
+     * Get color for widget label - matches ItemAdapter color coding
+     * Blue: Date/Calendar/Pickup
+     * Purple: Single Select/Type/Status  
+     * Green: Multi Select/Category/Tag
+     * Orange: Text/Default
+     */
+    private fun getColorForLabel(label: String): Int {
+        return when {
+            label.contains("date") || label.contains("pickup") || label.contains("calendar") -> 0xFF64B5F6.toInt()  // Blue
+            label.contains("type") || label.contains("status") || label.contains("select") -> 0xFFCE93D8.toInt()    // Purple
+            label.contains("category") || label.contains("tag") -> 0xFF81C784.toInt()                               // Green
+            else -> 0xFFFFB74D.toInt()  // Orange (text/default)
+        }
+    }
+    
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
     }
 
     private fun getItemCount(list: List<ItemModal>): Int {
@@ -141,13 +262,10 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             if (data == null) {
                 CoroutineScope(Dispatchers.Main).launch {
                     binding?.apply {
-                        cartEmpty.showView()
-                        cartEmptyText.showView()
+                        // Show empty state (#42)
+                        emptyStateContainer.showView()
                         itemRecycler.hideView()
                         progressLayout.hideView()
-                        itemCount.hideView()
-                        orderId.hideView()
-                        customerName.hideView()
                         OrderDetailFragment.orderIdForReopen = null
                         OrderDetailFragment.isReOpenBtnClicked = false
                     }
@@ -172,13 +290,11 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
 
         binding?.container1?.setOnClickListener {
             binding?.orderMateButton?.hideView()
-            // when the cart is empty
+            // when the cart is empty (#42 - use new emptyStateContainer)
             if (prefManager.getString((Constants.isOrderSaved)) == Constants.isTrue && OrderDetailFragment.orderIdForReopen == null) {
                 binding?.itemRecycler?.hideView()
-                binding?.itemCount?.hideView()
-                binding?.orderId?.hideView()
-                binding?.customerName?.hideView()
                 binding?.progressLayout?.hideView()
+                binding?.emptyStateContainer?.showView()
             }
             if (prefManager.getString(Constants.isOrderSaved) == Constants.isFalse) {
                 getTheOrderData()
@@ -201,6 +317,15 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
 
         binding?.transparentContainer?.setOnClickListener {
             closeHandler()
+        }
+        
+        // Edit Order Notes button (#42) - opens order-level notes popup
+        binding?.btnEditOrderNotes?.setOnClickListener {
+            val data = Intent(applicationContext, OverlayActivity::class.java)
+            data.putExtra(Constants.overlayIntentExtraOrder, lastOrder?.id)
+            data.putExtra(OverlayActivity.EXTRA_OVERLAY_MODE, OverlayActivity.OVERLAY_MODE_ORDER_NOTE)
+            data.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            applicationContext?.startActivity(data)
         }
     }
 
