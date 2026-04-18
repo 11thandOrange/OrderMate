@@ -75,6 +75,17 @@
 
         </LinearLayout>
 
+        <!-- Order-level Notes Pills (#93 requirement) -->
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/orderNotesPillsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            app:flexWrap="wrap"
+            app:alignItems="center"
+            app:justifyContent="flex_start"/>
+
         <!-- Order Details Section -->
         <LinearLayout
             android:layout_width="match_parent"

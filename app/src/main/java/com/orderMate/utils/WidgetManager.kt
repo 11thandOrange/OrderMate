@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.PopupSettings
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.modals.WidgetOption
@@ -26,6 +27,7 @@ class WidgetManager private constructor(private val context: Context) {
         private const val PREFS_NAME = "widget_config_v2"
         private const val KEY_WIDGETS = "widgets"
         private const val KEY_SETTINGS = "settings"
+        const val MAX_WIDGETS_PER_LEVEL = 7
         
         @Volatile
         private var instance: WidgetManager? = null
@@ -61,9 +63,16 @@ class WidgetManager private constructor(private val context: Context) {
             val json = prefs.getString(KEY_WIDGETS, null)
             if (json != null) {
                 val type = object : TypeToken<List<WidgetConfig>>() {}.type
-                gson.fromJson<List<WidgetConfig>>(json, type) ?: DefaultWidgetFactory.createDefaults()
+                val widgets = gson.fromJson<List<WidgetConfig>>(json, type)
+                if (widgets.isNullOrEmpty()) {
+                    DefaultWidgetFactory.createDefaults()
+                } else {
+                    // Normalize: set level to ITEM if null (backward compatibility)
+                    widgets.forEach { if (it.level == null) it.level = NoteLevel.ITEM }
+                    widgets
+                }
             } else {
-                // Cache empty → return defaults (no saving needed)
+                // Cache empty → return defaults
                 DefaultWidgetFactory.createDefaults()
             }
         } catch (e: Exception) {
@@ -86,6 +95,66 @@ class WidgetManager private constructor(private val context: Context) {
         return getWidgets()
             .filter { it.isEnabled && it.type != WidgetType.TEXT_BOX }
             .sortedBy { it.order }
+    }
+    
+    // ==================== Level-based Filtering ====================
+    
+    /**
+     * Get item-level widgets (enabled) sorted by order.
+     */
+    fun getItemLevelWidgets(): List<WidgetConfig> {
+        return getWidgets()
+            .filter { it.level == NoteLevel.ITEM && it.isEnabled }
+            .sortedBy { it.order }
+    }
+    
+    /**
+     * Get order-level widgets (enabled) sorted by order.
+     */
+    fun getOrderLevelWidgets(): List<WidgetConfig> {
+        return getWidgets()
+            .filter { it.level == NoteLevel.ORDER && it.isEnabled }
+            .sortedBy { it.order }
+    }
+    
+    /**
+     * Get all item-level widgets (including disabled) sorted by order.
+     */
+    fun getAllItemLevelWidgets(): List<WidgetConfig> {
+        return getWidgets()
+            .filter { it.level == NoteLevel.ITEM }
+            .sortedBy { it.order }
+    }
+    
+    /**
+     * Get all order-level widgets (including disabled) sorted by order.
+     */
+    fun getAllOrderLevelWidgets(): List<WidgetConfig> {
+        return getWidgets()
+            .filter { it.level == NoteLevel.ORDER }
+            .sortedBy { it.order }
+    }
+    
+    /**
+     * Get count of item-level widgets.
+     */
+    fun getItemLevelWidgetCount(): Int {
+        return getWidgets().count { it.level == NoteLevel.ITEM }
+    }
+    
+    /**
+     * Get count of order-level widgets.
+     */
+    fun getOrderLevelWidgetCount(): Int {
+        return getWidgets().count { it.level == NoteLevel.ORDER }
+    }
+    
+    /**
+     * Check if can add more widgets for a given level (max 7 per level).
+     */
+    fun canAddWidget(level: NoteLevel): Boolean {
+        val count = if (level == NoteLevel.ITEM) getItemLevelWidgetCount() else getOrderLevelWidgetCount()
+        return count < MAX_WIDGETS_PER_LEVEL
     }
     
     /**
@@ -136,14 +205,22 @@ class WidgetManager private constructor(private val context: Context) {
     
     // ==================== Widget CRUD ====================
     
-    fun addWidget(type: WidgetType, callback: (WidgetConfig?) -> Unit) {
+    fun addWidget(type: WidgetType, level: NoteLevel = NoteLevel.ITEM, callback: (WidgetConfig?) -> Unit) {
         val mid = merchantId ?: return callback(null)
-        val widgets = getWidgets().toMutableList()
-        val order = (widgets.maxOfOrNull { it.order } ?: -1) + 1
-        val widget = DefaultWidgetFactory.createEmpty(type, order)
+        
+        // Check max widgets per level
+        if (!canAddWidget(level)) {
+            callback(null)
+            return
+        }
+        
+        val widgetsForLevel = if (level == NoteLevel.ITEM) getAllItemLevelWidgets() else getAllOrderLevelWidgets()
+        val order = (widgetsForLevel.maxOfOrNull { it.order } ?: -1) + 1
+        val widget = DefaultWidgetFactory.createEmpty(type, order, level)
         
         firebase.saveWidget(mid, widget) { success ->
             if (success) {
+                val widgets = getWidgets().toMutableList()
                 widgets.add(widget)
                 saveWidgetsToCache(widgets)
                 callback(widget)
@@ -155,6 +232,13 @@ class WidgetManager private constructor(private val context: Context) {
     
     fun addWidget(widget: WidgetConfig, callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
+        
+        // Check max widgets per level
+        if (!canAddWidget(widget.level)) {
+            callback(false)
+            return
+        }
+        
         firebase.saveWidget(mid, widget) { success ->
             if (success) {
                 val widgets = getWidgets().toMutableList()

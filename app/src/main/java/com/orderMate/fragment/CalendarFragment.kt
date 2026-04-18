@@ -30,6 +30,7 @@ import com.orderMate.utils.CalendarManager
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FilterCategoryBuilder
 import com.orderMate.utils.MyApp
+import com.orderMate.utils.OrderDueDateResolver
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.OrderSearchFilter
 import com.orderMate.utils.exceptionHandlerWithReturn
@@ -425,7 +426,10 @@ class CalendarFragment : Fragment() {
         return orders.mapNotNull { order ->
             order ?: return@mapNotNull null
             
-            val dueDate = order.createdTime?.let { Date(it) } ?: return@mapNotNull null
+            // Use OrderDueDateResolver for due date priority (#93)
+            // Priority: 1) Order-level Due Date, 2) Item-level Due Date, 3) Order created
+            val dueDate = OrderDueDateResolver.resolveDueDate(order) ?: return@mapNotNull null
+            
             val customerName = try {
                 val customer = order.customers?.firstOrNull()
                 "${customer?.firstName ?: ""} ${customer?.lastName ?: ""}".trim().ifEmpty { "-" }
@@ -464,7 +468,8 @@ class CalendarFragment : Fragment() {
                 total = total,
                 itemCount = itemCount,
                 note = null,
-                lineItems = lineItems
+                lineItems = lineItems,
+                orderNote = order.note  // Include order-level note for EventPreviewDialog (#93)
             )
         }
     }

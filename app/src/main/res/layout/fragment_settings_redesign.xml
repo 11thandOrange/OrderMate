@@ -37,14 +37,27 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tabPopUp"
+                android:id="@+id/tabItemLevelNotes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:background="@drawable/bg_settings_subtab"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="10dp"
-                android:text="Pop Up"
+                android:text="Item Level Notes"
+                android:textColor="@color/text_muted"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabOrderLevelNotes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_settings_subtab"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="10dp"
+                android:text="Order Level Notes"
                 android:textColor="@color/text_muted"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -202,9 +215,9 @@
             </LinearLayout>
         </ScrollView>
 
-        <!-- Pop Up Panel -->
+        <!-- Item Level Notes Panel -->
         <ScrollView
-            android:id="@+id/panelPopUp"
+            android:id="@+id/panelItemLevelNotes"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone">
@@ -214,7 +227,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Pop Up Editor Card -->
+                <!-- Item Level Notes Editor Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -227,7 +240,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="OrderMate Pop Up Editor"
+                        android:text="Item Level Notes Editor"
                         android:textColor="@color/text_light"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -238,7 +251,7 @@
                         android:layout_marginTop="4dp"
                         android:layout_marginBottom="16dp"
                         android:gravity="center"
-                        android:text="Add &amp; Edit Sections That Appear In the OrderMate Editor"
+                        android:text="Add &amp; Edit Widgets For Individual Line Items"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
 
@@ -252,7 +265,7 @@
                         android:minHeight="200dp">
 
                         <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/widgetRecyclerView"
+                            android:id="@+id/itemLevelWidgetRecyclerView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:nestedScrollingEnabled="false"
@@ -263,7 +276,97 @@
 
                     <!-- Add Widget Button -->
                     <LinearLayout
-                        android:id="@+id/btnAddWidget"
+                        android:id="@+id/btnAddItemLevelWidget"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="16dp"
+                        android:background="@drawable/bg_add_widget_button"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_add"
+                            app:tint="@color/text_muted" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Add Widget"
+                            android:textColor="@color/text_muted"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- Order Level Notes Panel -->
+        <ScrollView
+            android:id="@+id/panelOrderLevelNotes"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Order Level Notes Editor Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_settings_card_glass"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Centered title and subtitle -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Order Level Notes Editor"
+                        android:textColor="@color/text_light"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="16dp"
+                        android:gravity="center"
+                        android:text="Add &amp; Edit Widgets For Entire Orders"
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp" />
+
+                    <!-- Widget List Container -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_widget_list_container"
+                        android:orientation="vertical"
+                        android:padding="12dp"
+                        android:minHeight="200dp">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/orderLevelWidgetRecyclerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false"
+                            tools:itemCount="4"
+                            tools:listitem="@layout/item_widget_editor" />
+
+                    </LinearLayout>
+
+                    <!-- Add Widget Button -->
+                    <LinearLayout
+                        android:id="@+id/btnAddOrderLevelWidget"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_marginTop="16dp"

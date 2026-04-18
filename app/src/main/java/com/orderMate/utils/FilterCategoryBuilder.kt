@@ -1,6 +1,7 @@
 package com.orderMate.utils
 
 import com.clover.sdk.v3.order.Order
+import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.modals.WidgetType
 import java.util.Date
@@ -11,8 +12,8 @@ import java.util.Date
  * Filter Modal displays:
  * 1. Clover filters (Payment Status, Order Status, Payment Type, Employee)
  *    - Options extracted from actual order data at runtime
- * 2. OrderMate widget filters (where isEnabled=true and showInFilter=true)
- *    - Options from widget configuration in DB
+ * 2. Item-level widget filters (isEnabled=true, level=ITEM)
+ * 3. Order-level widget filters (isEnabled=true, level=ORDER) (#93)
  */
 object FilterCategoryBuilder {
     
@@ -96,13 +97,23 @@ object FilterCategoryBuilder {
             categories.add(employeeFilter)
         }
         
-        // 3. ALL enabled OrderMate widgets (not TEXT_BOX - can't filter text)
-        widgets
-            .filter { it.isEnabled && it.type != WidgetType.TEXT_BOX }
+        // 3. Item-level widgets (ITEM level, enabled, not TEXT_BOX)
+        val itemWidgets = widgets
+            .filter { it.isEnabled && it.type != WidgetType.TEXT_BOX && it.level == NoteLevel.ITEM }
             .sortedBy { it.order }
-            .forEach { widget ->
-                categories.add(buildWidgetFilter(widget))
-            }
+        
+        itemWidgets.forEach { widget ->
+            categories.add(buildWidgetFilter(widget, prefix = "Item: "))
+        }
+        
+        // 4. Order-level widgets (ORDER level, enabled, not TEXT_BOX) (#93)
+        val orderWidgets = widgets
+            .filter { it.isEnabled && it.type != WidgetType.TEXT_BOX && it.level == NoteLevel.ORDER }
+            .sortedBy { it.order }
+        
+        orderWidgets.forEach { widget ->
+            categories.add(buildWidgetFilter(widget, prefix = "Order: "))
+        }
         
         return categories
     }
@@ -216,8 +227,11 @@ object FilterCategoryBuilder {
     
     /**
      * Build filter from OrderMate widget configuration
+     * 
+     * @param widget The widget configuration
+     * @param prefix Optional prefix to distinguish item vs order level (e.g., "Item: ", "Order: ")
      */
-    private fun buildWidgetFilter(widget: WidgetConfig): FilterCategory {
+    private fun buildWidgetFilter(widget: WidgetConfig, prefix: String = ""): FilterCategory {
         val filterType = when (widget.type) {
             WidgetType.CALENDAR -> FilterType.DATE_PICKER
             else -> FilterType.MULTI_SELECT
@@ -231,9 +245,12 @@ object FilterCategoryBuilder {
             )
         }
         
+        // Include level in ID to differentiate item vs order level widgets
+        val levelSuffix = if (widget.level == NoteLevel.ORDER) "_order" else "_item"
+        
         return FilterCategory(
-            id = "$WIDGET_PREFIX${widget.id}",
-            label = widget.label,
+            id = "$WIDGET_PREFIX${widget.id}$levelSuffix",
+            label = "$prefix${widget.label}",
             type = filterType,
             source = FilterSource.ORDERMATE,
             options = options

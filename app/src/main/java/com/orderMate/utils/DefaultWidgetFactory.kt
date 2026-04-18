@@ -1,5 +1,6 @@
 package com.orderMate.utils
 
+import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.modals.WidgetOption
 import com.orderMate.modals.WidgetType
@@ -12,39 +13,30 @@ import java.util.UUID
 object DefaultWidgetFactory {
     
     /**
-     * Creates default widgets for new merchants
+     * Creates default widgets for new merchants (both item-level and order-level)
      * Each call generates new UUIDs
+     * - Item-level widgets: enabled by default
+     * - Order-level widgets: disabled by default
      */
-    fun createDefaults(): List<WidgetConfig> = listOf(
+    fun createDefaults(): List<WidgetConfig> = createItemLevelDefaults() + createOrderLevelDefaults()
+    
+    /**
+     * Creates default item-level widgets (enabled by default)
+     */
+    fun createItemLevelDefaults(): List<WidgetConfig> = listOf(
         createWidget(
             type = WidgetType.CALENDAR,
-            label = "Pickup Date",
+            label = "Due Date",
+            level = NoteLevel.ITEM,
+            isEnabled = true,
             order = 0
         ),
         createWidget(
             type = WidgetType.SINGLE_SELECT,
-            label = "Type",
-            order = 1,
-            options = listOf(
-                "Pickup" to "Pickup",
-                "Delivery" to "Delivery",
-                "Preorder" to "Preorder"
-            )
-        ),
-        createWidget(
-            type = WidgetType.SINGLE_SELECT,
-            label = "Status",
-            order = 2,
-            options = listOf(
-                "In Progress" to "In Progress",
-                "Ready" to "Ready",
-                "Completed" to "Completed"
-            )
-        ),
-        createWidget(
-            type = WidgetType.MULTI_SELECT,
             label = "Category",
-            order = 3,
+            level = NoteLevel.ITEM,
+            isEnabled = true,
+            order = 1,
             options = listOf(
                 "Birthday" to "Birthday",
                 "Wedding" to "Wedding",
@@ -53,15 +45,68 @@ object DefaultWidgetFactory {
         ),
         createWidget(
             type = WidgetType.MULTI_SELECT,
-            label = "Sub-Category",
-            order = 4,
-            options = emptyList()
+            label = "Tags",
+            level = NoteLevel.ITEM,
+            isEnabled = true,
+            order = 2,
+            options = listOf(
+                "Rush" to "Rush",
+                "VIP" to "VIP",
+                "Delivery" to "Delivery"
+            )
         ),
         createWidget(
             type = WidgetType.TEXT_BOX,
             label = "Description",
+            level = NoteLevel.ITEM,
+            isEnabled = true,
             showInFilter = false,
-            order = 5
+            order = 3
+        )
+    )
+    
+    /**
+     * Creates default order-level widgets (disabled by default)
+     */
+    fun createOrderLevelDefaults(): List<WidgetConfig> = listOf(
+        createWidget(
+            type = WidgetType.CALENDAR,
+            label = "Deadline",
+            level = NoteLevel.ORDER,
+            isEnabled = false,
+            order = 0
+        ),
+        createWidget(
+            type = WidgetType.SINGLE_SELECT,
+            label = "Group",
+            level = NoteLevel.ORDER,
+            isEnabled = false,
+            order = 1,
+            options = listOf(
+                "Catering" to "Catering",
+                "Retail" to "Retail",
+                "Event" to "Event"
+            )
+        ),
+        createWidget(
+            type = WidgetType.MULTI_SELECT,
+            label = "Tags",
+            level = NoteLevel.ORDER,
+            isEnabled = false,
+            order = 2,
+            options = listOf(
+                "Priority" to "Priority",
+                "Fragile" to "Fragile",
+                "Gift" to "Gift"
+            )
+        ),
+        createWidget(
+            type = WidgetType.TEXT_BOX,
+            label = "Details",
+            level = NoteLevel.ORDER,
+            isEnabled = false,
+            showInFilter = false,
+            order = 3
         )
     )
     
@@ -71,6 +116,8 @@ object DefaultWidgetFactory {
     fun createWidget(
         type: WidgetType,
         label: String,
+        level: NoteLevel = NoteLevel.ITEM,
+        isEnabled: Boolean = true,
         showInFilter: Boolean = type != WidgetType.TEXT_BOX,
         order: Int = 0,
         options: List<Pair<String, String>> = emptyList()
@@ -79,10 +126,11 @@ object DefaultWidgetFactory {
             id = UUID.randomUUID().toString(),
             type = type,
             label = label,
-            isEnabled = true,
+            isEnabled = isEnabled,
             isRequired = false,
             showInFilter = showInFilter,
             order = order,
+            level = level,
             options = options.mapIndexed { index, (optLabel, optValue) ->
                 WidgetOption(
                     id = UUID.randomUUID().toString(),
@@ -95,9 +143,9 @@ object DefaultWidgetFactory {
     }
     
     /**
-     * Create an empty widget of given type
+     * Create an empty widget of given type and level
      */
-    fun createEmpty(type: WidgetType, order: Int): WidgetConfig {
+    fun createEmpty(type: WidgetType, order: Int, level: NoteLevel = NoteLevel.ITEM): WidgetConfig {
         return WidgetConfig(
             id = UUID.randomUUID().toString(),
             type = type,
@@ -106,6 +154,7 @@ object DefaultWidgetFactory {
             isRequired = false,
             showInFilter = type != WidgetType.TEXT_BOX,
             order = order,
+            level = level,
             options = mutableListOf()
         )
     }

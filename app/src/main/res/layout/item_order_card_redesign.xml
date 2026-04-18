@@ -55,6 +55,18 @@
                     android:fontFamily="sans-serif-medium"
                     tools:text="#ORD-001A"/>
 
+                <!-- Order-level Notes Pills (inline with order number) -->
+                <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/orderLevelNotesContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone"
+                    app:flexWrap="wrap"
+                    app:alignItems="center"
+                    app:justifyContent="flex_start"/>
+
                 <!-- Status Badges and Custom Tags Container (#19) -->
                 <HorizontalScrollView
                     android:layout_width="0dp"

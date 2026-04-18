@@ -86,6 +86,9 @@ class EventPreviewDialog : DialogFragment() {
         val shortId = currentEvent.orderId.takeLast(4).uppercase()
         orderTitle.text = "Order #$shortId"
 
+        // Setup order-level notes pills (#93)
+        setupOrderNotesPills(view, currentEvent)
+
         // Set details
         customerName.text = if (currentEvent.customerName.isBlank()) "-" else currentEvent.customerName
         
@@ -155,6 +158,79 @@ class EventPreviewDialog : DialogFragment() {
 
     fun setOnEventClickListener(listener: (ScheduledEvent) -> Unit) {
         this.onFullDetailsClick = listener
+    }
+    
+    /**
+     * Setup order-level notes pills display (#93)
+     */
+    private fun setupOrderNotesPills(view: View, event: ScheduledEvent) {
+        val container = view.findViewById<FlexboxLayout>(R.id.orderNotesPillsContainer)
+        container.removeAllViews()
+        
+        val orderNote = event.orderNote
+        if (orderNote.isNullOrBlank()) {
+            container.visibility = View.GONE
+            return
+        }
+        
+        // Parse order notes
+        val notes = parseOrderNote(orderNote)
+        if (notes.isEmpty()) {
+            container.visibility = View.GONE
+            return
+        }
+        
+        container.visibility = View.VISIBLE
+        
+        notes.forEach { noteItem ->
+            val pill = TextView(requireContext()).apply {
+                text = noteItem.text
+                setBackgroundResource(R.drawable.bg_order_note_pill)
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.order_pill_text))
+                textSize = 11f
+                setPadding(dpToPx(10), dpToPx(4), dpToPx(10), dpToPx(4))
+                
+                val lp = FlexboxLayout.LayoutParams(
+                    FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                    FlexboxLayout.LayoutParams.WRAP_CONTENT
+                )
+                lp.setMargins(0, 0, dpToPx(6), dpToPx(4))
+                layoutParams = lp
+            }
+            container.addView(pill)
+        }
+    }
+    
+    private data class NoteItem(val text: String, val label: String)
+    
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
+    }
+    
+    private fun parseOrderNote(noteString: String): List<NoteItem> {
+        val notes = mutableListOf<NoteItem>()
+        val delimiter = if (noteString.contains("•")) "•" else "|"
+        val parts = noteString.split(delimiter).map { it.trim() }.filter { it.isNotEmpty() }
+        
+        parts.forEach { part ->
+            val colonIndex = part.indexOf(':')
+            if (colonIndex > 0) {
+                val label = part.substring(0, colonIndex).trim().lowercase()
+                val rawValue = part.substring(colonIndex + 1).trim()
+                
+                val isMultiSelect = label.contains("category") || label.contains("tag")
+                if (isMultiSelect) {
+                    rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { value ->
+                        notes.add(NoteItem(value, label))
+                    }
+                } else if (rawValue.isNotBlank()) {
+                    notes.add(NoteItem(rawValue, label))
+                }
+            } else if (part.isNotBlank()) {
+                notes.add(NoteItem(part, ""))
+            }
+        }
+        return notes
     }
 
     inner class LineItemAdapter(

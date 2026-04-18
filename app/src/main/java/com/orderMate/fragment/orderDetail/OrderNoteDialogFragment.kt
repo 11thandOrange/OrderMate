@@ -9,15 +9,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.textfield.TextInputEditText
 import com.orderMate.R
-import com.orderMate.databinding.DialogItemNoteBinding
 import com.orderMate.modals.WidgetConfig
-import com.orderMate.modals.WidgetOption
 import com.orderMate.modals.WidgetType
 import com.orderMate.utils.WidgetManager
 import java.text.SimpleDateFormat
@@ -25,47 +24,43 @@ import java.util.Calendar
 import java.util.Locale
 
 /**
- * Dialog for adding/editing notes on line items
+ * Dialog for adding/editing notes at the order level (#93 requirement)
  * 
- * Displays widgets dynamically based on WidgetConfig list:
- * - SINGLE_SELECT: Chips with radio-like behavior (one selection)
- * - MULTI_SELECT: Chips with checkbox-like behavior (multiple selections)
- * - CALENDAR: Date picker input
- * - TEXT_BOX: Free-form text input
+ * Similar to ItemNoteDialogFragment but:
+ * - Uses order-level widgets (level = ORDER)
+ * - Saves to Order.note field (not LineItem.note)
+ * - Different color scheme (purple accent)
  */
-class ItemNoteDialogFragment : DialogFragment() {
+class OrderNoteDialogFragment : DialogFragment() {
 
-    private var _binding: DialogItemNoteBinding? = null
-    private val binding get() = _binding!!
+    private var noteSectionsContainer: LinearLayout? = null
+    private var btnCancel: View? = null
+    private var btnSave: View? = null
 
     private var widgets: List<WidgetConfig> = emptyList()
-    private var listener: ItemNoteListener? = null
-    private var lineItemId: String? = null
+    private var listener: OrderNoteListener? = null
+    private var orderId: String? = null
     private var existingNote: String? = null
 
-    // Selections: widgetId -> selected values
     private val singleSelections = mutableMapOf<String, String?>()
     private val multiSelections = mutableMapOf<String, MutableSet<String>>()
     private val dateSelections = mutableMapOf<String, String?>()
     private val textSelections = mutableMapOf<String, String?>()
-
-    // Track view references for collecting data
     private val textInputViews = mutableMapOf<String, TextInputEditText>()
 
     private val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
 
-    interface ItemNoteListener {
-        fun onNoteSaved(lineItemId: String?, note: String)
-        fun onNoteCancelled()
+    interface OrderNoteListener {
+        fun onOrderNoteSaved(orderId: String?, note: String)
+        fun onOrderNoteCancelled()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NO_FRAME, R.style.Theme_OrderMate_Dialog)
         
-        // Restore simple arguments
         arguments?.let { args ->
-            lineItemId = args.getString(ARG_LINE_ITEM_ID)
+            orderId = args.getString(ARG_ORDER_ID)
             existingNote = args.getString(ARG_EXISTING_NOTE)
         }
     }
@@ -100,16 +95,19 @@ class ItemNoteDialogFragment : DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        _binding = DialogItemNoteBinding.inflate(inflater, container, false)
-        return binding.root
+    ): View? {
+        return inflater.inflate(R.layout.dialog_order_note, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Read item-level widgets only (not order-level)
-        widgets = WidgetManager.getInstance(requireContext()).getItemLevelWidgets()
+        noteSectionsContainer = view.findViewById(R.id.noteSectionsContainer)
+        btnCancel = view.findViewById(R.id.btnCancel)
+        btnSave = view.findViewById(R.id.btnSave)
+
+        // Read order-level widgets only
+        widgets = WidgetManager.getInstance(requireContext()).getOrderLevelWidgets()
         
         setupButtons()
         buildNoteSections()
@@ -117,31 +115,27 @@ class ItemNoteDialogFragment : DialogFragment() {
     }
 
     private fun setupButtons() {
-        binding.btnCancel.setOnClickListener {
-            listener?.onNoteCancelled()
+        btnCancel?.setOnClickListener {
+            listener?.onOrderNoteCancelled()
             dismiss()
         }
 
-        binding.btnSave.setOnClickListener {
+        btnSave?.setOnClickListener {
             val note = buildNoteString()
-            listener?.onNoteSaved(lineItemId, note)
+            listener?.onOrderNoteSaved(orderId, note)
             dismiss()
         }
     }
 
-    /**
-     * Build all widget sections dynamically
-     */
     private fun buildNoteSections() {
-        binding.noteSectionsContainer.removeAllViews()
+        noteSectionsContainer?.removeAllViews()
 
         val enabledWidgets = widgets.filter { it.isEnabled }.sortedBy { it.order }
         
         if (enabledWidgets.isEmpty()) {
-            // Show empty state message and disable save button
             addEmptyStateMessage()
-            binding.btnSave.isEnabled = false
-            binding.btnSave.alpha = 0.5f
+            btnSave?.isEnabled = false
+            btnSave?.alpha = 0.5f
             return
         }
         
@@ -155,26 +149,20 @@ class ItemNoteDialogFragment : DialogFragment() {
         }
     }
     
-    /**
-     * Show empty state when no widgets are enabled
-     */
     private fun addEmptyStateMessage() {
         val emptyView = TextView(requireContext()).apply {
-            text = "No item-level widgets enabled. Update Item Level Notes settings."
+            text = "No order-level widgets enabled. Update Order Level Notes settings."
             textSize = 16f
             setTextColor(ContextCompat.getColor(requireContext(), R.color.text_muted))
             textAlignment = View.TEXT_ALIGNMENT_CENTER
             setPadding(0, dpToPx(48), 0, dpToPx(48))
         }
-        binding.noteSectionsContainer.addView(emptyView)
+        noteSectionsContainer?.addView(emptyView)
     }
 
-    /**
-     * Add SINGLE_SELECT section - radio-like chip selection
-     */
     private fun addSingleSelectSection(widget: WidgetConfig) {
         val sectionView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.note_section_select, binding.noteSectionsContainer, false)
+            .inflate(R.layout.note_section_select, noteSectionsContainer, false)
 
         val labelView = sectionView.findViewById<TextView>(R.id.sectionLabel)
         labelView.text = widget.label
@@ -182,15 +170,12 @@ class ItemNoteDialogFragment : DialogFragment() {
         val optionsContainer = sectionView.findViewById<FlexboxLayout>(R.id.optionsContainer)
         setupSingleSelectOptions(optionsContainer, widget)
 
-        binding.noteSectionsContainer.addView(sectionView)
+        noteSectionsContainer?.addView(sectionView)
     }
 
-    /**
-     * Add MULTI_SELECT section - checkbox-like chip selection
-     */
     private fun addMultiSelectSection(widget: WidgetConfig) {
         val sectionView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.note_section_select, binding.noteSectionsContainer, false)
+            .inflate(R.layout.note_section_select, noteSectionsContainer, false)
 
         val labelView = sectionView.findViewById<TextView>(R.id.sectionLabel)
         labelView.text = widget.label
@@ -198,70 +183,49 @@ class ItemNoteDialogFragment : DialogFragment() {
         val optionsContainer = sectionView.findViewById<FlexboxLayout>(R.id.optionsContainer)
         setupMultiSelectOptions(optionsContainer, widget)
 
-        binding.noteSectionsContainer.addView(sectionView)
+        noteSectionsContainer?.addView(sectionView)
     }
 
-    /**
-     * Add CALENDAR section - date picker
-     */
     private fun addCalendarSection(widget: WidgetConfig) {
         val sectionView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.note_section_calendar, binding.noteSectionsContainer, false)
+            .inflate(R.layout.note_section_calendar, noteSectionsContainer, false)
 
         val labelView = sectionView.findViewById<TextView>(R.id.sectionLabel)
         labelView.text = widget.label
 
         val dateInput = sectionView.findViewById<TextInputEditText>(R.id.dateInput)
+        dateSelections[widget.id]?.let { dateInput.setText(it) }
         dateInput.setOnClickListener { showDatePicker(widget.id, dateInput) }
 
-        // Restore existing selection
-        dateSelections[widget.id]?.let { dateInput.setText(it) }
-
-        binding.noteSectionsContainer.addView(sectionView)
+        noteSectionsContainer?.addView(sectionView)
     }
 
-    /**
-     * Add TEXT_BOX section - free-form text input
-     */
     private fun addTextBoxSection(widget: WidgetConfig) {
         val sectionView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.note_section_textbox, binding.noteSectionsContainer, false)
+            .inflate(R.layout.note_section_textbox, noteSectionsContainer, false)
 
         val labelView = sectionView.findViewById<TextView>(R.id.sectionLabel)
         labelView.text = widget.label
 
         val textInput = sectionView.findViewById<TextInputEditText>(R.id.textInput)
+        textSelections[widget.id]?.let { textInput.setText(it) }
         textInputViews[widget.id] = textInput
 
-        // Restore existing text
-        textSelections[widget.id]?.let { textInput.setText(it) }
-
-        binding.noteSectionsContainer.addView(sectionView)
+        noteSectionsContainer?.addView(sectionView)
     }
 
-    /**
-     * Setup SINGLE_SELECT chips - only one can be selected
-     */
     private fun setupSingleSelectOptions(container: FlexboxLayout, widget: WidgetConfig) {
         container.removeAllViews()
-
-        // Initialize selection
-        if (!singleSelections.containsKey(widget.id)) {
-            singleSelections[widget.id] = null
-        }
-
-        val chipViews = mutableListOf<TextView>()
 
         widget.options.forEach { option ->
             val isSelected = singleSelections[widget.id] == option.value
             val chip = createChip(option.label, option.value, isSelected)
-            chipViews.add(chip)
 
             chip.setOnClickListener {
-                // Deselect all other chips
-                chipViews.forEach { other -> updateChipState(other, false) }
+                container.children.forEach { child ->
+                    if (child is TextView) updateChipState(child, false)
+                }
                 
-                // Toggle this chip
                 val wasSelected = singleSelections[widget.id] == option.value
                 if (wasSelected) {
                     singleSelections[widget.id] = null
@@ -276,13 +240,9 @@ class ItemNoteDialogFragment : DialogFragment() {
         }
     }
 
-    /**
-     * Setup MULTI_SELECT chips - multiple can be selected
-     */
     private fun setupMultiSelectOptions(container: FlexboxLayout, widget: WidgetConfig) {
         container.removeAllViews()
 
-        // Initialize selections set
         if (!multiSelections.containsKey(widget.id)) {
             multiSelections[widget.id] = mutableSetOf()
         }
@@ -306,13 +266,9 @@ class ItemNoteDialogFragment : DialogFragment() {
         }
     }
 
-    /**
-     * Show date picker dialog
-     */
     private fun showDatePicker(widgetId: String, dateInput: TextInputEditText) {
         val calendar = Calendar.getInstance()
 
-        // If there's an existing date, parse it
         dateSelections[widgetId]?.let { existing ->
             try {
                 dateFormat.parse(existing)?.let { calendar.time = it }
@@ -334,9 +290,6 @@ class ItemNoteDialogFragment : DialogFragment() {
         ).show()
     }
 
-    /**
-     * Create a chip view
-     */
     private fun createChip(label: String, value: String, isSelected: Boolean): TextView {
         return TextView(requireContext()).apply {
             text = label
@@ -357,11 +310,9 @@ class ItemNoteDialogFragment : DialogFragment() {
         }
     }
 
-    /**
-     * Update chip visual state
-     */
     private fun updateChipState(chip: TextView, isSelected: Boolean) {
         if (isSelected) {
+            // Use order-level colors (purple) for selected state
             chip.setBackgroundResource(R.drawable.bg_filter_option_selected)
             chip.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
         } else {
@@ -370,9 +321,6 @@ class ItemNoteDialogFragment : DialogFragment() {
         }
     }
 
-    /**
-     * Build the note string from all selections
-     */
     private fun buildNoteString(): String {
         val parts = mutableListOf<String>()
 
@@ -409,13 +357,9 @@ class ItemNoteDialogFragment : DialogFragment() {
         return parts.joinToString(" • ")
     }
 
-    /**
-     * Parse existing note and populate selections
-     */
     private fun parseExistingNote() {
         if (existingNote.isNullOrEmpty()) return
 
-        // Parse format: "Label:Value • Label:Value" (or legacy "|" delimiter)
         val delimiter = if (existingNote!!.contains("•")) "•" else "|"
         existingNote?.split(delimiter)?.forEach { part ->
             val trimmed = part.trim()
@@ -424,7 +368,6 @@ class ItemNoteDialogFragment : DialogFragment() {
                 val label = trimmed.substring(0, colonIndex).trim()
                 val value = trimmed.substring(colonIndex + 1).trim()
 
-                // Find widget by label
                 val widget = widgets.find { it.label.equals(label, ignoreCase = true) }
                 widget?.let {
                     when (it.type) {
@@ -451,21 +394,22 @@ class ItemNoteDialogFragment : DialogFragment() {
         return (dp * resources.displayMetrics.density).toInt()
     }
 
+    private val ViewGroup.children: Sequence<View>
+        get() = (0 until childCount).asSequence().map { getChildAt(it) }
+
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        noteSectionsContainer = null
+        btnCancel = null
+        btnSave = null
     }
 
-    fun setListener(listener: ItemNoteListener) {
+    fun setListener(listener: OrderNoteListener) {
         this.listener = listener
     }
 
-    fun setWidgets(widgets: List<WidgetConfig>) {
-        this.widgets = widgets
-    }
-
-    fun setLineItemId(id: String?) {
-        this.lineItemId = id
+    fun setOrderId(id: String?) {
+        this.orderId = id
     }
 
     fun setExistingNote(note: String?) {
@@ -473,17 +417,17 @@ class ItemNoteDialogFragment : DialogFragment() {
     }
 
     companion object {
-        const val TAG = "ItemNoteDialogFragment"
-        private const val ARG_LINE_ITEM_ID = "arg_line_item_id"
+        const val TAG = "OrderNoteDialogFragment"
+        private const val ARG_ORDER_ID = "arg_order_id"
         private const val ARG_EXISTING_NOTE = "arg_existing_note"
 
         fun newInstance(
-            lineItemId: String? = null,
+            orderId: String? = null,
             existingNote: String? = null
-        ): ItemNoteDialogFragment {
-            return ItemNoteDialogFragment().apply {
+        ): OrderNoteDialogFragment {
+            return OrderNoteDialogFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_LINE_ITEM_ID, lineItemId)
+                    putString(ARG_ORDER_ID, orderId)
                     putString(ARG_EXISTING_NOTE, existingNote)
                 }
             }

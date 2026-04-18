@@ -89,7 +89,10 @@ class OrderCardRedesignAdapter(
             // Custom Order Tags (#19)
             setupCustomTags(order)
 
-            // Custom Notes Pills
+            // Order-level Notes Pills (inline with order number)
+            setupOrderLevelNotesPills(order)
+            
+            // Item-level Notes Pills (in notes section)
             setupNotesPills(order)
 
             // Left Status Indicator (green for paid, red for unpaid)
@@ -353,6 +356,85 @@ class OrderCardRedesignAdapter(
                 "$${total.toDoubleFloatPoint()}"
             } catch (e: Exception) {
                 "$0.00"
+            }
+        }
+
+        /**
+         * Setup order-level notes pills (from Order.note field)
+         * Displayed inline with order number using purple color scheme
+         */
+        private fun setupOrderLevelNotesPills(order: Order) {
+            val container = binding.orderLevelNotesContainer
+            container.removeAllViews()
+            
+            val orderNote = order.note
+            if (orderNote.isNullOrBlank()) {
+                container.visibility = View.GONE
+                return
+            }
+            
+            val notes = mutableListOf<NoteItem>()
+            parseNotes(orderNote, notes)
+            
+            if (notes.isEmpty()) {
+                container.visibility = View.GONE
+                return
+            }
+            
+            container.visibility = View.VISIBLE
+            val context = binding.root.context
+            
+            // Show max 2 order-level pills inline to save space
+            notes.take(2).forEach { noteItem ->
+                val pillView = LayoutInflater.from(context)
+                    .inflate(R.layout.item_note_pill, container, false) as LinearLayout
+                
+                val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
+                val pillText = pillView.findViewById<TextView>(R.id.pillText)
+                
+                val iconRes = getIconForLabel(noteItem.label)
+                
+                // Truncate to 10 chars for compact display
+                val displayText = noteItem.text.replace("\n", " ").take(10).let {
+                    if (noteItem.text.length > 10) "$it..." else it
+                }
+                pillText.text = displayText
+                pillText.maxLines = 1
+                
+                // Use order-level colors (purple theme)
+                pillText.setTextColor(ContextCompat.getColor(context, R.color.order_pill_text))
+                pillIcon.setImageResource(iconRes)
+                pillIcon.setColorFilter(ContextCompat.getColor(context, R.color.order_pill_icon))
+                
+                // Set purple background
+                val bg = android.graphics.drawable.GradientDrawable()
+                bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                bg.cornerRadius = 10f * context.resources.displayMetrics.density
+                bg.setColor(ContextCompat.getColor(context, R.color.order_pill_bg))
+                bg.setStroke(
+                    (1 * context.resources.displayMetrics.density).toInt(),
+                    ContextCompat.getColor(context, R.color.order_pill_border)
+                )
+                pillView.background = bg
+                
+                // Smaller padding for inline display
+                val horizontalPad = (8 * context.resources.displayMetrics.density).toInt()
+                val verticalPad = (4 * context.resources.displayMetrics.density).toInt()
+                pillView.setPadding(horizontalPad, verticalPad, horizontalPad, verticalPad)
+                
+                container.addView(pillView)
+            }
+            
+            // Show "+N" indicator if more than 2 order-level notes
+            if (notes.size > 2) {
+                val moreText = TextView(context).apply {
+                    text = "+${notes.size - 2}"
+                    setTextColor(ContextCompat.getColor(context, R.color.order_pill_text))
+                    textSize = 11f
+                    val pad = (4 * context.resources.displayMetrics.density).toInt()
+                    setPadding(pad, 0, pad, 0)
+                }
+                container.addView(moreText)
             }
         }
 

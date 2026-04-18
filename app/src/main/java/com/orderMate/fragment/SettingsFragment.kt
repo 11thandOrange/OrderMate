@@ -31,6 +31,7 @@ import com.orderMate.utils.SettingsManager
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.WidgetType
 import java.util.Collections
+import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.modals.WidgetType as FirebaseWidgetType
 
@@ -54,23 +55,28 @@ class SettingsFragment : Fragment() {
     
     // Sub-tabs
     private var tabGeneral: TextView? = null
-    private var tabPopUp: TextView? = null
+    private var tabItemLevelNotes: TextView? = null
+    private var tabOrderLevelNotes: TextView? = null
     private var tabNotification: TextView? = null
     private var tabAdvanced: TextView? = null
     
     // Panels
     private var panelGeneral: View? = null
-    private var panelPopUp: View? = null
+    private var panelItemLevelNotes: View? = null
+    private var panelOrderLevelNotes: View? = null
     private var panelNotification: View? = null
     private var panelAdvanced: View? = null
     
     // General Panel
     private var switchUseInCloverRegister: Switch? = null
     
-    // Pop Up Panel
-    private var widgetRecyclerView: RecyclerView? = null
-    private var btnAddWidget: View? = null
-    private var widgetAdapter: WidgetEditorAdapter? = null
+    // Item Level Notes Panel
+    private var itemLevelWidgetRecyclerView: RecyclerView? = null
+    private var btnAddItemLevelWidget: View? = null
+    
+    // Order Level Notes Panel
+    private var orderLevelWidgetRecyclerView: RecyclerView? = null
+    private var btnAddOrderLevelWidget: View? = null
     
     // Notification Panel
     private var templateRecyclerView: RecyclerView? = null
@@ -85,6 +91,10 @@ class SettingsFragment : Fragment() {
     
     // Loading
     private var loadingOverlay: View? = null
+    
+    // Widget adapters for both levels
+    private var itemLevelWidgetAdapter: FirebaseWidgetEditorAdapter? = null
+    private var orderLevelWidgetAdapter: FirebaseWidgetEditorAdapter? = null
     
     private var currentTab = "general"
 
@@ -104,11 +114,13 @@ class SettingsFragment : Fragment() {
         // Get merchantId from PreferenceManager
         val prefManager = PreferenceManager.getInstance(requireContext())
         merchantId = prefManager.getString("merchantId")
+        merchantId?.let { widgetManager.setMerchantId(it) }
         
         initViews(view)
         setupSubTabs()
         setupGeneralPanel()
-        setupPopUpPanel()
+        setupItemLevelNotesPanel()
+        setupOrderLevelNotesPanel()
         setupNotificationPanel()
         setupAdvancedPanel()
         loadSettings()
@@ -120,22 +132,28 @@ class SettingsFragment : Fragment() {
     private fun initViews(view: View) {
         // Sub-tabs
         tabGeneral = view.findViewById(R.id.tabGeneral)
-        tabPopUp = view.findViewById(R.id.tabPopUp)
+        tabItemLevelNotes = view.findViewById(R.id.tabItemLevelNotes)
+        tabOrderLevelNotes = view.findViewById(R.id.tabOrderLevelNotes)
         tabNotification = view.findViewById(R.id.tabNotification)
         tabAdvanced = view.findViewById(R.id.tabAdvanced)
         
         // Panels
         panelGeneral = view.findViewById(R.id.panelGeneral)
-        panelPopUp = view.findViewById(R.id.panelPopUp)
+        panelItemLevelNotes = view.findViewById(R.id.panelItemLevelNotes)
+        panelOrderLevelNotes = view.findViewById(R.id.panelOrderLevelNotes)
         panelNotification = view.findViewById(R.id.panelNotification)
         panelAdvanced = view.findViewById(R.id.panelAdvanced)
         
         // General Panel
         switchUseInCloverRegister = view.findViewById(R.id.switchUseInCloverRegister)
         
-        // Pop Up Panel
-        widgetRecyclerView = view.findViewById(R.id.widgetRecyclerView)
-        btnAddWidget = view.findViewById(R.id.btnAddWidget)
+        // Item Level Notes Panel
+        itemLevelWidgetRecyclerView = view.findViewById(R.id.itemLevelWidgetRecyclerView)
+        btnAddItemLevelWidget = view.findViewById(R.id.btnAddItemLevelWidget)
+        
+        // Order Level Notes Panel
+        orderLevelWidgetRecyclerView = view.findViewById(R.id.orderLevelWidgetRecyclerView)
+        btnAddOrderLevelWidget = view.findViewById(R.id.btnAddOrderLevelWidget)
         
         // Notification Panel
         templateRecyclerView = view.findViewById(R.id.templateRecyclerView)
@@ -150,7 +168,8 @@ class SettingsFragment : Fragment() {
 
     private fun setupSubTabs() {
         tabGeneral?.setOnClickListener { switchToTab("general") }
-        tabPopUp?.setOnClickListener { switchToTab("popup") }
+        tabItemLevelNotes?.setOnClickListener { switchToTab("item_level") }
+        tabOrderLevelNotes?.setOnClickListener { switchToTab("order_level") }
         tabNotification?.setOnClickListener { switchToTab("notification") }
         tabAdvanced?.setOnClickListener { switchToTab("advanced") }
     }
@@ -159,8 +178,8 @@ class SettingsFragment : Fragment() {
         currentTab = tab
         
         // Update tab appearance
-        val tabs = listOf(tabGeneral, tabPopUp, tabNotification, tabAdvanced)
-        val tabNames = listOf("general", "popup", "notification", "advanced")
+        val tabs = listOf(tabGeneral, tabItemLevelNotes, tabOrderLevelNotes, tabNotification, tabAdvanced)
+        val tabNames = listOf("general", "item_level", "order_level", "notification", "advanced")
         
         tabs.forEachIndexed { index, textView ->
             val isSelected = tabNames[index] == tab
@@ -175,7 +194,8 @@ class SettingsFragment : Fragment() {
         
         // Show/hide panels
         panelGeneral?.visibility = if (tab == "general") View.VISIBLE else View.GONE
-        panelPopUp?.visibility = if (tab == "popup") View.VISIBLE else View.GONE
+        panelItemLevelNotes?.visibility = if (tab == "item_level") View.VISIBLE else View.GONE
+        panelOrderLevelNotes?.visibility = if (tab == "order_level") View.VISIBLE else View.GONE
         panelNotification?.visibility = if (tab == "notification") View.VISIBLE else View.GONE
         panelAdvanced?.visibility = if (tab == "advanced") View.VISIBLE else View.GONE
     }
@@ -198,24 +218,20 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    // ==================== Pop Up Panel ====================
+    // ==================== Item Level Notes Panel ====================
     
-    // Firebase-backed widget adapter
-    private var firebaseWidgetAdapter: FirebaseWidgetEditorAdapter? = null
-    
-    private fun setupPopUpPanel() {
-        // Setup RecyclerView with Firebase-backed adapter
-        firebaseWidgetAdapter = FirebaseWidgetEditorAdapter(
+    private fun setupItemLevelNotesPanel() {
+        itemLevelWidgetAdapter = FirebaseWidgetEditorAdapter(
             onWidgetUpdate = { widget -> saveWidgetToFirebase(widget) },
-            onWidgetDelete = { widget -> showDeleteFirebaseWidgetDialog(widget) }
+            onWidgetDelete = { widget -> showDeleteWidgetDialog(widget, NoteLevel.ITEM) }
         )
         
-        widgetRecyclerView?.apply {
+        itemLevelWidgetRecyclerView?.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = firebaseWidgetAdapter
+            adapter = itemLevelWidgetAdapter
         }
         
-        // Setup drag-and-drop
+        // Setup drag-and-drop for item level widgets
         val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
         ) {
@@ -226,8 +242,7 @@ class SettingsFragment : Fragment() {
             ): Boolean {
                 val fromPos = viewHolder.adapterPosition
                 val toPos = target.adapterPosition
-                firebaseWidgetAdapter?.moveWidget(fromPos, toPos)
-                // Save reordering to Firebase
+                itemLevelWidgetAdapter?.moveWidget(fromPos, toPos)
                 widgetManager.reorderWidgets(fromPos, toPos) { success ->
                     if (!success) {
                         activity?.runOnUiThread {
@@ -237,35 +252,76 @@ class SettingsFragment : Fragment() {
                 }
                 return true
             }
-
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-            
             override fun isLongPressDragEnabled() = false
         })
         
-        itemTouchHelper.attachToRecyclerView(widgetRecyclerView)
-        firebaseWidgetAdapter?.setDragHelper(itemTouchHelper)
+        itemTouchHelper.attachToRecyclerView(itemLevelWidgetRecyclerView)
+        itemLevelWidgetAdapter?.setDragHelper(itemTouchHelper)
         
-        // Add widget button
-        btnAddWidget?.setOnClickListener {
-            showAddFirebaseWidgetDialog()
+        btnAddItemLevelWidget?.setOnClickListener {
+            showAddWidgetDialog(NoteLevel.ITEM)
+        }
+    }
+    
+    // ==================== Order Level Notes Panel ====================
+    
+    private fun setupOrderLevelNotesPanel() {
+        orderLevelWidgetAdapter = FirebaseWidgetEditorAdapter(
+            onWidgetUpdate = { widget -> saveWidgetToFirebase(widget) },
+            onWidgetDelete = { widget -> showDeleteWidgetDialog(widget, NoteLevel.ORDER) }
+        )
+        
+        orderLevelWidgetRecyclerView?.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = orderLevelWidgetAdapter
         }
         
-        // Load widgets from Firebase
+        // Setup drag-and-drop for order level widgets
+        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                val fromPos = viewHolder.adapterPosition
+                val toPos = target.adapterPosition
+                orderLevelWidgetAdapter?.moveWidget(fromPos, toPos)
+                widgetManager.reorderWidgets(fromPos, toPos) { success ->
+                    if (!success) {
+                        activity?.runOnUiThread {
+                            Toast.makeText(context, "Failed to save order", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                return true
+            }
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+            override fun isLongPressDragEnabled() = false
+        })
+        
+        itemTouchHelper.attachToRecyclerView(orderLevelWidgetRecyclerView)
+        orderLevelWidgetAdapter?.setDragHelper(itemTouchHelper)
+        
+        btnAddOrderLevelWidget?.setOnClickListener {
+            showAddWidgetDialog(NoteLevel.ORDER)
+        }
+        
+        // Load widgets AFTER both adapters are created
         loadWidgetsFromFirebase()
     }
     
+    // ==================== Shared Widget Methods ====================
+    
     private fun loadWidgetsFromFirebase() {
-        widgetManager.reload { success ->
-            activity?.runOnUiThread {
-                if (success) {
-                    val widgets = widgetManager.getWidgets()
-                    firebaseWidgetAdapter?.setWidgets(widgets.toMutableList())
-                } else {
-                    Toast.makeText(context, "Failed to load widgets", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
+        // Read directly from cache (MainActivityRedesign already populated it)
+        val itemWidgets = widgetManager.getAllItemLevelWidgets()
+        itemLevelWidgetAdapter?.setWidgets(itemWidgets.toMutableList())
+
+        val orderWidgets = widgetManager.getAllOrderLevelWidgets()
+        orderLevelWidgetAdapter?.setWidgets(orderWidgets.toMutableList())
     }
     
     private fun saveWidgetToFirebase(widget: WidgetConfig) {
@@ -278,10 +334,10 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun showAddFirebaseWidgetDialog() {
-        val currentCount = widgetManager.getWidgetCount()
-        if (currentCount >= 7) {
-            Toast.makeText(requireContext(), "Maximum 7 widgets allowed", Toast.LENGTH_SHORT).show()
+    private fun showAddWidgetDialog(level: NoteLevel) {
+        if (!widgetManager.canAddWidget(level)) {
+            val levelName = if (level == NoteLevel.ITEM) "item-level" else "order-level"
+            Toast.makeText(requireContext(), "Maximum 7 $levelName widgets allowed", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -293,13 +349,19 @@ class SettingsFragment : Fragment() {
             FirebaseWidgetType.TEXT_BOX
         )
         
+        val title = if (level == NoteLevel.ITEM) "Add Item Widget" else "Add Order Widget"
+        
         android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Add Widget")
+            .setTitle(title)
             .setItems(types) { _, which ->
-                widgetManager.addWidget(typeEnums[which]) { newWidget ->
+                widgetManager.addWidget(typeEnums[which], level) { newWidget ->
                     activity?.runOnUiThread {
                         if (newWidget != null) {
-                            firebaseWidgetAdapter?.addWidget(newWidget)
+                            if (level == NoteLevel.ITEM) {
+                                itemLevelWidgetAdapter?.addWidget(newWidget)
+                            } else {
+                                orderLevelWidgetAdapter?.addWidget(newWidget)
+                            }
                         } else {
                             Toast.makeText(context, "Failed to add widget", Toast.LENGTH_SHORT).show()
                         }
@@ -310,7 +372,7 @@ class SettingsFragment : Fragment() {
             .show()
     }
     
-    private fun showDeleteFirebaseWidgetDialog(widget: WidgetConfig) {
+    private fun showDeleteWidgetDialog(widget: WidgetConfig, level: NoteLevel) {
         showDeleteConfirmationDialog(
             title = "Delete Widget?",
             message = "Are you sure you want to delete \"${widget.label}\"? This action cannot be undone.",
@@ -318,7 +380,11 @@ class SettingsFragment : Fragment() {
                 widgetManager.deleteWidget(widget.id) { success ->
                     activity?.runOnUiThread {
                         if (success) {
-                            firebaseWidgetAdapter?.removeWidget(widget)
+                            if (level == NoteLevel.ITEM) {
+                                itemLevelWidgetAdapter?.removeWidget(widget)
+                            } else {
+                                orderLevelWidgetAdapter?.removeWidget(widget)
+                            }
                             Toast.makeText(context, "Widget deleted", Toast.LENGTH_SHORT).show()
                         } else {
                             Toast.makeText(context, "Failed to delete widget", Toast.LENGTH_SHORT).show()
@@ -336,7 +402,7 @@ class SettingsFragment : Fragment() {
             message = "Are you sure you want to delete \"${widget.label}\"? This action cannot be undone.",
             onConfirm = {
                 settingsManager.removeWidget(widget.id)
-                widgetAdapter?.removeWidget(widget)
+                // Note: Legacy widgetAdapter removed - use itemLevelWidgetAdapter or orderLevelWidgetAdapter
                 Toast.makeText(context, "Widget deleted", Toast.LENGTH_SHORT).show()
             }
         )
@@ -589,16 +655,20 @@ class SettingsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         tabGeneral = null
-        tabPopUp = null
+        tabItemLevelNotes = null
+        tabOrderLevelNotes = null
         tabNotification = null
         tabAdvanced = null
         panelGeneral = null
-        panelPopUp = null
+        panelItemLevelNotes = null
+        panelOrderLevelNotes = null
         panelNotification = null
         panelAdvanced = null
         switchUseInCloverRegister = null
-        widgetRecyclerView = null
-        btnAddWidget = null
+        itemLevelWidgetRecyclerView = null
+        orderLevelWidgetRecyclerView = null
+        btnAddItemLevelWidget = null
+        btnAddOrderLevelWidget = null
         templateRecyclerView = null
         btnAddTemplate = null
         inputNotificationDays = null
@@ -1000,7 +1070,9 @@ class FirebaseWidgetEditorAdapter(
                 } else false
             }
 
-            // Delete widget
+            // Delete widget - disable if last widget
+            btnDeleteWidget.isEnabled = widgets.size > 1
+            btnDeleteWidget.alpha = if (widgets.size > 1) 1.0f else 0.3f
             btnDeleteWidget.setOnClickListener {
                 onWidgetDelete(widget)
             }
