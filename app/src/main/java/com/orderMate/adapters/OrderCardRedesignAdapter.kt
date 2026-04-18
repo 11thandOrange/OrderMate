@@ -83,6 +83,12 @@ class OrderCardRedesignAdapter(
             // Total
             binding.orderTotal.text = formatTotal(order)
 
+            // Order Description (#18)
+            setupOrderDescription(order)
+
+            // Custom Order Tags (#19)
+            setupCustomTags(order)
+
             // Custom Notes Pills
             setupNotesPills(order)
 
@@ -97,6 +103,161 @@ class OrderCardRedesignAdapter(
             }
             binding.unpaidIndicator.setBackgroundColor(indicatorColor)
             binding.unpaidIndicator.visibility = View.VISIBLE
+        }
+
+        /**
+         * (#18) Setup order description from line item notes
+         * Extracts "description:" field and displays it
+         */
+        private fun setupOrderDescription(order: Order) {
+            val description = getOrderDescription(order)
+            if (description.isNullOrBlank()) {
+                binding.orderDescription.visibility = View.GONE
+            } else {
+                binding.orderDescription.text = description
+                binding.orderDescription.visibility = View.VISIBLE
+            }
+        }
+
+        /**
+         * (#18) Extract order-level description from line item notes
+         * Looks for "description:" prefix in notes
+         */
+        private fun getOrderDescription(order: Order): String? {
+            order.lineItems?.forEach { lineItem ->
+                lineItem?.note?.let { note ->
+                    if (note.isNotBlank()) {
+                        val delimiter = if (note.contains("•")) "•" else "|"
+                        val parts = note.split(delimiter).map { it.trim() }
+                        
+                        for (part in parts) {
+                            val colonIndex = part.indexOf(':')
+                            if (colonIndex > 0) {
+                                val label = part.substring(0, colonIndex).trim().lowercase()
+                                if (label == "description") {
+                                    val value = part.substring(colonIndex + 1).trim()
+                                    if (value.isNotBlank()) {
+                                        return value
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return null
+        }
+
+        /**
+         * (#19) Setup custom order tags from line item notes
+         * Extracts category, type, status, sub-category tags and displays as pills
+         */
+        private fun setupCustomTags(order: Order) {
+            val context = binding.root.context
+            val tagsContainer = binding.tagsContainer
+            
+            // Remove any previously added custom tags (keep first 2 - order status and payment status)
+            while (tagsContainer.childCount > 2) {
+                tagsContainer.removeViewAt(2)
+            }
+            
+            val customTags = getCustomTags(order)
+            if (customTags.isEmpty()) return
+            
+            customTags.forEach { tag ->
+                val tagView = android.widget.TextView(context).apply {
+                    text = tag.value
+                    textSize = 11f
+                    typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
+                    
+                    // Get colors based on tag type
+                    val (bgColorRes, textColorRes) = getTagColors(tag.type)
+                    setTextColor(ContextCompat.getColor(context, textColorRes))
+                    
+                    // Create rounded background
+                    val bgDrawable = android.graphics.drawable.GradientDrawable().apply {
+                        shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                        cornerRadius = 12f * context.resources.displayMetrics.density
+                        setColor(ContextCompat.getColor(context, bgColorRes))
+                    }
+                    background = bgDrawable
+                    
+                    // Padding and margin
+                    val paddingH = (12 * context.resources.displayMetrics.density).toInt()
+                    val paddingV = (4 * context.resources.displayMetrics.density).toInt()
+                    setPadding(paddingH, paddingV, paddingH, paddingV)
+                    
+                    val params = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        marginStart = (8 * context.resources.displayMetrics.density).toInt()
+                    }
+                    layoutParams = params
+                }
+                
+                tagsContainer.addView(tagView)
+            }
+        }
+
+        /**
+         * (#19) Extract custom tags from line item notes
+         * Returns list of tag type and value pairs
+         */
+        private fun getCustomTags(order: Order): List<CustomTag> {
+            val tags = mutableListOf<CustomTag>()
+            val seenValues = mutableSetOf<String>()
+            
+            // Tag labels to extract (OrderMate custom fields)
+            val tagLabels = setOf("category", "type", "status", "sub-category", "subcategory")
+            
+            order.lineItems?.forEach { lineItem ->
+                lineItem?.note?.let { note ->
+                    if (note.isNotBlank()) {
+                        val delimiter = if (note.contains("•")) "•" else "|"
+                        val parts = note.split(delimiter).map { it.trim() }
+                        
+                        for (part in parts) {
+                            val colonIndex = part.indexOf(':')
+                            if (colonIndex > 0) {
+                                val label = part.substring(0, colonIndex).trim().lowercase()
+                                if (tagLabels.contains(label)) {
+                                    val rawValue = part.substring(colonIndex + 1).trim()
+                                    
+                                    // Handle comma-separated values for multi-select
+                                    val values = rawValue.split(",").map { it.trim() }.filter { it.isNotBlank() }
+                                    values.forEach { value ->
+                                        val uniqueKey = "$label:$value"
+                                        if (!seenValues.contains(uniqueKey)) {
+                                            seenValues.add(uniqueKey)
+                                            tags.add(CustomTag(label, value))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Limit to 3 tags to avoid overflow
+            return tags.take(3)
+        }
+
+        /**
+         * (#19) Get background and text colors for a tag type
+         */
+        private fun getTagColors(tagType: String): Pair<Int, Int> {
+            return when (tagType) {
+                "category", "sub-category", "subcategory" -> 
+                    Pair(R.color.tag_category_bg, R.color.tag_category_text)
+                "type" -> 
+                    Pair(R.color.tag_type_bg, R.color.tag_type_text)
+                "status" -> 
+                    Pair(R.color.tag_status_bg, R.color.tag_status_text)
+                else -> 
+                    Pair(R.color.tag_default_bg, R.color.tag_default_text)
+            }
         }
 
         private fun Float.dpToPx(): Float {
@@ -297,4 +458,7 @@ class OrderCardRedesignAdapter(
     }
 
     private data class NoteItem(val text: String, val label: String)
+    
+    // (#19) Custom tag data class
+    private data class CustomTag(val type: String, val value: String)
 }
