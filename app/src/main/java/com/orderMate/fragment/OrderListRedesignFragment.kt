@@ -31,6 +31,7 @@ import com.orderMate.utils.OrderSearchFilter
 import com.orderMate.utils.MyApp.Companion.filterArray
 import com.orderMate.utils.PreferenceManager
 import com.orderMate.utils.WidgetManager
+import com.orderMate.utils.OrderDueDateResolver
 import com.orderMate.utils.debugSnackBar
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.exceptionHandlerWithReturn
@@ -580,20 +581,25 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                     matchesOrderDate = orderCreatedDate == targetOrderDate
                 }
 
-                // Filter by Due Date (from widget notes if available)
-                if (selectedDueDate != null) {
-                    val targetDueDate = dateFormat.format(selectedDueDate!!)
-                    // Look for due date in line item notes (widget data)
-                    val dueDateValues = extractWidgetValuesFromNotes(order?.lineItems, "Due Date")
-                        .plus(extractWidgetValuesFromNotes(order?.lineItems, "Pickup Date"))
-                    matchesDueDate = if (dueDateValues.isNotEmpty()) {
-                        dueDateValues.any { it.contains(targetDueDate) || 
-                            SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(selectedDueDate!!).let { formatted ->
-                                it.contains(formatted)
-                            }
-                        }
+                // (#12) Filter by Due Date using three-priority logic:
+                // P1: Order-level CALENDAR from order.note
+                // P2: Item-level CALENDAR from lineItem.note (earliest)
+                // P3: order.createdTime
+                if (selectedDueDate != null && order != null) {
+                    val widgets = WidgetManager.getCachedWidgets()
+                    val orderDueDate = if (widgets.isNotEmpty()) {
+                        OrderDueDateResolver.resolveDueDate(order, widgets)
                     } else {
-                        false // No due date in order
+                        OrderDueDateResolver.resolveDueDate(order)
+                    }
+                    
+                    matchesDueDate = if (orderDueDate != null) {
+                        // Compare dates (day only)
+                        val targetDateStr = dateFormat.format(selectedDueDate!!)
+                        val orderDateStr = dateFormat.format(orderDueDate)
+                        targetDateStr == orderDateStr
+                    } else {
+                        false
                     }
                 }
 

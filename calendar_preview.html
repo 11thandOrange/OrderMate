@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrderMate - Calendar Page Refinements (#20)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #E2E8F0;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .section-title {
+            color: #A0AEC0;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            margin-bottom: 15px;
+            margin-top: 30px;
+            text-transform: uppercase;
+        }
+
+        .ticket-badge {
+            display: inline-block;
+            background: rgba(115, 103, 240, 0.2);
+            color: #7367F0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .feature-card.done {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+
+        .feature-card h4 {
+            color: #E2E8F0;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feature-card.done h4 {
+            color: #81c784;
+        }
+
+        .feature-card p {
+            color: #718096;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .arrow {
+            color: #718096;
+            font-size: 24px;
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', monospace;
+            font-size: 11px;
+        }
+
+        /* Status indicator */
+        .status-complete {
+            color: #81c784;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 Calendar Page Refinements</h1>
+        <p class="subtitle">Issue #20 - All 10 Sub-tickets Implemented</p>
+
+        <!-- All Features Summary -->
+        <p class="section-title">Implementation Summary - ALL COMPLETE ✓</p>
+        <div class="features-grid">
+            <div class="feature-card done">
+                <h4><span class="ticket-badge">#21</span> Auto-Scroll ✓</h4>
+                <p>Timeline auto-scrolls to first event (1 hr before), or current time if no events, or 8 AM as fallback</p>
+                <p style="margin-top: 8px;"><code>calculateAutoScrollPosition()</code></p>
+            </div>
+            <div class="feature-card done">
+                <h4><span class="ticket-badge">#22</span> Back Navigation Fix ✓</h4>
+                <p>Events remain visible after returning from Order Details</p>
+                <p style="margin-top: 8px;"><code>commit 983f67b</code></p>
+            </div>
+            <div class="feature-card done">
+                <h4><span class="ticket-badge">#23</span> Smart Navigation ✓</h4>
+                <p>Arrow buttons: Day view ±1 day, Week view ±1 week, Month view ±1 month</p>
+                <p style="margin-top: 8px;"><code>navigateMonth()</code></p>
+            </div>
+            <div class="feature-card done">
+                <h4><span class="ticket-badge">#24</span> Darker Backgrounds ✓</h4>
+                <p>Event bg opacity: #33 (20%) → #80 (50%) in colors.xml</p>
+                <p style="margin-top: 8px;"><code>event_pickup_bg, event_delivery_bg, event_preorder_bg</code></p>
+            </div>
+            <div class="feature-card done">
+                <h4><span class="ticket-badge">#25</span> Grid Lines ✓</h4>
+                <p>bg_calendar_day.xml: 1dp stroke with calendar_grid_line (#1AFFFFFF)</p>
+                <p style="margin-top: 8px;"><code>calendar_grid_line = 10% white</code></p>
+            </div>
+            <div class="feature-card done">
+                <h4><span class="ticket-badge">#26</span> Multi-Event → Day View ✓</h4>
+                <p>Clicking a day with 2+ events switches to Day view</p>
+                <p style="margin-top: 8px;"><code>day.events.size > 1 → setViewMode("day")</code></p>
+            </div>
+            <div class="feature-card done">
+                <h4><span class="ticket-badge">#27</span> Single Event → Preview ✓</h4>
+                <p>Clicking a day with 1 event opens the Event Preview modal directly</p>
+                <p style="margin-top: 8px;"><code>showDayEventsDialog(day)</code></p>
+            </div>
+            <div class="feature-card done">
+                <h4><span class="ticket-badge">#28</span> Full Details Button ✓</h4>
+                <p>Event preview "Full Details" button navigates to Order Details</p>
+                <p style="margin-top: 8px;"><code>viewFullOrderDetails(orderId)</code></p>
+            </div>
+            <div class="feature-card done">
+                <h4><span class="ticket-badge">#29</span> Due Date Fallback ✓</h4>
+                <p>Widget-based: P1 ORDER CALENDAR → P2 ITEM CALENDAR (earliest) → P3 createdTime</p>
+                <p style="margin-top: 8px;"><code>OrderDueDateResolver.resolveDueDate(order, widgets)</code></p>
+            </div>
+            <div class="feature-card done">
+                <h4><span class="ticket-badge">#30</span> Custom Tags ✓</h4>
+                <p>Widget-based: SINGLE_SELECT + MULTI_SELECT + CALENDAR from order.note (level=ORDER)</p>
+                <p style="margin-top: 8px;"><code>OrderNoteParser.extractTagsFromNote()</code></p>
+            </div>
+        </div>
+
+        <!-- Due Date Priority -->
+        <p class="section-title"><span class="ticket-badge">#29</span> Due Date Priority Logic (Widget-Based)</p>
+        <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                <div style="background: rgba(76, 175, 80, 0.2); padding: 10px 15px; border-radius: 8px; color: #81c784;">
+                    <div style="font-size: 10px; opacity: 0.8;">P1: Order-Level</div>
+                    <div style="font-weight: 500;">Order Due Date</div>
+                    <div style="font-size: 10px; opacity: 0.7; margin-top: 4px;">level=ORDER, type=CALENDAR</div>
+                    <div style="font-size: 9px; opacity: 0.6; margin-top: 2px;">→ parse order.note</div>
+                </div>
+                <span class="arrow">→</span>
+                <div style="background: rgba(33, 150, 243, 0.2); padding: 10px 15px; border-radius: 8px; color: #64b5f6;">
+                    <div style="font-size: 10px; opacity: 0.8;">P2: Item-Level</div>
+                    <div style="font-weight: 500;">Item Due Date</div>
+                    <div style="font-size: 10px; opacity: 0.7; margin-top: 4px;">level=ITEM, type=CALENDAR</div>
+                    <div style="font-size: 9px; opacity: 0.6; margin-top: 2px;">→ parse lineItem.note (earliest)</div>
+                </div>
+                <span class="arrow">→</span>
+                <div style="background: rgba(156, 39, 176, 0.2); padding: 10px 15px; border-radius: 8px; color: #ce93d8;">
+                    <div style="font-size: 10px; opacity: 0.8;">P3: Fallback</div>
+                    <div style="font-weight: 500;">Order Created Time</div>
+                    <div style="font-size: 10px; opacity: 0.7; margin-top: 4px;">order.createdTime</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Files Changed -->
+        <p class="section-title">Files Changed</p>
+        <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div style="display: grid; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #81c784;">✓</span>
+                    <code style="color: #64B5F6;">CalendarFragment.kt</code>
+                    <span style="color: #718096; font-size: 11px;">#21, #23, #26, #27, #29, #30</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #81c784;">✓</span>
+                    <code style="color: #64B5F6;">EventPreviewDialog.kt</code>
+                    <span style="color: #718096; font-size: 11px;">#30</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #81c784;">✓</span>
+                    <code style="color: #64B5F6;">ScheduledEvent.kt</code>
+                    <span style="color: #718096; font-size: 11px;">Added customTags field</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #81c784;">✓</span>
+                    <code style="color: #64B5F6;">OrderDueDateResolver.kt</code>
+                    <span style="color: #718096; font-size: 11px;">#29 widget-based parsing</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #FFB74D;">+</span>
+                    <code style="color: #FFB74D;">OrderNoteParser.kt</code>
+                    <span style="color: #718096; font-size: 11px;">NEW - Widget-based note parsing</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #81c784;">✓</span>
+                    <code style="color: #64B5F6;">colors.xml</code>
+                    <span style="color: #718096; font-size: 11px;">#24, #25</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #81c784;">✓</span>
+                    <code style="color: #64B5F6;">bg_calendar_day.xml</code>
+                    <span style="color: #718096; font-size: 11px;">#25 grid lines</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Branch Info -->
+        <p class="section-title">Branch Information</p>
+        <div style="background: rgba(76, 175, 80, 0.1); padding: 20px; border-radius: 12px; border: 1px solid rgba(76, 175, 80, 0.3);">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <span style="color: #81c784; font-size: 20px;">✓</span>
+                <span style="color: #81c784; font-weight: 500;">All 10 Sub-tickets Implemented</span>
+            </div>
+            <div style="color: #A0AEC0; font-size: 13px;">
+                <p><strong>Branch:</strong> <code>#20/calendar_page_refinements</code></p>
+                <p style="margin-top: 5px;"><strong>Commit:</strong> <code>0853aea</code></p>
+                <p style="margin-top: 5px;"><strong>Base:</strong> <code>complete_v2_redesign_2</code></p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

@@ -13,7 +13,11 @@ import com.clover.sdk.v3.order.Order
 import com.orderMate.R
 import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.databinding.ItemOrderCardRedesignBinding
+import com.orderMate.modals.NoteLevel
+import com.orderMate.modals.WidgetConfig
 import com.orderMate.utils.Constants
+import com.orderMate.utils.OrderNoteParser
+import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatPaymentState
 import com.orderMate.utils.toDoubleFloatPoint
@@ -86,11 +90,8 @@ class OrderCardRedesignAdapter(
             // Order Description (#18)
             setupOrderDescription(order)
 
-            // Custom Order Tags (#19)
+            // (#18, #19) Custom Order Tags - all order-level tags as color-coded pills
             setupCustomTags(order)
-
-            // Order-level Notes Pills (inline with order number)
-            setupOrderLevelNotesPills(order)
             
             // Item-level Notes Pills (in notes section)
             setupNotesPills(order)
@@ -123,27 +124,41 @@ class OrderCardRedesignAdapter(
         }
 
         /**
-         * (#18) Extract order-level description from line item notes
-         * Looks for "description:" prefix in notes
+         * (#18) Extract order-level description from order.note
+         * Uses widget-based parsing for ORDER-level TEXT widgets.
+         * Falls back to legacy parsing if no widgets configured.
          */
         private fun getOrderDescription(order: Order): String? {
-            order.lineItems?.forEach { lineItem ->
-                lineItem?.note?.let { note ->
-                    if (note.isNotBlank()) {
-                        val delimiter = if (note.contains("•")) "•" else "|"
-                        val parts = note.split(delimiter).map { it.trim() }
-                        
-                        for (part in parts) {
-                            val colonIndex = part.indexOf(':')
-                            if (colonIndex > 0) {
-                                val label = part.substring(0, colonIndex).trim().lowercase()
-                                if (label == "description") {
-                                    val value = part.substring(colonIndex + 1).trim()
-                                    if (value.isNotBlank()) {
-                                        return value
-                                    }
-                                }
-                            }
+            val orderNote = order.note
+            if (orderNote.isNullOrBlank()) return null
+            
+            // (#18) Use widget-based parsing for ORDER-level TEXT widgets
+            val widgets = WidgetManager.getCachedWidgets()
+            if (widgets.isNotEmpty()) {
+                val textWidgets = widgets.filter { 
+                    it.level == NoteLevel.ORDER && it.type == com.orderMate.modals.WidgetType.TEXT
+                }
+                for (widget in textWidgets) {
+                    val label = widget.label
+                    if (label.lowercase() == "description") {
+                        val tags = OrderNoteParser.extractTagsFromNote(orderNote, listOf(widget), NoteLevel.ORDER)
+                        tags.firstOrNull()?.let { return it.value }
+                    }
+                }
+            }
+            
+            // Legacy fallback: parse "description:" from order.note
+            val delimiter = if (orderNote.contains("•")) "•" else "|"
+            val parts = orderNote.split(delimiter).map { it.trim() }
+            
+            for (part in parts) {
+                val colonIndex = part.indexOf(':')
+                if (colonIndex > 0) {
+                    val label = part.substring(0, colonIndex).trim().lowercase()
+                    if (label == "description") {
+                        val value = part.substring(colonIndex + 1).trim()
+                        if (value.isNotBlank()) {
+                            return value
                         }
                     }
                 }
@@ -204,39 +219,59 @@ class OrderCardRedesignAdapter(
         }
 
         /**
-         * (#19) Extract custom tags from line item notes
-         * Returns list of tag type and value pairs
+         * (#19) Extract custom tags from order.note using widget-based parsing.
+         * Reads ORDER-level SINGLE_SELECT and MULTI_SELECT widgets.
+         * Returns list of tag type and value pairs.
          */
         private fun getCustomTags(order: Order): List<CustomTag> {
+            val orderNote = order.note
+            if (orderNote.isNullOrBlank()) return emptyList()
+            
             val tags = mutableListOf<CustomTag>()
             val seenValues = mutableSetOf<String>()
             
-            // Tag labels to extract (OrderMate custom fields)
-            val tagLabels = setOf("category", "type", "status", "sub-category", "subcategory")
+            // (#19) Use widget-based parsing for ORDER-level SELECT widgets
+            val widgets = WidgetManager.getCachedWidgets()
+            if (widgets.isNotEmpty()) {
+                val selectWidgets = widgets.filter { 
+                    it.level == NoteLevel.ORDER && 
+                    (it.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
+                     it.type == com.orderMate.modals.WidgetType.MULTI_SELECT)
+                }
+                
+                val parsedTags = OrderNoteParser.extractTagsFromNote(orderNote, selectWidgets, NoteLevel.ORDER)
+                parsedTags.forEach { tag ->
+                    val uniqueKey = "${tag.label.lowercase()}:${tag.value}"
+                    if (!seenValues.contains(uniqueKey)) {
+                        seenValues.add(uniqueKey)
+                        tags.add(CustomTag(tag.label.lowercase(), tag.value))
+                    }
+                }
+                
+                if (tags.isNotEmpty()) {
+                    return tags.take(3)
+                }
+            }
             
-            order.lineItems?.forEach { lineItem ->
-                lineItem?.note?.let { note ->
-                    if (note.isNotBlank()) {
-                        val delimiter = if (note.contains("•")) "•" else "|"
-                        val parts = note.split(delimiter).map { it.trim() }
+            // Legacy fallback: parse from order.note directly
+            val tagLabels = setOf("category", "type", "status", "sub-category", "subcategory")
+            val delimiter = if (orderNote.contains("•")) "•" else "|"
+            val parts = orderNote.split(delimiter).map { it.trim() }
+            
+            for (part in parts) {
+                val colonIndex = part.indexOf(':')
+                if (colonIndex > 0) {
+                    val label = part.substring(0, colonIndex).trim().lowercase()
+                    if (tagLabels.contains(label)) {
+                        val rawValue = part.substring(colonIndex + 1).trim()
                         
-                        for (part in parts) {
-                            val colonIndex = part.indexOf(':')
-                            if (colonIndex > 0) {
-                                val label = part.substring(0, colonIndex).trim().lowercase()
-                                if (tagLabels.contains(label)) {
-                                    val rawValue = part.substring(colonIndex + 1).trim()
-                                    
-                                    // Handle comma-separated values for multi-select
-                                    val values = rawValue.split(",").map { it.trim() }.filter { it.isNotBlank() }
-                                    values.forEach { value ->
-                                        val uniqueKey = "$label:$value"
-                                        if (!seenValues.contains(uniqueKey)) {
-                                            seenValues.add(uniqueKey)
-                                            tags.add(CustomTag(label, value))
-                                        }
-                                    }
-                                }
+                        // Handle comma-separated values for multi-select
+                        val values = rawValue.split(",").map { it.trim() }.filter { it.isNotBlank() }
+                        values.forEach { value ->
+                            val uniqueKey = "$label:$value"
+                            if (!seenValues.contains(uniqueKey)) {
+                                seenValues.add(uniqueKey)
+                                tags.add(CustomTag(label, value))
                             }
                         }
                     }
@@ -356,85 +391,6 @@ class OrderCardRedesignAdapter(
                 "$${total.toDoubleFloatPoint()}"
             } catch (e: Exception) {
                 "$0.00"
-            }
-        }
-
-        /**
-         * Setup order-level notes pills (from Order.note field)
-         * Displayed inline with order number using purple color scheme
-         */
-        private fun setupOrderLevelNotesPills(order: Order) {
-            val container = binding.orderLevelNotesContainer
-            container.removeAllViews()
-            
-            val orderNote = order.note
-            if (orderNote.isNullOrBlank()) {
-                container.visibility = View.GONE
-                return
-            }
-            
-            val notes = mutableListOf<NoteItem>()
-            parseNotes(orderNote, notes)
-            
-            if (notes.isEmpty()) {
-                container.visibility = View.GONE
-                return
-            }
-            
-            container.visibility = View.VISIBLE
-            val context = binding.root.context
-            
-            // Show max 2 order-level pills inline to save space
-            notes.take(2).forEach { noteItem ->
-                val pillView = LayoutInflater.from(context)
-                    .inflate(R.layout.item_note_pill, container, false) as LinearLayout
-                
-                val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-                val pillText = pillView.findViewById<TextView>(R.id.pillText)
-                
-                val iconRes = getIconForLabel(noteItem.label)
-                
-                // Truncate to 10 chars for compact display
-                val displayText = noteItem.text.replace("\n", " ").take(10).let {
-                    if (noteItem.text.length > 10) "$it..." else it
-                }
-                pillText.text = displayText
-                pillText.maxLines = 1
-                
-                // Use order-level colors (purple theme)
-                pillText.setTextColor(ContextCompat.getColor(context, R.color.order_pill_text))
-                pillIcon.setImageResource(iconRes)
-                pillIcon.setColorFilter(ContextCompat.getColor(context, R.color.order_pill_icon))
-                
-                // Set purple background
-                val bg = android.graphics.drawable.GradientDrawable()
-                bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                bg.cornerRadius = 10f * context.resources.displayMetrics.density
-                bg.setColor(ContextCompat.getColor(context, R.color.order_pill_bg))
-                bg.setStroke(
-                    (1 * context.resources.displayMetrics.density).toInt(),
-                    ContextCompat.getColor(context, R.color.order_pill_border)
-                )
-                pillView.background = bg
-                
-                // Smaller padding for inline display
-                val horizontalPad = (8 * context.resources.displayMetrics.density).toInt()
-                val verticalPad = (4 * context.resources.displayMetrics.density).toInt()
-                pillView.setPadding(horizontalPad, verticalPad, horizontalPad, verticalPad)
-                
-                container.addView(pillView)
-            }
-            
-            // Show "+N" indicator if more than 2 order-level notes
-            if (notes.size > 2) {
-                val moreText = TextView(context).apply {
-                    text = "+${notes.size - 2}"
-                    setTextColor(ContextCompat.getColor(context, R.color.order_pill_text))
-                    textSize = 11f
-                    val pad = (4 * context.resources.displayMetrics.density).toInt()
-                    setPadding(pad, 0, pad, 0)
-                }
-                container.addView(moreText)
             }
         }
 
