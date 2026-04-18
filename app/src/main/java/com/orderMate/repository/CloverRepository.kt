@@ -53,6 +53,47 @@ class CloverRepository private constructor(private val context: Context) {
     suspend fun sendSms(data: ShareSmsModal) =
         apiWithAuth.shareSms(Constants.workSpaceId, Constants.SMSChannelId, data)
 
+    // ==================== Notification History (#54) ====================
+
+    /**
+     * Get all sent notifications for a specific order
+     * Uses Bird Conversations API with resource filter
+     * @param orderId The Clover order ID
+     * @return List of messages sent for this order
+     */
+    suspend fun getNotificationsForOrder(orderId: String): List<com.orderMate.modals.MessageItem> = withContext(Dispatchers.IO) {
+        try {
+            // Query conversations filtered by order resource
+            val conversationsResponse = apiWithAuth.getConversationsByOrder(
+                workspaceId = Constants.workSpaceId,
+                resource = "order:$orderId"
+            )
+            
+            val conversations = conversationsResponse.body()?.results ?: return@withContext emptyList()
+            
+            // Collect messages from all matching conversations
+            val allMessages = mutableListOf<com.orderMate.modals.MessageItem>()
+            
+            for (conversation in conversations) {
+                val conversationId = conversation.id ?: continue
+                
+                val messagesResponse = apiWithAuth.getConversationMessages(
+                    workspaceId = Constants.workSpaceId,
+                    conversationId = conversationId
+                )
+                
+                val messages = messagesResponse.body()?.results ?: continue
+                allMessages.addAll(messages)
+            }
+            
+            // Sort by createdAt descending (newest first)
+            allMessages.sortedByDescending { it.createdAt }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
     // ==================== Customer Management ====================
 
     /**

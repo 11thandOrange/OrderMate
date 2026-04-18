@@ -243,5 +243,6 @@
     <string name="history_event">History event</string>
     <string name="order_modified">Order Modified</string>
     <string name="status_changed">Status Changed</string>
+    <string name="notification_sent">Notification Sent</string>
 
 </resources>

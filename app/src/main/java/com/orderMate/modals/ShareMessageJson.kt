@@ -3,7 +3,9 @@ package com.orderMate.modals
 
 data class ShareMessageJson(
     val body: Body?,
-    val `receiver`: Receiver?
+    val `receiver`: Receiver?,
+    val reference: String? = null,
+    val meta: MessageMeta? = null
 )
 
 data class Body(
@@ -25,7 +27,9 @@ data class Metadata(
 
 data class ShareSmsModal(
     val body: SmsBody?,
-    val `receiver`: Receiver? = Receiver()
+    val `receiver`: Receiver? = Receiver(),
+    val reference: String? = null,
+    val meta: MessageMeta? = null
 )
 
 data class SmsBody(
@@ -44,6 +48,10 @@ data class Text(
 data class Contact(
     val identifierKey: String?,
     val identifierValue: String?
+)
+
+data class MessageMeta(
+    val extraInformation: Map<String, String>? = null
 )
 
 data class ShareResponse(

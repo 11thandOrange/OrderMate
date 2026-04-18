@@ -765,14 +765,14 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Card Header -->
+                    <!-- Card Header - #56: Reduced spacing to match item card -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
                         android:paddingHorizontal="20dp"
-                        android:paddingVertical="16dp">
+                        android:paddingVertical="12dp">
 
                         <!-- Icon with background -->
                         <FrameLayout
@@ -814,14 +814,15 @@
                         android:layout_marginHorizontal="16dp"
                         android:background="#1AFFFFFF" />
 
-                    <!-- History Items Container - no scroll, just shows items -->
+                    <!-- History Items Container - #56: Reduced top padding to 8dp to match item card -->
                     <LinearLayout
                         android:id="@+id/historyContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:paddingHorizontal="20dp"
-                        android:paddingVertical="12dp" />
+                        android:paddingTop="8dp"
+                        android:paddingBottom="12dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
             

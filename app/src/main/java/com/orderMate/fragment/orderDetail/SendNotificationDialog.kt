@@ -22,6 +22,7 @@ import com.orderMate.databinding.DialogSendNotificationBinding
 import com.orderMate.modals.Body
 import com.orderMate.modals.Contact
 import com.orderMate.modals.Html
+import com.orderMate.modals.MessageMeta
 import com.orderMate.modals.Metadata
 import com.orderMate.modals.Receiver
 import com.orderMate.modals.ShareMessageJson
@@ -287,7 +288,20 @@ class SendNotificationDialog(
             binding.etNotes.text.toString()
         )
         val body = Body(html, Constants.html)
-        return ShareMessageJson(body, messageReceiver)
+        
+        // Include order ID reference for notification history (#54)
+        val orderId = order?.id
+        val reference = orderId?.let { "order-$it" }
+        val meta = orderId?.let {
+            MessageMeta(
+                extraInformation = mapOf(
+                    "orderId" to it,
+                    "type" to "email"
+                )
+            )
+        }
+        
+        return ShareMessageJson(body, messageReceiver, reference, meta)
     }
 
     //    make the request for the messaging Bird for sms
@@ -295,11 +309,24 @@ class SendNotificationDialog(
         val list = getContactList()
         val messageReceiver = Receiver(list)
 
-        val html = SmsBody(
+        val smsBody = SmsBody(
             Text(binding.etNotes.text.toString()),
             Constants.text,
         )
-        return ShareSmsModal(html, messageReceiver)
+        
+        // Include order ID reference for notification history (#54)
+        val orderId = order?.id
+        val reference = orderId?.let { "order-$it" }
+        val meta = orderId?.let {
+            MessageMeta(
+                extraInformation = mapOf(
+                    "orderId" to it,
+                    "type" to "sms"
+                )
+            )
+        }
+        
+        return ShareSmsModal(smsBody, messageReceiver, reference, meta)
     }
 
     private fun getContactList(): List<Contact> {

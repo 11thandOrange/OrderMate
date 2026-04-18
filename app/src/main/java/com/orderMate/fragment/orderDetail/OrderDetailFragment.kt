@@ -544,15 +544,20 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         }
     }
     
+    /**
+     * History item data class for order history card
+     * messageBody is optional - only set for notification items (#58)
+     */
+    data class HistoryItem(
+        val title: String,
+        val timestamp: Long,
+        val iconRes: Int,
+        val messageBody: String? = null
+    )
+    
     private fun populateHistoryCard() {
         val historyContainer = binding.historyContainer
         historyContainer.removeAllViews()
-        
-        data class HistoryItem(
-            val title: String,
-            val timestamp: Long,
-            val iconRes: Int
-        )
         
         val historyItems = mutableListOf<HistoryItem>()
         
@@ -595,6 +600,82 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 )
             }
         }
+        
+        // Display initial items while loading notifications
+        displayHistoryItems(historyItems)
+        
+        // Fetch notification history from Bird API (#54)
+        val orderId = orderArguments?.id
+        if (orderId != null) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val notifications = CloverRepository.getInstance(requireContext())
+                        .getNotificationsForOrder(orderId)
+                    
+                    // Add notification items
+                    notifications.forEach { message ->
+                        val timestamp = parseIsoTimestamp(message.createdAt)
+                        val messageText = message.body?.text?.text 
+                            ?: message.body?.html?.text 
+                            ?: getString(R.string.notification_sent)
+                        
+                        // Determine icon based on message type (email vs SMS)
+                        val notificationType = message.meta?.extraInformation?.get("type")
+                        val iconRes = if (notificationType == "email") {
+                            R.drawable.ic_email
+                        } else {
+                            R.drawable.ic_send
+                        }
+                        
+                        // Truncate title but keep full message for dialog (#58)
+                        val truncatedTitle = if (messageText.length > 40) {
+                            "${messageText.take(40)}..."
+                        } else {
+                            messageText
+                        }
+                        
+                        historyItems.add(
+                            HistoryItem(
+                                title = truncatedTitle,
+                                timestamp = timestamp,
+                                iconRes = iconRes,
+                                messageBody = messageText
+                            )
+                        )
+                    }
+                    
+                    // Re-display with notifications included
+                    CoroutineScope(Dispatchers.Main).launch {
+                        displayHistoryItems(historyItems)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    // Keep showing items without notifications on error
+                }
+            }
+        }
+    }
+    
+    /**
+     * Parse ISO 8601 timestamp string to milliseconds
+     */
+    private fun parseIsoTimestamp(isoTimestamp: String?): Long {
+        if (isoTimestamp == null) return 0L
+        return try {
+            val format = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.US)
+            format.timeZone = java.util.TimeZone.getTimeZone("UTC")
+            format.parse(isoTimestamp.substringBefore(".").substringBefore("Z"))?.time ?: 0L
+        } catch (e: Exception) {
+            0L
+        }
+    }
+    
+    /**
+     * Display history items in the card
+     */
+    private fun displayHistoryItems(historyItems: MutableList<HistoryItem>) {
+        val historyContainer = binding.historyContainer
+        historyContainer.removeAllViews()
         
         // Sort by timestamp descending (most recent first)
         historyItems.sortByDescending { it.timestamp }

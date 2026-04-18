@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6C: Order History Card - Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #fff;
+        }
+
+        .preview-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+
+        .section {
+            background: rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title .badge {
+            background: #FF9F43;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+
+        .section-title .badge.done {
+            background: #3ccd79;
+        }
+
+        /* Order History Card - Matches Android layout */
+        .order-history-card {
+            background: rgba(255,255,255,0.15);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .order-history-card:hover {
+            background: rgba(255,255,255,0.18);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            padding: 12px 20px; /* #56: Reduced from 16px to 12dp */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .icon-bg {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .card-title {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .chevron {
+            color: rgba(255,255,255,0.6);
+            font-size: 16px;
+        }
+
+        /* History Container - #56: Reduced top padding to 8dp */
+        .history-container {
+            padding: 8px 20px 12px;
+        }
+
+        /* History Item Row */
+        .history-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px 0;
+            gap: 12px;
+        }
+
+        .history-item:not(:first-child) {
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .history-icon-container {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .history-icon {
+            font-size: 18px;
+        }
+
+        .history-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .history-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 2px;
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Dialog - matches bg_dialog.xml: #CC292D3E (rgba(41,45,62,0.8)) with 20dp radius */
+        .modal {
+            background: rgba(41, 45, 62, 0.8);
+            border-radius: 20px;
+            width: 520px;
+            max-width: 90vw;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s;
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Header - padding: 24dp */
+        .modal-header {
+            padding: 24px;
+        }
+
+        /* Header border - separate element, #1AFFFFFF */
+        .modal-header-border {
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Title - 20sp, sans-serif-medium, text_light */
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.9);
+            margin: 0;
+        }
+
+        /* Body - padding: 24dp, max-height: 400dp */
+        .modal-body {
+            padding: 24px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* Dialog History Item - matches item_order_history_dialog.xml */
+        /* paddingVertical: 12dp, horizontal layout, gravity: top */
+        .dialog-history-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px 0;
+            gap: 12px;
+        }
+
+        /* Icon container - 36dp x 36dp, bg_history_icon (rgba 8%) */
+        .dialog-icon-container {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Icon - 18dp, tint: text_muted */
+        .dialog-icon {
+            font-size: 18px;
+            opacity: 0.7;
+        }
+
+        .dialog-history-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Title - 14sp, sans-serif-medium, text_light */
+        .dialog-history-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* Date - 12sp, text_muted, marginTop: 2dp */
+        .dialog-history-date {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 2px;
+        }
+
+        /* #58: Message body for notifications */
+        /* bg_note_chip (rgba 10%), padding: 12dp, marginTop: 8dp, 13sp, lineSpacing: 1.3 */
+        .dialog-message-body {
+            margin-top: 8px;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.3;
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* Icons for different event types - #55 */
+        .icon-created { color: #81c784; }
+        .icon-modified { color: #64b5f6; }
+        .icon-payment { color: #FFD54F; }
+        .icon-refund { color: #ef9a9a; }
+        .icon-sms { color: #4FC3F7; }
+        .icon-email { color: #BA68C8; }
+
+        /* Feature explanation box */
+        .feature-box {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .feature-box h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feature-box ul {
+            margin-left: 20px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.6;
+        }
+
+        /* Compare boxes */
+        .compare-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .compare-box {
+            background: rgba(0,0,0,0.15);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .compare-box.before {
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .compare-box.after {
+            border: 1px solid rgba(60, 205, 121, 0.3);
+        }
+
+        .compare-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .compare-box.before .compare-label {
+            color: #ef9a9a;
+        }
+
+        .compare-box.after .compare-label {
+            color: #a5d6a7;
+        }
+
+        .spacing-demo {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .spacing-demo .value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        /* Loading indicator */
+        .loading-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 8px;
+        }
+
+        .loading-spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #FF9F43;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer link */
+        .footer-note {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <h1>🗂️ 6C: Order History Card</h1>
+        <p class="subtitle">Preview of implemented changes • Issue #43</p>
+
+        <!-- #54: Notification History -->
+        <div class="section">
+            <div class="section-title">
+                <span>#54</span>
+                <span class="badge done">✓ DONE</span>
+                Add Sent Notifications to Order History Card
+            </div>
+            
+            <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+                Notifications sent via Bird API now appear in order history. Click the card to see the full "View All" dialog.
+            </p>
+
+            <!-- Order History Card -->
+            <div class="order-history-card" onclick="openHistoryModal()">
+                <div class="card-header">
+                    <div class="icon-bg">🕐</div>
+                    <span class="card-title">Order History</span>
+                    <span class="chevron">›</span>
+                </div>
+                <div class="history-container">
+                    <!-- Most recent: SMS notification -->
+                    <div class="history-item">
+                        <div class="history-icon-container">
+                            <span class="history-icon icon-sms">📱</span>
+                        </div>
+                        <div class="history-content">
+                            <div class="history-title">Your order is ready for pickup!...</div>
+                            <div class="history-date">04/18/26</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment -->
+                    <div class="history-item">
+                        <div class="history-icon-container">
+                            <span class="history-icon icon-payment">💳</span>
+                        </div>
+                        <div class="history-content">
+                            <div class="history-title">Payment Received $107.00</div>
+                            <div class="history-date">04/18/26</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Created -->
+                    <div class="history-item">
+                        <div class="history-icon-container">
+                            <span class="history-icon icon-created">➕</span>
+                        </div>
+                        <div class="history-content">
+                            <div class="history-title">Order Created</div>
+                            <div class="history-date">04/18/26</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading-indicator" style="display: none;" id="loadingIndicator">
+                <div class="loading-spinner"></div>
+                Loading notifications from Bird API...
+            </div>
+
+            <div class="feature-box">
+                <h4>🔗 Bird API Integration</h4>
+                <ul>
+                    <li>When sending: Includes <code>reference: "order-{orderId}"</code> in message</li>
+                    <li>When fetching: Uses <code>?resource=order:{orderId}</code> filter</li>
+                    <li>Shows SMS (📱) and Email (✉️) with distinct icons</li>
+                    <li>Truncates to 40 chars in card, full message in dialog</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- #55: Icons -->
+        <div class="section">
+            <div class="section-title">
+                <span>#55</span>
+                <span class="badge done">✓ DONE</span>
+                Create Reusable Icons for Order History Events
+            </div>
+
+            <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+                All required icons verified to exist in <code>res/drawable/</code>
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 8px;" class="icon-created">➕</div>
+                    <div style="font-size: 11px;">ic_add_circle.xml</div>
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.5);">Order Created</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 8px;" class="icon-modified">✏️</div>
+                    <div style="font-size: 11px;">ic_edit.xml</div>
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.5);">Order Modified</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 8px;" class="icon-payment">💳</div>
+                    <div style="font-size: 11px;">ic_credit_card.xml</div>
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.5);">Payment</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 8px;" class="icon-sms">📱</div>
+                    <div style="font-size: 11px;">ic_send.xml</div>
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.5);">SMS Notification</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 8px;" class="icon-email">✉️</div>
+                    <div style="font-size: 11px;">ic_email.xml</div>
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.5);">Email Notification</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 8px;" class="icon-refund">↩️</div>
+                    <div style="font-size: 11px;">ic_undo.xml</div>
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.5);">Refund</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- #56: Reduced Spacing -->
+        <div class="section">
+            <div class="section-title">
+                <span>#56</span>
+                <span class="badge done">✓ DONE</span>
+                Reduce History Card Header Spacing
+            </div>
+
+            <div class="compare-container">
+                <div class="compare-box before">
+                    <div class="compare-label">Before</div>
+                    <div class="spacing-demo">
+                        <div class="value">16dp</div>
+                        <div>Header paddingVertical</div>
+                    </div>
+                    <div class="spacing-demo" style="margin-top: 8px;">
+                        <div class="value">12dp</div>
+                        <div>Container paddingVertical</div>
+                    </div>
+                </div>
+                <div class="compare-box after">
+                    <div class="compare-label">After</div>
+                    <div class="spacing-demo">
+                        <div class="value">12dp</div>
+                        <div>Header paddingVertical</div>
+                    </div>
+                    <div class="spacing-demo" style="margin-top: 8px;">
+                        <div class="value">8dp / 12dp</div>
+                        <div>Container paddingTop / Bottom</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-box">
+                <h4>📐 Spacing Changes</h4>
+                <ul>
+                    <li>Header: <code>paddingVertical="16dp"</code> → <code>paddingVertical="12dp"</code></li>
+                    <li>Container: <code>paddingVertical="12dp"</code> → <code>paddingTop="8dp" paddingBottom="12dp"</code></li>
+                    <li>Now matches item card spacing for visual consistency</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- #58: Full Message in Dialog -->
+        <div class="section">
+            <div class="section-title">
+                <span>#58</span>
+                <span class="badge done">✓ DONE</span>
+                View All Popup Renders Full Notification Messages
+            </div>
+
+            <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+                Click the Order History card above to see the full dialog with complete notification messages.
+            </p>
+
+            <div class="feature-box">
+                <h4>📝 Implementation Details</h4>
+                <ul>
+                    <li>Added <code>messageBody</code> field to <code>HistoryItem</code> data class</li>
+                    <li>Created <code>item_order_history_dialog.xml</code> with message body section</li>
+                    <li>Notifications show truncated in card (40 chars), full text in dialog</li>
+                    <li>Non-notification items (payments, etc.) don't show message body</li>
+                </ul>
+            </div>
+        </div>
+
+        <p class="footer-note">
+            Preview rendered from Android XML layouts • Changes not staged
+        </p>
+    </div>
+
+    <!-- Order History Dialog Modal - matches dialog_order_history.xml -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal">
+            <!-- Header - padding: 24dp -->
+            <div class="modal-header">
+                <h3>Order History</h3>
+            </div>
+            <!-- Header border - #1AFFFFFF -->
+            <div class="modal-header-border"></div>
+            <!-- Body - RecyclerView with padding: 24dp -->
+            <div class="modal-body">
+                <!-- SMS Notification with full message (#58) -->
+                <div class="dialog-history-item">
+                    <div class="dialog-icon-container">
+                        <span class="dialog-icon">📱</span>
+                    </div>
+                    <div class="dialog-history-content">
+                        <div class="dialog-history-title">Notification Sent</div>
+                        <div class="dialog-history-date">April 18, 2026 • 3:45 PM</div>
+                        <div class="dialog-message-body">
+                            Your order is ready for pickup! Please come to our store at 123 Main St. 
+                            We'll have it waiting at the counter. Thank you for your business!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Notification with full message (#58) -->
+                <div class="dialog-history-item">
+                    <div class="dialog-icon-container">
+                        <span class="dialog-icon">✉️</span>
+                    </div>
+                    <div class="dialog-history-content">
+                        <div class="dialog-history-title">Notification Sent</div>
+                        <div class="dialog-history-date">April 18, 2026 • 2:30 PM</div>
+                        <div class="dialog-message-body">
+                            Hello Edward! Your custom birthday cake order has been confirmed. 
+                            Expected completion: April 20th. We'll send another notification when it's ready.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment - no message body -->
+                <div class="dialog-history-item">
+                    <div class="dialog-icon-container">
+                        <span class="dialog-icon">💳</span>
+                    </div>
+                    <div class="dialog-history-content">
+                        <div class="dialog-history-title">Payment Received $107.00</div>
+                        <div class="dialog-history-date">April 18, 2026 • 2:15 PM</div>
+                    </div>
+                </div>
+
+                <!-- Order Modified - no message body -->
+                <div class="dialog-history-item">
+                    <div class="dialog-icon-container">
+                        <span class="dialog-icon">✏️</span>
+                    </div>
+                    <div class="dialog-history-content">
+                        <div class="dialog-history-title">Order Modified</div>
+                        <div class="dialog-history-date">April 18, 2026 • 2:10 PM</div>
+                    </div>
+                </div>
+
+                <!-- Order Created - no message body -->
+                <div class="dialog-history-item">
+                    <div class="dialog-icon-container">
+                        <span class="dialog-icon">➕</span>
+                    </div>
+                    <div class="dialog-history-content">
+                        <div class="dialog-history-title">Order Created</div>
+                        <div class="dialog-history-date">April 18, 2026 • 2:00 PM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openHistoryModal() {
+            document.getElementById('historyModal').classList.add('active');
+        }
+
+        // Close modal on overlay click
+        document.getElementById('historyModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+
+        // Simulate loading indicator briefly
+        document.getElementById('loadingIndicator').style.display = 'flex';
+        setTimeout(function() {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }, 1500);
+    </script>
+</body>
+</html>
