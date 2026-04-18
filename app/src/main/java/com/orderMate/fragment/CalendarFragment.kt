@@ -108,6 +108,7 @@ class CalendarFragment : Fragment() {
     // Header Views (same as List tab)
     private var searchInput: EditText? = null
     private var calendarIcon: ImageView? = null
+    private var calendarIconContainer: View? = null  // (#14) Expanded click area
     private var filterButton: View? = null
     private var resetButton: View? = null
     private var filterPillsScroll: HorizontalScrollView? = null
@@ -156,6 +157,7 @@ class CalendarFragment : Fragment() {
         // Header views (same as List tab)
         searchInput = view.findViewById(R.id.searchInput)
         calendarIcon = view.findViewById(R.id.calendarIcon)
+        calendarIconContainer = view.findViewById(R.id.calendarIconContainer)  // (#14) Expanded click area
         filterButton = view.findViewById(R.id.filterButton)
         resetButton = view.findViewById(R.id.resetButton)
         filterPillsScroll = view.findViewById(R.id.filterPillsScroll)
@@ -279,7 +281,8 @@ class CalendarFragment : Fragment() {
     private fun setupHeaderActions() {
         filterButton?.setOnClickListener { showFilterDialog() }
         resetButton?.setOnClickListener { resetFilters() }
-        calendarIcon?.setOnClickListener { showDatePicker() }
+        // (#14) Use container for expanded click area
+        calendarIconContainer?.setOnClickListener { showDatePicker() }
     }
     
     private fun setupSearchListener() {

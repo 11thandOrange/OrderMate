@@ -89,8 +89,10 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     private var filterData: ArrayList<Order?> = ArrayList()
     private var allItemList: ArrayList<Order?> = ArrayList()
 
-    // Selected date filter
+    // Selected date filters (#12 - separate order date and due date)
     private var selectedDateFilter: Date? = null
+    private var selectedOrderDate: Date? = null
+    private var selectedDueDate: Date? = null
 
     private val preferenceManager by lazy {
         PreferenceManager.getInstance(requireContext())
@@ -220,9 +222,32 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             resetFilters()
         }
 
-        // Calendar icon for date picker
-        binding.calendarIcon.setOnClickListener {
+        // Calendar icon for date picker (#14 - expanded click area)
+        binding.calendarIconContainer.setOnClickListener {
             showDatePicker()
+        }
+
+        // Sync button (#15)
+        binding.syncButton.setOnClickListener {
+            if (!isSyncing) {
+                syncOrders()
+            }
+        }
+
+        // Order Date pill (#12)
+        binding.orderDatePill.setOnClickListener {
+            showOrderDatePicker()
+        }
+        binding.orderDateClear.setOnClickListener {
+            clearOrderDate()
+        }
+
+        // Due Date pill (#12)
+        binding.dueDatePill.setOnClickListener {
+            showDueDatePicker()
+        }
+        binding.dueDateClear.setOnClickListener {
+            clearDueDate()
         }
     }
 
@@ -232,6 +257,12 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         selectedDateFilter = null
         currentFilterState = FilterDialogFragment.FilterState()
         currentSearchQuery = ""
+        
+        // Clear date pills (#12)
+        selectedOrderDate = null
+        selectedDueDate = null
+        updateOrderDatePill()
+        updateDueDatePill()
         
         // Sync reset to shared ViewModel for cross-tab persistence
         sharedFilterViewModel.resetAll()
@@ -318,8 +349,10 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         binding.searchInput.text?.clear()
         selectedDateFilter = null
         
-        // Show syncing indicator
+        // Show syncing indicator (#15)
         binding.syncingContainer.showView()
+        binding.syncButton.isEnabled = false
+        binding.syncButton.alpha = 0.5f
 
         runOnBackgroundThread {
             try {
@@ -339,6 +372,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             runOnMainThread {
                 isSyncing = false
                 binding.syncingContainer.hideView()
+                binding.syncButton.isEnabled = true
+                binding.syncButton.alpha = 1.0f
                 
                 updateResultsInfo()
                 notifyAdapter()
@@ -411,7 +446,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
         DatePickerDialog(
             requireContext(),
-            R.style.Theme_OrderMate_Dialog,
+            R.style.Theme_OrderMate_DatePicker,
             { _, year, month, day ->
                 calendar.set(year, month, day, 0, 0, 0)
                 calendar.set(Calendar.MILLISECOND, 0)
@@ -427,6 +462,152 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         ).show()
+    }
+
+    // ==================== Separate Date Pills (#12) ====================
+
+    /**
+     * Show date picker for Order Date pill (#12)
+     */
+    private fun showOrderDatePicker() {
+        val calendar = Calendar.getInstance()
+        selectedOrderDate?.let { calendar.time = it }
+
+        DatePickerDialog(
+            requireContext(),
+            R.style.Theme_OrderMate_DatePicker,
+            { _, year, month, day ->
+                calendar.set(year, month, day, 0, 0, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                selectedOrderDate = calendar.time
+                updateOrderDatePill()
+                applyDateFilters()
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+
+    /**
+     * Show date picker for Due Date pill (#12)
+     */
+    private fun showDueDatePicker() {
+        val calendar = Calendar.getInstance()
+        selectedDueDate?.let { calendar.time = it }
+
+        DatePickerDialog(
+            requireContext(),
+            R.style.Theme_OrderMate_DatePicker,
+            { _, year, month, day ->
+                calendar.set(year, month, day, 0, 0, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                selectedDueDate = calendar.time
+                updateDueDatePill()
+                applyDateFilters()
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+
+    /**
+     * Clear Order Date selection (#12)
+     */
+    private fun clearOrderDate() {
+        selectedOrderDate = null
+        updateOrderDatePill()
+        applyDateFilters()
+    }
+
+    /**
+     * Clear Due Date selection (#12)
+     */
+    private fun clearDueDate() {
+        selectedDueDate = null
+        updateDueDatePill()
+        applyDateFilters()
+    }
+
+    /**
+     * Update Order Date pill display (#12)
+     */
+    private fun updateOrderDatePill() {
+        val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+        if (selectedOrderDate != null) {
+            binding.orderDateText.text = dateFormat.format(selectedOrderDate!!)
+            binding.orderDateClear.visibility = View.VISIBLE
+        } else {
+            binding.orderDateText.text = "Order Date"
+            binding.orderDateClear.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Update Due Date pill display (#12)
+     */
+    private fun updateDueDatePill() {
+        val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+        if (selectedDueDate != null) {
+            binding.dueDateText.text = dateFormat.format(selectedDueDate!!)
+            binding.dueDateClear.visibility = View.VISIBLE
+        } else {
+            binding.dueDateText.text = "Due Date"
+            binding.dueDateClear.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Apply date filters for Order Date and Due Date (#12)
+     * Filters are independent - each filters orders that match that date
+     */
+    private fun applyDateFilters() {
+        runOnBackgroundThread {
+            val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+            
+            orderItems.clear()
+            val sourceList = if (isFilterActive()) filterData else allItemList
+
+            for (order in sourceList) {
+                var matchesOrderDate = true
+                var matchesDueDate = true
+
+                // Filter by Order Date (createdTime)
+                if (selectedOrderDate != null) {
+                    val orderCreatedDate = order?.createdTime?.let { dateFormat.format(Date(it)) }
+                    val targetOrderDate = dateFormat.format(selectedOrderDate!!)
+                    matchesOrderDate = orderCreatedDate == targetOrderDate
+                }
+
+                // Filter by Due Date (from widget notes if available)
+                if (selectedDueDate != null) {
+                    val targetDueDate = dateFormat.format(selectedDueDate!!)
+                    // Look for due date in line item notes (widget data)
+                    val dueDateValues = extractWidgetValuesFromNotes(order?.lineItems, "Due Date")
+                        .plus(extractWidgetValuesFromNotes(order?.lineItems, "Pickup Date"))
+                    matchesDueDate = if (dueDateValues.isNotEmpty()) {
+                        dueDateValues.any { it.contains(targetDueDate) || 
+                            SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(selectedDueDate!!).let { formatted ->
+                                it.contains(formatted)
+                            }
+                        }
+                    } else {
+                        false // No due date in order
+                    }
+                }
+
+                if (matchesOrderDate && matchesDueDate) {
+                    orderItems.add(order)
+                }
+            }
+
+            runOnMainThread {
+                updateResultsInfo()
+                notifyAdapter()
+                updateEmptyState()
+            }
+        }
     }
     
     /**

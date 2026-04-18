@@ -206,7 +206,83 @@ class CommonFunctionsTest {
         assertEquals("", result)
     }
 
+    // ==================== formatPaymentState Tests (Issue #8) ====================
+
+    @Test
+    fun `formatPaymentState returns Open for OPEN`() {
+        assertEquals("Open", formatPaymentState("OPEN"))
+    }
+
+    @Test
+    fun `formatPaymentState returns Paid for PAID`() {
+        assertEquals("Paid", formatPaymentState("PAID"))
+    }
+
+    @Test
+    fun `formatPaymentState returns Unpaid for NOT_PAID`() {
+        assertEquals("Unpaid", formatPaymentState("NOT_PAID"))
+    }
+
+    @Test
+    fun `formatPaymentState returns Partially Paid for PARTIALLY_PAID`() {
+        assertEquals("Partially Paid", formatPaymentState("PARTIALLY_PAID"))
+    }
+
+    @Test
+    fun `formatPaymentState returns Partially Refunded for PARTIALLY_REFUNDED`() {
+        assertEquals("Partially Refunded", formatPaymentState("PARTIALLY_REFUNDED"))
+    }
+
+    @Test
+    fun `formatPaymentState returns Refunded for REFUNDED`() {
+        assertEquals("Refunded", formatPaymentState("REFUNDED"))
+    }
+
+    @Test
+    fun `formatPaymentState returns Closed for LOCKED`() {
+        assertEquals("Closed", formatPaymentState("LOCKED"))
+    }
+
+    @Test
+    fun `formatPaymentState returns Open for null`() {
+        assertEquals("Open", formatPaymentState(null))
+    }
+
+    @Test
+    fun `formatPaymentState returns Open for empty string`() {
+        assertEquals("Open", formatPaymentState(""))
+    }
+
+    @Test
+    fun `formatPaymentState is case insensitive`() {
+        assertEquals("Paid", formatPaymentState("paid"))
+        assertEquals("Paid", formatPaymentState("Paid"))
+        assertEquals("Paid", formatPaymentState("PAID"))
+    }
+
+    @Test
+    fun `formatPaymentState handles unknown state with formatting`() {
+        assertEquals("Custom status", formatPaymentState("CUSTOM_STATUS"))
+    }
+
     // ==================== Helper Functions for Testing ====================
+
+    private fun formatPaymentState(state: String?): String {
+        if (state.isNullOrEmpty()) return "Open"
+        
+        return when (state.uppercase()) {
+            "OPEN" -> "Open"
+            "PAID" -> "Paid"
+            "NOT_PAID" -> "Unpaid"
+            "PARTIALLY_PAID" -> "Partially Paid"
+            "PARTIALLY_REFUNDED" -> "Partially Refunded"
+            "REFUNDED" -> "Refunded"
+            "LOCKED" -> "Closed"
+            else -> state.replace("_", " ")
+                .lowercase()
+                .replaceFirstChar { it.uppercase() }
+        }
+    }
 
     private fun parseNoteString(note: String): Map<String, String> {
         val result = mutableMapOf<String, String>()

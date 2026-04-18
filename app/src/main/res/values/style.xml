@@ -19,11 +19,15 @@
         <item name="iconSize">50dp</item>
         <item name="startIconMinSize">50dp</item>
     </style>
+    <!-- Date picker theme (#13) - orange accent for selection, theme color for header applied programmatically -->
     <style name="MyDatePickerDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColor">@color/white</item>
         <item name="subheaderColor">@color/white</item>
         <item name="android:negativeButtonText">Clear</item>
+        <!-- Orange accent for selected date circle (#13) -->
+        <item name="colorAccent">@color/orange_accent</item>
+        <item name="android:colorAccent">@color/orange_accent</item>
     </style>
 
 
