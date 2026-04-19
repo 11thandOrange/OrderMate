@@ -254,8 +254,8 @@ class CloverRepository private constructor(private val context: Context) {
         try {
             val customerConnector = myApp.getCustomerConnector() ?: return@withContext null
             
-            // Create customer in Clover using firstName and lastName strings
-            val createdV1Customer = customerConnector.createCustomer(
+            // Create customer in Clover using newCustomer (not deprecated createCustomer)
+            val createdV1Customer = customerConnector.newCustomer(
                 firstName ?: "",
                 lastName ?: ""
             ) ?: return@withContext null
