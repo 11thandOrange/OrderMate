@@ -80,6 +80,10 @@ class SettingsFragment : Fragment() {
     private var filterOrderLevelHeader: TextView? = null
     private var filterItemLevelWidgetsContainer: LinearLayout? = null
     private var filterOrderLevelWidgetsContainer: LinearLayout? = null
+    private var filterItemLevelRecyclerView: RecyclerView? = null
+    private var filterOrderLevelRecyclerView: RecyclerView? = null
+    private var filterItemLevelAdapter: FilterWidgetAdapter? = null
+    private var filterOrderLevelAdapter: FilterWidgetAdapter? = null
     private var filterEmptyState: TextView? = null
     
     // Item Level Notes Panel (#34)
@@ -174,6 +178,8 @@ class SettingsFragment : Fragment() {
         filterOrderLevelHeader = view.findViewById(R.id.filterOrderLevelHeader)
         filterItemLevelWidgetsContainer = view.findViewById(R.id.filterItemLevelWidgetsContainer)
         filterOrderLevelWidgetsContainer = view.findViewById(R.id.filterOrderLevelWidgetsContainer)
+        filterItemLevelRecyclerView = view.findViewById(R.id.filterItemLevelRecyclerView)
+        filterOrderLevelRecyclerView = view.findViewById(R.id.filterOrderLevelRecyclerView)
         filterEmptyState = view.findViewById(R.id.filterEmptyState)
         
         // Item Level Notes Panel (#34)
@@ -884,11 +890,9 @@ class SettingsFragment : Fragment() {
     /**
      * Load all enabled widgets (Item + Order level) and display toggles for showInFilter
      * Only shows widgets that are enabled - TEXT_BOX types excluded since they can't be filtered
+     * Uses expandable card layout matching Item/Order Level settings pages
      */
     private fun loadFilterWidgetToggles() {
-        filterItemLevelWidgetsContainer?.removeAllViews()
-        filterOrderLevelWidgetsContainer?.removeAllViews()
-        
         val allWidgets = widgetManager.getWidgets()
         
         // Get Item Level widgets (enabled, not TEXT_BOX)
@@ -911,99 +915,56 @@ class SettingsFragment : Fragment() {
         // Show empty state if no widgets
         if (!hasItemWidgets && !hasOrderWidgets) {
             filterEmptyState?.visibility = View.VISIBLE
+            filterItemLevelRecyclerView?.visibility = View.GONE
+            filterOrderLevelRecyclerView?.visibility = View.GONE
             return
         }
         filterEmptyState?.visibility = View.GONE
         
-        // Add Item Level widget toggles
-        itemLevelWidgets.forEach { widget ->
-            val toggleRow = createFilterWidgetToggleRow(widget)
-            filterItemLevelWidgetsContainer?.addView(toggleRow)
-        }
-        
-        // Add Order Level widget toggles
-        orderLevelWidgets.forEach { widget ->
-            val toggleRow = createFilterWidgetToggleRow(widget)
-            filterOrderLevelWidgetsContainer?.addView(toggleRow)
-        }
-    }
-    
-    /**
-     * Create a toggle row for a widget's showInFilter setting
-     */
-    private fun createFilterWidgetToggleRow(widget: WidgetConfig): View {
-        val context = requireContext()
-        val density = resources.displayMetrics.density
-        
-        return LinearLayout(context).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = android.view.Gravity.CENTER_VERTICAL
-            setBackgroundResource(R.drawable.bg_toggle_option_container)
-            setPadding((14 * density).toInt(), (14 * density).toInt(), (14 * density).toInt(), (14 * density).toInt())
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { bottomMargin = (8 * density).toInt() }
-            
-            // Widget type indicator icon
-            val iconRes = when (widget.type) {
-                FirebaseWidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
-                FirebaseWidgetType.MULTI_SELECT -> R.drawable.ic_label
-                FirebaseWidgetType.CALENDAR -> R.drawable.ic_calendar
-                else -> R.drawable.ic_edit
-            }
-            
-            val icon = ImageView(context).apply {
-                setImageResource(iconRes)
-                setColorFilter(ContextCompat.getColor(context, R.color.text_muted))
-                layoutParams = LinearLayout.LayoutParams((18 * density).toInt(), (18 * density).toInt()).apply {
-                    marginEnd = (12 * density).toInt()
-                }
-            }
-            addView(icon)
-            
-            // Widget label
-            val label = TextView(context).apply {
-                text = widget.label
-                setTextColor(ContextCompat.getColor(context, R.color.text_light))
-                textSize = 13f
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-            }
-            addView(label)
-            
-            // Widget type badge
-            val typeBadge = TextView(context).apply {
-                text = when (widget.type) {
-                    FirebaseWidgetType.SINGLE_SELECT -> "Single"
-                    FirebaseWidgetType.MULTI_SELECT -> "Multi"
-                    FirebaseWidgetType.CALENDAR -> "Date"
-                    else -> ""
-                }
-                setTextColor(ContextCompat.getColor(context, R.color.text_muted))
-                textSize = 10f
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, 
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { marginEnd = (12 * density).toInt() }
-            }
-            addView(typeBadge)
-            
-            // Toggle switch for showInFilter
-            val toggle = Switch(context).apply {
-                isChecked = widget.showInFilter
-                setOnCheckedChangeListener { _, isChecked ->
-                    widget.showInFilter = isChecked
+        // Setup Item Level RecyclerView with adapter
+        if (hasItemWidgets) {
+            filterItemLevelRecyclerView?.visibility = View.VISIBLE
+            if (filterItemLevelAdapter == null) {
+                filterItemLevelAdapter = FilterWidgetAdapter { widget ->
                     widgetManager.updateWidget(widget) { success ->
                         if (!success) {
                             activity?.runOnUiThread {
-                                this.isChecked = !isChecked // Revert on failure
                                 Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
                 }
+                filterItemLevelRecyclerView?.apply {
+                    layoutManager = LinearLayoutManager(requireContext())
+                    adapter = filterItemLevelAdapter
+                }
             }
-            addView(toggle)
+            filterItemLevelAdapter?.setWidgets(itemLevelWidgets.toMutableList())
+        } else {
+            filterItemLevelRecyclerView?.visibility = View.GONE
+        }
+        
+        // Setup Order Level RecyclerView with adapter
+        if (hasOrderWidgets) {
+            filterOrderLevelRecyclerView?.visibility = View.VISIBLE
+            if (filterOrderLevelAdapter == null) {
+                filterOrderLevelAdapter = FilterWidgetAdapter { widget ->
+                    widgetManager.updateWidget(widget) { success ->
+                        if (!success) {
+                            activity?.runOnUiThread {
+                                Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+                filterOrderLevelRecyclerView?.apply {
+                    layoutManager = LinearLayoutManager(requireContext())
+                    adapter = filterOrderLevelAdapter
+                }
+            }
+            filterOrderLevelAdapter?.setWidgets(orderLevelWidgets.toMutableList())
+        } else {
+            filterOrderLevelRecyclerView?.visibility = View.GONE
         }
     }
     
@@ -1059,6 +1020,10 @@ class SettingsFragment : Fragment() {
         filterOrderLevelHeader = null
         filterItemLevelWidgetsContainer = null
         filterOrderLevelWidgetsContainer = null
+        filterItemLevelRecyclerView = null
+        filterOrderLevelRecyclerView = null
+        filterItemLevelAdapter = null
+        filterOrderLevelAdapter = null
         filterEmptyState = null
         itemLevelWidgetRecyclerView = null
         orderLevelWidgetRecyclerView = null
@@ -1708,6 +1673,160 @@ class FirebaseTemplateAdapter(
 
         private fun updateCharCount(count: Int) {
             charCount.text = "$count/250"
+        }
+    }
+}
+
+// ==================== Filter Widget Adapter ====================
+
+/**
+ * Adapter for displaying filter widgets in an expandable card format.
+ * Read-only version of FirebaseWidgetEditorAdapter - no editing or deleting.
+ * Shows toggle for showInFilter and expandable options view.
+ */
+class FilterWidgetAdapter(
+    private val onWidgetUpdate: (WidgetConfig) -> Unit
+) : RecyclerView.Adapter<FilterWidgetAdapter.ViewHolder>() {
+
+    private val widgets = mutableListOf<WidgetConfig>()
+    private val expandedIds = mutableSetOf<String>()
+
+    fun setWidgets(newWidgets: MutableList<WidgetConfig>) {
+        widgets.clear()
+        widgets.addAll(newWidgets)
+        notifyDataSetChanged()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_filter_widget, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(widgets[position])
+    }
+
+    override fun getItemCount() = widgets.size
+
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val widgetIconContainer: View = itemView.findViewById(R.id.filterWidgetIconContainer)
+        private val widgetIcon: ImageView = itemView.findViewById(R.id.filterWidgetIcon)
+        private val widgetTitle: TextView = itemView.findViewById(R.id.filterWidgetTitle)
+        private val widgetType: TextView = itemView.findViewById(R.id.filterWidgetType)
+        private val widgetToggle: Switch = itemView.findViewById(R.id.filterWidgetToggle)
+        private val expandChevron: ImageView = itemView.findViewById(R.id.filterExpandChevron)
+        private val widgetHeader: View = itemView.findViewById(R.id.filterWidgetHeader)
+        private val widgetBody: View = itemView.findViewById(R.id.filterWidgetBody)
+        private val optionsLabel: TextView = itemView.findViewById(R.id.filterOptionsLabel)
+        private val valuesContainer: com.google.android.flexbox.FlexboxLayout = itemView.findViewById(R.id.filterValuesContainer)
+
+        fun bind(widget: WidgetConfig) {
+            widgetTitle.text = widget.label
+            widgetType.text = widget.type.displayName
+            widgetToggle.isChecked = widget.showInFilter
+
+            // Set icon and colors based on type
+            val (iconRes, bgRes, tintColor) = when (widget.type) {
+                com.orderMate.modals.WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, 0xFF64B5F6.toInt())
+                com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, 0xFFCE93D8.toInt())
+                com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, 0xFF81C784.toInt())
+                com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, 0xFFFFB74D.toInt())
+            }
+            widgetIcon.setImageResource(iconRes)
+            widgetIcon.setColorFilter(tintColor)
+            widgetIconContainer.setBackgroundResource(bgRes)
+
+            // Show/hide options based on widget type
+            val hasOptions = widget.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
+                            widget.type == com.orderMate.modals.WidgetType.MULTI_SELECT
+            
+            if (hasOptions && widget.options.isNotEmpty()) {
+                optionsLabel.visibility = View.VISIBLE
+                setupOptionsDisplay(widget, tintColor)
+            } else if (widget.type == com.orderMate.modals.WidgetType.CALENDAR) {
+                optionsLabel.text = "Type: Date Picker"
+                optionsLabel.visibility = View.VISIBLE
+                valuesContainer.removeAllViews()
+            } else {
+                optionsLabel.visibility = View.GONE
+                valuesContainer.removeAllViews()
+            }
+
+            // Expand/collapse state
+            val isExpanded = expandedIds.contains(widget.id)
+            widgetBody.visibility = if (isExpanded) View.VISIBLE else View.GONE
+            expandChevron.rotation = if (isExpanded) 180f else 0f
+
+            // Header click to expand/collapse
+            widgetHeader.setOnClickListener {
+                val expanding = !expandedIds.contains(widget.id)
+                if (expanding) {
+                    expandedIds.add(widget.id)
+                } else {
+                    expandedIds.remove(widget.id)
+                }
+                animateExpand(expanding)
+            }
+
+            // Toggle showInFilter
+            widgetToggle.setOnCheckedChangeListener { _, isChecked ->
+                widget.showInFilter = isChecked
+                onWidgetUpdate(widget)
+            }
+        }
+
+        private fun setupOptionsDisplay(widget: WidgetConfig, tintColor: Int) {
+            valuesContainer.removeAllViews()
+            val context = itemView.context
+            val density = context.resources.displayMetrics.density
+
+            widget.options.forEach { option ->
+                val chip = TextView(context).apply {
+                    text = option.label
+                    setTextColor(tintColor)
+                    textSize = 12f
+                    setPadding((10 * density).toInt(), (6 * density).toInt(), (10 * density).toInt(), (6 * density).toInt())
+                    
+                    // Create chip background
+                    val bgDrawable = android.graphics.drawable.GradientDrawable().apply {
+                        shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                        cornerRadius = 8f * density
+                        setColor((tintColor and 0x00FFFFFF) or 0x26000000) // 15% opacity
+                        setStroke((1 * density).toInt(), (tintColor and 0x00FFFFFF) or 0x40000000) // 25% opacity border
+                    }
+                    background = bgDrawable
+                    
+                    layoutParams = com.google.android.flexbox.FlexboxLayout.LayoutParams(
+                        com.google.android.flexbox.FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                        com.google.android.flexbox.FlexboxLayout.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        setMargins(0, 0, (6 * density).toInt(), (6 * density).toInt())
+                    }
+                }
+                valuesContainer.addView(chip)
+            }
+        }
+
+        private fun animateExpand(expand: Boolean) {
+            if (expand) {
+                widgetBody.visibility = View.VISIBLE
+                widgetBody.alpha = 0f
+                widgetBody.animate()
+                    .alpha(1f)
+                    .setDuration(200)
+                    .start()
+            } else {
+                widgetBody.animate()
+                    .alpha(0f)
+                    .setDuration(200)
+                    .withEndAction { widgetBody.visibility = View.GONE }
+                    .start()
+            }
+            expandChevron.animate()
+                .rotation(if (expand) 180f else 0f)
+                .setDuration(200)
+                .start()
         }
     }
 }

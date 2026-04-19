@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Filter Widget Item Layout (read-only, expandable) -->
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/filterWidgetCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardBackgroundColor="#4D000000"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="0dp">
+
+<LinearLayout
+    android:id="@+id/filterWidgetContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- Widget Header (always visible) -->
+    <LinearLayout
+        android:id="@+id/filterWidgetHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <!-- Widget Icon -->
+        <FrameLayout
+            android:id="@+id/filterWidgetIconContainer"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_widget_icon_calendar">
+
+            <ImageView
+                android:id="@+id/filterWidgetIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_calendar"
+                app:tint="#3B82F6" />
+
+        </FrameLayout>
+
+        <!-- Widget Info -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/filterWidgetTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_light"
+                android:textSize="14sp"
+                tools:text="Due Date/Time" />
+
+            <TextView
+                android:id="@+id/filterWidgetType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_muted"
+                android:textSize="11sp"
+                tools:text="Calendar" />
+
+        </LinearLayout>
+
+        <!-- Toggle Switch for showInFilter -->
+        <Switch
+            android:id="@+id/filterWidgetToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:thumb="@drawable/bg_widget_toggle_thumb"
+            android:track="@drawable/bg_widget_toggle_track" />
+
+        <!-- Expand Chevron -->
+        <ImageView
+            android:id="@+id/filterExpandChevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_chevron_down"
+            app:tint="@color/text_muted" />
+
+    </LinearLayout>
+
+    <!-- Widget Body (expandable, read-only options display) -->
+    <LinearLayout
+        android:id="@+id/filterWidgetBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="12dp"
+        android:visibility="gone">
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="12dp"
+            android:background="#1AFFFFFF" />
+
+        <!-- Options Display (read-only) -->
+        <TextView
+            android:id="@+id/filterOptionsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Options"
+            android:textColor="@color/text_muted"
+            android:textSize="11sp" />
+
+        <!-- Values Tags Container (read-only) -->
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/filterValuesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:flexWrap="wrap"
+            app:alignItems="flex_start"
+            app:justifyContent="flex_start" />
+
+    </LinearLayout>
+
+</LinearLayout>
+
+</androidx.cardview.widget.CardView>

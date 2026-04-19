@@ -623,27 +623,32 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
+                    <!-- Centered Header -->
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Filter Popup Settings"
                         android:textColor="@color/text_light"
                         android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:textAlignment="center" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:layout_marginBottom="16dp"
                         android:text="Choose which widgets appear in the filter popup. Clover filters (Payment Status, Order Status, etc.) are always shown."
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp" />
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:textAlignment="center" />
 
                     <!-- Item Level Widgets Section -->
                     <TextView
                         android:id="@+id/filterItemLevelHeader"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:layout_marginBottom="8dp"
@@ -651,18 +656,28 @@
                         android:textColor="@color/text_light"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:gravity="center"
+                        android:textAlignment="center"
                         android:visibility="gone" />
 
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/filterItemLevelRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false" />
+
+                    <!-- Keep legacy container for compatibility -->
                     <LinearLayout
                         android:id="@+id/filterItemLevelWidgetsContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical" />
+                        android:orientation="vertical"
+                        android:visibility="gone" />
 
                     <!-- Order Level Widgets Section -->
                     <TextView
                         android:id="@+id/filterOrderLevelHeader"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:layout_marginBottom="8dp"
@@ -670,13 +685,23 @@
                         android:textColor="@color/text_light"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:gravity="center"
+                        android:textAlignment="center"
                         android:visibility="gone" />
 
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/filterOrderLevelRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false" />
+
+                    <!-- Keep legacy container for compatibility -->
                     <LinearLayout
                         android:id="@+id/filterOrderLevelWidgetsContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical" />
+                        android:orientation="vertical"
+                        android:visibility="gone" />
 
                     <!-- Empty State -->
                     <TextView
