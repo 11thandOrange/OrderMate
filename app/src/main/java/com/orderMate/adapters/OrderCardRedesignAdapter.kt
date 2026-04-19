@@ -276,36 +276,29 @@ class OrderCardRedesignAdapter(
         }
 
         private fun setupOrderStatusBadge(order: Order) {
-            val context = binding.root.context
             val state = order.state?.toString() ?: "OPEN"
             val displayText = formatPaymentState(state)
+            val density = binding.root.context.resources.displayMetrics.density
             
-            val (bgRes, textColorRes) = when (state.uppercase()) {
-                "LOCKED" -> Pair(R.drawable.bg_badge_closed, R.color.closed_status_color)
-                else -> Pair(R.drawable.bg_badge_open, R.color.open_status_color)
-            }
+            // Use WidgetColorUtils for consistent colors - ORDER_STATUS = Red
+            val color = WidgetColorUtils.COLOR_ORDER_STATUS
             
             binding.orderStatusBadge.text = displayText
-            binding.orderStatusBadge.setBackgroundResource(bgRes)
-            binding.orderStatusBadge.setTextColor(ContextCompat.getColor(context, textColorRes))
+            binding.orderStatusBadge.background = WidgetColorUtils.createPillBackground(color, 12f, density)
+            binding.orderStatusBadge.setTextColor(color)
         }
 
         private fun setupPaymentStatusBadge(order: Order) {
-            val context = binding.root.context
             val paymentState = order.paymentState?.name ?: "NOT_PAID"
             val displayText = formatPaymentState(paymentState)
-
-            val (bgRes, textColorRes) = when (paymentState.uppercase()) {
-                "PAID" -> Pair(R.drawable.bg_badge_paid, R.color.paid_status_color)
-                "NOT_PAID" -> Pair(R.drawable.bg_badge_unpaid, R.color.unpaid_status_color)
-                "PARTIALLY_PAID" -> Pair(R.drawable.bg_badge_unpaid, R.color.orange_accent)
-                "REFUNDED", "PARTIALLY_REFUNDED" -> Pair(R.drawable.bg_badge_closed, R.color.closed_status_color)
-                else -> Pair(R.drawable.bg_badge_open, R.color.text_secondary)
-            }
-
+            val density = binding.root.context.resources.displayMetrics.density
+            
+            // Use WidgetColorUtils for consistent colors - PAYMENT_STATUS = Yellow
+            val color = WidgetColorUtils.COLOR_PAYMENT_STATUS
+            
             binding.paymentStatusBadge.text = displayText
-            binding.paymentStatusBadge.setBackgroundResource(bgRes)
-            binding.paymentStatusBadge.setTextColor(ContextCompat.getColor(context, textColorRes))
+            binding.paymentStatusBadge.background = WidgetColorUtils.createPillBackground(color, 12f, density)
+            binding.paymentStatusBadge.setTextColor(color)
         }
 
         private fun getCustomerName(order: Order): String {
