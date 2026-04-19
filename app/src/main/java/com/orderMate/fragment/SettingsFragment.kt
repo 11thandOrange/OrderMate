@@ -86,6 +86,13 @@ class SettingsFragment : Fragment() {
     private var filterOrderLevelAdapter: FilterWidgetAdapter? = null
     private var filterEmptyState: TextView? = null
     
+    // Clover Filter Toggles
+    private var switchFilterOrderDate: Switch? = null
+    private var switchFilterPaymentStatus: Switch? = null
+    private var switchFilterOrderStatus: Switch? = null
+    private var switchFilterPaymentType: Switch? = null
+    private var switchFilterEmployee: Switch? = null
+    
     // Item Level Notes Panel (#34)
     private var switchItemNotesEnabled: Switch? = null
     private var itemLevelEditorCard: View? = null
@@ -182,6 +189,13 @@ class SettingsFragment : Fragment() {
         filterOrderLevelRecyclerView = view.findViewById(R.id.filterOrderLevelRecyclerView)
         filterEmptyState = view.findViewById(R.id.filterEmptyState)
         
+        // Clover Filter Toggles
+        switchFilterOrderDate = view.findViewById(R.id.switchFilterOrderDate)
+        switchFilterPaymentStatus = view.findViewById(R.id.switchFilterPaymentStatus)
+        switchFilterOrderStatus = view.findViewById(R.id.switchFilterOrderStatus)
+        switchFilterPaymentType = view.findViewById(R.id.switchFilterPaymentType)
+        switchFilterEmployee = view.findViewById(R.id.switchFilterEmployee)
+        
         // Item Level Notes Panel (#34)
         switchItemNotesEnabled = view.findViewById(R.id.switchItemNotesEnabled)
         itemLevelEditorCard = view.findViewById(R.id.itemLevelEditorCard)
@@ -242,9 +256,10 @@ class SettingsFragment : Fragment() {
         panelNotification?.visibility = if (tab == "notification") View.VISIBLE else View.GONE
         panelAdvanced?.visibility = if (tab == "advanced") View.VISIBLE else View.GONE
         
-        // Load filter widgets when switching to filter tab
+        // Load filter widgets and Clover filter toggles when switching to filter tab
         if (tab == "filter") {
             loadFilterWidgetToggles()
+            setupCloverFilterToggles()
         }
     }
 
@@ -968,6 +983,35 @@ class SettingsFragment : Fragment() {
         }
     }
     
+    /**
+     * Setup Clover filter toggles - load saved state and add listeners
+     */
+    private fun setupCloverFilterToggles() {
+        // Load saved states
+        switchFilterOrderDate?.isChecked = settingsManager.getShowFilterOrderDate()
+        switchFilterPaymentStatus?.isChecked = settingsManager.getShowFilterPaymentStatus()
+        switchFilterOrderStatus?.isChecked = settingsManager.getShowFilterOrderStatus()
+        switchFilterPaymentType?.isChecked = settingsManager.getShowFilterPaymentType()
+        switchFilterEmployee?.isChecked = settingsManager.getShowFilterEmployee()
+        
+        // Set up listeners
+        switchFilterOrderDate?.setOnCheckedChangeListener { _, isChecked ->
+            settingsManager.setShowFilterOrderDate(isChecked)
+        }
+        switchFilterPaymentStatus?.setOnCheckedChangeListener { _, isChecked ->
+            settingsManager.setShowFilterPaymentStatus(isChecked)
+        }
+        switchFilterOrderStatus?.setOnCheckedChangeListener { _, isChecked ->
+            settingsManager.setShowFilterOrderStatus(isChecked)
+        }
+        switchFilterPaymentType?.setOnCheckedChangeListener { _, isChecked ->
+            settingsManager.setShowFilterPaymentType(isChecked)
+        }
+        switchFilterEmployee?.setOnCheckedChangeListener { _, isChecked ->
+            settingsManager.setShowFilterEmployee(isChecked)
+        }
+    }
+    
     // ==================== Delete Confirmation Dialog ====================
     
     private fun showDeleteConfirmationDialog(
@@ -1025,6 +1069,11 @@ class SettingsFragment : Fragment() {
         filterItemLevelAdapter = null
         filterOrderLevelAdapter = null
         filterEmptyState = null
+        switchFilterOrderDate = null
+        switchFilterPaymentStatus = null
+        switchFilterOrderStatus = null
+        switchFilterPaymentType = null
+        switchFilterEmployee = null
         itemLevelWidgetRecyclerView = null
         orderLevelWidgetRecyclerView = null
         btnAddItemLevelWidget = null

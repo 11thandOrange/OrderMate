@@ -274,6 +274,48 @@ class SettingsManager(private val context: Context) {
         prefs.edit { putBoolean("${KEY_THEME_TARGET_PREFIX}$target", enabled) }
     }
 
+    // ==================== Clover Filter Visibility Settings ====================
+
+    fun getShowFilterOrderDate(): Boolean {
+        return prefs.getBoolean(KEY_SHOW_FILTER_ORDER_DATE, true)
+    }
+
+    fun setShowFilterOrderDate(show: Boolean) {
+        prefs.edit { putBoolean(KEY_SHOW_FILTER_ORDER_DATE, show) }
+    }
+
+    fun getShowFilterPaymentStatus(): Boolean {
+        return prefs.getBoolean(KEY_SHOW_FILTER_PAYMENT_STATUS, true)
+    }
+
+    fun setShowFilterPaymentStatus(show: Boolean) {
+        prefs.edit { putBoolean(KEY_SHOW_FILTER_PAYMENT_STATUS, show) }
+    }
+
+    fun getShowFilterOrderStatus(): Boolean {
+        return prefs.getBoolean(KEY_SHOW_FILTER_ORDER_STATUS, true)
+    }
+
+    fun setShowFilterOrderStatus(show: Boolean) {
+        prefs.edit { putBoolean(KEY_SHOW_FILTER_ORDER_STATUS, show) }
+    }
+
+    fun getShowFilterPaymentType(): Boolean {
+        return prefs.getBoolean(KEY_SHOW_FILTER_PAYMENT_TYPE, true)
+    }
+
+    fun setShowFilterPaymentType(show: Boolean) {
+        prefs.edit { putBoolean(KEY_SHOW_FILTER_PAYMENT_TYPE, show) }
+    }
+
+    fun getShowFilterEmployee(): Boolean {
+        return prefs.getBoolean(KEY_SHOW_FILTER_EMPLOYEE, true)
+    }
+
+    fun setShowFilterEmployee(show: Boolean) {
+        prefs.edit { putBoolean(KEY_SHOW_FILTER_EMPLOYEE, show) }
+    }
+
     // ==================== Commit (apply pending changes) ====================
 
     fun commit() {
@@ -327,6 +369,13 @@ class SettingsManager(private val context: Context) {
         private const val KEY_AVATAR_EMOJI = "avatar_emoji"
         private const val KEY_COLOR_SCHEME = "color_scheme"
         private const val KEY_THEME_TARGET_PREFIX = "theme_target_"
+        
+        // Clover Filter Visibility Keys
+        private const val KEY_SHOW_FILTER_ORDER_DATE = "show_filter_order_date"
+        private const val KEY_SHOW_FILTER_PAYMENT_STATUS = "show_filter_payment_status"
+        private const val KEY_SHOW_FILTER_ORDER_STATUS = "show_filter_order_status"
+        private const val KEY_SHOW_FILTER_PAYMENT_TYPE = "show_filter_payment_type"
+        private const val KEY_SHOW_FILTER_EMPLOYEE = "show_filter_employee"
 
         // Defaults
         private const val DEFAULT_NOTIFICATION_DAYS = 3

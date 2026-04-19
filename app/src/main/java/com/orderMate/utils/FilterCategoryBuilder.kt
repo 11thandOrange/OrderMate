@@ -76,26 +76,38 @@ object FilterCategoryBuilder {
      * 
      * @param orders List of orders to extract Clover filter options from
      * @param widgets List of widgets from OrderMate DB
+     * @param settingsManager SettingsManager to check filter visibility settings
      * @return List of filter categories to display
      */
     fun buildCategories(
         orders: List<Order?>,
-        widgets: List<WidgetConfig>
+        widgets: List<WidgetConfig>,
+        settingsManager: SettingsManager? = null
     ): List<FilterCategory> {
         val categories = mutableListOf<FilterCategory>()
         
-        // 1. Order Date - ALWAYS shown (Clover data, not user-editable widget)
-        categories.add(buildOrderDateFilter())
+        // 1. Order Date - check settings (default: shown)
+        if (settingsManager?.getShowFilterOrderDate() != false) {
+            categories.add(buildOrderDateFilter())
+        }
         
-        // 2. Clover filters - use Clover's known values (always render all values)
-        categories.add(buildPaymentStatusFilter())
-        categories.add(buildOrderStatusFilter())
-        categories.add(buildPaymentTypeFilter())
+        // 2. Clover filters - check settings for each (default: shown)
+        if (settingsManager?.getShowFilterPaymentStatus() != false) {
+            categories.add(buildPaymentStatusFilter())
+        }
+        if (settingsManager?.getShowFilterOrderStatus() != false) {
+            categories.add(buildOrderStatusFilter())
+        }
+        if (settingsManager?.getShowFilterPaymentType() != false) {
+            categories.add(buildPaymentTypeFilter())
+        }
         
         // Employee filter - dynamic, extracted from orders (can't predefine employees)
-        val employeeFilter = buildEmployeeFilter(orders)
-        if (employeeFilter.options.isNotEmpty()) {
-            categories.add(employeeFilter)
+        if (settingsManager?.getShowFilterEmployee() != false) {
+            val employeeFilter = buildEmployeeFilter(orders)
+            if (employeeFilter.options.isNotEmpty()) {
+                categories.add(employeeFilter)
+            }
         }
         
         // 3. Item-level widgets (ITEM level, enabled, showInFilter=true, not TEXT_BOX)

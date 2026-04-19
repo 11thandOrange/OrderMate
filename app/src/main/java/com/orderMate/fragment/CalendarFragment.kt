@@ -34,6 +34,7 @@ import com.orderMate.utils.OrderDueDateResolver
 import com.orderMate.utils.OrderNoteParser
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.OrderSearchFilter
+import com.orderMate.utils.SettingsManager
 import com.orderMate.utils.exceptionHandlerWithReturn
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.runOnBackgroundThread
@@ -661,7 +662,8 @@ class CalendarFragment : Fragment() {
     
     private fun showFilterDialog() {
         val filterableWidgets = WidgetManager.getInstance(requireContext()).getFilterableWidgets() ?: emptyList()
-        val categories = FilterCategoryBuilder.buildCategories(allOrders, filterableWidgets)
+        val settingsManager = SettingsManager(requireContext())
+        val categories = FilterCategoryBuilder.buildCategories(allOrders, filterableWidgets, settingsManager)
         
         val dialog = FilterDialogFragment.newInstance(
             categories = categories,

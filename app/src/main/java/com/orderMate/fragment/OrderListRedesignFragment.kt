@@ -39,6 +39,7 @@ import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.hideView
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
+import com.orderMate.utils.SettingsManager
 import com.orderMate.utils.showView
 import com.orderMate.viewmodel.SharedFilterViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -572,7 +573,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     private fun showFilterDialog() {
         // Build dynamic filter categories from Clover orders + OrderMate widgets
         val filterableWidgets = WidgetManager.getInstance(requireContext()).getFilterableWidgets() ?: emptyList()
-        val categories = FilterCategoryBuilder.buildCategories(allItemList, filterableWidgets)
+        val settingsManager = SettingsManager(requireContext())
+        val categories = FilterCategoryBuilder.buildCategories(allItemList, filterableWidgets, settingsManager)
         
         val dialog = FilterDialogFragment.newInstance(
             categories = categories,
