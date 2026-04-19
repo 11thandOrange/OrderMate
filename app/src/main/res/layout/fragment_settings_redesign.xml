@@ -565,7 +565,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:layout_marginBottom="16dp"
-                        android:text="Choose which filters appear in the filter popup."
+                        android:text="Choose which widgets appear in the filter pop up"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp"
                         android:gravity="center"
@@ -609,6 +609,83 @@
                         android:orientation="vertical"
                         android:layout_marginBottom="8dp">
 
+                        <!-- Order Date Card -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            app:cardBackgroundColor="#4D000000"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <!-- Header -->
+                                <LinearLayout
+                                    android:id="@+id/orderDateHeader"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:padding="12dp">
+
+                                    <!-- Icon -->
+                                    <FrameLayout
+                                        android:layout_width="36dp"
+                                        android:layout_height="36dp"
+                                        android:background="@drawable/bg_widget_icon_calendar">
+
+                                        <ImageView
+                                            android:layout_width="20dp"
+                                            android:layout_height="20dp"
+                                            android:layout_gravity="center"
+                                            android:src="@drawable/ic_calendar"
+                                            app:tint="#64B5F6" />
+
+                                    </FrameLayout>
+
+                                    <!-- Info -->
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="12dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Order Date"
+                                            android:textColor="@color/text_light"
+                                            android:textSize="14sp" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Calendar"
+                                            android:textColor="@color/text_muted"
+                                            android:textSize="11sp" />
+
+                                    </LinearLayout>
+
+                                    <!-- Toggle -->
+                                    <Switch
+                                        android:id="@+id/switchFilterOrderDate"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:checked="true"
+                                        android:thumb="@drawable/bg_widget_toggle_thumb"
+                                        android:track="@drawable/bg_widget_toggle_track" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
                         <!-- Payment Status Card -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="match_parent"
@@ -636,14 +713,14 @@
                                     <FrameLayout
                                         android:layout_width="36dp"
                                         android:layout_height="36dp"
-                                        android:background="@drawable/bg_widget_icon_select">
+                                        android:background="@drawable/bg_widget_icon_text">
 
                                         <ImageView
                                             android:layout_width="20dp"
                                             android:layout_height="20dp"
                                             android:layout_gravity="center"
                                             android:src="@drawable/ic_attach_money"
-                                            app:tint="#CE93D8" />
+                                            app:tint="#FFB74D" />
 
                                     </FrameLayout>
 
@@ -665,7 +742,7 @@
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="Multi Select"
+                                            android:text="Single Select"
                                             android:textColor="@color/text_muted"
                                             android:textSize="11sp" />
 
@@ -757,14 +834,14 @@
                                     <FrameLayout
                                         android:layout_width="36dp"
                                         android:layout_height="36dp"
-                                        android:background="@drawable/bg_widget_icon_multiselect">
+                                        android:background="@drawable/bg_circle_red">
 
                                         <ImageView
                                             android:layout_width="20dp"
                                             android:layout_height="20dp"
                                             android:layout_gravity="center"
                                             android:src="@drawable/ic_list"
-                                            app:tint="#81C784" />
+                                            app:tint="#EF5350" />
 
                                     </FrameLayout>
 
@@ -786,7 +863,7 @@
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="Multi Select"
+                                            android:text="Single Select"
                                             android:textColor="@color/text_muted"
                                             android:textSize="11sp" />
 
@@ -878,14 +955,14 @@
                                     <FrameLayout
                                         android:layout_width="36dp"
                                         android:layout_height="36dp"
-                                        android:background="@drawable/bg_widget_icon_text">
+                                        android:background="@drawable/bg_circle_grey">
 
                                         <ImageView
                                             android:layout_width="20dp"
                                             android:layout_height="20dp"
                                             android:layout_gravity="center"
                                             android:src="@drawable/ic_credit_card"
-                                            app:tint="#FFB74D" />
+                                            app:tint="#9E9E9E" />
 
                                     </FrameLayout>
 
@@ -907,7 +984,7 @@
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="Multi Select"
+                                            android:text="Single Select"
                                             android:textColor="@color/text_muted"
                                             android:textSize="11sp" />
 
@@ -965,6 +1042,83 @@
                                         app:flexWrap="wrap"
                                         app:alignItems="flex_start"
                                         app:justifyContent="flex_start" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- Employee Card -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            app:cardBackgroundColor="#4D000000"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <!-- Header -->
+                                <LinearLayout
+                                    android:id="@+id/employeeHeader"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:padding="12dp">
+
+                                    <!-- Icon -->
+                                    <FrameLayout
+                                        android:layout_width="36dp"
+                                        android:layout_height="36dp"
+                                        android:background="@drawable/bg_widget_icon_select">
+
+                                        <ImageView
+                                            android:layout_width="20dp"
+                                            android:layout_height="20dp"
+                                            android:layout_gravity="center"
+                                            android:src="@drawable/ic_person"
+                                            app:tint="#CE93D8" />
+
+                                    </FrameLayout>
+
+                                    <!-- Info -->
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="12dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Employee"
+                                            android:textColor="@color/text_light"
+                                            android:textSize="14sp" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Single Select"
+                                            android:textColor="@color/text_muted"
+                                            android:textSize="11sp" />
+
+                                    </LinearLayout>
+
+                                    <!-- Toggle -->
+                                    <Switch
+                                        android:id="@+id/switchFilterEmployee"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:checked="true"
+                                        android:thumb="@drawable/bg_widget_toggle_thumb"
+                                        android:track="@drawable/bg_widget_toggle_track" />
 
                                 </LinearLayout>
 

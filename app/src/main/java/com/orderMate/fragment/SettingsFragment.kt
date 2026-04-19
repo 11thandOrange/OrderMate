@@ -87,9 +87,11 @@ class SettingsFragment : Fragment() {
     private var filterEmptyState: TextView? = null
     
     // Clover Filter Cards (expandable)
+    private var switchFilterOrderDate: Switch? = null
     private var switchFilterPaymentStatus: Switch? = null
     private var switchFilterOrderStatus: Switch? = null
     private var switchFilterPaymentType: Switch? = null
+    private var switchFilterEmployee: Switch? = null
     private var paymentStatusHeader: View? = null
     private var paymentStatusBody: View? = null
     private var paymentStatusChevron: ImageView? = null
@@ -200,9 +202,11 @@ class SettingsFragment : Fragment() {
         filterEmptyState = view.findViewById(R.id.filterEmptyState)
         
         // Clover Filter Cards (expandable)
+        switchFilterOrderDate = view.findViewById(R.id.switchFilterOrderDate)
         switchFilterPaymentStatus = view.findViewById(R.id.switchFilterPaymentStatus)
         switchFilterOrderStatus = view.findViewById(R.id.switchFilterOrderStatus)
         switchFilterPaymentType = view.findViewById(R.id.switchFilterPaymentType)
+        switchFilterEmployee = view.findViewById(R.id.switchFilterEmployee)
         paymentStatusHeader = view.findViewById(R.id.paymentStatusHeader)
         paymentStatusBody = view.findViewById(R.id.paymentStatusBody)
         paymentStatusChevron = view.findViewById(R.id.paymentStatusChevron)
@@ -1005,15 +1009,19 @@ class SettingsFragment : Fragment() {
     
     /**
      * Setup Clover filter cards - load saved state, add listeners, populate options
-     * Only shows Payment Status, Order Status, Payment Type (Order Date and Employee always show in popup)
      */
     private fun setupCloverFilterToggles() {
         // Load saved states
+        switchFilterOrderDate?.isChecked = settingsManager.getShowFilterOrderDate()
         switchFilterPaymentStatus?.isChecked = settingsManager.getShowFilterPaymentStatus()
         switchFilterOrderStatus?.isChecked = settingsManager.getShowFilterOrderStatus()
         switchFilterPaymentType?.isChecked = settingsManager.getShowFilterPaymentType()
+        switchFilterEmployee?.isChecked = settingsManager.getShowFilterEmployee()
         
         // Set up toggle listeners
+        switchFilterOrderDate?.setOnCheckedChangeListener { _, isChecked ->
+            settingsManager.setShowFilterOrderDate(isChecked)
+        }
         switchFilterPaymentStatus?.setOnCheckedChangeListener { _, isChecked ->
             settingsManager.setShowFilterPaymentStatus(isChecked)
         }
@@ -1022,6 +1030,9 @@ class SettingsFragment : Fragment() {
         }
         switchFilterPaymentType?.setOnCheckedChangeListener { _, isChecked ->
             settingsManager.setShowFilterPaymentType(isChecked)
+        }
+        switchFilterEmployee?.setOnCheckedChangeListener { _, isChecked ->
+            settingsManager.setShowFilterEmployee(isChecked)
         }
         
         // Set up expand/collapse for Payment Status
@@ -1056,17 +1067,17 @@ class SettingsFragment : Fragment() {
      * Populate the options tags for each Clover filter
      */
     private fun populateCloverFilterOptions() {
-        // Payment Status options
+        // Payment Status options (Yellow/Orange)
         val paymentStatusValues = listOf("Paid", "Unpaid", "Partial", "Refunded", "Partial Refund", "Open")
-        populateOptionsContainer(paymentStatusOptions, paymentStatusValues, 0xFFCE93D8.toInt())
+        populateOptionsContainer(paymentStatusOptions, paymentStatusValues, 0xFFFFB74D.toInt())
         
-        // Order Status options
+        // Order Status options (Red)
         val orderStatusValues = listOf("Open", "Closed")
-        populateOptionsContainer(orderStatusOptions, orderStatusValues, 0xFF81C784.toInt())
+        populateOptionsContainer(orderStatusOptions, orderStatusValues, 0xFFEF5350.toInt())
         
-        // Payment Type options
+        // Payment Type options (Grey)
         val paymentTypeValues = listOf("Cash", "Credit Card", "Debit Card", "Check", "Gift Card", "Other")
-        populateOptionsContainer(paymentTypeOptions, paymentTypeValues, 0xFFFFB74D.toInt())
+        populateOptionsContainer(paymentTypeOptions, paymentTypeValues, 0xFF9E9E9E.toInt())
     }
     
     /**
@@ -1159,9 +1170,11 @@ class SettingsFragment : Fragment() {
         filterItemLevelAdapter = null
         filterOrderLevelAdapter = null
         filterEmptyState = null
+        switchFilterOrderDate = null
         switchFilterPaymentStatus = null
         switchFilterOrderStatus = null
         switchFilterPaymentType = null
+        switchFilterEmployee = null
         paymentStatusHeader = null
         paymentStatusBody = null
         paymentStatusChevron = null
