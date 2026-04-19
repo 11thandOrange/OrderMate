@@ -10,7 +10,7 @@ import com.orderMate.modals.WidgetType
  * - Calendar/Date: Blue (#64B5F6)
  * - Single Select: Purple (#CE93D8)
  * - Multi Select: Green (#81C784)
- * - Text Box: Orange (#FFB74D)
+ * - Text Box: Brown (#A1887F)
  */
 object WidgetColorUtils {
     
@@ -18,7 +18,7 @@ object WidgetColorUtils {
     const val COLOR_CALENDAR = 0xFF64B5F6.toInt()    // Blue
     const val COLOR_SINGLE_SELECT = 0xFFCE93D8.toInt() // Purple
     const val COLOR_MULTI_SELECT = 0xFF81C784.toInt()  // Green
-    const val COLOR_TEXT_BOX = 0xFFFFB74D.toInt()      // Orange
+    const val COLOR_TEXT_BOX = 0xFFA1887F.toInt()      // Brown
     
     /**
      * Get color for a widget type

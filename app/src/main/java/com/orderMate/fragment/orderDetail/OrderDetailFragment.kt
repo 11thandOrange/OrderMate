@@ -185,24 +185,18 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                     createdTime?.formatMillisToDateTime(Constants.yearFormat)
                 binding.merchantName.text = preferenceManager.getString(Constants.merchantName)
 
-                // #45: Clover tags in header - show ORDER state and PAYMENT state separately
-                // orderPlacedStatusValue shows order.state (OPEN or LOCKED/CLOSED)
-                // Dark background with tone-on-tone text
+                // #45: Clover tags in header - Order Status (red), Payment Status (yellow), Payment Type (grey)
+                // Order Status badge
                 val orderState = orderArguments?.state?.uppercase() ?: "OPEN"
                 val isOrderOpen = orderState == "OPEN"
                 binding.orderPlacedStatusValue.text = if (isOrderOpen) "OPEN" else "CLOSED"
-                binding.orderPlacedStatusValue.setTextColor(
-                    ContextCompat.getColor(requireContext(), 
-                        if (isOrderOpen) R.color.open_status_text else R.color.closed_status_text)
-                )
-                binding.orderPlacedStatusValue.setBackgroundResource(
-                    if (isOrderOpen) R.drawable.badge_background_open else R.drawable.badge_background_closed
-                )
                 
-                // paymentStatusBadge shows order.paymentState (PAID, NOT_PAID, PARTIALLY_PAID, etc.)
+                // Payment Status badge
                 val paymentState = orderArguments?.paymentState?.name ?: "NOT_PAID"
                 binding.paymentStatusBadge.text = formatPaymentState(paymentState).uppercase()
-                updatePaymentBadgeStyle(paymentState)
+                
+                // Payment Type badge - get from order payments
+                populatePaymentTypeBadge()
                 
                 if (isStatusOpen()) {
                     binding.reOpenButton.isVisible = true
@@ -359,62 +353,35 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         showTheDiscountAndTaxData()
         populateHistoryCard()
         setupOrderNotesPills()
-        populateDescriptionRow()  // #46
-        populateOrderTags()       // #46
-        populateDynamicWidgetRows()  // Task 21
-    }
-    
-    /**
-     * #46: Populate description row from order notes
-     */
-    private fun populateDescriptionRow() {
-        val orderNote = orderArguments?.note
-        val descriptionRow = binding.descriptionRow
-        val descriptionDivider = binding.descriptionDivider
-        val descriptionValue = binding.orderDescriptionValue
-        
-        // Extract description text from note (text after "text:" label)
-        val description = extractDescriptionFromNote(orderNote)
-        
-        if (description.isNullOrBlank()) {
-            descriptionRow.visibility = View.GONE
-            descriptionDivider.visibility = View.GONE
-        } else {
-            descriptionRow.visibility = View.VISIBLE
-            descriptionDivider.visibility = View.VISIBLE
-            descriptionValue.text = description
-        }
-    }
-    
-    private fun extractDescriptionFromNote(noteString: String?): String? {
-        if (noteString.isNullOrBlank()) return null
-        
-        val delimiter = if (noteString.contains("•")) "•" else "|"
-        val parts = noteString.split(delimiter).map { it.trim() }
-        
-        for (part in parts) {
-            val colonIndex = part.indexOf(':')
-            if (colonIndex > 0) {
-                val label = part.substring(0, colonIndex).trim().lowercase()
-                val value = part.substring(colonIndex + 1).trim()
-                if (label == "text" || label == "note" || label == "description") {
-                    return value.takeIf { it.isNotBlank() }
-                }
-            }
-        }
-        // If no labeled text, return the whole note as description
-        return if (!noteString.contains(":")) noteString else null
+        populateOrderTags()           // SINGLE_SELECT + MULTI_SELECT widgets
+        populateDynamicWidgetRows()   // CALENDAR + TEXT_BOX widgets
     }
     
     /**
      * #46: Populate custom order tags in the tags container
+     * Uses enabled SINGLE_SELECT and MULTI_SELECT widgets from order level
+     * Styled like pills on order details list row using WidgetColorUtils
      */
     private fun populateOrderTags() {
         val tagsContainer = binding.tagsContainer
         tagsContainer.removeAllViews()
         
         val orderNote = orderArguments?.note
-        val tags = extractTagsFromNote(orderNote)
+        val widgetManager = context?.let { WidgetManager.getInstance(it) }
+        
+        // Get enabled SINGLE_SELECT and MULTI_SELECT widgets
+        val selectWidgets = widgetManager?.getAllOrderLevelWidgets()
+            ?.filter { it.isEnabled && (it.type == WidgetType.SINGLE_SELECT || it.type == WidgetType.MULTI_SELECT) }
+            ?: emptyList()
+        
+        // Parse and get tags from order note
+        val tags = if (orderNote.isNullOrBlank() || selectWidgets.isEmpty()) {
+            emptyList()
+        } else {
+            com.orderMate.utils.OrderNoteParser.extractTagsFromNote(
+                orderNote, selectWidgets, NoteLevel.ORDER
+            ).filter { it.type != com.orderMate.utils.OrderNoteParser.TagType.CALENDAR }
+        }
         
         if (tags.isEmpty()) {
             // Add a dash or placeholder
@@ -427,65 +394,45 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             return
         }
         
+        val density = resources.displayMetrics.density
+        
         tags.forEachIndexed { index, tag ->
-            val tagView = createTagView(tag.text, tag.type)
+            // Use WidgetColorUtils for consistent colors
+            val tagColor = if (tag.widgetType != null) {
+                com.orderMate.utils.WidgetColorUtils.getColorForWidgetType(tag.widgetType)
+            } else {
+                com.orderMate.utils.WidgetColorUtils.getColorForLabel(tag.type.name)
+            }
+            
+            val tagView = TextView(requireContext()).apply {
+                text = tag.value
+                textSize = 11f
+                setTextColor(tagColor)
+                setPadding(
+                    (8 * density).toInt(),
+                    (4 * density).toInt(),
+                    (8 * density).toInt(),
+                    (4 * density).toInt()
+                )
+                
+                // Styled like list row pills - 15% opacity bg with border
+                val bg = android.graphics.drawable.GradientDrawable().apply {
+                    shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                    cornerRadius = 10 * density
+                    setColor(com.orderMate.utils.WidgetColorUtils.getBackgroundColor(tagColor))
+                    setStroke((1 * density).toInt(), (tagColor and 0x00FFFFFF) or 0x40000000)
+                }
+                background = bg
+            }
             tagsContainer.addView(tagView)
             
             // Add spacing between tags
             if (index < tags.size - 1) {
                 val spacer = View(requireContext()).apply {
-                    layoutParams = LinearLayout.LayoutParams(8.dpToPx(), 1)
+                    layoutParams = LinearLayout.LayoutParams((4 * density).toInt(), 1)
                 }
                 tagsContainer.addView(spacer)
             }
-        }
-    }
-    
-    private data class OrderTag(val text: String, val type: String)
-    
-    private fun extractTagsFromNote(noteString: String?): List<OrderTag> {
-        if (noteString.isNullOrBlank()) return emptyList()
-        
-        val tags = mutableListOf<OrderTag>()
-        val delimiter = if (noteString.contains("•")) "•" else "|"
-        val parts = noteString.split(delimiter).map { it.trim() }
-        
-        for (part in parts) {
-            val colonIndex = part.indexOf(':')
-            if (colonIndex > 0) {
-                val label = part.substring(0, colonIndex).trim().lowercase()
-                val value = part.substring(colonIndex + 1).trim()
-                
-                if (label.contains("tag") || label.contains("category") || label.contains("type")) {
-                    // Split multiple values (comma-separated)
-                    value.split(",").map { it.trim() }.filter { it.isNotBlank() }.forEach {
-                        tags.add(OrderTag(it, label))
-                    }
-                }
-            }
-        }
-        return tags
-    }
-    
-    private fun createTagView(text: String, type: String): TextView {
-        val (bgColor, textColor) = when {
-            type.contains("category") -> Pair(R.color.tag_category_bg, R.color.tag_category_text)
-            type.contains("type") -> Pair(R.color.tag_type_bg, R.color.tag_type_text)
-            type.contains("status") -> Pair(R.color.tag_status_bg, R.color.tag_status_text)
-            else -> Pair(R.color.tag_default_bg, R.color.tag_default_text)
-        }
-        
-        return TextView(requireContext()).apply {
-            this.text = text
-            textSize = 11f
-            setTextColor(ContextCompat.getColor(requireContext(), textColor))
-            setPadding(8.dpToPx(), 4.dpToPx(), 8.dpToPx(), 4.dpToPx())
-            
-            val bg = android.graphics.drawable.GradientDrawable()
-            bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-            bg.cornerRadius = 12f * resources.displayMetrics.density
-            bg.setColor(ContextCompat.getColor(requireContext(), bgColor))
-            background = bg
         }
     }
     
@@ -493,30 +440,29 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     
     /**
      * Task 21: Populate dynamic widget rows in order details card
-     * Only renders widgets that have values saved to the order
+     * - CALENDAR type widgets render as their own rows (e.g., "Due Date: 12/1")
+     * - TEXT_BOX type widgets render as their own rows (e.g., "Description: Custom cake")
+     * - SINGLE_SELECT and MULTI_SELECT go into Order Tags row (handled by populateOrderTags)
      */
     private fun populateDynamicWidgetRows() {
         val container = binding.dynamicWidgetRowsContainer
         container.removeAllViews()
         
         val orderNote = orderArguments?.note
-        if (orderNote.isNullOrBlank()) {
-            container.visibility = View.GONE
-            return
-        }
-        
         val widgetManager = context?.let { WidgetManager.getInstance(it) } ?: return
-        val orderLevelWidgets = widgetManager.getAllOrderLevelWidgets()
-            .filter { it.isEnabled && it.type == WidgetType.CALENDAR }
         
-        if (orderLevelWidgets.isEmpty()) {
+        // Get enabled CALENDAR and TEXT_BOX widgets
+        val dynamicWidgets = widgetManager.getAllOrderLevelWidgets()
+            .filter { it.isEnabled && (it.type == WidgetType.CALENDAR || it.type == WidgetType.TEXT_BOX) }
+        
+        if (orderNote.isNullOrBlank() || dynamicWidgets.isEmpty()) {
             container.visibility = View.GONE
             return
         }
         
         // Parse order note to find widget values
         val parsedValues = com.orderMate.utils.OrderNoteParser.parseNotesByWidgetType(
-            orderNote, orderLevelWidgets, NoteLevel.ORDER
+            orderNote, dynamicWidgets, NoteLevel.ORDER
         )
         
         if (parsedValues.isEmpty()) {
@@ -527,7 +473,17 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         container.visibility = View.VISIBLE
         val density = resources.displayMetrics.density
         
-        parsedValues.forEach { (widget, value) ->
+        parsedValues.entries.forEachIndexed { index, (widget, value) ->
+            // Add divider before each row (acts as separator from previous row)
+            val divider = View(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    (1 * density).toInt()
+                )
+                setBackgroundColor(0x0DFFFFFF)
+            }
+            container.addView(divider)
+            
             // Create row layout
             val rowLayout = LinearLayout(requireContext()).apply {
                 orientation = LinearLayout.HORIZONTAL
@@ -543,27 +499,27 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             }
             
-            // Value
+            // Value - for TEXT_BOX allow wrapping, for CALENDAR show inline
             val valueView = TextView(requireContext()).apply {
                 text = value
                 setTextColor(ContextCompat.getColor(requireContext(), R.color.text_light))
                 textSize = 14f
                 typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.BOLD)
+                
+                if (widget.type == WidgetType.TEXT_BOX) {
+                    // TEXT_BOX: allow wrapping, max 2 lines
+                    maxLines = 2
+                    ellipsize = android.text.TextUtils.TruncateAt.END
+                    layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 2f).apply {
+                        gravity = android.view.Gravity.END
+                    }
+                    gravity = android.view.Gravity.END
+                }
             }
             
             rowLayout.addView(labelView)
             rowLayout.addView(valueView)
             container.addView(rowLayout)
-            
-            // Add divider
-            val divider = View(requireContext()).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    (1 * density).toInt()
-                )
-                setBackgroundColor(0x0DFFFFFF)
-            }
-            container.addView(divider)
         }
     }
     
@@ -1268,19 +1224,23 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
     
     /**
-     * #45: Update payment badge style based on payment state
+     * Populate Payment Type badge from order payments
+     * Shows the tender type used (CASH, CREDIT_CARD, etc.)
      */
-    private fun updatePaymentBadgeStyle(paymentState: String?) {
-        // Dark background with tone-on-tone text
-        val (textColorRes, bgRes) = when (paymentState?.uppercase()) {
-            "PAID" -> Pair(R.color.paid_status_text, R.drawable.badge_background_paid)
-            "NOT_PAID" -> Pair(R.color.unpaid_status_text, R.drawable.badge_background_unpaid)
-            "PARTIALLY_PAID" -> Pair(R.color.partial_status_text, R.drawable.badge_background_partial)
-            "PARTIALLY_REFUNDED" -> Pair(R.color.partial_status_text, R.drawable.badge_background_partial)
-            "REFUNDED" -> Pair(R.color.closed_status_text, R.drawable.badge_background_closed)
-            else -> Pair(R.color.open_status_text, R.drawable.badge_background_open)
+    private fun populatePaymentTypeBadge() {
+        val payments = orderArguments?.payments
+        if (payments.isNullOrEmpty()) {
+            binding.paymentTypeBadge.visibility = View.GONE
+            return
         }
-        binding.paymentStatusBadge.setTextColor(ContextCompat.getColor(requireContext(), textColorRes))
-        binding.paymentStatusBadge.setBackgroundResource(bgRes)
+        
+        // Get the first payment's tender type
+        val firstPayment = payments.firstOrNull()
+        val tenderType = firstPayment?.tender?.label 
+            ?: firstPayment?.tender?.labelKey
+            ?: return
+        
+        binding.paymentTypeBadge.text = tenderType.uppercase()
+        binding.paymentTypeBadge.visibility = View.VISIBLE
     }
 }

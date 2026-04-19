@@ -463,17 +463,17 @@
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
-                        <!-- Status badges - matches HTML .detail-status-badge -->
+                        <!-- Status badges - Clover filters: Order Status (red), Payment Status (yellow), Payment Type (grey) -->
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/orderPlacedStatusValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:background="@drawable/badge_background_open"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/badge_background_order_status"
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="4dp"
                             android:text="@string/open"
-                            android:textColor="@color/open_status_color"
+                            android:textColor="#EF5350"
                             android:textSize="11sp"
                             android:textStyle="bold"
                             android:textAllCaps="true" />
@@ -482,14 +482,29 @@
                             android:id="@+id/paymentStatusBadge"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/badge_background_paid"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/badge_background_payment_status"
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="4dp"
                             android:text="@string/paid"
-                            android:textColor="@color/paid_status_color"
+                            android:textColor="#FFB74D"
                             android:textSize="11sp"
                             android:textStyle="bold"
                             android:textAllCaps="true" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/paymentTypeBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/badge_background_payment_type"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="CASH"
+                            android:textColor="#9E9E9E"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:textAllCaps="true"
+                            android:visibility="gone" />
 
                         <!-- Task 12: Right-facing carrot to indicate clickable -->
                         <ImageView
@@ -581,35 +596,7 @@
                             android:layout_height="1dp"
                             android:background="#0DFFFFFF" />
 
-                        <!-- Due Date -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:paddingVertical="12dp">
-                            <com.google.android.material.textview.MaterialTextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/due_date"
-                                android:textColor="@color/text_muted"
-                                android:textSize="13sp" />
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/dueDateValue"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/text_light"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                        
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#0DFFFFFF" />
-
-                        <!-- Order Tags -->
+                        <!-- Order Tags - Shows SINGLE_SELECT + MULTI_SELECT order level widget pills -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -630,47 +617,7 @@
                                 android:orientation="horizontal" />
                         </LinearLayout>
                         
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#0DFFFFFF" />
-
-                        <!-- #46: Description Row (from order notes) -->
-                        <LinearLayout
-                            android:id="@+id/descriptionRow"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:paddingVertical="12dp"
-                            android:visibility="gone">
-                            <com.google.android.material.textview.MaterialTextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/description"
-                                android:textColor="@color/text_muted"
-                                android:textSize="13sp" />
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/orderDescriptionValue"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="2"
-                                android:gravity="end"
-                                android:textColor="@color/text_light"
-                                android:textSize="14sp"
-                                android:maxLines="2"
-                                android:ellipsize="end" />
-                        </LinearLayout>
-                        
-                        <View
-                            android:id="@+id/descriptionDivider"
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#0DFFFFFF"
-                            android:visibility="gone" />
-
-                        <!-- Task 21: Dynamic Widget Rows Container -->
+                        <!-- Task 21: Dynamic Widget Rows Container - renders CALENDAR and TEXT_BOX widgets -->
                         <LinearLayout
                             android:id="@+id/dynamicWidgetRowsContainer"
                             android:layout_width="match_parent"
