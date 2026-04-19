@@ -28,7 +28,7 @@
                 android:textSize="18sp"
                 android:fontFamily="sans-serif-medium"/>
 
-            <!-- Full Details Button - icon BEFORE text like HTML -->
+            <!-- Full Details Button -->
             <LinearLayout
                 android:id="@+id/btnFullDetails"
                 android:layout_width="wrap_content"
@@ -59,34 +59,16 @@
 
         </LinearLayout>
 
-        <!-- All Pills Container (event type + order-level notes) -->
+        <!-- Order Level Widget Pills (CALENDAR, SINGLE_SELECT, MULTI_SELECT - not TEXT_BOX) -->
         <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/orderNotesPillsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:visibility="gone"
             app:flexWrap="wrap"
             app:alignItems="center"
-            app:justifyContent="flex_start">
-            
-            <!-- Event Type Badge (first pill) -->
-            <TextView
-                android:id="@+id/eventTypeBadge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="6dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="4dp"
-                android:text="PICKUP"
-                android:textColor="@color/event_pickup"
-                android:textSize="10sp"
-                android:textAllCaps="true"
-                android:fontFamily="sans-serif-bold"
-                android:letterSpacing="0.05"
-                android:background="@drawable/bg_event_badge_pickup"/>
-                
-        </com.google.android.flexbox.FlexboxLayout>
+            app:justifyContent="flex_start"/>
 
         <!-- Order Details Section -->
         <LinearLayout

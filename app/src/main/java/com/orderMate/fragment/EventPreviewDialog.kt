@@ -54,7 +54,6 @@ class EventPreviewDialog : DialogFragment() {
         val currentEvent = event ?: return
 
         // Header
-        val eventTypeBadge = view.findViewById<TextView>(R.id.eventTypeBadge)
         val orderTitle = view.findViewById<TextView>(R.id.orderTitle)
         val btnFullDetails = view.findViewById<View>(R.id.btnFullDetails)
         
@@ -64,23 +63,6 @@ class EventPreviewDialog : DialogFragment() {
         val orderTotal = view.findViewById<TextView>(R.id.orderTotal)
         val itemCount = view.findViewById<TextView>(R.id.itemCount)
         val itemsList = view.findViewById<RecyclerView>(R.id.itemsList)
-
-        // Set type badge
-        eventTypeBadge.text = currentEvent.type.getDisplayName().uppercase()
-        when (currentEvent.type) {
-            EventType.PICKUP -> {
-                eventTypeBadge.setTextColor(ContextCompat.getColor(requireContext(), R.color.event_pickup))
-                eventTypeBadge.setBackgroundResource(R.drawable.bg_event_badge_pickup)
-            }
-            EventType.DELIVERY -> {
-                eventTypeBadge.setTextColor(ContextCompat.getColor(requireContext(), R.color.event_delivery))
-                eventTypeBadge.setBackgroundResource(R.drawable.bg_event_badge_delivery)
-            }
-            EventType.PREORDER -> {
-                eventTypeBadge.setTextColor(ContextCompat.getColor(requireContext(), R.color.event_preorder))
-                eventTypeBadge.setBackgroundResource(R.drawable.bg_event_badge_preorder)
-            }
-        }
 
         // Set order title
         val shortId = currentEvent.orderId.takeLast(4).uppercase()
@@ -167,11 +149,19 @@ class EventPreviewDialog : DialogFragment() {
      */
     private fun setupOrderNotesPills(view: View, event: ScheduledEvent) {
         val container = view.findViewById<FlexboxLayout>(R.id.orderNotesPillsContainer)
-        // Don't removeAllViews - event type badge is already in container from XML
+        container.removeAllViews()
         
+        // Only show pills if there are widget values on the order
+        if (event.customTags.isEmpty()) {
+            container.visibility = View.GONE
+            return
+        }
+        
+        container.visibility = View.VISIBLE
         val density = resources.displayMetrics.density
         
-        // Add order-level note pills after the event type badge
+        // Add order-level widget pills (CALENDAR, SINGLE_SELECT, MULTI_SELECT)
+        // All use WidgetColorUtils for consistent color coding
         event.customTags.forEach { tag ->
             val color = com.orderMate.utils.WidgetColorUtils.getColorForWidgetType(tag.widgetType)
             
@@ -180,6 +170,7 @@ class EventPreviewDialog : DialogFragment() {
                 textSize = 11f
                 setTextColor(color)
                 setPadding(dpToPx(10), dpToPx(4), dpToPx(10), dpToPx(4))
+                // Same pill styling as everywhere else: 15% opacity bg + 25% border
                 background = com.orderMate.utils.WidgetColorUtils.createPillBackground(color, 10f, density)
                 
                 val lp = FlexboxLayout.LayoutParams(

@@ -117,6 +117,9 @@ class CalendarFragment : Fragment() {
     private var resetButton: View? = null
     private var filterPillsScroll: HorizontalScrollView? = null
     private var filterPillsContainer: LinearLayout? = null
+    private var syncButton: View? = null
+    private var syncingContainer: View? = null
+    private var isSyncing = false
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -166,6 +169,8 @@ class CalendarFragment : Fragment() {
         resetButton = view.findViewById(R.id.resetButton)
         filterPillsScroll = view.findViewById(R.id.filterPillsScroll)
         filterPillsContainer = view.findViewById(R.id.filterPillsContainer)
+        syncButton = view.findViewById(R.id.syncButton)
+        syncingContainer = view.findViewById(R.id.syncingContainer)
         
         // Setup grid layout manager
         calendarGrid?.layoutManager = GridLayoutManager(requireContext(), 7)
@@ -287,6 +292,45 @@ class CalendarFragment : Fragment() {
         resetButton?.setOnClickListener { resetFilters() }
         // (#14) Use container for expanded click area
         calendarIconContainer?.setOnClickListener { showDatePicker() }
+        // Sync button
+        syncButton?.setOnClickListener {
+            if (!isSyncing) {
+                syncOrders()
+            }
+        }
+    }
+    
+    private fun syncOrders() {
+        isSyncing = true
+        searchInput?.text?.clear()
+        
+        // Show syncing indicator
+        syncingContainer?.visibility = View.VISIBLE
+        syncButton?.isEnabled = false
+        syncButton?.alpha = 0.5f
+        
+        runOnBackgroundThread {
+            try {
+                val orderConnector = (requireActivity().application as MyApp).getOrderConnector()
+                val orderData = orderConnector.getOrders(mutableListOf())
+                allOrders.clear()
+                orderData?.forEach { allOrders.add(it) }
+                allEvents = convertOrdersToEvents(allOrders)
+                filteredEvents = allEvents
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            
+            runOnMainThread {
+                isSyncing = false
+                syncingContainer?.visibility = View.GONE
+                syncButton?.isEnabled = true
+                syncButton?.alpha = 1.0f
+                
+                renderCurrentView()
+                Toast.makeText(requireContext(), "Calendar synced", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
     
     private fun setupSearchListener() {
@@ -427,14 +471,16 @@ class CalendarFragment : Fragment() {
      */
     private fun convertOrdersToEvents(orders: List<Order?>): List<ScheduledEvent> {
         // Get widgets for widget-based parsing (#29, #30)
-        val widgets = WidgetManager.getCachedWidgets()
+        val allWidgets = WidgetManager.getCachedWidgets()
+        // Get ORDER level widgets only for order-level tag extraction
+        val orderLevelWidgets = allWidgets.filter { it.level == NoteLevel.ORDER && it.isEnabled }
         
         return orders.mapNotNull { order ->
             order ?: return@mapNotNull null
             
             // (#29) Use widget-based due date resolution
-            val dueDate = if (widgets.isNotEmpty()) {
-                OrderDueDateResolver.resolveDueDate(order, widgets)
+            val dueDate = if (allWidgets.isNotEmpty()) {
+                OrderDueDateResolver.resolveDueDate(order, allWidgets)
             } else {
                 OrderDueDateResolver.resolveDueDate(order)  // Legacy fallback
             } ?: return@mapNotNull null
@@ -468,8 +514,8 @@ class CalendarFragment : Fragment() {
             // Determine event type based on order data
             val eventType = determineEventType(order)
             
-            // (#30) Extract order-level tags for event preview
-            val customTags = extractOrderLevelTags(order.note, widgets)
+            // (#30) Extract order-level tags for event preview (ORDER level widgets only)
+            val customTags = extractOrderLevelTags(order.note, orderLevelWidgets)
             
             ScheduledEvent(
                 id = order.id?.hashCode()?.toLong() ?: System.currentTimeMillis(),
@@ -495,7 +541,10 @@ class CalendarFragment : Fragment() {
         if (orderNote.isNullOrBlank() || widgets.isEmpty()) return emptyList()
         
         val tags = OrderNoteParser.extractTagsFromNote(orderNote, widgets, NoteLevel.ORDER)
-        return tags.map { com.orderMate.model.EventTag("${it.label}: ${it.value}", it.widgetType) }
+        // Only return tags that have actual values (not empty)
+        return tags
+            .filter { it.value.isNotBlank() }
+            .map { com.orderMate.model.EventTag("${it.label}: ${it.value}", it.widgetType) }
     }
     
     private fun determineEventType(order: Order): EventType {

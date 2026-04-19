@@ -127,7 +127,7 @@
                 <ImageView
                     android:layout_width="14dp"
                     android:layout_height="14dp"
-                    android:src="@drawable/ic_refresh"
+                    android:src="@drawable/ic_reset"
                     app:tint="@color/text_light"/>
 
                 <TextView
@@ -137,6 +137,58 @@
                     android:text="Reset"
                     android:textColor="@color/text_light"
                     android:textSize="14sp"/>
+            </LinearLayout>
+
+            <!-- Spacer to push sync button to right -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <!-- Sync Button - icon only, flexed right -->
+            <FrameLayout
+                android:id="@+id/syncButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_header_button"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/syncIcon"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_sync"
+                    app:tint="@color/text_light"/>
+            </FrameLayout>
+
+            <!-- Syncing Indicator -->
+            <LinearLayout
+                android:id="@+id/syncingContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ProgressBar
+                    android:id="@+id/syncProgress"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:indeterminateTint="@color/text_light"
+                    style="?android:attr/progressBarStyleSmall"/>
+
+                <TextView
+                    android:id="@+id/syncingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Syncing..."
+                    android:textColor="@color/text_muted"
+                    android:textSize="13sp"/>
             </LinearLayout>
 
         </LinearLayout>
