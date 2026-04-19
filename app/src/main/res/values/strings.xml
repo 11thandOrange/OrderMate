@@ -244,5 +244,6 @@
     <string name="order_modified">Order Modified</string>
     <string name="status_changed">Status Changed</string>
     <string name="notification_sent">Notification Sent</string>
+    <string name="view_details">View Details</string>
 
 </resources>
