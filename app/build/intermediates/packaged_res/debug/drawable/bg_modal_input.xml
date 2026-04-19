@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Modal input field background - matches HTML .filter-date-input -->
+<!-- background: rgba(255,255,255,0.1), border: 1px solid rgba(255,255,255,0.2), border-radius: 10px -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/glass_background"/>
+    <stroke android:width="1dp" android:color="#33FFFFFF"/>
+    <corners android:radius="10dp"/>
+</shape>

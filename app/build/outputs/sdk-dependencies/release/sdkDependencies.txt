@@ -1578,6 +1578,18 @@ library {
 }
 library {
   maven_library {
+    groupId: "com.google.android.flexbox"
+    artifactId: "flexbox"
+    version: "3.0.0"
+  }
+  digests {
+    sha256: "^\031P\004\206\375|\216.\214z\255k\273\251\310\320\255\247\005|k2\271\265\306\0249\201Nut"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
     groupId: "androidx.multidex"
     artifactId: "multidex"
     version: "2.0.0"
@@ -2536,6 +2548,10 @@ library_dependencies {
   library_dep_index: 128
   library_dep_index: 129
 }
+library_dependencies {
+  library_index: 130
+  library_dep_index: 2
+}
 module_dependencies {
   module_name: "base"
   dependency_index: 0
@@ -2565,6 +2581,8 @@ module_dependencies {
   dependency_index: 91
   dependency_index: 121
   dependency_index: 130
+  dependency_index: 57
+  dependency_index: 131
 }
 repositories {
   maven_repo {

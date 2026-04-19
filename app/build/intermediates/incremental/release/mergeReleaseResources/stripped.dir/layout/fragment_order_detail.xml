@@ -1,746 +1,836 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Order Detail Tab - matches HTML .order-detail-tab (#87) -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/transparent"
     tools:context=".fragment.orderDetail.OrderDetailFragment">
 
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Top Header Bar - matches HTML .order-detail-header -->
+    <!-- height: 70px, background: rgba(0,0,0,0.1), border-bottom: 1px solid rgba(255,255,255,0.1) -->
+    <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/header_blue"
-        android:outlineProvider="background"
-        android:visibility="visible"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="24dp"
+        android:background="@color/header_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:targetApi="lollipop">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.divider.MaterialDivider
-            android:id="@+id/dividerTop"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_2sdp"
-            app:dividerColor="@color/orange_bar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-        <com.google.android.material.imageview.ShapeableImageView
+        <!-- Back Button - matches HTML .back-btn -->
+        <!-- 40x40, border-radius: 12px, background: rgba(255,255,255,0.15) -->
+        <ImageView
             android:id="@+id/backButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginHorizontal="@dimen/_10sdp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_button_glass"
+            android:padding="10dp"
             android:src="@drawable/ic_back"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dividerTop" />
+            app:tint="@color/text_light"
+            android:contentDescription="@string/back" />
 
+        <!-- Order ID Title - matches HTML .order-detail-title -->
+        <!-- flex: 1, font-size: 18px, font-weight: 600, color: text-light -->
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/orderId"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:text="@string/dummy_heading_dashboard"
+            android:textColor="@color/text_light"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Action Buttons Container - matches HTML .order-detail-actions -->
+        <!-- gap: 12px -->
+        <LinearLayout
+            android:id="@+id/actionButtonsContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/_10sdp"
-            android:ellipsize="end"
-            android:letterSpacing="0.02"
-            android:maxWidth="@dimen/_400sdp"
-            android:text="@string/dummy_heading_dashboard"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_9ssp"
-            app:layout_constraintBottom_toBottomOf="@id/backButton"
-            app:layout_constraintStart_toEndOf="@id/backButton"
-            app:layout_constraintTop_toTopOf="@id/backButton" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
+            <!-- Add Payment Button - matches HTML .order-action-btn.secondary -->
+            <!-- background: rgba(255,255,255,0.15), padding: 10px 16px, border-radius: 12px -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/addPayment"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginEnd="12dp"
+                android:backgroundTint="@color/glass_background"
+                android:text="@string/add_payment"
+                android:textSize="13sp"
+                android:textColor="@color/text_light"
+                android:paddingHorizontal="16dp"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_cash"
+                app:iconTint="@color/text_light"
+                app:iconSize="16dp"
+                app:iconPadding="8dp" />
+
+            <!-- Re-Open Button - matches HTML .order-action-btn.secondary -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/reOpenButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginEnd="12dp"
+                android:backgroundTint="@color/glass_background"
+                android:text="@string/re_open"
+                android:textSize="13sp"
+                android:textColor="@color/text_light"
+                android:paddingHorizontal="16dp"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_refresh"
+                app:iconTint="@color/text_light"
+                app:iconSize="16dp"
+                app:iconPadding="8dp" />
+
+            <!-- Send Notification Button - matches HTML .order-action-btn.primary -->
+            <!-- background: #FF9F43 (orange-accent) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sendNotificationButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginEnd="12dp"
+                android:backgroundTint="@color/orange_accent"
+                android:text="@string/send_notification"
+                android:textSize="13sp"
+                android:textColor="@color/white"
+                android:paddingHorizontal="16dp"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_notification"
+                app:iconTint="@color/white"
+                app:iconSize="16dp"
+                app:iconPadding="8dp" />
+
+            <!-- Delete Button - matches HTML .order-action-btn.danger -->
+            <!-- background: #ea2c2f (unpaid-status-color) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/deleteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:backgroundTint="@color/unpaid_status_color"
+                android:text="@string/delete_order"
+                android:textSize="13sp"
+                android:textColor="@color/white"
+                android:paddingHorizontal="16dp"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_delete"
+                app:iconTint="@color/white"
+                app:iconSize="16dp"
+                app:iconPadding="8dp" />
+        </LinearLayout>
+
+        <!-- Hidden views for backward compatibility -->
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/syncingText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:alpha="0.8"
-            android:text="@string/syncing"
-            android:textColor="#8a9194"
-            android:textSize="@dimen/_8ssp"
-            android:textStyle="bold|normal"
-            android:visibility="gone"
-            android:layout_marginHorizontal="@dimen/_10sdp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/merchantName"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-
+        <ImageView
+            android:id="@+id/syncButton"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/merchantName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:letterSpacing="0.08"
-            android:maxWidth="@dimen/_150sdp"
-            android:text="@string/dummy_name"
-            android:textAllCaps="true"
-            android:layout_marginEnd="@dimen/_5sdp"
-            android:textColor="@color/darker_gray"
-            android:textSize="@dimen/_8ssp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/syncButton"
-            app:layout_constraintEnd_toStartOf="@id/syncButton"
-            app:layout_constraintTop_toTopOf="@id/syncButton" />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/syncButton"
-            android:layout_width="@dimen/_12sdp"
-            android:layout_height="@dimen/_12sdp"
-           android:layout_marginHorizontal="@dimen/_8sdp"
-            android:layout_marginVertical="@dimen/_10sdp"
-            android:src="@drawable/ic_refresh"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/reIssueReceiptButton"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+    </LinearLayout>
+    
+    <!-- Header border bottom - matches HTML border-bottom: 1px solid rgba(255,255,255,0.1) -->
     <View
-        android:id="@+id/elevator"
+        android:id="@+id/headerBorder"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="#bdc6c9"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="1dp"
+        android:background="@color/nav_border"
         app:layout_constraintTop_toBottomOf="@id/topBar" />
 
-
+    <!-- Main Content Area - matches HTML .order-detail-content -->
+    <!-- padding: 24px -->
     <LinearLayout
+        android:id="@+id/mainContent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:weightSum="1"
+        android:orientation="horizontal"
+        android:padding="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topBar">
+        app:layout_constraintTop_toBottomOf="@id/headerBorder">
 
+        <!-- Left Column: Items Card - matches HTML .order-detail-main -->
+        <!-- grid-template-columns: 1fr 380px, gap: 24px -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/orderDetails"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.75">
+            android:layout_weight="1"
+            android:layout_marginEnd="24dp">
 
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/orderData"
+            <!-- Items Card - matches HTML .detail-card -->
+            <!-- background: rgba(255,255,255,0.15), border-radius: 16px, border: 1px solid rgba(255,255,255,0.1) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/itemsCard"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/header_blue"
-                app:layout_constraintBottom_toTopOf="@+id/orderItemCountText"
+                android:layout_height="match_parent"
+                app:cardBackgroundColor="@color/glass_background"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/nav_border"
+                app:strokeWidth="1dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <View
-                    android:id="@+id/dividerUpper"
-                    android:layout_width="match_parent"
-                    android:layout_height="1.5dp"
-                    android:background="#bdc6c9"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/orderPlacedAt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_5sdp"
-                    android:paddingTop="@dimen/_3sdp"
-                    android:text="@string/placed_at"
-                    android:ems="11"
-                    android:textStyle="bold"
-                    android:textSize="@dimen/_8ssp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.03"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/orderPlacedAtValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/_10sdp"
-                    android:ems="11"
-                    android:text="@string/placed_at"
-                    android:textColor="@color/darker_gray"
-                    android:textSize="@dimen/_8ssp"
-                    app:layout_constraintHorizontal_bias="0.03"
-                    app:layout_constraintStart_toStartOf="@id/orderPlacedAt"
-                    app:layout_constraintTop_toBottomOf="@id/orderPlacedAt" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/orderPlacedEmployee"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ems="11"
-                    android:textStyle="bold"
-                    android:layout_marginHorizontal="@dimen/_10sdp"
-                    android:layout_marginTop="@dimen/_5sdp"
-                    android:paddingTop="@dimen/_3sdp"
-                    android:text="@string/employee_name"
-                    android:textSize="@dimen/_8ssp"
-                    app:layout_constraintStart_toEndOf="@+id/orderPlacedStatus"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/orderPlacedEmployeeValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/employee_name_value"
-                    android:textColor="@color/darker_gray"                    android:textSize="@dimen/_8ssp"
-                    android:ems="11"
-                    app:layout_constraintStart_toStartOf="@id/orderPlacedEmployee"
-                    app:layout_constraintTop_toBottomOf="@id/orderPlacedEmployee" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/orderPlacedCustomer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ems="11"
-                    android:textStyle="bold"
-                    android:layout_marginTop="@dimen/_5sdp"
-                    android:paddingTop="@dimen/_3sdp"
-                    android:text="@string/customer_name"
-                    android:textSize="@dimen/_8ssp"
-                    app:layout_constraintStart_toStartOf="@id/orderPlacedAtValue"
-                    app:layout_constraintTop_toBottomOf="@+id/orderPlacedAtValue"
-                     />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/orderPlacedCustomerValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/hypen_text"
-                    android:textColor="@color/darker_gray"                    android:textSize="@dimen/_8ssp"
-                    android:ems="11"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:layout_marginBottom="@dimen/_5sdp"
-                    app:layout_constraintStart_toStartOf="@id/orderPlacedCustomer"
-                    app:layout_constraintTop_toBottomOf="@id/orderPlacedCustomer" />
-
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/orderPlacedCustomerNumber"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ems="11"
-                    android:textStyle="bold"
-
-                    android:layout_marginTop="@dimen/_5sdp"
-                    android:paddingTop="@dimen/_3sdp"
-                    android:text="@string/customer_number"
-                    android:textSize="@dimen/_8ssp"
-                    app:layout_constraintStart_toStartOf="@id/orderPlacedStatusValue"
-                    app:layout_constraintTop_toBottomOf="@+id/orderPlacedStatusValue"
-                    />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/orderPlacedCustomerNumberValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/hypen_text"
-                    android:textColor="@color/darker_gray"                    android:textSize="@dimen/_8ssp"
-                    android:maxWidth="@dimen/_100sdp"
-                    android:maxLines="2"
-                    android:ellipsize="end"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:layout_marginBottom="@dimen/_5sdp"
-                    app:layout_constraintStart_toStartOf="@id/orderPlacedCustomerNumber"
-                    app:layout_constraintTop_toBottomOf="@id/orderPlacedCustomerNumber" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/orderPlacedCustomerEmail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ems="11"
-                    android:textStyle="bold"
-                    android:layout_marginTop="@dimen/_5sdp"
-                    android:paddingTop="@dimen/_3sdp"
-                    android:text="@string/customer_email"
-                    android:textSize="@dimen/_8ssp"
-                    app:layout_constraintStart_toStartOf="@id/orderPlacedEmployee"
-                    app:layout_constraintTop_toBottomOf="@+id/orderPlacedStatusValue"
-                    />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/orderPlacedCustomerEmailValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/hypen_text"
-                    android:textColor="@color/darker_gray"                    android:textSize="@dimen/_8ssp"
-                    android:maxWidth="@dimen/_100sdp"
-                    android:maxLines="2"
-                    android:ellipsize="end"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:layout_marginBottom="@dimen/_5sdp"
-                    app:layout_constraintStart_toStartOf="@id/orderPlacedCustomerEmail"
-                    app:layout_constraintTop_toBottomOf="@id/orderPlacedCustomerEmail" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/orderPlacedStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ems="11"
-                    android:textStyle="bold"
-                    android:layout_marginHorizontal="@dimen/_10sdp"
-                    android:layout_marginTop="@dimen/_5sdp"
-                    android:paddingTop="@dimen/_3sdp"
-                    android:text="@string/statusString"
-
-                    android:textSize="@dimen/_8ssp"
-                    app:layout_constraintStart_toEndOf="@+id/orderPlacedAt"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/orderPlacedStatusValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/statusString"
-                    android:textAllCaps="true"
-                    android:textColor="@color/open_status_color"
-                    android:textSize="@dimen/_8ssp"
-                    android:ems="11"
-                    app:layout_constraintStart_toStartOf="@id/orderPlacedStatus"
-                    app:layout_constraintTop_toBottomOf="@id/orderPlacedStatus" />
-
-                <View
-                    android:id="@+id/divider"
-                    android:layout_width="match_parent"
-                    android:layout_height="1.5dp"
-                    android:layout_marginTop="@dimen/_7sdp"
-                    android:background="#bdc6c9"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-            <View
-                android:id="@+id/dividerSide"
-                android:layout_width="2dp"
-                android:layout_height="0dp"
-                android:background="#bdc6c9"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/orderData" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/orderItemCountText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_3sdp"
-                android:paddingStart="@dimen/_6sdp"
-                android:paddingTop="@dimen/_3sdp"
-                android:paddingEnd="@dimen/_1sdp"
-                android:text="@string/order"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_9ssp"
-                app:layout_constraintHorizontal_bias="0.03"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/orderData" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/showSummary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_3sdp"
-                android:paddingHorizontal="@dimen/_5sdp"
-                android:text="@string/show_summary"
-                android:textAllCaps="true"
-                android:textColor="#30b1de"
-                android:visibility="invisible"
-                android:textSize="@dimen/_8ssp"
-                android:textStyle="bold"
-                app:layout_constraintVertical_bias="0.4"
-                app:layout_constraintBottom_toTopOf="@id/orderTextBelowDivider"
-                app:layout_constraintEnd_toStartOf="@+id/dividerSide"
-                app:layout_constraintTop_toBottomOf="@+id/orderData" />
-
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/transactionText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_3sdp"
-                android:paddingStart="@dimen/_6sdp"
-                android:paddingTop="@dimen/_3sdp"
-                android:paddingEnd="@dimen/_1sdp"
-                android:text="@string/transaction"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_9ssp"
-                app:layout_constraintHorizontal_bias="0.03"
-                app:layout_constraintStart_toEndOf="@id/dividerSide"
-                app:layout_constraintTop_toBottomOf="@id/orderData" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/noTransactionText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_5sdp"
-                android:paddingHorizontal="@dimen/_3sdp"
-                android:paddingTop="@dimen/_3sdp"
-                android:text="@string/no_transaction"
-                android:textColor="#8a9194"
-                android:textSize="@dimen/_8ssp"
-                android:textStyle="bold"
-                android:visibility="gone"
-                app:chainUseRtl="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/dividerSide"
-                app:layout_constraintTop_toBottomOf="@id/orderTextBelowDivider" />
-
-            <ScrollView
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/lineItemScrollView"
-                app:layout_constraintTop_toBottomOf="@+id/orderTextBelowDivider">
-
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="match_parent">
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/refundRecycler"
-                        android:layout_width="0dp"
+                    <!-- Card Header - matches HTML .detail-card-header -->
+                    <LinearLayout
+                        android:id="@+id/itemsHeader"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/_3sdp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="16dp"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:itemCount="3"
-                        tools:listitem="@layout/item_transaction" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/transactionRecycler"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/refundRecycler"
-                        tools:itemCount="3"
-                        tools:listitem="@layout/item_transaction" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        app:layout_constraintEnd_toEndOf="parent">
 
-            </ScrollView>
+                        <!-- Icon with background - matches HTML .detail-card-title i -->
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_card_title_icon">
+                            
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_box"
+                                app:tint="@color/text_light"
+                                android:contentDescription="@string/items" />
+                        </FrameLayout>
 
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/orderItemCountText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:text="@string/items"
+                            android:textColor="@color/text_light"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/lineItemScrollView"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintEnd_toStartOf="@+id/dividerSide"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/orderTextBelowDivider"
-                    >
+                    <View
+                        android:id="@+id/headerDivider"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="#1AFFFFFF"
+                        app:layout_constraintTop_toBottomOf="@id/itemsHeader" />
 
-
+                    <!-- Items RecyclerView -->
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/itemRecycler"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_marginTop="4dp"
-                        android:scrollbars="vertical"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginTop="8dp"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="16dp"
+                        android:paddingBottom="8dp"
+                        app:layout_constraintBottom_toTopOf="@id/summarySection"
+                        app:layout_constraintTop_toBottomOf="@id/headerDivider" />
+
+                    <!-- Order Summary Section - matches HTML .detail-summary -->
+                    <!-- padding: 16px 0 0 0, border-top, margin-top: 16px -->
+                    <LinearLayout
+                        android:id="@+id/summarySection"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="20dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toTopOf="@+id/priceBox"
-                        tools:itemCount="6"
-                        tools:listitem="@layout/listitem_order" />
+                        app:layout_constraintEnd_toEndOf="parent">
 
-                   <androidx.constraintlayout.widget.ConstraintLayout
-                       android:id="@+id/priceBox"
-                       android:layout_width="match_parent"
-                       app:layout_constraintStart_toStartOf="parent"
-                       app:layout_constraintEnd_toEndOf="parent"
-                       app:layout_constraintBottom_toBottomOf="parent"
-                       android:layout_height="0dp">
+                        <!-- Top border - matches HTML border-top: 1px solid rgba(255,255,255,0.1) -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#1AFFFFFF"
+                            android:layout_marginBottom="16dp" />
 
-                       <com.google.android.material.textview.MaterialTextView
-                           android:id="@+id/subtotal"
-                           android:layout_width="wrap_content"
-                           android:layout_height="wrap_content"
-                           android:layout_marginTop="@dimen/_3sdp"
-                           android:paddingStart="@dimen/_6sdp"
-                           android:paddingEnd="@dimen/_1sdp"
-                           android:text="@string/subtotal"
-                           android:textSize="@dimen/_9ssp"
-                           app:layout_constraintHorizontal_bias="0.03"
-                           app:layout_constraintStart_toStartOf="parent"
-                           app:layout_constraintTop_toTopOf="parent" />
+                        <!-- Subtotal Row - matches HTML .detail-summary-row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingVertical="8dp">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/subtotal"
+                                android:textColor="@color/text_muted"
+                                android:textSize="14sp" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/subtotalValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="$0.00"
+                                android:textColor="@color/text_light"
+                                android:textSize="14sp" />
+                        </LinearLayout>
 
-                       <com.google.android.material.textview.MaterialTextView
-                           android:id="@+id/subtotalValue"
-                           android:layout_width="wrap_content"
-                           android:layout_height="wrap_content"
-                           android:layout_marginHorizontal="@dimen/_4sdp"
-                           android:layout_marginTop="@dimen/_3sdp"
-                           android:paddingStart="@dimen/_6sdp"
+                        <!-- Tax Row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingVertical="8dp">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/tax"
+                                android:textColor="@color/text_muted"
+                                android:textSize="14sp" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/taxValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="$0.00"
+                                android:textColor="@color/text_light"
+                                android:textSize="14sp" />
+                        </LinearLayout>
 
-                           android:paddingEnd="@dimen/_1sdp"
-                           android:text="@string/subtotal"
-                           android:textSize="@dimen/_9ssp"
-                           app:layout_constraintBottom_toBottomOf="@id/subtotal"
-                           app:layout_constraintEnd_toEndOf="parent"
-                           app:layout_constraintTop_toTopOf="@id/subtotal" />
+                        <!-- Discount Row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingVertical="8dp">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/discount"
+                                android:textColor="@color/text_muted"
+                                android:textSize="14sp" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/discountValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="-$0.00"
+                                android:textColor="@color/text_light"
+                                android:textSize="14sp" />
+                        </LinearLayout>
 
-                       <com.google.android.material.textview.MaterialTextView
-                           android:id="@+id/discount"
-                           android:layout_width="wrap_content"
-                           android:layout_height="wrap_content"
-                           android:layout_marginTop="@dimen/_3sdp"
-                           android:paddingStart="@dimen/_6sdp"
-                           android:paddingEnd="@dimen/_1sdp"
-                           android:text="@string/tax"
-                           android:textColor="@android:color/holo_red_dark"
-                           android:textSize="@dimen/_8ssp"
-                           app:layout_constraintHorizontal_bias="0.03"
-                           app:layout_constraintStart_toStartOf="parent"
-                           app:layout_constraintTop_toBottomOf="@id/subtotal" />
+                        <!-- Total separator - matches HTML .detail-summary-row.total border-top -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#1AFFFFFF"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="12dp" />
 
-                       <com.google.android.material.textview.MaterialTextView
-                           android:id="@+id/discountValue"
-                           android:layout_width="wrap_content"
-                           android:layout_height="wrap_content"
-                           android:layout_marginHorizontal="@dimen/_4sdp"
-                           android:layout_marginTop="@dimen/_3sdp"
-                           android:paddingStart="@dimen/_6sdp"
-                           android:paddingEnd="@dimen/_1sdp"
-                           android:text="@string/tax"
-                           android:textColor="@android:color/holo_red_dark"
-                           android:textSize="@dimen/_8ssp"
-                           app:layout_constraintBottom_toBottomOf="@id/discount"
-                           app:layout_constraintEnd_toEndOf="parent"
-                           app:layout_constraintTop_toTopOf="@id/discount" />
-
-                       <com.google.android.material.textview.MaterialTextView
-                           android:id="@+id/tax"
-                           android:layout_width="wrap_content"
-                           android:layout_height="wrap_content"
-                           android:layout_marginTop="@dimen/_3sdp"
-                           android:paddingStart="@dimen/_6sdp"
-                           android:paddingEnd="@dimen/_1sdp"
-                           android:text="@string/tax"
-                           android:textSize="@dimen/_9ssp"
-                           app:layout_constraintHorizontal_bias="0.03"
-                           app:layout_constraintStart_toStartOf="parent"
-                           app:layout_constraintTop_toBottomOf="@id/discount" />
-
-                       <com.google.android.material.textview.MaterialTextView
-                           android:id="@+id/taxValue"
-                           android:layout_width="wrap_content"
-                           android:layout_height="wrap_content"
-                           android:layout_marginHorizontal="@dimen/_4sdp"
-                           android:layout_marginTop="@dimen/_3sdp"
-                           android:paddingStart="@dimen/_6sdp"
-                           android:paddingEnd="@dimen/_1sdp"
-                           android:text="@string/tax"
-                           android:textSize="@dimen/_9ssp"
-                           app:layout_constraintBottom_toBottomOf="@id/tax"
-                           app:layout_constraintEnd_toEndOf="parent"
-                           app:layout_constraintTop_toTopOf="@id/tax" />
-
-                       <com.google.android.material.textview.MaterialTextView
-                           android:id="@+id/total"
-                           android:layout_width="wrap_content"
-                           android:layout_height="wrap_content"
-                           android:layout_marginTop="@dimen/_3sdp"
-                           android:paddingStart="@dimen/_6sdp"
-                           android:paddingEnd="@dimen/_1sdp"
-                           android:text="@string/total"
-                           android:textSize="@dimen/_9ssp"
-                           app:layout_constraintHorizontal_bias="0.03"
-                           app:layout_constraintStart_toStartOf="parent"
-                           app:layout_constraintTop_toBottomOf="@id/tax" />
-
-                       <com.google.android.material.textview.MaterialTextView
-                           android:id="@+id/totalValue"
-                           android:layout_width="wrap_content"
-                           android:layout_height="wrap_content"
-                           android:layout_marginHorizontal="@dimen/_4sdp"
-                           android:layout_marginTop="@dimen/_3sdp"
-                           android:paddingStart="@dimen/_6sdp"
-                           android:paddingEnd="@dimen/_1sdp"
-                           android:text="@string/total"
-                           android:textSize="@dimen/_9ssp"
-                           app:layout_constraintEnd_toEndOf="parent"
-                           app:layout_constraintHorizontal_bias="0.03"
-                           app:layout_constraintTop_toBottomOf="@id/tax" />
-
-
-                   </androidx.constraintlayout.widget.ConstraintLayout>
+                        <!-- Total Row - matches HTML .detail-summary-row.total -->
+                        <!-- font-weight: 600, font-size: 16px -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/total"
+                                android:textColor="@color/text_light"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/totalValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="$0.00"
+                                android:textColor="@color/text_light"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-            <View
-                android:id="@+id/orderTextBelowDivider"
-                android:layout_width="match_parent"
-                android:layout_height="1.5dp"
-                android:layout_marginTop="@dimen/_7sdp"
-                android:background="#bdc6c9"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/orderItemCountText" />
-
-
+            </com.google.android.material.card.MaterialCardView>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <!-- Right Column: Order Details & History - matches HTML .order-detail-sidebar -->
+        <!-- width: 380px, gap: 20px -->
+        <LinearLayout
             android:id="@+id/buttonMenu"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.25">
+            android:layout_width="380dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <View
-                android:id="@+id/sideLine"
-                android:layout_width="2dp"
-                android:layout_height="match_parent"
-                android:background="#bdc6c9"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.core.widget.NestedScrollView
+            <!-- Order Details Card - matches HTML .detail-card -->
+            <!-- background: rgba(255,255,255,0.15), border-radius: 16px, border: 1px solid rgba(255,255,255,0.1) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/orderDetailsCard"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="@color/glass_background"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/nav_border"
+                app:strokeWidth="1dp">
 
-               <androidx.constraintlayout.widget.ConstraintLayout
-                   android:layout_width="match_parent"
-                   android:layout_height="match_parent">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
+                    <!-- Card Header with Status Badges - matches HTML .detail-card-header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="16dp">
 
-                   <com.google.android.material.textview.MaterialTextView
-                       android:id="@+id/addPayment"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:layout_marginVertical="@dimen/_5sdp"
-                       android:background="@drawable/border_background_green"
-                       android:minWidth="@dimen/_100sdp"
-                       android:paddingHorizontal="@dimen/_12sdp"
-                       android:paddingVertical="@dimen/_14sdp"
-                       android:text="@string/add_payment"
-                       android:layout_marginTop="@dimen/_10sdp"
-                       android:textAlignment="center"
-                       android:textSize="@dimen/_9ssp"
-                       android:textStyle="bold"
-                       android:textColor="@color/white"
-                       app:layout_constraintStart_toStartOf="parent"
-                       app:layout_constraintEnd_toEndOf="parent"
-                       app:layout_constraintTop_toTopOf="parent"
-                       />
+                        <!-- Icon with background - matches HTML .detail-card-title i -->
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_card_title_icon">
+                            
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_receipt"
+                                app:tint="@color/text_light"
+                                android:contentDescription="@string/order_details" />
+                        </FrameLayout>
 
-                   <com.google.android.material.textview.MaterialTextView
-                       android:id="@+id/reIssueReceiptButton"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:background="@drawable/button_background_border"
-                       android:minWidth="@dimen/_100sdp"
-                       android:layout_marginVertical="@dimen/_5sdp"
-                       android:paddingHorizontal="@dimen/_12sdp"
-                       android:paddingVertical="@dimen/_13sdp"
-                       android:text="@string/reissue_receipt"
-                       android:textAlignment="center"
-                       android:textSize="@dimen/_9ssp"
-                       android:textStyle="bold"
-                       app:layout_constraintStart_toStartOf="parent"
-                       app:layout_constraintEnd_toEndOf="parent"
-                       app:layout_constraintTop_toBottomOf="@+id/addPayment"
-                       app:layout_constraintVertical_bias="0.05" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="10dp"
+                            android:text="@string/order_details"
+                            android:textColor="@color/text_light"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
+                        <!-- Status badges - matches HTML .detail-status-badge -->
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/orderPlacedStatusValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/badge_background_open"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="@string/open"
+                            android:textColor="@color/open_status_color"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:textAllCaps="true" />
 
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/paymentStatusBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/badge_background_paid"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="@string/paid"
+                            android:textColor="@color/paid_status_color"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:textAllCaps="true" />
+                    </LinearLayout>
 
-                   <com.google.android.material.textview.MaterialTextView
-                       android:id="@+id/reOpenButton"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:layout_marginVertical="@dimen/_5sdp"
-                       android:background="@drawable/button_background_border"
-                       android:minWidth="@dimen/_100sdp"
-                       android:paddingHorizontal="@dimen/_12sdp"
-                       android:paddingVertical="@dimen/_14sdp"
-                       android:text="@string/re_open"
-                       android:textAlignment="center"
-                       android:textSize="@dimen/_9ssp"
-                       android:textStyle="bold"
-                       app:layout_constraintStart_toStartOf="parent"
-                       app:layout_constraintEnd_toEndOf="parent"
-                       app:layout_constraintTop_toBottomOf="@+id/reIssueReceiptButton"
-                       />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="#1AFFFFFF" />
 
-                   <com.google.android.material.textview.MaterialTextView
-                       android:id="@+id/sendNotificationButton"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:layout_marginVertical="@dimen/_5sdp"
-                       android:background="@drawable/button_background_orange"
-                       android:minWidth="@dimen/_100sdp"
-                       android:paddingHorizontal="@dimen/_13sdp"
-                       android:paddingVertical="@dimen/_10sdp"
-                       android:text="@string/send_n_notification"
-                       android:textAlignment="center"
-                       android:textSize="@dimen/_9ssp"
-                       android:textStyle="bold"
-                       app:layout_constraintStart_toStartOf="parent"
-                       app:layout_constraintEnd_toEndOf="parent"
-                       app:layout_constraintTop_toBottomOf="@+id/reOpenButton"
-                       />
+                    <!-- Order Info Rows - matches HTML .detail-card-body -->
+                    <!-- padding: 20px -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
 
-                   <com.google.android.material.textview.MaterialTextView
-                       android:id="@+id/deleteButton"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:layout_marginVertical="@dimen/_5sdp"
-                       android:background="@drawable/button_background_red"
-                       android:minWidth="@dimen/_100sdp"
-                       android:paddingHorizontal="@dimen/_12sdp"
-                       android:paddingVertical="@dimen/_13sdp"
-                       android:text="@string/delete_order"
-                       android:textAlignment="center"
-                       android:textSize="@dimen/_9ssp"
-                       android:layout_marginBottom="@dimen/_10sdp"
-                       android:textStyle="bold"
-                       android:textColor="@color/white"
-                       app:layout_constraintStart_toStartOf="parent"
-                       app:layout_constraintEnd_toEndOf="parent"
-                       app:layout_constraintBottom_toBottomOf="parent"
-                       app:layout_constraintTop_toBottomOf="@+id/sendNotificationButton"
-                       />
+                        <!-- Order Date - matches HTML .detail-info-row -->
+                        <!-- padding: 12px 0, border-bottom: 1px solid rgba(255,255,255,0.05) -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="12dp">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/order_date"
+                                android:textColor="@color/text_muted"
+                                android:textSize="13sp" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/orderPlacedAtValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/text_light"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                        
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#0DFFFFFF" />
 
-               </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.core.widget.NestedScrollView>
+                        <!-- Due Date -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="12dp">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/due_date"
+                                android:textColor="@color/text_muted"
+                                android:textSize="13sp" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/dueDateValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/text_light"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                        
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#0DFFFFFF" />
 
+                        <!-- Order Tags -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="12dp">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/order_tags"
+                                android:textColor="@color/text_muted"
+                                android:textSize="13sp" />
+                            <LinearLayout
+                                android:id="@+id/tagsContainer"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal" />
+                        </LinearLayout>
+                        
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#0DFFFFFF" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                        <!-- Employee -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="12dp">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/employee"
+                                android:textColor="@color/text_muted"
+                                android:textSize="13sp" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/employeeValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/text_light"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                        
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#0DFFFFFF" />
 
+                        <!-- Customer (Clickable) - matches HTML .detail-info-row.clickable -->
+                        <!-- HTML: margin: 0 -12px extends beyond parent padding, padding: 12px -->
+                        <LinearLayout
+                            android:id="@+id/customerRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="@drawable/bg_clickable_row"
+                            android:paddingVertical="12dp"
+                            android:paddingHorizontal="12dp"
+                            android:layout_marginHorizontal="-12dp"
+                            android:layout_marginTop="4dp"
+                            android:clickable="true"
+                            android:focusable="true">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/customer"
+                                android:textColor="@color/text_muted"
+                                android:textSize="13sp" />
+                            
+                            <!-- Customer inline avatar with initials - matches HTML .customer-inline-avatar -->
+                            <!-- 24x24, border-radius: 50%, background: orange-accent -->
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/customerAvatar"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:background="@drawable/bg_customer_avatar_inline"
+                                android:gravity="center"
+                                android:text="ED"
+                                android:textColor="@color/white"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
+                            
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/orderPlacedCustomerValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:textColor="@color/text_light"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                            
+                            <!-- Chevron icon - matches HTML .chevron-icon -->
+                            <ImageView
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:layout_marginStart="8dp"
+                                android:src="@drawable/ic_chevron_right"
+                                app:tint="@color/text_muted"
+                                android:contentDescription="@string/view_customer" />
+                        </LinearLayout>
+                    </LinearLayout>
+                    
+                    <!-- Hidden description field for backward compatibility -->
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/descriptionValue"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Order History Card - matches HTML .detail-card -->
+            <!-- Scrollable with fade at bottom and scroll indicator -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/orderHistoryCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/glass_background"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/nav_border"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Card Header - matches HTML .detail-card-header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="16dp">
+
+                        <!-- Icon with background - matches HTML .detail-card-title i -->
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_card_title_icon">
+                            
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_history"
+                                app:tint="@color/text_light"
+                                android:contentDescription="@string/order_history" />
+                        </FrameLayout>
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="10dp"
+                            android:text="@string/order_history"
+                            android:textColor="@color/text_light"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <!-- View All button with chevron - matches HTML .detail-card-action -->
+                        <LinearLayout
+                            android:id="@+id/viewAllHistoryButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="@drawable/bg_view_all_button"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="6dp"
+                            android:clickable="true"
+                            android:focusable="true">
+                            
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/view_all"
+                                android:textColor="@color/text_light"
+                                android:textSize="12sp" />
+                            
+                            <ImageView
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:layout_marginStart="6dp"
+                                android:src="@drawable/ic_chevron_right"
+                                app:tint="@color/text_light"
+                                android:contentDescription="@string/view_all" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="#1AFFFFFF" />
+
+                    <!-- Scrollable History Items Container with fade overlay -->
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        
+                        <!-- Scrollable History Items -->
+                        <ScrollView
+                            android:id="@+id/historyScrollView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:maxHeight="180dp"
+                            android:scrollbars="none"
+                            android:fillViewport="true"
+                            android:clipToPadding="false">
+
+                            <!-- Dynamic history container - populated by fragment -->
+                            <LinearLayout
+                                android:id="@+id/historyContainer"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:paddingHorizontal="20dp"
+                                android:paddingTop="20dp"
+                                android:paddingBottom="40dp" />
+                            
+                        </ScrollView>
+                        
+                        <!-- Fade gradient overlay at bottom -->
+                        <View
+                            android:id="@+id/historyFadeOverlay"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_gravity="bottom"
+                            android:background="@drawable/bg_scroll_fade_bottom" />
+                        
+                        <!-- Scroll indicator with chevron -->
+                        <LinearLayout
+                            android:id="@+id/historyScrollIndicator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|center_horizontal"
+                            android:layout_marginBottom="8dp"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:background="@drawable/bg_scroll_indicator_container"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="6dp">
+                            
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/scroll_for_more"
+                                android:textColor="@color/text_muted"
+                                android:textSize="10sp" />
+                            
+                            <ImageView
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:layout_marginStart="4dp"
+                                android:src="@drawable/ic_chevron_down"
+                                app:tint="@color/text_muted"
+                                android:contentDescription="@string/scroll_down" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
     </LinearLayout>
 
+    <!-- Progress Overlay -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/progressLayout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@color/white"
+        android:layout_height="match_parent"
+        android:background="#80000000"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topBar">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ProgressBar
             android:layout_width="wrap_content"
@@ -749,9 +839,64 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Hidden views for backward compatibility -->
+    <LinearLayout
+        android:id="@+id/orderData"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Hidden RecyclerViews (data still displayed in items list) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/transactionRecycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/refundRecycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/noTransactionText"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderPlacedCustomerNumberValue"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderPlacedCustomerEmailValue"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/orderPlacedEmployeeValue"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/discount"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-

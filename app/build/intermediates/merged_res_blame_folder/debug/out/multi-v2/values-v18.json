@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.orderMate.app-mergeDebugResources-53:/values-v18/values-v18.xml",
+            "outputFile": "com.orderMate.app-mergeDebugResources-54:/values-v18/values-v18.xml",
             "map": [
                 {
-                    "source": "/Users/chicmic/.gradle/caches/transforms-3/f78a8135a1d2c56a982d366d1d05a147/transformed/appcompat-1.6.1/res/values-v18/values-v18.xml",
+                    "source": "/Users/chloe_mac/.gradle/caches/transforms-3/21ea3b44e5e81a6d0c4678c1bec77175/transformed/appcompat-1.6.1/res/values-v18/values-v18.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

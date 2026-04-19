@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Timeline column for a single day -->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/columnContainer"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:background="@drawable/bg_timeline_column">
+
+    <!-- Hour rows (24 rows x 60dp each = 1440dp total) -->
+    <LinearLayout
+        android:id="@+id/hourRows"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"/>
+
+    <!-- Events container (absolute positioning) -->
+    <FrameLayout
+        android:id="@+id/eventsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</FrameLayout>

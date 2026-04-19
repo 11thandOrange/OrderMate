@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- iOS-style Calendar Fragment (#82 requirement) -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/transparent">
+
+    <!-- Header with Search (same as List Tab) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="20dp"
+        android:paddingHorizontal="30dp"
+        android:background="@color/header_background">
+
+        <!-- Header Top Row: Search + Filter + Reset -->
+        <LinearLayout
+            android:id="@+id/headerTopRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical|start"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Search Container -->
+            <LinearLayout
+                android:id="@+id/searchContainer"
+                android:layout_width="400dp"
+                android:layout_height="48dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="20dp"
+                android:background="@drawable/bg_search_bar">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_search"
+                    android:contentDescription="Search"
+                    app:tint="@color/text_muted"/>
+
+                <EditText
+                    android:id="@+id/searchInput"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:background="@null"
+                    android:hint="@string/search_orders"
+                    android:textColorHint="@color/text_muted"
+                    android:textColor="@color/text_light"
+                    android:textSize="14sp"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1"/>
+
+                <ImageView
+                    android:id="@+id/calendarIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_calender"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Pick date"
+                    app:tint="@color/text_muted"
+                    android:clickable="true"
+                    android:focusable="true"/>
+            </LinearLayout>
+
+            <!-- Filter Button -->
+            <LinearLayout
+                android:id="@+id/filterButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_header_button"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_filter"
+                    app:tint="@color/text_light"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Filters"
+                    android:textColor="@color/text_light"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <!-- Reset Button -->
+            <LinearLayout
+                android:id="@+id/resetButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_header_button_outline"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_refresh"
+                    app:tint="@color/text_light"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Reset"
+                    android:textColor="@color/text_light"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Filter Pills Row -->
+        <HorizontalScrollView
+            android:id="@+id/filterPillsScroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:scrollbars="none"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@id/headerTopRow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:id="@+id/filterPillsContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"/>
+
+        </HorizontalScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Calendar Subheader -->
+    <LinearLayout
+        android:id="@+id/calendarSubheader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="12dp">
+
+        <!-- Navigation: Prev / Month-Year / Next -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <FrameLayout
+                android:id="@+id/btnPrev"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_glass_button_round"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_chevron_left"
+                    app:tint="@color/text_light"/>
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/monthYearTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:minWidth="150dp"
+                android:gravity="center"
+                android:textColor="@color/text_light"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="March 2026"/>
+
+            <FrameLayout
+                android:id="@+id/btnNext"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_glass_button_round"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/text_light"/>
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <!-- Spacer -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <!-- View Mode Toggle: Day / Week / Month -->
+        <LinearLayout
+            android:id="@+id/viewModeContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/bg_glass_pill"
+            android:padding="4dp">
+
+            <TextView
+                android:id="@+id/btnDay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="6dp"
+                android:text="Day"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:id="@+id/btnWeek"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="6dp"
+                android:text="Week"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:id="@+id/btnMonth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="6dp"
+                android:background="@drawable/bg_view_mode_active"
+                android:text="Month"
+                android:textColor="@color/text_primary"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:clickable="true"
+                android:focusable="true"/>
+
+        </LinearLayout>
+
+        <!-- Spacer -->
+        <View
+            android:layout_width="16dp"
+            android:layout_height="0dp"/>
+
+        <!-- Action Buttons: Today / Next Fulfillment -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/btnToday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:gravity="center"
+                android:background="@drawable/bg_calendar_btn_today"
+                android:drawableStart="@drawable/ic_calendar_today"
+                android:drawablePadding="6dp"
+                android:drawableTint="@color/text_light"
+                android:text="Today"
+                android:textColor="@color/text_light"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:id="@+id/btnNextFulfillment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:gravity="center"
+                android:background="@drawable/bg_calendar_btn_next"
+                android:drawableStart="@drawable/ic_arrow_right"
+                android:drawablePadding="6dp"
+                android:drawableTint="@color/text_primary"
+                android:text="Next Fulfillment"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:clickable="true"
+                android:focusable="true"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Calendar Content -->
+    <FrameLayout
+        android:id="@+id/calendarContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="20dp">
+
+        <!-- Calendar Grid Container -->
+        <LinearLayout
+            android:id="@+id/calendarGridContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@drawable/bg_calendar_grid"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <!-- Weekday Headers (Month view) -->
+            <LinearLayout
+                android:id="@+id/weekdayHeaders"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:orientation="horizontal"
+                android:background="@drawable/bg_calendar_weekday_header"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="SUN"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="MON"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="TUE"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="WED"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="THU"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="FRI"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="SAT"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"/>
+
+            </LinearLayout>
+
+            <!-- Calendar Days Grid (Month view) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/calendarGrid"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:overScrollMode="never"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:spanCount="7"
+                tools:listitem="@layout/item_calendar_day"/>
+
+            <!-- Timeline Container (Day/Week view) - same level as grid -->
+            <LinearLayout
+                android:id="@+id/timelineContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Timeline Header - matches weekdayHeaders height -->
+                <LinearLayout
+                    android:id="@+id/timelineHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:orientation="horizontal"
+                    android:background="@drawable/bg_calendar_weekday_header"
+                    android:gravity="center_vertical"/>
+
+                <!-- Timeline Body (scrollable) -->
+                <ScrollView
+                    android:id="@+id/timelineScrollView"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:fillViewport="true">
+
+                    <LinearLayout
+                        android:id="@+id/timelineBody"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"/>
+
+                </ScrollView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</LinearLayout>

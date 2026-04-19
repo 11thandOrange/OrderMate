@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.orderMate.app-mergeReleaseResources-53:/values-de-rDE-port/values-de-rDE-port.xml",
+            "outputFile": "com.orderMate.app-mergeReleaseResources-54:/values-de-rDE-port/values-de-rDE-port.xml",
             "map": [
                 {
-                    "source": "/Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/res/values-de-rDE-port/values-de-rDE-port.xml",
+                    "source": "/Users/chloe_mac/.gradle/caches/transforms-3/dea4978974ad9453142b74f6cb577d79/transformed/clover-android-sdk-304/res/values-de-rDE-port/values-de-rDE-port.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",

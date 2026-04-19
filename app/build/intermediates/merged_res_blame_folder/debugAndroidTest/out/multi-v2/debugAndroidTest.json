@@ -1,34 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.orderShubham.test.app-merged_res-5:/values-v18_values-v18.arsc.flat",
+            "outputFile": "com.orderMate.test.app-merged_res-5:/values-v21_values-v21.arsc.flat",
             "map": [
                 {
-                    "source": "/Users/chicmic/.gradle/caches/transforms-3/e33bf01f3c3ac7a35b080a4eb40739ae/transformed/core-1.5.0/res/values-v18/values.xml",
-                    "from": {
-                        "startLines": "4,12",
-                        "startColumns": "0,0",
-                        "startOffsets": "180,596",
-                        "endLines": "11,19",
-                        "endColumns": "8,8",
-                        "endOffsets": "595,1009"
-                    },
-                    "to": {
-                        "startLines": "2,10",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,475",
-                        "endLines": "9,17",
-                        "endColumns": "8,8",
-                        "endOffsets": "470,888"
-                    }
-                }
-            ]
-        },
-        {
-            "outputFile": "com.orderShubham.test.app-merged_res-5:/values-v21_values-v21.arsc.flat",
-            "map": [
-                {
-                    "source": "/Users/chicmic/.gradle/caches/transforms-3/e33bf01f3c3ac7a35b080a4eb40739ae/transformed/core-1.5.0/res/values-v21/values.xml",
+                    "source": "/Users/chloe_mac/.gradle/caches/transforms-3/03f21cb5518b12002aa3fb16ceb49457/transformed/core-1.5.0/res/values-v21/values.xml",
                     "from": {
                         "startLines": "4,13",
                         "startColumns": "0,0",
@@ -49,10 +25,10 @@
             ]
         },
         {
-            "outputFile": "com.orderShubham.test.app-merged_res-5:/values_values.arsc.flat",
+            "outputFile": "com.orderMate.test.app-merged_res-5:/values_values.arsc.flat",
             "map": [
                 {
-                    "source": "/Users/chicmic/.gradle/caches/transforms-3/e33bf01f3c3ac7a35b080a4eb40739ae/transformed/core-1.5.0/res/values/values.xml",
+                    "source": "/Users/chloe_mac/.gradle/caches/transforms-3/03f21cb5518b12002aa3fb16ceb49457/transformed/core-1.5.0/res/values/values.xml",
                     "from": {
                         "startLines": "4,11",
                         "startColumns": "0,0",
@@ -73,10 +49,10 @@
             ]
         },
         {
-            "outputFile": "com.orderShubham.test.app-merged_res-5:/values-v28_values-v28.arsc.flat",
+            "outputFile": "com.orderMate.test.app-merged_res-5:/values-v28_values-v28.arsc.flat",
             "map": [
                 {
-                    "source": "/Users/chicmic/.gradle/caches/transforms-3/e33bf01f3c3ac7a35b080a4eb40739ae/transformed/core-1.5.0/res/values-v28/values.xml",
+                    "source": "/Users/chloe_mac/.gradle/caches/transforms-3/03f21cb5518b12002aa3fb16ceb49457/transformed/core-1.5.0/res/values-v28/values.xml",
                     "from": {
                         "startLines": "4,13",
                         "startColumns": "0,0",
@@ -92,6 +68,30 @@
                         "endLines": "10,19",
                         "endColumns": "8,8",
                         "endOffsets": "533,1014"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "com.orderMate.test.app-merged_res-5:/values-v18_values-v18.arsc.flat",
+            "map": [
+                {
+                    "source": "/Users/chloe_mac/.gradle/caches/transforms-3/03f21cb5518b12002aa3fb16ceb49457/transformed/core-1.5.0/res/values-v18/values.xml",
+                    "from": {
+                        "startLines": "4,12",
+                        "startColumns": "0,0",
+                        "startOffsets": "180,596",
+                        "endLines": "11,19",
+                        "endColumns": "8,8",
+                        "endOffsets": "595,1009"
+                    },
+                    "to": {
+                        "startLines": "2,10",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,475",
+                        "endLines": "9,17",
+                        "endColumns": "8,8",
+                        "endOffsets": "470,888"
                     }
                 }
             ]

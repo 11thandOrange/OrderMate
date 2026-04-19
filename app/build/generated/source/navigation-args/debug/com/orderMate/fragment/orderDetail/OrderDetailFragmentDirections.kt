@@ -34,6 +34,9 @@ public class OrderDetailFragmentDirections private constructor() {
   }
 
   public companion object {
+    public fun actionOrderDetailFragmentToOrderListRedesignFragment(): NavDirections =
+        ActionOnlyNavDirections(R.id.action_orderDetailFragment_to_orderListRedesignFragment)
+
     public fun actionOrderDetailFragmentToOrderHistoryFragment(): NavDirections =
         ActionOnlyNavDirections(R.id.action_orderDetailFragment_to_orderHistoryFragment)
 

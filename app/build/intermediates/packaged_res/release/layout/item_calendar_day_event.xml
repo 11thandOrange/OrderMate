@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Single event row for day/week view (#82 CAL-5) -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="10dp"
+    android:paddingHorizontal="12dp"
+    android:layout_marginTop="4dp"
+    android:background="@drawable/bg_glass_card"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Event Type Color Bar -->
+    <View
+        android:id="@+id/eventColorBar"
+        android:layout_width="3dp"
+        android:layout_height="36dp"
+        android:background="@color/event_pickup"/>
+
+    <!-- Event Info -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/customerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="John Smith"
+            android:textColor="@color/text_light"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <TextView
+            android:id="@+id/eventDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Pickup • 3 items"
+            android:textColor="@color/text_muted"
+            android:textSize="12sp"/>
+    </LinearLayout>
+
+    <!-- Total -->
+    <TextView
+        android:id="@+id/orderTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="$45.00"
+        android:textColor="@color/accent_orange"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-medium"/>
+
+    <!-- Arrow -->
+    <ImageView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_chevron_right"
+        app:tint="@color/text_muted"/>
+
+</LinearLayout>

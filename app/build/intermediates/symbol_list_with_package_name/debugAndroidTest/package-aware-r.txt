@@ -1,3 +1,3 @@
-com.orderShubham.test
+com.orderMate.test
 style WhiteBackgroundDialogTheme
 style WhiteBackgroundTheme

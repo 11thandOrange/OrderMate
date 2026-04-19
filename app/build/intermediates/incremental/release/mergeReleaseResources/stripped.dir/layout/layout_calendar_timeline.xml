@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Timeline view for Day/Week calendar views (#82 CAL-5) -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_calendar_grid">
+
+    <!-- Timeline Header (Day names) -->
+    <LinearLayout
+        android:id="@+id/timelineHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_calendar_weekday_header"
+        android:paddingVertical="12dp">
+
+        <!-- Gutter (space for hour labels) -->
+        <View
+            android:id="@+id/timelineGutter"
+            android:layout_width="50dp"
+            android:layout_height="1dp"/>
+
+        <!-- Day Headers Container -->
+        <LinearLayout
+            android:id="@+id/timelineHeaderDays"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"/>
+
+    </LinearLayout>
+
+    <!-- Timeline Body (scrollable) -->
+    <ScrollView
+        android:id="@+id/timelineScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Hour Labels Column -->
+            <LinearLayout
+                android:id="@+id/timelineHours"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+            <!-- Timeline Columns Container -->
+            <LinearLayout
+                android:id="@+id/timelineColumns"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

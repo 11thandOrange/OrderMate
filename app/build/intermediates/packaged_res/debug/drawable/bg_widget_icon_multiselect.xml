@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Multi select widget icon background - matches HTML rgba(56, 142, 60, 0.2) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#33388E3C" />
+    <corners android:radius="8dp" />
+</shape>

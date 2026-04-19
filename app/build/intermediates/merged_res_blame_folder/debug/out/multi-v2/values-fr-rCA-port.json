@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.orderMate.app-mergeDebugResources-53:/values-fr-rCA-port/values-fr-rCA-port.xml",
+            "outputFile": "com.orderMate.app-mergeDebugResources-54:/values-fr-rCA-port/values-fr-rCA-port.xml",
             "map": [
                 {
-                    "source": "/Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/res/values-fr-rCA-port/values-fr-rCA-port.xml",
+                    "source": "/Users/chloe_mac/.gradle/caches/transforms-3/dea4978974ad9453142b74f6cb577d79/transformed/clover-android-sdk-304/res/values-fr-rCA-port/values-fr-rCA-port.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",

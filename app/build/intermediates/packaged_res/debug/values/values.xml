@@ -39,21 +39,101 @@
         <item>Delivery</item>
         <item>Catering</item>
     </string-array>
+    <color name="accent_orange">#FF9F43</color>
     <color name="back">#03CDB8</color>
+    <color name="background_primary">#F5F5F7</color>
+    <color name="bg_dark">#1a1a2e</color>
+    <color name="bg_glass">#26FFFFFF</color>
     <color name="black">#FF000000</color>
+    <color name="button_gray">#6B7280</color>
+    <color name="calendar_today_bg">#1AFF9F43</color>
+    <color name="calendar_weekday_bg">#33000000</color>
+    <color name="card_background">#F2FFFFFF</color>
+    <color name="card_border">#1AFFFFFF</color>
+    <color name="category_chip_bg">#26FF9F43</color>
+    <color name="closed_status_color">#7367F0</color>
     <color name="darkBlue">#abf1f9</color>
     <color name="dark_orange_bar">#F46809</color>
     <color name="darker_gray">#757575</color>
     <color name="darker_gray_light">#E1DEDE</color>
     <color name="date_picker_color">#08A7E8</color>
+    <color name="delete_red">#EF4444</color>
+    <color name="delete_red_hover">#c92428</color>
+    <color name="divider_color">#E5E5EA</color>
+    <color name="event_delivery">#64b5f6</color>
+    <color name="event_delivery_bg">#332196F3</color>
+    <color name="event_pickup">#81c784</color>
+    <color name="event_pickup_bg">#334CAF50</color>
+    <color name="event_preorder">#ce93d8</color>
+    <color name="event_preorder_bg">#339C27B0</color>
+    <color name="event_preview_bg">#26FFFFFF</color>
+    <color name="event_preview_border">#1AFFFFFF</color>
+    <color name="glass_background">#26FFFFFF</color>
+    <color name="glass_background_hover">#40FFFFFF</color>
+    <color name="glass_card_background">#26FFFFFF</color>
+    <color name="glass_ripple">#40FFFFFF</color>
+    <color name="gradient_end">#764ba2</color>
+    <color name="gradient_start">#667eea</color>
+    <color name="header_background">#1A000000</color>
     <color name="header_blue">#ddf1f9</color>
     <color name="header_blue_dark">#ebf7fc</color>
+    <color name="input_bg">#1AFFFFFF</color>
+    <color name="input_border">#33FFFFFF</color>
+    <color name="item_dialog_accent">#27AE60</color>
+    <color name="item_pill_bg">#D0E8D8</color>
+    <color name="item_pill_border">#A8D4B8</color>
+    <color name="item_pill_icon">#27AE60</color>
+    <color name="item_pill_text">#2D5A3D</color>
+    <color name="item_row_background">#33000000</color>
+    <color name="list_chip_bg">#D0D8E8</color>
+    <color name="list_chip_icon">#A08060</color>
+    <color name="list_chip_text">#3D4A5C</color>
+    <color name="modal_overlay">#99000000</color>
+    <color name="nav_border">#1AFFFFFF</color>
+    <color name="note_chip_bg">#1AFFFFFF</color>
+    <color name="note_pill_category_bg">#337B1FA2</color>
+    <color name="note_pill_category_text">#ce93d8</color>
+    <color name="note_pill_tag_bg">#33388E3C</color>
+    <color name="note_pill_tag_text">#81c784</color>
+    <color name="note_pill_text_bg">#33F57C00</color>
+    <color name="note_pill_text_text">#ffb74d</color>
     <color name="open_status_color">#eed013</color>
+    <color name="orange_accent">#FF9F43</color>
+    <color name="orange_accent_hover">#e68a2e</color>
     <color name="orange_bar">#fca468</color>
+    <color name="order_dialog_accent">#9B59B6</color>
+    <color name="order_pill_bg">#E8D5F0</color>
+    <color name="order_pill_border">#D4A8E8</color>
+    <color name="order_pill_icon">#9B59B6</color>
+    <color name="order_pill_text">#6B3FA0</color>
     <color name="other_order_payment_status">#ea2c2f</color>
     <color name="paid_status_color">#3ccd79</color>
+    <color name="side_nav_background">#33000000</color>
     <color name="status_bar_color">#f2f2f2</color>
+    <color name="status_closed_bg">#337367F0</color>
+    <color name="status_open_bg">#33eed013</color>
+    <color name="status_paid_bg">#333ccd79</color>
+    <color name="status_unpaid_bg">#33ea2c2f</color>
+    <color name="tag_bakery">#F59E0B</color>
+    <color name="tag_category_bg">#33FF9F43</color>
+    <color name="tag_category_text">#FF9F43</color>
+    <color name="tag_chip_bg">#267367F0</color>
+    <color name="tag_custom">#A78BFA</color>
+    <color name="tag_dessert">#EC4899</color>
+    <color name="tag_pickup">#4ECDC4</color>
+    <color name="tag_pill_bg">#337367F0</color>
+    <color name="tag_pill_text">#7367F0</color>
+    <color name="tag_rush">#FF6B6B</color>
+    <color name="text_chip_bg">#266c757d</color>
+    <color name="text_light">#E6FFFFFF</color>
+    <color name="text_muted">#99FFFFFF</color>
+    <color name="text_primary">#1a1a2e</color>
+    <color name="text_primary_dark">#1C1C1E</color>
+    <color name="text_secondary">#6c757d</color>
+    <color name="today_highlight_bg">#1AFF9F43</color>
+    <color name="unpaid_status_color">#ea2c2f</color>
     <color name="white">#FFFFFFFF</color>
+    <item name="timelineContainer" type="id"/>
     <string name="add">Add</string>
     <string name="add_note">Add Note to Item</string>
     <string name="add_payment">Add Payment</string>
@@ -63,6 +143,7 @@
     <string name="all_type">All Type</string>
     <string name="api_exception">Api Exception is there</string>
     <string name="app_name">OrderMate</string>
+    <string name="back">Back</string>
     <string name="bullet_symbol">\u2022</string>
     <string name="cancel">Cancel</string>
     <string name="cart_is_empty">Cart is Empty</string>
@@ -75,20 +156,31 @@
     <string name="choose_item_type">Type</string>
     <string name="clear">Clear</string>
     <string name="clear_all">Clear all</string>
+    <string name="close">Close</string>
+    <string name="closed">Closed</string>
+    <string name="clover_customers_not_available">Clover Customers app not available</string>
     <string name="com.google.firebase.crashlytics.mapping_file_id" ns1:ignore="UnusedResources,TypographyDashes" translatable="false">00000000000000000000000000000000</string>
     <string name="commas">", "</string>
     <string name="custom_menu">Custom Menu</string>
+    <string name="custom_notes">Custom Notes</string>
     <string name="custom_order_menu">Set Custom Option</string>
     <string name="custom_order_menus">Set Custom Options</string>
+    <string name="customer">Customer</string>
+    <string name="customer_details">Customer Details</string>
     <string name="customer_email">Customer Email</string>
     <string name="customer_name">Customer</string>
     <string name="customer_name_value">Customer: %1$s</string>
     <string name="customer_number">Customer Number</string>
+    <string name="customer_save_failed">Failed to save customer</string>
+    <string name="customer_saved">Customer saved successfully</string>
     <string name="dash">-</string>
     <string name="date">Date</string>
     <string name="delete_order">Delete Order</string>
+    <string name="description">Description</string>
     <string name="discard">Discard</string>
+    <string name="discount">Discount</string>
     <string name="do_you_want_to_save_the_changes">Do you want to save the changes?</string>
+    <string name="due_date">Due Date</string>
     <string name="dummy_date">5/8/24</string>
     <string name="dummy_heading_dashboard">Orders (DEV)</string>
     <string name="dummy_id">1234567DDFKHVDFJK</string>
@@ -96,12 +188,19 @@
     <string name="dummy_price">$0.00</string>
     <string name="dummy_status">Open</string>
     <string name="dummy_time">0:00 PM</string>
+    <string name="edit">Edit</string>
+    <string name="edit_item">Edit item</string>
     <string name="email">Email</string>
     <string name="email_has_been_shared_successfully">Email has been Shared SuccessFully</string>
+    <string name="employee">Employee</string>
     <string name="employee_name">Employee</string>
     <string name="employee_name_header">Customer/Employee</string>
     <string name="employee_name_value">No Name</string>
     <string name="enabled">Enabled</string>
+    <string name="enter_email">Enter email address</string>
+    <string name="enter_first_name">Enter first name</string>
+    <string name="enter_last_name">Enter last name</string>
+    <string name="enter_phone_number">Enter phone number</string>
     <string name="enter_pickup_date">PickUp Date</string>
     <string name="enter_the_customer_email_address">Enter customer email address</string>
     <string name="enter_the_customer_number">Enter customer phone number</string>
@@ -113,6 +212,7 @@
     <string name="enter_your_notes_here">Enter message for customer</string>
     <string name="fail_to_share_the_sms">Fail to share the SMS</string>
     <string name="failed_to_share_the_email">"Failed to share the Email "</string>
+    <string name="first_name">First Name</string>
     <string name="gcm_defaultSenderId" translatable="false">862296565248</string>
     <string name="getDateWithDot">%1$s . %2$s</string>
     <string name="getFullName">%1$s %2$s</string>
@@ -121,16 +221,21 @@
     <string name="google_crash_reporting_api_key" translatable="false">AIzaSyCZjXXJs_qTjKCb3kXh-vN6TDtyn0F2M08</string>
     <string name="google_storage_bucket" translatable="false">ordermate-53077.appspot.com</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="history_event">History event</string>
     <string name="hypen_text">-</string>
     <string name="id">Notes/Id</string>
     <string name="itemCount">X%1$d</string>
     <string name="item_count">%1$s custom items </string>
     <string name="item_count_single">%1$s custom item </string>
+    <string name="items">Items</string>
     <string name="key">%1$s-%2$s-%3$s-%4$s-%5$s-%6$s</string>
+    <string name="last_name">Last Name</string>
     <string name="message">Message</string>
     <string name="nav_close">Close</string>
     <string name="nav_open">Open</string>
     <string name="no_access">Notes are temporarily disabled by the admin. For assistance, please reach out to the admin.</string>
+    <string name="no_customers_found">No customers found</string>
+    <string name="no_history">No history available</string>
     <string name="no_number">No Number</string>
     <string name="no_order_match">No order match the current filter and/or search item.</string>
     <string name="no_transaction">There is no transaction made for this order.</string>
@@ -142,18 +247,33 @@
     <string name="note_string_progress">" status:%1$s "</string>
     <string name="note_string_type">" type:%1$s "</string>
     <string name="notes">Notes</string>
+    <string name="notification">Notification</string>
+    <string name="open">Open</string>
     <string name="order">Items (%1$d) </string>
+    <string name="order_created">Order Created</string>
+    <string name="order_date">Order Date</string>
+    <string name="order_details">Order Details</string>
+    <string name="order_history">Order History</string>
     <string name="order_id_value">Order #: %1$s </string>
+    <string name="order_modified">Order Modified</string>
     <string name="order_more_than_100">Order more than 100 days old will be viewed on the Web Dashboard or by search the full order id in the search.</string>
     <string name="order_status">Status</string>
     <string name="order_status_string">Order Status</string>
+    <string name="order_tags">Order Tags</string>
     <string name="order_time">Placed</string>
     <string name="order_type">Order Type</string>
     <string name="orders_text">Order %1$s</string>
     <string name="overlay_permission">Overlay Permission</string>
+    <string name="paid">Paid</string>
+    <string name="partially_paid">Partial</string>
+    <string name="partially_refunded">Partial Refund</string>
     <string name="payment">Payment</string>
     <string name="payment_mode">Payment Mode</string>
+    <string name="payment_received">Payment Received</string>
+    <string name="payment_type">Payment</string>
+    <string name="phone">Phone</string>
     <string name="pick_up_time">PickUp Date</string>
+    <string name="pickup">Pickup</string>
     <string name="placed_at">Placed at</string>
     <string name="please_check_internet">Please check Internet connection</string>
     <string name="please_check_your_internet_connection">Please check your internet Connection</string>
@@ -163,34 +283,74 @@
     <string name="priceStringWithRefund">%1$s%2$s(%3$s%4$s)</string>
     <string name="project_id" translatable="false">ordermate-53077</string>
     <string name="re_open">Re-Open</string>
+    <string name="refunded">Refunded</string>
     <string name="reissue_receipt">Reissue Receipt</string>
+    <string name="reminder_sent">Reminder Sent</string>
+    <string name="rush">Rush</string>
+    <string name="sample_date_time">March 15, 2026 • 9:00 AM</string>
+    <string name="sample_date_time_2">March 14, 2026 • 2:32 PM</string>
+    <string name="sample_date_time_3">March 14, 2026 • 2:30 PM</string>
     <string name="save">Save</string>
+    <string name="saving_customer">Saving customer…</string>
+    <string name="scroll_down">Scroll down</string>
+    <string name="scroll_for_more">Scroll for more</string>
+    <string name="search">Search</string>
+    <string name="search_by_name_phone_email">Search by name, phone, or email</string>
+    <string name="search_customers">Search Customers</string>
     <string name="search_orders">Search Orders</string>
+    <string name="select_customer">Select</string>
+    <string name="select_template">Select Template</string>
     <string name="send">send</string>
     <string name="send_n_notification">Send \n Notification</string>
     <string name="send_n_notification_without_newLine">Send Notification</string>
+    <string name="send_notification">Send Notification</string>
     <string name="settings">Settings</string>
     <string name="show_modal">Trigger modal when item is added to cart</string>
     <string name="show_modal_basket">Trigger modal from basket</string>
     <string name="show_summary">Show Summary</string>
     <string name="sms">SMS</string>
     <string name="sms_has_been_shared_successfully">Sms has been Shared SuccessFully</string>
+    <string name="sms_reminder_sent">SMS reminder sent to customer</string>
     <string name="something_wrong">Something went wrong</string>
     <string name="source">Source/Type</string>
     <string name="special_char">●</string>
     <string name="statusString">Status</string>
+    <string name="status_changed">Status Changed</string>
     <string name="subItemCost">%1$d %2$s @ %3$s/%4$s</string>
     <string name="subcategories">Subcategories</string>
     <string name="subject">Subject</string>
     <string name="subtotal">Subtotal</string>
     <string name="syncing">SYNCING</string>
     <string name="tax">Taxes and fees</string>
+    <string name="template">Template</string>
     <string name="there_is_issue_with_your_account">There is Issue with Your Account Please check the Clover Dashboard</string>
     <string name="this_permission_is_required">This Permission is required to show the Custom Modal dialog over the Clover Register App. \n</string>
     <string name="total">Total</string>
     <string name="transaction">Transactions</string>
     <string name="type">Type</string>
+    <string name="unpaid">Unpaid</string>
     <string name="update_order">Add note</string>
+    <string name="view_all">View All</string>
+    <string name="view_customer">View customer details</string>
+    <style name="ActionButton">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+    <style name="ActionButton.Delete">
+        <item name="android:background">@drawable/bg_button_delete</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+    <style name="ActionButton.Orange">
+        <item name="android:background">@drawable/bg_button_orange</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
     <style name="AlertDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="alertDialogStyle">@style/MyAlertDialogStyle</item>
     </style>
@@ -208,6 +368,16 @@
     <style name="CustomEditTextStyle" parent="Widget.AppCompat.EditText">
         <item name="colorControlNormal">@android:color/darker_gray</item>
     </style>
+    <style name="GlassButton">
+        <item name="android:background">@drawable/bg_glass_button</item>
+        <item name="android:textColor">@color/text_light</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="GlassCard">
+        <item name="cardBackgroundColor">@color/card_background</item>
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">0dp</item>
+    </style>
     <style name="MyAlertDialogStyle" parent="MaterialAlertDialog.MaterialComponents">
         <item name="iconSize">50dp</item>
         <item name="startIconMinSize">50dp</item>
@@ -218,7 +388,77 @@
         <item name="subheaderColor">@color/white</item>
         <item name="android:negativeButtonText">Clear</item>
     </style>
+    <style name="NotePill">
+        <item name="android:paddingHorizontal">8dp</item>
+        <item name="android:paddingVertical">2dp</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="NotePill.Category">
+        <item name="android:background">@drawable/bg_note_chip_category</item>
+        <item name="android:textColor">@color/tag_category_text</item>
+        <item name="android:paddingHorizontal">8dp</item>
+        <item name="android:paddingVertical">2dp</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="NotePill.Tag">
+        <item name="android:background">@drawable/bg_note_chip_tag</item>
+        <item name="android:textColor">@color/tag_pill_text</item>
+        <item name="android:paddingHorizontal">8dp</item>
+        <item name="android:paddingVertical">2dp</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="StatusBadge">
+        <item name="android:paddingHorizontal">10dp</item>
+        <item name="android:paddingVertical">4dp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="StatusBadge.Closed">
+        <item name="android:background">@drawable/bg_badge_closed</item>
+        <item name="android:textColor">@color/closed_status_color</item>
+    </style>
+    <style name="StatusBadge.Open">
+        <item name="android:background">@drawable/bg_badge_open</item>
+        <item name="android:textColor">@color/open_status_color</item>
+    </style>
+    <style name="StatusBadge.Paid">
+        <item name="android:background">@drawable/bg_badge_paid</item>
+        <item name="android:textColor">@color/paid_status_color</item>
+    </style>
+    <style name="StatusBadge.Unpaid">
+        <item name="android:background">@drawable/bg_badge_unpaid</item>
+        <item name="android:textColor">@color/unpaid_status_color</item>
+    </style>
     <style name="Theme.OrderAppClover" parent="Base.Theme.OrderAppClover"/>
+    <style name="Theme.OrderMate.DatePicker" parent="Theme.Material3.DayNight.Dialog">
+        <item name="colorPrimary">@color/orange_accent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorAccent">@color/orange_accent</item>
+        <item name="android:colorAccent">@color/orange_accent</item>
+        <item name="colorSurface">@color/bg_dark</item>
+        <item name="colorOnSurface">@color/text_light</item>
+        <item name="android:windowBackground">@color/bg_dark</item>
+        <item name="android:textColorPrimary">@color/text_light</item>
+        <item name="android:textColorSecondary">@color/text_muted</item>
+        
+        <item name="android:buttonBarButtonStyle">@style/Widget.OrderMate.DatePicker.Button</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.OrderMate.DatePicker.Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.OrderMate.DatePicker.Button</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.OrderMate.DatePicker.Button</item>
+    </style>
+    <style name="Theme.OrderMate.Dialog" parent="Theme.Material3.DayNight.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.6</item>
+    </style>
+    <style name="Widget.OrderMate.DatePicker.Button" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/orange_accent</item>
+    </style>
     <style name="orderListStyle">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">wrap_content</item>

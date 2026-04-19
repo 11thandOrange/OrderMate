@@ -4,14 +4,18 @@ package com.orderMate.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
-import com.google.android.material.divider.MaterialDivider;
-import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.flexbox.FlexboxLayout;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textview.MaterialTextView;
 import com.orderMate.R;
 import java.lang.NullPointerException;
@@ -23,16 +27,31 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
   private final ConstraintLayout rootView;
 
   @NonNull
-  public final MaterialTextView addPayment;
+  public final LinearLayout actionButtonsContainer;
 
   @NonNull
-  public final ShapeableImageView backButton;
+  public final MaterialButton addPayment;
 
   @NonNull
-  public final ConstraintLayout buttonMenu;
+  public final ImageView backButton;
 
   @NonNull
-  public final MaterialTextView deleteButton;
+  public final ImageView btnAddOrderNote;
+
+  @NonNull
+  public final LinearLayout buttonMenu;
+
+  @NonNull
+  public final MaterialTextView customerAvatar;
+
+  @NonNull
+  public final LinearLayout customerRow;
+
+  @NonNull
+  public final MaterialButton deleteButton;
+
+  @NonNull
+  public final MaterialTextView descriptionValue;
 
   @NonNull
   public final MaterialTextView discount;
@@ -41,25 +60,40 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
   public final MaterialTextView discountValue;
 
   @NonNull
-  public final View divider;
+  public final MaterialTextView dueDateValue;
 
   @NonNull
-  public final View dividerSide;
+  public final MaterialTextView employeeValue;
 
   @NonNull
-  public final MaterialDivider dividerTop;
+  public final View headerBorder;
 
   @NonNull
-  public final View dividerUpper;
+  public final View headerDivider;
 
   @NonNull
-  public final View elevator;
+  public final LinearLayout historyContainer;
+
+  @NonNull
+  public final View historyFadeOverlay;
+
+  @NonNull
+  public final LinearLayout historyScrollIndicator;
+
+  @NonNull
+  public final ScrollView historyScrollView;
 
   @NonNull
   public final RecyclerView itemRecycler;
 
   @NonNull
-  public final ConstraintLayout lineItemScrollView;
+  public final MaterialCardView itemsCard;
+
+  @NonNull
+  public final LinearLayout itemsHeader;
+
+  @NonNull
+  public final LinearLayout mainContent;
 
   @NonNull
   public final MaterialTextView merchantName;
@@ -68,10 +102,16 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
   public final MaterialTextView noTransactionText;
 
   @NonNull
-  public final ConstraintLayout orderData;
+  public final LinearLayout orderData;
 
   @NonNull
   public final ConstraintLayout orderDetails;
+
+  @NonNull
+  public final MaterialCardView orderDetailsCard;
+
+  @NonNull
+  public final MaterialCardView orderHistoryCard;
 
   @NonNull
   public final MaterialTextView orderId;
@@ -80,22 +120,16 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
   public final MaterialTextView orderItemCountText;
 
   @NonNull
-  public final MaterialTextView orderPlacedAt;
+  public final FlexboxLayout orderNotesPillsContainer;
+
+  @NonNull
+  public final LinearLayout orderNotesSection;
 
   @NonNull
   public final MaterialTextView orderPlacedAtValue;
 
   @NonNull
-  public final MaterialTextView orderPlacedCustomer;
-
-  @NonNull
-  public final MaterialTextView orderPlacedCustomerEmail;
-
-  @NonNull
   public final MaterialTextView orderPlacedCustomerEmailValue;
-
-  @NonNull
-  public final MaterialTextView orderPlacedCustomerNumber;
 
   @NonNull
   public final MaterialTextView orderPlacedCustomerNumberValue;
@@ -104,22 +138,13 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
   public final MaterialTextView orderPlacedCustomerValue;
 
   @NonNull
-  public final MaterialTextView orderPlacedEmployee;
-
-  @NonNull
   public final MaterialTextView orderPlacedEmployeeValue;
-
-  @NonNull
-  public final MaterialTextView orderPlacedStatus;
 
   @NonNull
   public final MaterialTextView orderPlacedStatusValue;
 
   @NonNull
-  public final View orderTextBelowDivider;
-
-  @NonNull
-  public final ConstraintLayout priceBox;
+  public final MaterialTextView paymentStatusBadge;
 
   @NonNull
   public final ConstraintLayout progressLayout;
@@ -128,43 +153,34 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
   public final MaterialTextView reIssueReceiptButton;
 
   @NonNull
-  public final MaterialTextView reOpenButton;
+  public final MaterialButton reOpenButton;
 
   @NonNull
   public final RecyclerView refundRecycler;
 
   @NonNull
-  public final MaterialTextView sendNotificationButton;
-
-  @NonNull
-  public final MaterialTextView showSummary;
-
-  @NonNull
-  public final View sideLine;
-
-  @NonNull
-  public final MaterialTextView subtotal;
+  public final MaterialButton sendNotificationButton;
 
   @NonNull
   public final MaterialTextView subtotalValue;
 
   @NonNull
-  public final ShapeableImageView syncButton;
+  public final LinearLayout summarySection;
+
+  @NonNull
+  public final ImageView syncButton;
 
   @NonNull
   public final MaterialTextView syncingText;
 
   @NonNull
-  public final MaterialTextView tax;
+  public final LinearLayout tagsContainer;
 
   @NonNull
   public final MaterialTextView taxValue;
 
   @NonNull
-  public final ConstraintLayout topBar;
-
-  @NonNull
-  public final MaterialTextView total;
+  public final LinearLayout topBar;
 
   @NonNull
   public final MaterialTextView totalValue;
@@ -173,89 +189,95 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
   public final RecyclerView transactionRecycler;
 
   @NonNull
-  public final MaterialTextView transactionText;
+  public final LinearLayout viewAllHistoryButton;
 
   private FragmentOrderDetailBinding(@NonNull ConstraintLayout rootView,
-      @NonNull MaterialTextView addPayment, @NonNull ShapeableImageView backButton,
-      @NonNull ConstraintLayout buttonMenu, @NonNull MaterialTextView deleteButton,
-      @NonNull MaterialTextView discount, @NonNull MaterialTextView discountValue,
-      @NonNull View divider, @NonNull View dividerSide, @NonNull MaterialDivider dividerTop,
-      @NonNull View dividerUpper, @NonNull View elevator, @NonNull RecyclerView itemRecycler,
-      @NonNull ConstraintLayout lineItemScrollView, @NonNull MaterialTextView merchantName,
-      @NonNull MaterialTextView noTransactionText, @NonNull ConstraintLayout orderData,
-      @NonNull ConstraintLayout orderDetails, @NonNull MaterialTextView orderId,
-      @NonNull MaterialTextView orderItemCountText, @NonNull MaterialTextView orderPlacedAt,
-      @NonNull MaterialTextView orderPlacedAtValue, @NonNull MaterialTextView orderPlacedCustomer,
-      @NonNull MaterialTextView orderPlacedCustomerEmail,
+      @NonNull LinearLayout actionButtonsContainer, @NonNull MaterialButton addPayment,
+      @NonNull ImageView backButton, @NonNull ImageView btnAddOrderNote,
+      @NonNull LinearLayout buttonMenu, @NonNull MaterialTextView customerAvatar,
+      @NonNull LinearLayout customerRow, @NonNull MaterialButton deleteButton,
+      @NonNull MaterialTextView descriptionValue, @NonNull MaterialTextView discount,
+      @NonNull MaterialTextView discountValue, @NonNull MaterialTextView dueDateValue,
+      @NonNull MaterialTextView employeeValue, @NonNull View headerBorder,
+      @NonNull View headerDivider, @NonNull LinearLayout historyContainer,
+      @NonNull View historyFadeOverlay, @NonNull LinearLayout historyScrollIndicator,
+      @NonNull ScrollView historyScrollView, @NonNull RecyclerView itemRecycler,
+      @NonNull MaterialCardView itemsCard, @NonNull LinearLayout itemsHeader,
+      @NonNull LinearLayout mainContent, @NonNull MaterialTextView merchantName,
+      @NonNull MaterialTextView noTransactionText, @NonNull LinearLayout orderData,
+      @NonNull ConstraintLayout orderDetails, @NonNull MaterialCardView orderDetailsCard,
+      @NonNull MaterialCardView orderHistoryCard, @NonNull MaterialTextView orderId,
+      @NonNull MaterialTextView orderItemCountText, @NonNull FlexboxLayout orderNotesPillsContainer,
+      @NonNull LinearLayout orderNotesSection, @NonNull MaterialTextView orderPlacedAtValue,
       @NonNull MaterialTextView orderPlacedCustomerEmailValue,
-      @NonNull MaterialTextView orderPlacedCustomerNumber,
       @NonNull MaterialTextView orderPlacedCustomerNumberValue,
       @NonNull MaterialTextView orderPlacedCustomerValue,
-      @NonNull MaterialTextView orderPlacedEmployee,
       @NonNull MaterialTextView orderPlacedEmployeeValue,
-      @NonNull MaterialTextView orderPlacedStatus, @NonNull MaterialTextView orderPlacedStatusValue,
-      @NonNull View orderTextBelowDivider, @NonNull ConstraintLayout priceBox,
-      @NonNull ConstraintLayout progressLayout, @NonNull MaterialTextView reIssueReceiptButton,
-      @NonNull MaterialTextView reOpenButton, @NonNull RecyclerView refundRecycler,
-      @NonNull MaterialTextView sendNotificationButton, @NonNull MaterialTextView showSummary,
-      @NonNull View sideLine, @NonNull MaterialTextView subtotal,
-      @NonNull MaterialTextView subtotalValue, @NonNull ShapeableImageView syncButton,
-      @NonNull MaterialTextView syncingText, @NonNull MaterialTextView tax,
-      @NonNull MaterialTextView taxValue, @NonNull ConstraintLayout topBar,
-      @NonNull MaterialTextView total, @NonNull MaterialTextView totalValue,
-      @NonNull RecyclerView transactionRecycler, @NonNull MaterialTextView transactionText) {
+      @NonNull MaterialTextView orderPlacedStatusValue,
+      @NonNull MaterialTextView paymentStatusBadge, @NonNull ConstraintLayout progressLayout,
+      @NonNull MaterialTextView reIssueReceiptButton, @NonNull MaterialButton reOpenButton,
+      @NonNull RecyclerView refundRecycler, @NonNull MaterialButton sendNotificationButton,
+      @NonNull MaterialTextView subtotalValue, @NonNull LinearLayout summarySection,
+      @NonNull ImageView syncButton, @NonNull MaterialTextView syncingText,
+      @NonNull LinearLayout tagsContainer, @NonNull MaterialTextView taxValue,
+      @NonNull LinearLayout topBar, @NonNull MaterialTextView totalValue,
+      @NonNull RecyclerView transactionRecycler, @NonNull LinearLayout viewAllHistoryButton) {
     this.rootView = rootView;
+    this.actionButtonsContainer = actionButtonsContainer;
     this.addPayment = addPayment;
     this.backButton = backButton;
+    this.btnAddOrderNote = btnAddOrderNote;
     this.buttonMenu = buttonMenu;
+    this.customerAvatar = customerAvatar;
+    this.customerRow = customerRow;
     this.deleteButton = deleteButton;
+    this.descriptionValue = descriptionValue;
     this.discount = discount;
     this.discountValue = discountValue;
-    this.divider = divider;
-    this.dividerSide = dividerSide;
-    this.dividerTop = dividerTop;
-    this.dividerUpper = dividerUpper;
-    this.elevator = elevator;
+    this.dueDateValue = dueDateValue;
+    this.employeeValue = employeeValue;
+    this.headerBorder = headerBorder;
+    this.headerDivider = headerDivider;
+    this.historyContainer = historyContainer;
+    this.historyFadeOverlay = historyFadeOverlay;
+    this.historyScrollIndicator = historyScrollIndicator;
+    this.historyScrollView = historyScrollView;
     this.itemRecycler = itemRecycler;
-    this.lineItemScrollView = lineItemScrollView;
+    this.itemsCard = itemsCard;
+    this.itemsHeader = itemsHeader;
+    this.mainContent = mainContent;
     this.merchantName = merchantName;
     this.noTransactionText = noTransactionText;
     this.orderData = orderData;
     this.orderDetails = orderDetails;
+    this.orderDetailsCard = orderDetailsCard;
+    this.orderHistoryCard = orderHistoryCard;
     this.orderId = orderId;
     this.orderItemCountText = orderItemCountText;
-    this.orderPlacedAt = orderPlacedAt;
+    this.orderNotesPillsContainer = orderNotesPillsContainer;
+    this.orderNotesSection = orderNotesSection;
     this.orderPlacedAtValue = orderPlacedAtValue;
-    this.orderPlacedCustomer = orderPlacedCustomer;
-    this.orderPlacedCustomerEmail = orderPlacedCustomerEmail;
     this.orderPlacedCustomerEmailValue = orderPlacedCustomerEmailValue;
-    this.orderPlacedCustomerNumber = orderPlacedCustomerNumber;
     this.orderPlacedCustomerNumberValue = orderPlacedCustomerNumberValue;
     this.orderPlacedCustomerValue = orderPlacedCustomerValue;
-    this.orderPlacedEmployee = orderPlacedEmployee;
     this.orderPlacedEmployeeValue = orderPlacedEmployeeValue;
-    this.orderPlacedStatus = orderPlacedStatus;
     this.orderPlacedStatusValue = orderPlacedStatusValue;
-    this.orderTextBelowDivider = orderTextBelowDivider;
-    this.priceBox = priceBox;
+    this.paymentStatusBadge = paymentStatusBadge;
     this.progressLayout = progressLayout;
     this.reIssueReceiptButton = reIssueReceiptButton;
     this.reOpenButton = reOpenButton;
     this.refundRecycler = refundRecycler;
     this.sendNotificationButton = sendNotificationButton;
-    this.showSummary = showSummary;
-    this.sideLine = sideLine;
-    this.subtotal = subtotal;
     this.subtotalValue = subtotalValue;
+    this.summarySection = summarySection;
     this.syncButton = syncButton;
     this.syncingText = syncingText;
-    this.tax = tax;
+    this.tagsContainer = tagsContainer;
     this.taxValue = taxValue;
     this.topBar = topBar;
-    this.total = total;
     this.totalValue = totalValue;
     this.transactionRecycler = transactionRecycler;
-    this.transactionText = transactionText;
+    this.viewAllHistoryButton = viewAllHistoryButton;
   }
 
   @Override
@@ -285,27 +307,57 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.actionButtonsContainer;
+      LinearLayout actionButtonsContainer = ViewBindings.findChildViewById(rootView, id);
+      if (actionButtonsContainer == null) {
+        break missingId;
+      }
+
       id = R.id.addPayment;
-      MaterialTextView addPayment = ViewBindings.findChildViewById(rootView, id);
+      MaterialButton addPayment = ViewBindings.findChildViewById(rootView, id);
       if (addPayment == null) {
         break missingId;
       }
 
       id = R.id.backButton;
-      ShapeableImageView backButton = ViewBindings.findChildViewById(rootView, id);
+      ImageView backButton = ViewBindings.findChildViewById(rootView, id);
       if (backButton == null) {
         break missingId;
       }
 
+      id = R.id.btnAddOrderNote;
+      ImageView btnAddOrderNote = ViewBindings.findChildViewById(rootView, id);
+      if (btnAddOrderNote == null) {
+        break missingId;
+      }
+
       id = R.id.buttonMenu;
-      ConstraintLayout buttonMenu = ViewBindings.findChildViewById(rootView, id);
+      LinearLayout buttonMenu = ViewBindings.findChildViewById(rootView, id);
       if (buttonMenu == null) {
         break missingId;
       }
 
+      id = R.id.customerAvatar;
+      MaterialTextView customerAvatar = ViewBindings.findChildViewById(rootView, id);
+      if (customerAvatar == null) {
+        break missingId;
+      }
+
+      id = R.id.customerRow;
+      LinearLayout customerRow = ViewBindings.findChildViewById(rootView, id);
+      if (customerRow == null) {
+        break missingId;
+      }
+
       id = R.id.deleteButton;
-      MaterialTextView deleteButton = ViewBindings.findChildViewById(rootView, id);
+      MaterialButton deleteButton = ViewBindings.findChildViewById(rootView, id);
       if (deleteButton == null) {
+        break missingId;
+      }
+
+      id = R.id.descriptionValue;
+      MaterialTextView descriptionValue = ViewBindings.findChildViewById(rootView, id);
+      if (descriptionValue == null) {
         break missingId;
       }
 
@@ -321,33 +373,51 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.divider;
-      View divider = ViewBindings.findChildViewById(rootView, id);
-      if (divider == null) {
+      id = R.id.dueDateValue;
+      MaterialTextView dueDateValue = ViewBindings.findChildViewById(rootView, id);
+      if (dueDateValue == null) {
         break missingId;
       }
 
-      id = R.id.dividerSide;
-      View dividerSide = ViewBindings.findChildViewById(rootView, id);
-      if (dividerSide == null) {
+      id = R.id.employeeValue;
+      MaterialTextView employeeValue = ViewBindings.findChildViewById(rootView, id);
+      if (employeeValue == null) {
         break missingId;
       }
 
-      id = R.id.dividerTop;
-      MaterialDivider dividerTop = ViewBindings.findChildViewById(rootView, id);
-      if (dividerTop == null) {
+      id = R.id.headerBorder;
+      View headerBorder = ViewBindings.findChildViewById(rootView, id);
+      if (headerBorder == null) {
         break missingId;
       }
 
-      id = R.id.dividerUpper;
-      View dividerUpper = ViewBindings.findChildViewById(rootView, id);
-      if (dividerUpper == null) {
+      id = R.id.headerDivider;
+      View headerDivider = ViewBindings.findChildViewById(rootView, id);
+      if (headerDivider == null) {
         break missingId;
       }
 
-      id = R.id.elevator;
-      View elevator = ViewBindings.findChildViewById(rootView, id);
-      if (elevator == null) {
+      id = R.id.historyContainer;
+      LinearLayout historyContainer = ViewBindings.findChildViewById(rootView, id);
+      if (historyContainer == null) {
+        break missingId;
+      }
+
+      id = R.id.historyFadeOverlay;
+      View historyFadeOverlay = ViewBindings.findChildViewById(rootView, id);
+      if (historyFadeOverlay == null) {
+        break missingId;
+      }
+
+      id = R.id.historyScrollIndicator;
+      LinearLayout historyScrollIndicator = ViewBindings.findChildViewById(rootView, id);
+      if (historyScrollIndicator == null) {
+        break missingId;
+      }
+
+      id = R.id.historyScrollView;
+      ScrollView historyScrollView = ViewBindings.findChildViewById(rootView, id);
+      if (historyScrollView == null) {
         break missingId;
       }
 
@@ -357,9 +427,21 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.lineItemScrollView;
-      ConstraintLayout lineItemScrollView = ViewBindings.findChildViewById(rootView, id);
-      if (lineItemScrollView == null) {
+      id = R.id.itemsCard;
+      MaterialCardView itemsCard = ViewBindings.findChildViewById(rootView, id);
+      if (itemsCard == null) {
+        break missingId;
+      }
+
+      id = R.id.itemsHeader;
+      LinearLayout itemsHeader = ViewBindings.findChildViewById(rootView, id);
+      if (itemsHeader == null) {
+        break missingId;
+      }
+
+      id = R.id.mainContent;
+      LinearLayout mainContent = ViewBindings.findChildViewById(rootView, id);
+      if (mainContent == null) {
         break missingId;
       }
 
@@ -376,7 +458,7 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
       }
 
       id = R.id.orderData;
-      ConstraintLayout orderData = ViewBindings.findChildViewById(rootView, id);
+      LinearLayout orderData = ViewBindings.findChildViewById(rootView, id);
       if (orderData == null) {
         break missingId;
       }
@@ -384,6 +466,18 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
       id = R.id.orderDetails;
       ConstraintLayout orderDetails = ViewBindings.findChildViewById(rootView, id);
       if (orderDetails == null) {
+        break missingId;
+      }
+
+      id = R.id.orderDetailsCard;
+      MaterialCardView orderDetailsCard = ViewBindings.findChildViewById(rootView, id);
+      if (orderDetailsCard == null) {
+        break missingId;
+      }
+
+      id = R.id.orderHistoryCard;
+      MaterialCardView orderHistoryCard = ViewBindings.findChildViewById(rootView, id);
+      if (orderHistoryCard == null) {
         break missingId;
       }
 
@@ -399,9 +493,15 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.orderPlacedAt;
-      MaterialTextView orderPlacedAt = ViewBindings.findChildViewById(rootView, id);
-      if (orderPlacedAt == null) {
+      id = R.id.orderNotesPillsContainer;
+      FlexboxLayout orderNotesPillsContainer = ViewBindings.findChildViewById(rootView, id);
+      if (orderNotesPillsContainer == null) {
+        break missingId;
+      }
+
+      id = R.id.orderNotesSection;
+      LinearLayout orderNotesSection = ViewBindings.findChildViewById(rootView, id);
+      if (orderNotesSection == null) {
         break missingId;
       }
 
@@ -411,27 +511,9 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.orderPlacedCustomer;
-      MaterialTextView orderPlacedCustomer = ViewBindings.findChildViewById(rootView, id);
-      if (orderPlacedCustomer == null) {
-        break missingId;
-      }
-
-      id = R.id.orderPlacedCustomerEmail;
-      MaterialTextView orderPlacedCustomerEmail = ViewBindings.findChildViewById(rootView, id);
-      if (orderPlacedCustomerEmail == null) {
-        break missingId;
-      }
-
       id = R.id.orderPlacedCustomerEmailValue;
       MaterialTextView orderPlacedCustomerEmailValue = ViewBindings.findChildViewById(rootView, id);
       if (orderPlacedCustomerEmailValue == null) {
-        break missingId;
-      }
-
-      id = R.id.orderPlacedCustomerNumber;
-      MaterialTextView orderPlacedCustomerNumber = ViewBindings.findChildViewById(rootView, id);
-      if (orderPlacedCustomerNumber == null) {
         break missingId;
       }
 
@@ -447,21 +529,9 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.orderPlacedEmployee;
-      MaterialTextView orderPlacedEmployee = ViewBindings.findChildViewById(rootView, id);
-      if (orderPlacedEmployee == null) {
-        break missingId;
-      }
-
       id = R.id.orderPlacedEmployeeValue;
       MaterialTextView orderPlacedEmployeeValue = ViewBindings.findChildViewById(rootView, id);
       if (orderPlacedEmployeeValue == null) {
-        break missingId;
-      }
-
-      id = R.id.orderPlacedStatus;
-      MaterialTextView orderPlacedStatus = ViewBindings.findChildViewById(rootView, id);
-      if (orderPlacedStatus == null) {
         break missingId;
       }
 
@@ -471,15 +541,9 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.orderTextBelowDivider;
-      View orderTextBelowDivider = ViewBindings.findChildViewById(rootView, id);
-      if (orderTextBelowDivider == null) {
-        break missingId;
-      }
-
-      id = R.id.priceBox;
-      ConstraintLayout priceBox = ViewBindings.findChildViewById(rootView, id);
-      if (priceBox == null) {
+      id = R.id.paymentStatusBadge;
+      MaterialTextView paymentStatusBadge = ViewBindings.findChildViewById(rootView, id);
+      if (paymentStatusBadge == null) {
         break missingId;
       }
 
@@ -496,7 +560,7 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
       }
 
       id = R.id.reOpenButton;
-      MaterialTextView reOpenButton = ViewBindings.findChildViewById(rootView, id);
+      MaterialButton reOpenButton = ViewBindings.findChildViewById(rootView, id);
       if (reOpenButton == null) {
         break missingId;
       }
@@ -508,26 +572,8 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
       }
 
       id = R.id.sendNotificationButton;
-      MaterialTextView sendNotificationButton = ViewBindings.findChildViewById(rootView, id);
+      MaterialButton sendNotificationButton = ViewBindings.findChildViewById(rootView, id);
       if (sendNotificationButton == null) {
-        break missingId;
-      }
-
-      id = R.id.showSummary;
-      MaterialTextView showSummary = ViewBindings.findChildViewById(rootView, id);
-      if (showSummary == null) {
-        break missingId;
-      }
-
-      id = R.id.sideLine;
-      View sideLine = ViewBindings.findChildViewById(rootView, id);
-      if (sideLine == null) {
-        break missingId;
-      }
-
-      id = R.id.subtotal;
-      MaterialTextView subtotal = ViewBindings.findChildViewById(rootView, id);
-      if (subtotal == null) {
         break missingId;
       }
 
@@ -537,8 +583,14 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.summarySection;
+      LinearLayout summarySection = ViewBindings.findChildViewById(rootView, id);
+      if (summarySection == null) {
+        break missingId;
+      }
+
       id = R.id.syncButton;
-      ShapeableImageView syncButton = ViewBindings.findChildViewById(rootView, id);
+      ImageView syncButton = ViewBindings.findChildViewById(rootView, id);
       if (syncButton == null) {
         break missingId;
       }
@@ -549,9 +601,9 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.tax;
-      MaterialTextView tax = ViewBindings.findChildViewById(rootView, id);
-      if (tax == null) {
+      id = R.id.tagsContainer;
+      LinearLayout tagsContainer = ViewBindings.findChildViewById(rootView, id);
+      if (tagsContainer == null) {
         break missingId;
       }
 
@@ -562,14 +614,8 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
       }
 
       id = R.id.topBar;
-      ConstraintLayout topBar = ViewBindings.findChildViewById(rootView, id);
+      LinearLayout topBar = ViewBindings.findChildViewById(rootView, id);
       if (topBar == null) {
-        break missingId;
-      }
-
-      id = R.id.total;
-      MaterialTextView total = ViewBindings.findChildViewById(rootView, id);
-      if (total == null) {
         break missingId;
       }
 
@@ -585,23 +631,24 @@ public final class FragmentOrderDetailBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.transactionText;
-      MaterialTextView transactionText = ViewBindings.findChildViewById(rootView, id);
-      if (transactionText == null) {
+      id = R.id.viewAllHistoryButton;
+      LinearLayout viewAllHistoryButton = ViewBindings.findChildViewById(rootView, id);
+      if (viewAllHistoryButton == null) {
         break missingId;
       }
 
-      return new FragmentOrderDetailBinding((ConstraintLayout) rootView, addPayment, backButton,
-          buttonMenu, deleteButton, discount, discountValue, divider, dividerSide, dividerTop,
-          dividerUpper, elevator, itemRecycler, lineItemScrollView, merchantName, noTransactionText,
-          orderData, orderDetails, orderId, orderItemCountText, orderPlacedAt, orderPlacedAtValue,
-          orderPlacedCustomer, orderPlacedCustomerEmail, orderPlacedCustomerEmailValue,
-          orderPlacedCustomerNumber, orderPlacedCustomerNumberValue, orderPlacedCustomerValue,
-          orderPlacedEmployee, orderPlacedEmployeeValue, orderPlacedStatus, orderPlacedStatusValue,
-          orderTextBelowDivider, priceBox, progressLayout, reIssueReceiptButton, reOpenButton,
-          refundRecycler, sendNotificationButton, showSummary, sideLine, subtotal, subtotalValue,
-          syncButton, syncingText, tax, taxValue, topBar, total, totalValue, transactionRecycler,
-          transactionText);
+      return new FragmentOrderDetailBinding((ConstraintLayout) rootView, actionButtonsContainer,
+          addPayment, backButton, btnAddOrderNote, buttonMenu, customerAvatar, customerRow,
+          deleteButton, descriptionValue, discount, discountValue, dueDateValue, employeeValue,
+          headerBorder, headerDivider, historyContainer, historyFadeOverlay, historyScrollIndicator,
+          historyScrollView, itemRecycler, itemsCard, itemsHeader, mainContent, merchantName,
+          noTransactionText, orderData, orderDetails, orderDetailsCard, orderHistoryCard, orderId,
+          orderItemCountText, orderNotesPillsContainer, orderNotesSection, orderPlacedAtValue,
+          orderPlacedCustomerEmailValue, orderPlacedCustomerNumberValue, orderPlacedCustomerValue,
+          orderPlacedEmployeeValue, orderPlacedStatusValue, paymentStatusBadge, progressLayout,
+          reIssueReceiptButton, reOpenButton, refundRecycler, sendNotificationButton, subtotalValue,
+          summarySection, syncButton, syncingText, tagsContainer, taxValue, topBar, totalValue,
+          transactionRecycler, viewAllHistoryButton);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

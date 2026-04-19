@@ -213,6 +213,7 @@ com/clover/sdk/v1/ForbiddenException.class
 com/clover/sdk/v1/ResultStatusException.class
 com/clover/sdk/v1/ServiceConnector$OnServiceConnectedListener.class
 com/clover/sdk/v1/ServiceConnector.class
+com/clover/sdk/v1/customer/CustomerConnector.class
 com/clover/sdk/v1/merchant/Merchant.class
 com/clover/sdk/v1/merchant/MerchantConnector.class
 com/clover/sdk/v3/Validator.class
@@ -307,6 +308,13 @@ com/google/android/datatransport/runtime/dagger/multibindings/IntoSet.class
 com/google/android/datatransport/runtime/dagger/multibindings/LongKey.class
 com/google/android/datatransport/runtime/dagger/multibindings/Multibinds.class
 com/google/android/datatransport/runtime/dagger/multibindings/StringKey.class
+com/google/android/flexbox/AlignContent.class
+com/google/android/flexbox/AlignItems.class
+com/google/android/flexbox/AlignSelf.class
+com/google/android/flexbox/FlexDirection.class
+com/google/android/flexbox/FlexWrap.class
+com/google/android/flexbox/FlexboxLayout$DividerMode.class
+com/google/android/flexbox/JustifyContent.class
 com/google/android/gms/ads/identifier/AdvertisingIdClient.class
 com/google/android/gms/auth/api/signin/internal/Storage.class
 com/google/android/gms/common/GoogleSignatureVerifier.class

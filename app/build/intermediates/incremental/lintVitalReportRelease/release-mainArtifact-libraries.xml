@@ -1,9 +1,9 @@
 <libraries>
   <library
       name="androidx.databinding:viewbinding:8.1.1@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/d49ce2d7001911975b9b550fb012a7f5/transformed/viewbinding-8.1.1/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/05a871c2bf8af253f0362c1e3294ec6d/transformed/viewbinding-8.1.1/jars/classes.jar"
       resolved="androidx.databinding:viewbinding:8.1.1"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/d49ce2d7001911975b9b550fb012a7f5/transformed/viewbinding-8.1.1"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/05a871c2bf8af253f0362c1e3294ec6d/transformed/viewbinding-8.1.1"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -14,13 +14,13 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.squareup.okhttp3:logging-interceptor:4.12.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/logging-interceptor/4.12.0/e922c1f14d365c0f2bed140cc0825e18462c2778/logging-interceptor-4.12.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/logging-interceptor/4.12.0/e922c1f14d365c0f2bed140cc0825e18462c2778/logging-interceptor-4.12.0.jar"
       resolved="com.squareup.okhttp3:logging-interceptor:4.12.0"/>
   <library
       name="androidx.navigation:navigation-common:2.7.7@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/e75b977ea3f13e420d1442c2b7d38482/transformed/navigation-common-2.7.7/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/c2406b93eb7a7930ff8bc5c58fffac57/transformed/navigation-common-2.7.7/jars/classes.jar"
       resolved="androidx.navigation:navigation-common:2.7.7"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/e75b977ea3f13e420d1442c2b7d38482/transformed/navigation-common-2.7.7"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/c2406b93eb7a7930ff8bc5c58fffac57/transformed/navigation-common-2.7.7"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -31,9 +31,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.navigation:navigation-common-ktx:2.7.7@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/450d147874dd4744a55eaa6a7a30bac0/transformed/navigation-common-ktx-2.7.7/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/7c4e24ef78164e1d9997dae83478e953/transformed/navigation-common-ktx-2.7.7/jars/classes.jar"
       resolved="androidx.navigation:navigation-common-ktx:2.7.7"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/450d147874dd4744a55eaa6a7a30bac0/transformed/navigation-common-ktx-2.7.7"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/7c4e24ef78164e1d9997dae83478e953/transformed/navigation-common-ktx-2.7.7"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -44,9 +44,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.navigation:navigation-runtime:2.7.7@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/5cc3a9cbc2f243eb6c06ad01e0162c3a/transformed/navigation-runtime-2.7.7/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/0f7403a0ffca4d5834872cdd6760d44f/transformed/navigation-runtime-2.7.7/jars/classes.jar"
       resolved="androidx.navigation:navigation-runtime:2.7.7"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/5cc3a9cbc2f243eb6c06ad01e0162c3a/transformed/navigation-runtime-2.7.7"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/0f7403a0ffca4d5834872cdd6760d44f/transformed/navigation-runtime-2.7.7"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -57,9 +57,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.navigation:navigation-runtime-ktx:2.7.7@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/7abec11de59108c9a33a3635e5550518/transformed/navigation-runtime-ktx-2.7.7/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/cd4b0b3e12b135f2e92b7ac398aeae3c/transformed/navigation-runtime-ktx-2.7.7/jars/classes.jar"
       resolved="androidx.navigation:navigation-runtime-ktx:2.7.7"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/7abec11de59108c9a33a3635e5550518/transformed/navigation-runtime-ktx-2.7.7"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/cd4b0b3e12b135f2e92b7ac398aeae3c/transformed/navigation-runtime-ktx-2.7.7"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -70,9 +70,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.navigation:navigation-fragment:2.7.7@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/5b52d2369fd8d4e0202e02446a8fbbf3/transformed/navigation-fragment-2.7.7/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/1b4bff81c5a7c739088d2e02fc7df957/transformed/navigation-fragment-2.7.7/jars/classes.jar"
       resolved="androidx.navigation:navigation-fragment:2.7.7"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/5b52d2369fd8d4e0202e02446a8fbbf3/transformed/navigation-fragment-2.7.7"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/1b4bff81c5a7c739088d2e02fc7df957/transformed/navigation-fragment-2.7.7"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -83,9 +83,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.navigation:navigation-fragment-ktx:2.7.7@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/18ec2c8213c641797315a0652fa74794/transformed/navigation-fragment-ktx-2.7.7/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/0bdaab5e0b4fb87fbf30bf66b9fc7416/transformed/navigation-fragment-ktx-2.7.7/jars/classes.jar"
       resolved="androidx.navigation:navigation-fragment-ktx:2.7.7"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/18ec2c8213c641797315a0652fa74794/transformed/navigation-fragment-ktx-2.7.7"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/0bdaab5e0b4fb87fbf30bf66b9fc7416/transformed/navigation-fragment-ktx-2.7.7"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -96,9 +96,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.navigation:navigation-ui-ktx:2.7.7@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/73fe9d167f768ce483a8963609f67f8a/transformed/navigation-ui-ktx-2.7.7/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/df4ed8b1cb52e87a550f9b67344325e6/transformed/navigation-ui-ktx-2.7.7/jars/classes.jar"
       resolved="androidx.navigation:navigation-ui-ktx:2.7.7"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/73fe9d167f768ce483a8963609f67f8a/transformed/navigation-ui-ktx-2.7.7"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/df4ed8b1cb52e87a550f9b67344325e6/transformed/navigation-ui-ktx-2.7.7"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -109,9 +109,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.navigation:navigation-ui:2.7.7@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/42e09ffa3c1b2e6767cf21b3096ce7d6/transformed/navigation-ui-2.7.7/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/0eaa3b538114a351bb6f7c9d23999b66/transformed/navigation-ui-2.7.7/jars/classes.jar"
       resolved="androidx.navigation:navigation-ui:2.7.7"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/42e09ffa3c1b2e6767cf21b3096ce7d6/transformed/navigation-ui-2.7.7"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/0eaa3b538114a351bb6f7c9d23999b66/transformed/navigation-ui-2.7.7"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -122,9 +122,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.android.material:material:1.11.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/14e04ca5bdd032ef07ac2eb3b0aba2ec/transformed/material-1.11.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/621d9e6fb11f80667c817a3f4a950ecb/transformed/material-1.11.0/jars/classes.jar"
       resolved="com.google.android.material:material:1.11.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/14e04ca5bdd032ef07ac2eb3b0aba2ec/transformed/material-1.11.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/621d9e6fb11f80667c817a3f4a950ecb/transformed/material-1.11.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -135,9 +135,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.appcompat:appcompat:1.6.1@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/f78a8135a1d2c56a982d366d1d05a147/transformed/appcompat-1.6.1/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/21ea3b44e5e81a6d0c4678c1bec77175/transformed/appcompat-1.6.1/jars/classes.jar"
       resolved="androidx.appcompat:appcompat:1.6.1"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/f78a8135a1d2c56a982d366d1d05a147/transformed/appcompat-1.6.1"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/21ea3b44e5e81a6d0c4678c1bec77175/transformed/appcompat-1.6.1"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -148,9 +148,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.viewpager2:viewpager2:1.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/c27f9f5f5a9995eb3f1260624fe572e4/transformed/viewpager2-1.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/9af669d5be77b3f69f410872afb14f99/transformed/viewpager2-1.0.0/jars/classes.jar"
       resolved="androidx.viewpager2:viewpager2:1.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/c27f9f5f5a9995eb3f1260624fe572e4/transformed/viewpager2-1.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/9af669d5be77b3f69f410872afb14f99/transformed/viewpager2-1.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -161,9 +161,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.firebase:firebase-database:20.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/f08b71c939c6c2120eea9b120efa3304/transformed/firebase-database-20.0.0/jars/classes.jar"
       resolved="com.google.firebase:firebase-database:20.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/f08b71c939c6c2120eea9b120efa3304/transformed/firebase-database-20.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -174,9 +174,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.firebase:firebase-appcheck-interop:16.0.0-beta01@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/d926d0b53279409a840fbef377d3566a/transformed/firebase-appcheck-interop-16.0.0-beta01/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/19b98f275b913078a2731612c7e50c1c/transformed/firebase-appcheck-interop-16.0.0-beta01/jars/classes.jar"
       resolved="com.google.firebase:firebase-appcheck-interop:16.0.0-beta01"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/d926d0b53279409a840fbef377d3566a/transformed/firebase-appcheck-interop-16.0.0-beta01"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/19b98f275b913078a2731612c7e50c1c/transformed/firebase-appcheck-interop-16.0.0-beta01"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -187,9 +187,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.firebase:firebase-database-collection:18.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/ed3bf5db92b06768db1cc88d12bc8610/transformed/firebase-database-collection-18.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/cc07003da3a159d106b1586edea81eff/transformed/firebase-database-collection-18.0.0/jars/classes.jar"
       resolved="com.google.firebase:firebase-database-collection:18.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/ed3bf5db92b06768db1cc88d12bc8610/transformed/firebase-database-collection-18.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/cc07003da3a159d106b1586edea81eff/transformed/firebase-database-collection-18.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -200,9 +200,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.android.gms:play-services-base:17.1.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/825d768d79e0e93575d8cc84dae0de07/transformed/play-services-base-17.1.0/jars/classes.jar"
       resolved="com.google.android.gms:play-services-base:17.1.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/825d768d79e0e93575d8cc84dae0de07/transformed/play-services-base-17.1.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -213,9 +213,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.firebase:firebase-crashlytics:18.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/332a1c2addda9dbefdededd697dd2ca7/transformed/firebase-crashlytics-18.0.0/jars/classes.jar"
       resolved="com.google.firebase:firebase-crashlytics:18.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/332a1c2addda9dbefdededd697dd2ca7/transformed/firebase-crashlytics-18.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -226,9 +226,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.firebase:firebase-auth-interop:19.0.2@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/37f1ae1cf3437577c95b8c87fd739b1d/transformed/firebase-auth-interop-19.0.2/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/f0ef45ced1bdbcb3420a4028c49f8a0d/transformed/firebase-auth-interop-19.0.2/jars/classes.jar"
       resolved="com.google.firebase:firebase-auth-interop:19.0.2"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/37f1ae1cf3437577c95b8c87fd739b1d/transformed/firebase-auth-interop-19.0.2"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/f0ef45ced1bdbcb3420a4028c49f8a0d/transformed/firebase-auth-interop-19.0.2"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -239,9 +239,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.firebase:firebase-core:19.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/0ade818e7ce829b704847875d7f8a6e8/transformed/firebase-core-19.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/016cae42f749063a4d7033ff22b31fde/transformed/firebase-core-19.0.0/jars/classes.jar"
       resolved="com.google.firebase:firebase-core:19.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/0ade818e7ce829b704847875d7f8a6e8/transformed/firebase-core-19.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/016cae42f749063a4d7033ff22b31fde/transformed/firebase-core-19.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -252,9 +252,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.firebase:firebase-analytics:19.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/232b86131b76bc4d2d1f43a8372a68e3/transformed/firebase-analytics-19.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/8bf6d1e16acc4a3198ab589460086adc/transformed/firebase-analytics-19.0.0/jars/classes.jar"
       resolved="com.google.firebase:firebase-analytics:19.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/232b86131b76bc4d2d1f43a8372a68e3/transformed/firebase-analytics-19.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/8bf6d1e16acc4a3198ab589460086adc/transformed/firebase-analytics-19.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -265,9 +265,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.android.gms:play-services-measurement-api:19.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/c6bc20251e1b480ea7349dc421eec8fd/transformed/play-services-measurement-api-19.0.0/jars/classes.jar"
       resolved="com.google.android.gms:play-services-measurement-api:19.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/c6bc20251e1b480ea7349dc421eec8fd/transformed/play-services-measurement-api-19.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -278,9 +278,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.firebase:firebase-installations:17.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/cf7580403d124e4b59e905845c584ae7/transformed/firebase-installations-17.0.0/jars/classes.jar"
       resolved="com.google.firebase:firebase-installations:17.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/cf7580403d124e4b59e905845c584ae7/transformed/firebase-installations-17.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -291,9 +291,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.firebase:firebase-common:20.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/3e7dab51e6cc67d4cbad7605a3499049/transformed/firebase-common-20.0.0/jars/classes.jar"
       resolved="com.google.firebase:firebase-common:20.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/3e7dab51e6cc67d4cbad7605a3499049/transformed/firebase-common-20.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -304,9 +304,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.firebase:firebase-installations-interop:17.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/4ef3089f59d121ef51b816a4dc89692c/transformed/firebase-installations-interop-17.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/618447af692fc3789fad139d3b04e57f/transformed/firebase-installations-interop-17.0.0/jars/classes.jar"
       resolved="com.google.firebase:firebase-installations-interop:17.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/4ef3089f59d121ef51b816a4dc89692c/transformed/firebase-installations-interop-17.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/618447af692fc3789fad139d3b04e57f/transformed/firebase-installations-interop-17.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -317,9 +317,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.android.gms:play-services-tasks:17.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/cae5b2b72fc863d67bbdfdb2b8f08f7f/transformed/play-services-tasks-17.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/a6e9013696aba1c00a76b59330f37f55/transformed/play-services-tasks-17.0.0/jars/classes.jar"
       resolved="com.google.android.gms:play-services-tasks:17.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/cae5b2b72fc863d67bbdfdb2b8f08f7f/transformed/play-services-tasks-17.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/a6e9013696aba1c00a76b59330f37f55/transformed/play-services-tasks-17.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -330,9 +330,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.firebase:firebase-measurement-connector:19.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/58f329deb347fe00d7c6ec13968248a1/transformed/firebase-measurement-connector-19.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/ccf764b01393e7fdeff22c5873023740/transformed/firebase-measurement-connector-19.0.0/jars/classes.jar"
       resolved="com.google.firebase:firebase-measurement-connector:19.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/58f329deb347fe00d7c6ec13968248a1/transformed/firebase-measurement-connector-19.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/ccf764b01393e7fdeff22c5873023740/transformed/firebase-measurement-connector-19.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -343,9 +343,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.android.gms:play-services-measurement:19.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/jars/classes.jar"
       resolved="com.google.android.gms:play-services-measurement:19.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -356,9 +356,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.android.gms:play-services-measurement-sdk:19.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/1f0a2b82f94add1e6e4c7a84afa3ca48/transformed/play-services-measurement-sdk-19.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/1371acdaa5528229dc200d6adf93220f/transformed/play-services-measurement-sdk-19.0.0/jars/classes.jar"
       resolved="com.google.android.gms:play-services-measurement-sdk:19.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/1f0a2b82f94add1e6e4c7a84afa3ca48/transformed/play-services-measurement-sdk-19.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/1371acdaa5528229dc200d6adf93220f/transformed/play-services-measurement-sdk-19.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -369,9 +369,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.android.gms:play-services-measurement-impl:19.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/f19b5166c6e7eb7bad467e0aad261927/transformed/play-services-measurement-impl-19.0.0/jars/classes.jar"
       resolved="com.google.android.gms:play-services-measurement-impl:19.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/ed4191cac85edcb68dcd65775a142123/transformed/play-services-measurement-impl-19.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/f19b5166c6e7eb7bad467e0aad261927/transformed/play-services-measurement-impl-19.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -382,9 +382,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.android.gms:play-services-ads-identifier:17.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/7853f14ef1a4c6c2b590320e2c963d50/transformed/play-services-ads-identifier-17.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/b6d224e8c9d3cbf21d501f53ac7783e0/transformed/play-services-ads-identifier-17.0.0/jars/classes.jar"
       resolved="com.google.android.gms:play-services-ads-identifier:17.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/7853f14ef1a4c6c2b590320e2c963d50/transformed/play-services-ads-identifier-17.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/b6d224e8c9d3cbf21d501f53ac7783e0/transformed/play-services-ads-identifier-17.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -395,9 +395,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.android.gms:play-services-measurement-sdk-api:19.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/b5c25991cdbeaaa0bf084404ffb8619c/transformed/play-services-measurement-sdk-api-19.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/2826e62c9c6dc5645bb71058074c96d3/transformed/play-services-measurement-sdk-api-19.0.0/jars/classes.jar"
       resolved="com.google.android.gms:play-services-measurement-sdk-api:19.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/b5c25991cdbeaaa0bf084404ffb8619c/transformed/play-services-measurement-sdk-api-19.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/2826e62c9c6dc5645bb71058074c96d3/transformed/play-services-measurement-sdk-api-19.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -408,9 +408,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.android.gms:play-services-measurement-base:19.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/9f272eaf23914e09564e06edb703e72d/transformed/play-services-measurement-base-19.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/05c532c5bd711fcb40f282d58efde19a/transformed/play-services-measurement-base-19.0.0/jars/classes.jar"
       resolved="com.google.android.gms:play-services-measurement-base:19.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/9f272eaf23914e09564e06edb703e72d/transformed/play-services-measurement-base-19.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/05c532c5bd711fcb40f282d58efde19a/transformed/play-services-measurement-base-19.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -421,9 +421,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.android.gms:play-services-stats:17.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/a3cf3c7c836872b0c74c29520ffaab9d/transformed/play-services-stats-17.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/b78ae1aa3d1dc8ba62838d4c51f10923/transformed/play-services-stats-17.0.0/jars/classes.jar"
       resolved="com.google.android.gms:play-services-stats:17.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/a3cf3c7c836872b0c74c29520ffaab9d/transformed/play-services-stats-17.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/b78ae1aa3d1dc8ba62838d4c51f10923/transformed/play-services-stats-17.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -434,9 +434,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.android.gms:play-services-basement:17.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/b73dc83d3a80e324f500d6f71689816c/transformed/play-services-basement-17.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/cc0b39c04f19a85100fce2548476a84f/transformed/play-services-basement-17.0.0/jars/classes.jar"
       resolved="com.google.android.gms:play-services-basement:17.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/b73dc83d3a80e324f500d6f71689816c/transformed/play-services-basement-17.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/cc0b39c04f19a85100fce2548476a84f/transformed/play-services-basement-17.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -447,9 +447,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.fragment:fragment-ktx:1.6.2@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/ca42987ce35eca0bae4555a3df2a1689/transformed/fragment-ktx-1.6.2/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/25eaa50c8e2516c3166b22723b038c7e/transformed/fragment-ktx-1.6.2/jars/classes.jar"
       resolved="androidx.fragment:fragment-ktx:1.6.2"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/ca42987ce35eca0bae4555a3df2a1689/transformed/fragment-ktx-1.6.2"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/25eaa50c8e2516c3166b22723b038c7e/transformed/fragment-ktx-1.6.2"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -460,9 +460,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.fragment:fragment:1.6.2@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/b993543dba58bf63c363490b9ff58d14/transformed/fragment-1.6.2/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/4f31f3b6b2394ac01ee4b81151670ca0/transformed/fragment-1.6.2/jars/classes.jar"
       resolved="androidx.fragment:fragment:1.6.2"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/b993543dba58bf63c363490b9ff58d14/transformed/fragment-1.6.2"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/4f31f3b6b2394ac01ee4b81151670ca0/transformed/fragment-1.6.2"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -473,9 +473,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.activity:activity:1.8.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/2e08e572a7c7c714001a67e07b2d52a7/transformed/activity-1.8.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/c3d8ee7ecfba3603bde8bd3bdcf26cd3/transformed/activity-1.8.0/jars/classes.jar"
       resolved="androidx.activity:activity:1.8.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/2e08e572a7c7c714001a67e07b2d52a7/transformed/activity-1.8.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/c3d8ee7ecfba3603bde8bd3bdcf26cd3/transformed/activity-1.8.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -486,9 +486,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.activity:activity-ktx:1.8.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/350640a17d0346e9383f488854dec21f/transformed/activity-ktx-1.8.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/db0b89b23621eb68275f7748ebed6313/transformed/activity-ktx-1.8.0/jars/classes.jar"
       resolved="androidx.activity:activity-ktx:1.8.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/350640a17d0346e9383f488854dec21f/transformed/activity-ktx-1.8.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/db0b89b23621eb68275f7748ebed6313/transformed/activity-ktx-1.8.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -499,9 +499,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.core:core-ktx:1.9.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/9f06c59b6e9e1f48881973ed72c626e4/transformed/core-ktx-1.9.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/c5d742de46f16fd900c12feaa7751e42/transformed/core-ktx-1.9.0/jars/classes.jar"
       resolved="androidx.core:core-ktx:1.9.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/9f06c59b6e9e1f48881973ed72c626e4/transformed/core-ktx-1.9.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/c5d742de46f16fd900c12feaa7751e42/transformed/core-ktx-1.9.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -512,9 +512,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.appcompat:appcompat-resources:1.6.1@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/29ab635831de13e0d04d21d328226913/transformed/appcompat-resources-1.6.1/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/edb3624ebbda7e172dcdec831da3b3da/transformed/appcompat-resources-1.6.1/jars/classes.jar"
       resolved="androidx.appcompat:appcompat-resources:1.6.1"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/29ab635831de13e0d04d21d328226913/transformed/appcompat-resources-1.6.1"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/edb3624ebbda7e172dcdec831da3b3da/transformed/appcompat-resources-1.6.1"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -525,9 +525,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.drawerlayout:drawerlayout:1.1.1@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/4b81646bd8b9258cae974a3703193df0/transformed/drawerlayout-1.1.1/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/bedfbbf6aab7cc5ddb6d4c0472faa496/transformed/drawerlayout-1.1.1/jars/classes.jar"
       resolved="androidx.drawerlayout:drawerlayout:1.1.1"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/4b81646bd8b9258cae974a3703193df0/transformed/drawerlayout-1.1.1"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/bedfbbf6aab7cc5ddb6d4c0472faa496/transformed/drawerlayout-1.1.1"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -538,9 +538,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.coordinatorlayout:coordinatorlayout:1.1.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/7adef92afa91ea315ab4ade152aeae74/transformed/coordinatorlayout-1.1.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/7b24e99885c1487df3fa7fadac5b9fec/transformed/coordinatorlayout-1.1.0/jars/classes.jar"
       resolved="androidx.coordinatorlayout:coordinatorlayout:1.1.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/7adef92afa91ea315ab4ade152aeae74/transformed/coordinatorlayout-1.1.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/7b24e99885c1487df3fa7fadac5b9fec/transformed/coordinatorlayout-1.1.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -551,9 +551,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.dynamicanimation:dynamicanimation:1.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/0f0eee40b80e43e3eb69a710e8419773/transformed/dynamicanimation-1.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/d9809a6b197bf9fee59882c29ec71061/transformed/dynamicanimation-1.0.0/jars/classes.jar"
       resolved="androidx.dynamicanimation:dynamicanimation:1.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/0f0eee40b80e43e3eb69a710e8419773/transformed/dynamicanimation-1.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/d9809a6b197bf9fee59882c29ec71061/transformed/dynamicanimation-1.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -564,9 +564,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.recyclerview:recyclerview:1.1.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/445b4090e20c07ff29d5a79dfe234137/transformed/recyclerview-1.1.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/acdcf06d5c9db406059b7a217a8f16ef/transformed/recyclerview-1.1.0/jars/classes.jar"
       resolved="androidx.recyclerview:recyclerview:1.1.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/445b4090e20c07ff29d5a79dfe234137/transformed/recyclerview-1.1.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/acdcf06d5c9db406059b7a217a8f16ef/transformed/recyclerview-1.1.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -577,9 +577,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.transition:transition:1.4.1@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/f475475fb392fa3d8c401e403aa3be73/transformed/transition-1.4.1/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/f10350a7164e00b138f15abdc159c912/transformed/transition-1.4.1/jars/classes.jar"
       resolved="androidx.transition:transition:1.4.1"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/f475475fb392fa3d8c401e403aa3be73/transformed/transition-1.4.1"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/f10350a7164e00b138f15abdc159c912/transformed/transition-1.4.1"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -590,9 +590,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.vectordrawable:vectordrawable-animated:1.1.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/b0aea5706fdb1219e0292272022c40fc/transformed/vectordrawable-animated-1.1.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/d508aa268c7c70a64890e83e8534fd59/transformed/vectordrawable-animated-1.1.0/jars/classes.jar"
       resolved="androidx.vectordrawable:vectordrawable-animated:1.1.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/b0aea5706fdb1219e0292272022c40fc/transformed/vectordrawable-animated-1.1.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/d508aa268c7c70a64890e83e8534fd59/transformed/vectordrawable-animated-1.1.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -603,9 +603,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.vectordrawable:vectordrawable:1.1.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/db80b4a082d75e05fd11cc9bb1eb067a/transformed/vectordrawable-1.1.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/4dae7014433d0a9c3eab1d4dfff66be4/transformed/vectordrawable-1.1.0/jars/classes.jar"
       resolved="androidx.vectordrawable:vectordrawable:1.1.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/db80b4a082d75e05fd11cc9bb1eb067a/transformed/vectordrawable-1.1.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/4dae7014433d0a9c3eab1d4dfff66be4/transformed/vectordrawable-1.1.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -616,9 +616,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.viewpager:viewpager:1.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/2595df58de045559d6f4b6eee9f1418b/transformed/viewpager-1.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/09d87ecb50ccd9ed3a177b1cd242fde0/transformed/viewpager-1.0.0/jars/classes.jar"
       resolved="androidx.viewpager:viewpager:1.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/2595df58de045559d6f4b6eee9f1418b/transformed/viewpager-1.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/09d87ecb50ccd9ed3a177b1cd242fde0/transformed/viewpager-1.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -629,9 +629,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.slidingpanelayout:slidingpanelayout:1.2.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/8d1d7070f81b74b2c454ff335f52cfc4/transformed/slidingpanelayout-1.2.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/51e62a7b014b0e8a546af3defd0b9dd3/transformed/slidingpanelayout-1.2.0/jars/classes.jar"
       resolved="androidx.slidingpanelayout:slidingpanelayout:1.2.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/8d1d7070f81b74b2c454ff335f52cfc4/transformed/slidingpanelayout-1.2.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/51e62a7b014b0e8a546af3defd0b9dd3/transformed/slidingpanelayout-1.2.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -642,9 +642,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.customview:customview:1.1.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/77cb66da0f9676adac6dea632cc686f3/transformed/customview-1.1.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/2b9a3c4f3dd8bbc2f07914760b021df4/transformed/customview-1.1.0/jars/classes.jar"
       resolved="androidx.customview:customview:1.1.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/77cb66da0f9676adac6dea632cc686f3/transformed/customview-1.1.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/2b9a3c4f3dd8bbc2f07914760b021df4/transformed/customview-1.1.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -655,9 +655,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.legacy:legacy-support-core-utils:1.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/5af2111e40b2d4afd12d2564e853c45b/transformed/legacy-support-core-utils-1.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/876c9462a9a2c9f8c27da284d5dbc2c5/transformed/legacy-support-core-utils-1.0.0/jars/classes.jar"
       resolved="androidx.legacy:legacy-support-core-utils:1.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/5af2111e40b2d4afd12d2564e853c45b/transformed/legacy-support-core-utils-1.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/876c9462a9a2c9f8c27da284d5dbc2c5/transformed/legacy-support-core-utils-1.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -668,9 +668,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.loader:loader:1.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/f931f38b5d610d7797157dead68975e6/transformed/loader-1.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/4ec4016122c58a561c36dde49700c7e4/transformed/loader-1.0.0/jars/classes.jar"
       resolved="androidx.loader:loader:1.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/f931f38b5d610d7797157dead68975e6/transformed/loader-1.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/4ec4016122c58a561c36dde49700c7e4/transformed/loader-1.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -681,9 +681,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.core:core:1.9.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/801460d95be7684741abe3ee32432ede/transformed/core-1.9.0/jars/classes.jar"
       resolved="androidx.core:core:1.9.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/801460d95be7684741abe3ee32432ede/transformed/core-1.9.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -694,13 +694,13 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.lifecycle:lifecycle-common:2.6.2@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/androidx.lifecycle/lifecycle-common/2.6.2/10f354fdb64868baecd67128560c5a0d6312c495/lifecycle-common-2.6.2.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/androidx.lifecycle/lifecycle-common/2.6.2/10f354fdb64868baecd67128560c5a0d6312c495/lifecycle-common-2.6.2.jar"
       resolved="androidx.lifecycle:lifecycle-common:2.6.2"/>
   <library
       name="androidx.lifecycle:lifecycle-livedata-core-ktx:2.6.2@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/fa2e7b275f8651d5360f693b6b178ea2/transformed/lifecycle-livedata-core-ktx-2.6.2/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/4a3cf6e48849de5ef78731e4462dfdc6/transformed/lifecycle-livedata-core-ktx-2.6.2/jars/classes.jar"
       resolved="androidx.lifecycle:lifecycle-livedata-core-ktx:2.6.2"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/fa2e7b275f8651d5360f693b6b178ea2/transformed/lifecycle-livedata-core-ktx-2.6.2"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/4a3cf6e48849de5ef78731e4462dfdc6/transformed/lifecycle-livedata-core-ktx-2.6.2"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -711,9 +711,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.lifecycle:lifecycle-livedata:2.6.2@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/c359cea59e4afc77bb3280c7ee7178e9/transformed/lifecycle-livedata-2.6.2/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/c36c4c0e1704c1fe5d6a00cc75585874/transformed/lifecycle-livedata-2.6.2/jars/classes.jar"
       resolved="androidx.lifecycle:lifecycle-livedata:2.6.2"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/c359cea59e4afc77bb3280c7ee7178e9/transformed/lifecycle-livedata-2.6.2"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/c36c4c0e1704c1fe5d6a00cc75585874/transformed/lifecycle-livedata-2.6.2"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -724,9 +724,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.lifecycle:lifecycle-livedata-core:2.6.2@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/4d658a4144f790f95e855a041e9dffb3/transformed/lifecycle-livedata-core-2.6.2/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/343b962230826e88d82e677342b0e861/transformed/lifecycle-livedata-core-2.6.2/jars/classes.jar"
       resolved="androidx.lifecycle:lifecycle-livedata-core:2.6.2"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/4d658a4144f790f95e855a041e9dffb3/transformed/lifecycle-livedata-core-2.6.2"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/343b962230826e88d82e677342b0e861/transformed/lifecycle-livedata-core-2.6.2"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -737,9 +737,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.lifecycle:lifecycle-viewmodel:2.6.2@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/85ad9c60bc098c712f15e4975946a2ad/transformed/lifecycle-viewmodel-2.6.2/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/28803845e06273192690f1d6c34288ac/transformed/lifecycle-viewmodel-2.6.2/jars/classes.jar"
       resolved="androidx.lifecycle:lifecycle-viewmodel:2.6.2"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/85ad9c60bc098c712f15e4975946a2ad/transformed/lifecycle-viewmodel-2.6.2"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/28803845e06273192690f1d6c34288ac/transformed/lifecycle-viewmodel-2.6.2"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -750,9 +750,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.lifecycle:lifecycle-runtime:2.6.2@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/30f463133eaae243c4c40ce16af4a2cb/transformed/lifecycle-runtime-2.6.2/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/34a0f4eaea94b5a0973883c279135649/transformed/lifecycle-runtime-2.6.2/jars/classes.jar"
       resolved="androidx.lifecycle:lifecycle-runtime:2.6.2"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/30f463133eaae243c4c40ce16af4a2cb/transformed/lifecycle-runtime-2.6.2"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/34a0f4eaea94b5a0973883c279135649/transformed/lifecycle-runtime-2.6.2"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -763,9 +763,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.lifecycle:lifecycle-runtime-ktx:2.6.2@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/2c33eae62c961d99b7acfeb31c17f5db/transformed/lifecycle-runtime-ktx-2.6.2/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/4b94a2b9c2f2a7b29a1631d4a0063610/transformed/lifecycle-runtime-ktx-2.6.2/jars/classes.jar"
       resolved="androidx.lifecycle:lifecycle-runtime-ktx:2.6.2"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/2c33eae62c961d99b7acfeb31c17f5db/transformed/lifecycle-runtime-ktx-2.6.2"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/4b94a2b9c2f2a7b29a1631d4a0063610/transformed/lifecycle-runtime-ktx-2.6.2"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -776,9 +776,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.lifecycle:lifecycle-livedata-ktx:2.6.2@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/1862c47aa7b53124e9141b359051e712/transformed/lifecycle-livedata-ktx-2.6.2/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/9c999fd40f084904e4860f41f0f70b4b/transformed/lifecycle-livedata-ktx-2.6.2/jars/classes.jar"
       resolved="androidx.lifecycle:lifecycle-livedata-ktx:2.6.2"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/1862c47aa7b53124e9141b359051e712/transformed/lifecycle-livedata-ktx-2.6.2"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/9c999fd40f084904e4860f41f0f70b4b/transformed/lifecycle-livedata-ktx-2.6.2"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -789,9 +789,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/c1e15b30a2f0f49224d00dc35d3f7295/transformed/lifecycle-viewmodel-savedstate-2.6.2/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/848993de66ea43bcadcb1eab97b0674d/transformed/lifecycle-viewmodel-savedstate-2.6.2/jars/classes.jar"
       resolved="androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/c1e15b30a2f0f49224d00dc35d3f7295/transformed/lifecycle-viewmodel-savedstate-2.6.2"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/848993de66ea43bcadcb1eab97b0674d/transformed/lifecycle-viewmodel-savedstate-2.6.2"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -802,9 +802,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/0c2a309922b128bef9064c55809f778f/transformed/lifecycle-viewmodel-ktx-2.6.2/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/290ea00d722c6c355dde4c4941862bd9/transformed/lifecycle-viewmodel-ktx-2.6.2/jars/classes.jar"
       resolved="androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/0c2a309922b128bef9064c55809f778f/transformed/lifecycle-viewmodel-ktx-2.6.2"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/290ea00d722c6c355dde4c4941862bd9/transformed/lifecycle-viewmodel-ktx-2.6.2"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -815,37 +815,37 @@
       proguardRules="proguard.txt"/>
   <library
       name="org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.3@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.7.3/2b09627576f0989a436a00a4a54b55fa5026fb86/kotlinx-coroutines-core-jvm-1.7.3.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.7.3/2b09627576f0989a436a00a4a54b55fa5026fb86/kotlinx-coroutines-core-jvm-1.7.3.jar"
       resolved="org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.3"/>
   <library
       name="org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-android/1.7.3/38d9cad3a0b03a10453b56577984bdeb48edeed5/kotlinx-coroutines-android-1.7.3.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-android/1.7.3/38d9cad3a0b03a10453b56577984bdeb48edeed5/kotlinx-coroutines-android-1.7.3.jar"
       resolved="org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"/>
   <library
       name="com.squareup.retrofit2:converter-gson:2.9.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.squareup.retrofit2/converter-gson/2.9.0/fc93484fc67ab52b1e0ccbdaa3922d8a6678e097/converter-gson-2.9.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.squareup.retrofit2/converter-gson/2.9.0/fc93484fc67ab52b1e0ccbdaa3922d8a6678e097/converter-gson-2.9.0.jar"
       resolved="com.squareup.retrofit2:converter-gson:2.9.0"/>
   <library
       name="com.squareup.retrofit2:retrofit:2.9.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.squareup.retrofit2/retrofit/2.9.0/d8fdfbd5da952141a665a403348b74538efc05ff/retrofit-2.9.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.squareup.retrofit2/retrofit/2.9.0/d8fdfbd5da952141a665a403348b74538efc05ff/retrofit-2.9.0.jar"
       resolved="com.squareup.retrofit2:retrofit:2.9.0"/>
   <library
       name="com.squareup.okhttp3:okhttp:4.12.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/4.12.0/2f4525d4a200e97e1b87449c2cd9bd2e25b7e8cd/okhttp-4.12.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/4.12.0/2f4525d4a200e97e1b87449c2cd9bd2e25b7e8cd/okhttp-4.12.0.jar"
       resolved="com.squareup.okhttp3:okhttp:4.12.0"/>
   <library
       name="com.squareup.okio:okio-jvm:3.6.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio-jvm/3.6.0/5600569133b7bdefe1daf9ec7f4abeb6d13e1786/okio-jvm-3.6.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio-jvm/3.6.0/5600569133b7bdefe1daf9ec7f4abeb6d13e1786/okio-jvm-3.6.0.jar"
       resolved="com.squareup.okio:okio-jvm:3.6.0"/>
   <library
       name="org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.9.10/c7510d64a83411a649c76f2778304ddf71d7437b/kotlin-stdlib-jdk8-1.9.10.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.9.10/c7510d64a83411a649c76f2778304ddf71d7437b/kotlin-stdlib-jdk8-1.9.10.jar"
       resolved="org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10"/>
   <library
       name="androidx.constraintlayout:constraintlayout:2.1.4@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/bd0b84045b815a5e7b8fd3cb5c1004e8/transformed/constraintlayout-2.1.4/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/e9668a738814ed2717e1418a6658cadd/transformed/constraintlayout-2.1.4/jars/classes.jar"
       resolved="androidx.constraintlayout:constraintlayout:2.1.4"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/bd0b84045b815a5e7b8fd3cb5c1004e8/transformed/constraintlayout-2.1.4"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/e9668a738814ed2717e1418a6658cadd/transformed/constraintlayout-2.1.4"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -856,9 +856,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.intuit.sdp:sdp-android:1.0.6@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/c3aafd94f0f1f34a04de7cd146dbeb42/transformed/sdp-android-1.0.6/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/db81adc3ea8d6f1d3364f9d10c1cbeb5/transformed/sdp-android-1.0.6/jars/classes.jar"
       resolved="com.intuit.sdp:sdp-android:1.0.6"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/c3aafd94f0f1f34a04de7cd146dbeb42/transformed/sdp-android-1.0.6"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/db81adc3ea8d6f1d3364f9d10c1cbeb5/transformed/sdp-android-1.0.6"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -869,9 +869,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.intuit.ssp:ssp-android:1.0.6@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/9c9105d05833c9d3f7ddd9d3448fbaa2/transformed/ssp-android-1.0.6/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/4731b3a210a1df5a54a7846446ae7cb5/transformed/ssp-android-1.0.6/jars/classes.jar"
       resolved="com.intuit.ssp:ssp-android:1.0.6"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/9c9105d05833c9d3f7ddd9d3448fbaa2/transformed/ssp-android-1.0.6"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/4731b3a210a1df5a54a7846446ae7cb5/transformed/ssp-android-1.0.6"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -882,9 +882,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.jakewharton.timber:timber:4.7.1@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/93f9fa6dd3d8fbf369285c76bf158349/transformed/timber-4.7.1/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/61fcc896baeda5f0980c376faa55f83b/transformed/timber-4.7.1/jars/classes.jar"
       resolved="com.jakewharton.timber:timber:4.7.1"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/93f9fa6dd3d8fbf369285c76bf158349/transformed/timber-4.7.1"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/61fcc896baeda5f0980c376faa55f83b/transformed/timber-4.7.1"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -895,9 +895,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.clover.sdk:clover-android-sdk:304@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/jars/classes.jar:/Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/jars/libs/calc-jvm.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/dea4978974ad9453142b74f6cb577d79/transformed/clover-android-sdk-304/jars/classes.jar:/Users/chloe_mac/.gradle/caches/transforms-3/dea4978974ad9453142b74f6cb577d79/transformed/clover-android-sdk-304/jars/libs/calc-jvm.jar"
       resolved="com.clover.sdk:clover-android-sdk:304"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/dea4978974ad9453142b74f6cb577d79/transformed/clover-android-sdk-304"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -908,52 +908,13 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.messagebird:messagebird-api:6.1.7@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.messagebird/messagebird-api/6.1.7/d417e28b76baebf9b4fb23786fa6c89687931b6a/messagebird-api-6.1.7.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.messagebird/messagebird-api/6.1.7/d417e28b76baebf9b4fb23786fa6c89687931b6a/messagebird-api-6.1.7.jar"
       resolved="com.messagebird:messagebird-api:6.1.7"/>
   <library
-      name="androidx.multidex:multidex:2.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/517fe09fa8f5113b38d189022281437a/transformed/multidex-2.0.0/jars/classes.jar"
-      resolved="androidx.multidex:multidex:2.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/517fe09fa8f5113b38d189022281437a/transformed/multidex-2.0.0"
-      manifest="AndroidManifest.xml"
-      resFolder="res"
-      assetsFolder="assets"
-      lintJar="lint.jar"
-      publicResources="public.txt"
-      symbolFile="R.txt"
-      externalAnnotations="annotations.zip"
-      proguardRules="proguard.txt"/>
-  <library
-      name="androidx.cursoradapter:cursoradapter:1.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/aecab1aa62d19be17ae3c176777d7a6f/transformed/cursoradapter-1.0.0/jars/classes.jar"
-      resolved="androidx.cursoradapter:cursoradapter:1.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/aecab1aa62d19be17ae3c176777d7a6f/transformed/cursoradapter-1.0.0"
-      manifest="AndroidManifest.xml"
-      resFolder="res"
-      assetsFolder="assets"
-      lintJar="lint.jar"
-      publicResources="public.txt"
-      symbolFile="R.txt"
-      externalAnnotations="annotations.zip"
-      proguardRules="proguard.txt"/>
-  <library
-      name="androidx.savedstate:savedstate-ktx:1.2.1@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/01c7c9ae865cbbdfeeea010f545b092f/transformed/savedstate-ktx-1.2.1/jars/classes.jar"
-      resolved="androidx.savedstate:savedstate-ktx:1.2.1"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/01c7c9ae865cbbdfeeea010f545b092f/transformed/savedstate-ktx-1.2.1"
-      manifest="AndroidManifest.xml"
-      resFolder="res"
-      assetsFolder="assets"
-      lintJar="lint.jar"
-      publicResources="public.txt"
-      symbolFile="R.txt"
-      externalAnnotations="annotations.zip"
-      proguardRules="proguard.txt"/>
-  <library
-      name="androidx.savedstate:savedstate:1.2.1@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/6df3cc817cd633e01901dad58bd79117/transformed/savedstate-1.2.1/jars/classes.jar"
-      resolved="androidx.savedstate:savedstate:1.2.1"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/6df3cc817cd633e01901dad58bd79117/transformed/savedstate-1.2.1"
+      name="com.google.android.flexbox:flexbox:3.0.0@aar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/ce9d0fbbe6749f2d99ee5631ec6387e6/transformed/flexbox-3.0.0/jars/classes.jar"
+      resolved="com.google.android.flexbox:flexbox:3.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/ce9d0fbbe6749f2d99ee5631ec6387e6/transformed/flexbox-3.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -964,9 +925,61 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.cardview:cardview:1.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/cb728632fe06b3f1329f20dfcf90e932/transformed/cardview-1.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/c630db37f88a880c4f8dd1600eef73ad/transformed/cardview-1.0.0/jars/classes.jar"
       resolved="androidx.cardview:cardview:1.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/cb728632fe06b3f1329f20dfcf90e932/transformed/cardview-1.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/c630db37f88a880c4f8dd1600eef73ad/transformed/cardview-1.0.0"
+      manifest="AndroidManifest.xml"
+      resFolder="res"
+      assetsFolder="assets"
+      lintJar="lint.jar"
+      publicResources="public.txt"
+      symbolFile="R.txt"
+      externalAnnotations="annotations.zip"
+      proguardRules="proguard.txt"/>
+  <library
+      name="androidx.multidex:multidex:2.0.0@aar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/ca20af07c00d7981ca923c85d0c7b28a/transformed/multidex-2.0.0/jars/classes.jar"
+      resolved="androidx.multidex:multidex:2.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/ca20af07c00d7981ca923c85d0c7b28a/transformed/multidex-2.0.0"
+      manifest="AndroidManifest.xml"
+      resFolder="res"
+      assetsFolder="assets"
+      lintJar="lint.jar"
+      publicResources="public.txt"
+      symbolFile="R.txt"
+      externalAnnotations="annotations.zip"
+      proguardRules="proguard.txt"/>
+  <library
+      name="androidx.cursoradapter:cursoradapter:1.0.0@aar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/e134b6d13cd65a049c765228e12ec7d6/transformed/cursoradapter-1.0.0/jars/classes.jar"
+      resolved="androidx.cursoradapter:cursoradapter:1.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/e134b6d13cd65a049c765228e12ec7d6/transformed/cursoradapter-1.0.0"
+      manifest="AndroidManifest.xml"
+      resFolder="res"
+      assetsFolder="assets"
+      lintJar="lint.jar"
+      publicResources="public.txt"
+      symbolFile="R.txt"
+      externalAnnotations="annotations.zip"
+      proguardRules="proguard.txt"/>
+  <library
+      name="androidx.savedstate:savedstate-ktx:1.2.1@aar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/486a930d6e4a344bb3b0eedf90c609ee/transformed/savedstate-ktx-1.2.1/jars/classes.jar"
+      resolved="androidx.savedstate:savedstate-ktx:1.2.1"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/486a930d6e4a344bb3b0eedf90c609ee/transformed/savedstate-ktx-1.2.1"
+      manifest="AndroidManifest.xml"
+      resFolder="res"
+      assetsFolder="assets"
+      lintJar="lint.jar"
+      publicResources="public.txt"
+      symbolFile="R.txt"
+      externalAnnotations="annotations.zip"
+      proguardRules="proguard.txt"/>
+  <library
+      name="androidx.savedstate:savedstate:1.2.1@aar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/41ee987aed033587c2656bedbafbc613/transformed/savedstate-1.2.1/jars/classes.jar"
+      resolved="androidx.savedstate:savedstate:1.2.1"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/41ee987aed033587c2656bedbafbc613/transformed/savedstate-1.2.1"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -977,9 +990,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.firebase:firebase-components:17.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/3996814285557507b1ac48e064c767e9/transformed/firebase-components-17.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/2a380da0d7cdbd4db1d2b3407a19cca0/transformed/firebase-components-17.0.0/jars/classes.jar"
       resolved="com.google.firebase:firebase-components:17.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/3996814285557507b1ac48e064c767e9/transformed/firebase-components-17.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/2a380da0d7cdbd4db1d2b3407a19cca0/transformed/firebase-components-17.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -990,9 +1003,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.android.datatransport:transport-backend-cct:3.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/20a24d16564ef41b68fac515d0dc10d3/transformed/transport-backend-cct-3.0.0/jars/classes.jar"
       resolved="com.google.android.datatransport:transport-backend-cct:3.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/20a24d16564ef41b68fac515d0dc10d3/transformed/transport-backend-cct-3.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1003,9 +1016,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.firebase:firebase-encoders-json:18.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/369b7169a898cd34f97222e955479167/transformed/firebase-encoders-json-18.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/1aa879135965b316744d21fe1e25f255/transformed/firebase-encoders-json-18.0.0/jars/classes.jar"
       resolved="com.google.firebase:firebase-encoders-json:18.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/369b7169a898cd34f97222e955479167/transformed/firebase-encoders-json-18.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/1aa879135965b316744d21fe1e25f255/transformed/firebase-encoders-json-18.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1016,13 +1029,13 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.firebase:firebase-encoders:17.0.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.google.firebase/firebase-encoders/17.0.0/26f52dc549c42575b155f8c720e84059ee600a85/firebase-encoders-17.0.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.google.firebase/firebase-encoders/17.0.0/26f52dc549c42575b155f8c720e84059ee600a85/firebase-encoders-17.0.0.jar"
       resolved="com.google.firebase:firebase-encoders:17.0.0"/>
   <library
       name="com.google.android.datatransport:transport-runtime:3.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/91e651c559fa7c4dd123a43445e079d3/transformed/transport-runtime-3.0.0/jars/classes.jar"
       resolved="com.google.android.datatransport:transport-runtime:3.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/91e651c559fa7c4dd123a43445e079d3/transformed/transport-runtime-3.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1033,9 +1046,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.google.android.datatransport:transport-api:3.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/5d4938dcbceb788521af039cc53f88fa/transformed/transport-api-3.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/0ae036b36f4867ab0ccb8ad5cc74da43/transformed/transport-api-3.0.0/jars/classes.jar"
       resolved="com.google.android.datatransport:transport-api:3.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/5d4938dcbceb788521af039cc53f88fa/transformed/transport-api-3.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/0ae036b36f4867ab0ccb8ad5cc74da43/transformed/transport-api-3.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1046,9 +1059,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.versionedparcelable:versionedparcelable:1.1.1@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/90423f8a08fef1aac76eb72d7c623b45/transformed/versionedparcelable-1.1.1/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/9bad2b539e997289c3258b37db48692a/transformed/versionedparcelable-1.1.1/jars/classes.jar"
       resolved="androidx.versionedparcelable:versionedparcelable:1.1.1"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/90423f8a08fef1aac76eb72d7c623b45/transformed/versionedparcelable-1.1.1"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/9bad2b539e997289c3258b37db48692a/transformed/versionedparcelable-1.1.1"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1059,17 +1072,17 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.collection:collection-ktx:1.1.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/androidx.collection/collection-ktx/1.1.0/f807b2f366f7b75142a67d2f3c10031065b5168/collection-ktx-1.1.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/androidx.collection/collection-ktx/1.1.0/f807b2f366f7b75142a67d2f3c10031065b5168/collection-ktx-1.1.0.jar"
       resolved="androidx.collection:collection-ktx:1.1.0"/>
   <library
       name="androidx.collection:collection:1.1.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/androidx.collection/collection/1.1.0/1f27220b47669781457de0d600849a5de0e89909/collection-1.1.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/androidx.collection/collection/1.1.0/1f27220b47669781457de0d600849a5de0e89909/collection-1.1.0.jar"
       resolved="androidx.collection:collection:1.1.0"/>
   <library
       name="androidx.arch.core:core-runtime:2.2.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/cc5496e85877be32bac8691456241511/transformed/core-runtime-2.2.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/52b9543f8f1aadb909060a0303d11d83/transformed/core-runtime-2.2.0/jars/classes.jar"
       resolved="androidx.arch.core:core-runtime:2.2.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/cc5496e85877be32bac8691456241511/transformed/core-runtime-2.2.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/52b9543f8f1aadb909060a0303d11d83/transformed/core-runtime-2.2.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1080,13 +1093,13 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.arch.core:core-common:2.2.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/androidx.arch.core/core-common/2.2.0/5e1b8b81dfd5f52c56a8d53b18ca759c19a301f3/core-common-2.2.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/androidx.arch.core/core-common/2.2.0/5e1b8b81dfd5f52c56a8d53b18ca759c19a301f3/core-common-2.2.0.jar"
       resolved="androidx.arch.core:core-common:2.2.0"/>
   <library
       name="androidx.interpolator:interpolator:1.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/e75b51804934e4a2bdfcc2435411e30e/transformed/interpolator-1.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/96013a65ee69522036de87456c554e7c/transformed/interpolator-1.0.0/jars/classes.jar"
       resolved="androidx.interpolator:interpolator:1.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/e75b51804934e4a2bdfcc2435411e30e/transformed/interpolator-1.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/96013a65ee69522036de87456c554e7c/transformed/interpolator-1.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1097,9 +1110,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.documentfile:documentfile:1.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/58bf8cd8ba29d64d1ccc9f8c6bb22bfe/transformed/documentfile-1.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/50435781c366aaf44dae3cf0867cf3e2/transformed/documentfile-1.0.0/jars/classes.jar"
       resolved="androidx.documentfile:documentfile:1.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/58bf8cd8ba29d64d1ccc9f8c6bb22bfe/transformed/documentfile-1.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/50435781c366aaf44dae3cf0867cf3e2/transformed/documentfile-1.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1110,9 +1123,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.localbroadcastmanager:localbroadcastmanager:1.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/79283d44d469ef0b6346b528f01eae45/transformed/localbroadcastmanager-1.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/1d56dec7202d12830ba9f9fd64ba9f95/transformed/localbroadcastmanager-1.0.0/jars/classes.jar"
       resolved="androidx.localbroadcastmanager:localbroadcastmanager:1.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/79283d44d469ef0b6346b528f01eae45/transformed/localbroadcastmanager-1.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/1d56dec7202d12830ba9f9fd64ba9f95/transformed/localbroadcastmanager-1.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1123,9 +1136,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.print:print:1.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/8f79376522ede7ed62c99b50223484a4/transformed/print-1.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/9fa61cb3be355a4f0ea04f87d70f1d34/transformed/print-1.0.0/jars/classes.jar"
       resolved="androidx.print:print:1.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/8f79376522ede7ed62c99b50223484a4/transformed/print-1.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/9fa61cb3be355a4f0ea04f87d70f1d34/transformed/print-1.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1136,17 +1149,17 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.annotation:annotation:1.5.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/androidx.annotation/annotation/1.5.0/857678d6b4ca7b28571ef7935c668bdb57e15027/annotation-1.5.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/androidx.annotation/annotation/1.5.0/857678d6b4ca7b28571ef7935c668bdb57e15027/annotation-1.5.0.jar"
       resolved="androidx.annotation:annotation:1.5.0"/>
   <library
       name="org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.9.10/bc5bfc2690338defd5195b05c57562f2194eeb10/kotlin-stdlib-jdk7-1.9.10.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.9.10/bc5bfc2690338defd5195b05c57562f2194eeb10/kotlin-stdlib-jdk7-1.9.10.jar"
       resolved="org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10"/>
   <library
       name="androidx.annotation:annotation-experimental:1.3.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/bd9e4213ed831da72b758fd798ad8f5c/transformed/annotation-experimental-1.3.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/de0b9286e6f4a96b640635f2b184eacc/transformed/annotation-experimental-1.3.0/jars/classes.jar"
       resolved="androidx.annotation:annotation-experimental:1.3.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/bd9e4213ed831da72b758fd798ad8f5c/transformed/annotation-experimental-1.3.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/de0b9286e6f4a96b640635f2b184eacc/transformed/annotation-experimental-1.3.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1157,65 +1170,65 @@
       proguardRules="proguard.txt"/>
   <library
       name="org.jetbrains.kotlin:kotlin-stdlib:1.9.10@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.9.10/72812e8a368917ab5c0a5081b56915ffdfec93b7/kotlin-stdlib-1.9.10.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.9.10/72812e8a368917ab5c0a5081b56915ffdfec93b7/kotlin-stdlib-1.9.10.jar"
       resolved="org.jetbrains.kotlin:kotlin-stdlib:1.9.10"/>
   <library
       name="org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.9.10/dafaf2c27f27c09220cee312df10917d9a5d97ce/kotlin-stdlib-common-1.9.10.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.9.10/dafaf2c27f27c09220cee312df10917d9a5d97ce/kotlin-stdlib-common-1.9.10.jar"
       resolved="org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10"/>
   <library
       name="org.jetbrains:annotations:23.0.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/23.0.0/8cc20c07506ec18e0834947b84a864bfc094484e/annotations-23.0.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/23.0.0/8cc20c07506ec18e0834947b84a864bfc094484e/annotations-23.0.0.jar"
       resolved="org.jetbrains:annotations:23.0.0"/>
   <library
       name="androidx.resourceinspection:resourceinspection-annotation:1.0.1@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/androidx.resourceinspection/resourceinspection-annotation/1.0.1/8c21f8ff5d96d5d52c948707f7e4d6ca6773feef/resourceinspection-annotation-1.0.1.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/androidx.resourceinspection/resourceinspection-annotation/1.0.1/8c21f8ff5d96d5d52c948707f7e4d6ca6773feef/resourceinspection-annotation-1.0.1.jar"
       resolved="androidx.resourceinspection:resourceinspection-annotation:1.0.1"/>
   <library
       name="com.google.code.gson:gson:2.8.5@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.8.5/f645ed69d595b24d4cf8b3fbb64cc505bede8829/gson-2.8.5.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.8.5/f645ed69d595b24d4cf8b3fbb64cc505bede8829/gson-2.8.5.jar"
       resolved="com.google.code.gson:gson:2.8.5"/>
   <library
       name="com.google.firebase:firebase-annotations:16.0.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.google.firebase/firebase-annotations/16.0.0/dbeae20d6c97b747b59ef47b6dcf770ba1a60fa6/firebase-annotations-16.0.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.google.firebase/firebase-annotations/16.0.0/dbeae20d6c97b747b59ef47b6dcf770ba1a60fa6/firebase-annotations-16.0.0.jar"
       resolved="com.google.firebase:firebase-annotations:16.0.0"/>
   <library
       name="javax.inject:javax.inject:1@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/javax.inject/javax.inject/1/6975da39a7040257bd51d21a231b76c915872d38/javax.inject-1.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/javax.inject/javax.inject/1/6975da39a7040257bd51d21a231b76c915872d38/javax.inject-1.jar"
       resolved="javax.inject:javax.inject:1"/>
   <library
       name="com.fasterxml.jackson.core:jackson-core:2.14.0-rc1@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.14.0-rc1/a5d9b5fa8d49aea385608f14d0cc269bf9489525/jackson-core-2.14.0-rc1.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.14.0-rc1/a5d9b5fa8d49aea385608f14d0cc269bf9489525/jackson-core-2.14.0-rc1.jar"
       resolved="com.fasterxml.jackson.core:jackson-core:2.14.0-rc1"/>
   <library
       name="com.fasterxml.jackson.core:jackson-databind:2.14.0-rc1@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.14.0-rc1/e89ac425a32c3e59653df69ee2050734577d1357/jackson-databind-2.14.0-rc1.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.14.0-rc1/e89ac425a32c3e59653df69ee2050734577d1357/jackson-databind-2.14.0-rc1.jar"
       resolved="com.fasterxml.jackson.core:jackson-databind:2.14.0-rc1"/>
   <library
       name="com.fasterxml.jackson.core:jackson-annotations:2.14.0-rc1@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.14.0-rc1/baee36be5fe485569d34dacf40536bc668dc1891/jackson-annotations-2.14.0-rc1.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.14.0-rc1/baee36be5fe485569d34dacf40536bc668dc1891/jackson-annotations-2.14.0-rc1.jar"
       resolved="com.fasterxml.jackson.core:jackson-annotations:2.14.0-rc1"/>
   <library
       name="com.auth0:java-jwt:3.17.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.auth0/java-jwt/3.17.0/ec0a431bcccc578e544e91d40b888fedd8f260ca/java-jwt-3.17.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.auth0/java-jwt/3.17.0/ec0a431bcccc578e544e91d40b888fedd8f260ca/java-jwt-3.17.0.jar"
       resolved="com.auth0:java-jwt:3.17.0"/>
   <library
       name="org.apache.maven:maven-artifact:3.9.6@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/org.apache.maven/maven-artifact/3.9.6/fb0979832c10c1a25d038a33ca862bef055fcdc8/maven-artifact-3.9.6.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/org.apache.maven/maven-artifact/3.9.6/fb0979832c10c1a25d038a33ca862bef055fcdc8/maven-artifact-3.9.6.jar"
       resolved="org.apache.maven:maven-artifact:3.9.6"/>
   <library
       name="org.codehaus.plexus:plexus-utils:3.5.1@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/3.5.1/c6bfb17c97ecc8863e88778ea301be742c62b06d/plexus-utils-3.5.1.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/3.5.1/c6bfb17c97ecc8863e88778ea301be742c62b06d/plexus-utils-3.5.1.jar"
       resolved="org.codehaus.plexus:plexus-utils:3.5.1"/>
   <library
       name="org.apache.commons:commons-lang3:3.12.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.12.0/c6842c86792ff03b9f1d1fe2aab8dc23aa6c6f0e/commons-lang3-3.12.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.12.0/c6842c86792ff03b9f1d1fe2aab8dc23aa6c6f0e/commons-lang3-3.12.0.jar"
       resolved="org.apache.commons:commons-lang3:3.12.0"/>
   <library
       name="androidx.emoji2:emoji2-views-helper:1.2.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/cc7a794a1ac020f0f28145ff5e4339ed/transformed/emoji2-views-helper-1.2.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/100fea86a6a6eab1bcb9283e103947d8/transformed/emoji2-views-helper-1.2.0/jars/classes.jar"
       resolved="androidx.emoji2:emoji2-views-helper:1.2.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/cc7a794a1ac020f0f28145ff5e4339ed/transformed/emoji2-views-helper-1.2.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/100fea86a6a6eab1bcb9283e103947d8/transformed/emoji2-views-helper-1.2.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1226,9 +1239,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.emoji2:emoji2:1.2.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/jars/classes.jar:/Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/jars/libs/repackaged.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/7186c95eda9cdb6df703dab77477686b/transformed/emoji2-1.2.0/jars/classes.jar:/Users/chloe_mac/.gradle/caches/transforms-3/7186c95eda9cdb6df703dab77477686b/transformed/emoji2-1.2.0/jars/libs/repackaged.jar"
       resolved="androidx.emoji2:emoji2:1.2.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/7186c95eda9cdb6df703dab77477686b/transformed/emoji2-1.2.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1239,9 +1252,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.lifecycle:lifecycle-process:2.6.2@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/44ee5f8d0301d7f79662d680ebbf3934/transformed/lifecycle-process-2.6.2/jars/classes.jar"
       resolved="androidx.lifecycle:lifecycle-process:2.6.2"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/44ee5f8d0301d7f79662d680ebbf3934/transformed/lifecycle-process-2.6.2"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1252,9 +1265,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.window:window:1.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/4e6d3230ed8227a2d1d77c855be3cba7/transformed/window-1.0.0/jars/classes.jar"
       resolved="androidx.window:window:1.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/4e6d3230ed8227a2d1d77c855be3cba7/transformed/window-1.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1265,9 +1278,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.profileinstaller:profileinstaller:1.3.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/jars/classes.jar"
       resolved="androidx.profileinstaller:profileinstaller:1.3.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1278,9 +1291,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.startup:startup-runtime:1.1.1@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/e7815bb338a32b1a748569bab23457be/transformed/startup-runtime-1.1.1/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/db0c9648439236e48fedce6b8c0018c7/transformed/startup-runtime-1.1.1/jars/classes.jar"
       resolved="androidx.startup:startup-runtime:1.1.1"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/e7815bb338a32b1a748569bab23457be/transformed/startup-runtime-1.1.1"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/db0c9648439236e48fedce6b8c0018c7/transformed/startup-runtime-1.1.1"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1291,9 +1304,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.tracing:tracing:1.0.0@aar"
-      jars="/Users/chicmic/.gradle/caches/transforms-3/cca6793e549903a727436796a3d7bfe0/transformed/tracing-1.0.0/jars/classes.jar"
+      jars="/Users/chloe_mac/.gradle/caches/transforms-3/9cdf702095b347b76e2f18783be36489/transformed/tracing-1.0.0/jars/classes.jar"
       resolved="androidx.tracing:tracing:1.0.0"
-      folder="/Users/chicmic/.gradle/caches/transforms-3/cca6793e549903a727436796a3d7bfe0/transformed/tracing-1.0.0"
+      folder="/Users/chloe_mac/.gradle/caches/transforms-3/9cdf702095b347b76e2f18783be36489/transformed/tracing-1.0.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -1304,18 +1317,18 @@
       proguardRules="proguard.txt"/>
   <library
       name="androidx.concurrent:concurrent-futures:1.1.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/androidx.concurrent/concurrent-futures/1.1.0/50b7fb98350d5f42a4e49704b03278542293ba48/concurrent-futures-1.1.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/androidx.concurrent/concurrent-futures/1.1.0/50b7fb98350d5f42a4e49704b03278542293ba48/concurrent-futures-1.1.0.jar"
       resolved="androidx.concurrent:concurrent-futures:1.1.0"/>
   <library
       name="com.google.errorprone:error_prone_annotations:2.15.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.15.0/38c8485a652f808c8c149150da4e5c2b0bd17f9a/error_prone_annotations-2.15.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.15.0/38c8485a652f808c8c149150da4e5c2b0bd17f9a/error_prone_annotations-2.15.0.jar"
       resolved="com.google.errorprone:error_prone_annotations:2.15.0"/>
   <library
       name="androidx.constraintlayout:constraintlayout-core:1.0.4@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/androidx.constraintlayout/constraintlayout-core/1.0.4/29cdbe03ded6b0980f63fa5da2579a430e911c40/constraintlayout-core-1.0.4.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/androidx.constraintlayout/constraintlayout-core/1.0.4/29cdbe03ded6b0980f63fa5da2579a430e911c40/constraintlayout-core-1.0.4.jar"
       resolved="androidx.constraintlayout:constraintlayout-core:1.0.4"/>
   <library
       name="com.google.guava:listenablefuture:1.0@jar"
-      jars="/Users/chicmic/.gradle/caches/modules-2/files-2.1/com.google.guava/listenablefuture/1.0/c949a840a6acbc5268d088e47b04177bf90b3cad/listenablefuture-1.0.jar"
+      jars="/Users/chloe_mac/.gradle/caches/modules-2/files-2.1/com.google.guava/listenablefuture/1.0/c949a840a6acbc5268d088e47b04177bf90b3cad/listenablefuture-1.0.jar"
       resolved="com.google.guava:listenablefuture:1.0"/>
 </libraries>

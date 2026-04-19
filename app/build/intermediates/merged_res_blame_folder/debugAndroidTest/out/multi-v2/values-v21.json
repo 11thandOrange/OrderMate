@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.orderShubham.test.app-mergeDebugAndroidTestResources-3:/values-v21/values-v21.xml",
+            "outputFile": "com.orderMate.test.app-mergeDebugAndroidTestResources-3:/values-v21/values-v21.xml",
             "map": [
                 {
-                    "source": "/Users/chicmic/.gradle/caches/transforms-3/e33bf01f3c3ac7a35b080a4eb40739ae/transformed/core-1.5.0/res/values-v21/values.xml",
+                    "source": "/Users/chloe_mac/.gradle/caches/transforms-3/03f21cb5518b12002aa3fb16ceb49457/transformed/core-1.5.0/res/values-v21/values.xml",
                     "from": {
                         "startLines": "4,13",
                         "startColumns": "0,0",

@@ -1,78 +1,282 @@
 [
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/ordermate_basket_layout.xml",
-        "source": "com.orderMate.app-main-57:/layout/ordermate_basket_layout.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_timeline_day_header.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_timeline_day_header.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/fragment_order_detail.xml",
-        "source": "com.orderMate.app-main-57:/layout/fragment_order_detail.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/note_section_textbox.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/note_section_textbox.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/listitem_order.xml",
-        "source": "com.orderMate.app-main-57:/layout/listitem_order.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/listitem_order.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/listitem_order.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/item_spinner.xml",
-        "source": "com.orderMate.app-main-57:/layout/item_spinner.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_header_orders.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_header_orders.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/item_transaction.xml",
-        "source": "com.orderMate.app-main-57:/layout/item_transaction.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_widget_editor.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_widget_editor.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/item_custom_menu_items.xml",
-        "source": "com.orderMate.app-main-57:/layout/item_custom_menu_items.xml"
+        "merged": "com.orderMate.app-mergeDebugResources-55:/layout/item_order_card_redesign.xml",
+        "source": "com.orderMate.app-main-58:/layout/item_order_card_redesign.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/dialog_update_line_items.xml",
-        "source": "com.orderMate.app-main-57:/layout/dialog_update_line_items.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_order_detail_row.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_order_detail_row.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/item_header_orders.xml",
-        "source": "com.orderMate.app-main-57:/layout/item_header_orders.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_timeline_hour.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_timeline_hour.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/activity_main.xml",
-        "source": "com.orderMate.app-main-57:/layout/activity_main.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/activity_main_redesign.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/activity_main_redesign.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/item_order.xml",
-        "source": "com.orderMate.app-main-57:/layout/item_order.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_order_info_row.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_order_info_row.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/item_customer.xml",
-        "source": "com.orderMate.app-main-57:/layout/item_customer.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/dialog_emoji_picker.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/dialog_emoji_picker.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/item_notes_spinner.xml",
-        "source": "com.orderMate.app-main-57:/layout/item_notes_spinner.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_order_history.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_order_history.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/fragment_order_history.xml",
-        "source": "com.orderMate.app-main-57:/layout/fragment_order_history.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/dialog_event_preview.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/dialog_event_preview.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/item_grid.xml",
-        "source": "com.orderMate.app-main-57:/layout/item_grid.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_order.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_order.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/fragment_custom_fields.xml",
-        "source": "com.orderMate.app-main-57:/layout/fragment_custom_fields.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_notification_template.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_notification_template.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/item_order_sub_items.xml",
-        "source": "com.orderMate.app-main-57:/layout/item_order_sub_items.xml"
+        "merged": "com.orderMate.app-mergeDebugResources-55:/layout/dialog_event_preview.xml",
+        "source": "com.orderMate.app-main-58:/layout/dialog_event_preview.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/dialog_send_notification.xml",
-        "source": "com.orderMate.app-main-57:/layout/dialog_send_notification.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_calendar_day_event.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_calendar_day_event.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/activity_overlay.xml",
-        "source": "com.orderMate.app-main-57:/layout/activity_overlay.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_customer_search_result.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_customer_search_result.xml"
     },
     {
-        "merged": "com.orderMate.app-mergeDebugResources-54:/layout/item_spinner_heading.xml",
-        "source": "com.orderMate.app-main-57:/layout/item_spinner_heading.xml"
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_order_card.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_order_card.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_transaction.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_transaction.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/dialog_customer.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/dialog_customer.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/layout_shared_header.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/layout_shared_header.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_filter_pill.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_filter_pill.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_order_card_redesign.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_order_card_redesign.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_calendar_day.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_calendar_day.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/fragment_order_list_redesign.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/fragment_order_list_redesign.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/dialog_order_note.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/dialog_order_note.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/activity_main.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/activity_main.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_emoji.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_emoji.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_event_line_item.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_event_line_item.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_timeline_column.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_timeline_column.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/fragment_custom_fields.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/fragment_custom_fields.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/filter_section_multiselect.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/filter_section_multiselect.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeDebugResources-55:/layout/fragment_order_detail.xml",
+        "source": "com.orderMate.app-main-58:/layout/fragment_order_detail.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/dialog_update_line_items.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/dialog_update_line_items.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_notes_spinner.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_notes_spinner.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/note_section_calendar.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/note_section_calendar.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/filter_section_date.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/filter_section_date.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/dialog_filters.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/dialog_filters.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/fragment_profile_settings.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/fragment_profile_settings.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_event_preview.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_event_preview.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_order_detail_item.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_order_detail_item.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/dialog_order_history.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/dialog_order_history.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_spinner.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_spinner.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_customer.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_customer.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/dialog_customer_search.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/dialog_customer_search.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeDebugResources-55:/layout/fragment_settings_redesign.xml",
+        "source": "com.orderMate.app-main-58:/layout/fragment_settings_redesign.xml"
+    },
+    {
+        "merged": "com.orderMate.app-mergeDebugResources-55:/layout/dialog_order_note.xml",
+        "source": "com.orderMate.app-main-58:/layout/dialog_order_note.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/dialog_item_note.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/dialog_item_note.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_grid.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_grid.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/fragment_order_history.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/fragment_order_history.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_spinner_heading.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_spinner_heading.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/activity_overlay.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/activity_overlay.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/fragment_order_detail.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/fragment_order_detail.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/dialog_send_notification.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/dialog_send_notification.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_note_pill.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_note_pill.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/note_section_select.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/note_section_select.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/dialog_color_picker.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/dialog_color_picker.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/dialog_delete_confirmation.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/dialog_delete_confirmation.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_note_chip.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_note_chip.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_timeline_event.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_timeline_event.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_calendar_week_day.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_calendar_week_day.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/fragment_order_detail_redesign.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/fragment_order_detail_redesign.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/ordermate_basket_layout.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/ordermate_basket_layout.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_custom_menu_items.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_custom_menu_items.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_color.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_color.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/item_order_sub_items.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/item_order_sub_items.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/fragment_calendar_redesign.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/fragment_calendar_redesign.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/layout_calendar_timeline.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/layout_calendar_timeline.xml"
+    },
+    {
+        "merged": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-mergeDebugResources-55:/layout/fragment_settings_redesign.xml",
+        "source": "/Users/chloe_mac/.gradle/daemon/8.5/com.orderMate.app-main-58:/layout/fragment_settings_redesign.xml"
     }
 ]
