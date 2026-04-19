@@ -235,21 +235,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             }
         }
 
-        // Order Date pill (#12)
-        binding.orderDatePill.setOnClickListener {
-            showOrderDatePicker()
-        }
-        binding.orderDateClear.setOnClickListener {
-            clearOrderDate()
-        }
-
-        // Due Date pill (#12)
-        binding.dueDatePill.setOnClickListener {
-            showDueDatePicker()
-        }
-        binding.dueDateClear.setOnClickListener {
-            clearDueDate()
-        }
+        // Date pills removed - date filtering now handled through Filter dialog
     }
 
     private fun resetFilters() {
@@ -259,11 +245,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         currentFilterState = FilterDialogFragment.FilterState()
         currentSearchQuery = ""
         
-        // Clear date pills (#12)
+        // Clear date selections
         selectedOrderDate = null
         selectedDueDate = null
-        updateOrderDatePill()
-        updateDueDatePill()
         
         // Sync reset to shared ViewModel for cross-tab persistence
         sharedFilterViewModel.resetAll()
@@ -467,97 +451,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     // ==================== Separate Date Pills (#12) ====================
 
-    /**
-     * Show date picker for Order Date pill (#12)
-     */
-    private fun showOrderDatePicker() {
-        val calendar = Calendar.getInstance()
-        selectedOrderDate?.let { calendar.time = it }
-
-        DatePickerDialog(
-            requireContext(),
-            R.style.Theme_OrderMate_DatePicker,
-            { _, year, month, day ->
-                calendar.set(year, month, day, 0, 0, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                selectedOrderDate = calendar.time
-                updateOrderDatePill()
-                applyDateFilters()
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
-    }
-
-    /**
-     * Show date picker for Due Date pill (#12)
-     */
-    private fun showDueDatePicker() {
-        val calendar = Calendar.getInstance()
-        selectedDueDate?.let { calendar.time = it }
-
-        DatePickerDialog(
-            requireContext(),
-            R.style.Theme_OrderMate_DatePicker,
-            { _, year, month, day ->
-                calendar.set(year, month, day, 0, 0, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                selectedDueDate = calendar.time
-                updateDueDatePill()
-                applyDateFilters()
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
-    }
-
-    /**
-     * Clear Order Date selection (#12)
-     */
-    private fun clearOrderDate() {
-        selectedOrderDate = null
-        updateOrderDatePill()
-        applyDateFilters()
-    }
-
-    /**
-     * Clear Due Date selection (#12)
-     */
-    private fun clearDueDate() {
-        selectedDueDate = null
-        updateDueDatePill()
-        applyDateFilters()
-    }
-
-    /**
-     * Update Order Date pill display (#12)
-     */
-    private fun updateOrderDatePill() {
-        val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
-        if (selectedOrderDate != null) {
-            binding.orderDateText.text = dateFormat.format(selectedOrderDate!!)
-            binding.orderDateClear.visibility = View.VISIBLE
-        } else {
-            binding.orderDateText.text = "Order Date"
-            binding.orderDateClear.visibility = View.GONE
-        }
-    }
-
-    /**
-     * Update Due Date pill display (#12)
-     */
-    private fun updateDueDatePill() {
-        val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
-        if (selectedDueDate != null) {
-            binding.dueDateText.text = dateFormat.format(selectedDueDate!!)
-            binding.dueDateClear.visibility = View.VISIBLE
-        } else {
-            binding.dueDateText.text = "Due Date"
-            binding.dueDateClear.visibility = View.GONE
-        }
-    }
+    // Date pill methods removed - date filtering now handled through Filter dialog
+    // The applyDateFilters method is still used when filter dialog selections change
 
     /**
      * Apply date filters for Order Date and Due Date (#12)

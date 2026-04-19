@@ -139,6 +139,14 @@ class MainActivityRedesign : AppCompatActivity() {
         navCalendarIndicator = findViewById(R.id.navCalendarIndicator)
         navSettingsIndicator = findViewById(R.id.navSettingsIndicator)
         
+        // Logo click handler - navigate to list (home)
+        val navLogo: FrameLayout = findViewById(R.id.navLogo)
+        navLogo.setOnClickListener {
+            if (currentNavItem != R.id.navList) {
+                onNavItemClicked(R.id.navList)
+            }
+        }
+        
         // Set up click listeners
         navList.setOnClickListener { onNavItemClicked(R.id.navList) }
         navCalendar.setOnClickListener { onNavItemClicked(R.id.navCalendar) }

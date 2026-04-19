@@ -63,6 +63,19 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tabFilter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_settings_subtab"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="10dp"
+                android:text="Filter"
+                android:textColor="@color/text_muted"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
                 android:id="@+id/tabNotification"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -212,6 +225,87 @@
 
                 </LinearLayout>
 
+                <!-- Enable Custom Notes Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_settings_card_glass"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Enable Custom Notes"
+                        android:textColor="@color/text_light"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="16dp"
+                        android:text="Choose How You Take Custom Notes"
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp" />
+
+                    <!-- Enable Item Level Notes Toggle -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_toggle_option_container"
+                        android:padding="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Enable Item Level Notes"
+                            android:textColor="@color/text_light"
+                            android:textSize="13sp" />
+
+                        <Switch
+                            android:id="@+id/switchItemNotesEnabledGeneral"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:thumb="@drawable/bg_toggle_thumb"
+                            android:track="@drawable/bg_toggle_track" />
+                    </LinearLayout>
+
+                    <!-- Enable Order Level Notes Toggle -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_toggle_option_container"
+                        android:padding="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Enable Order Level Notes"
+                            android:textColor="@color/text_light"
+                            android:textSize="13sp" />
+
+                        <Switch
+                            android:id="@+id/switchOrderNotesEnabledGeneral"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:thumb="@drawable/bg_toggle_thumb"
+                            android:track="@drawable/bg_toggle_track" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
             </LinearLayout>
         </ScrollView>
 
@@ -329,16 +423,9 @@
                         android:gravity="center"
                         android:orientation="horizontal">
 
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_add"
-                            app:tint="@color/text_muted" />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
                             android:text="Add Widget"
                             android:textColor="@color/text_muted"
                             android:textSize="13sp" />
@@ -464,21 +551,107 @@
                         android:gravity="center"
                         android:orientation="horizontal">
 
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_add"
-                            app:tint="@color/text_muted" />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
                             android:text="Add Widget"
                             android:textColor="@color/text_muted"
                             android:textSize="13sp" />
 
                     </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- Filter Panel -->
+        <ScrollView
+            android:id="@+id/panelFilter"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Filter Popup Settings Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_settings_card_glass"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Filter Popup Settings"
+                        android:textColor="@color/text_light"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="16dp"
+                        android:text="Choose which widgets appear in the filter popup. Clover filters (Payment Status, Order Status, etc.) are always shown."
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp" />
+
+                    <!-- Item Level Widgets Section -->
+                    <TextView
+                        android:id="@+id/filterItemLevelHeader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="Item Level Widgets"
+                        android:textColor="@color/text_light"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:id="@+id/filterItemLevelWidgetsContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                    <!-- Order Level Widgets Section -->
+                    <TextView
+                        android:id="@+id/filterOrderLevelHeader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="Order Level Widgets"
+                        android:textColor="@color/text_light"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:id="@+id/filterOrderLevelWidgetsContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                    <!-- Empty State -->
+                    <TextView
+                        android:id="@+id/filterEmptyState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingVertical="24dp"
+                        android:text="No filterable widgets available.\nEnable widgets in Item Level or Order Level Notes settings."
+                        android:textAlignment="center"
+                        android:textColor="@color/text_muted"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
@@ -595,7 +768,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:layout_marginBottom="16dp"
-                        android:text="When to receive notifications for scheduled orders"
+                        android:text="Send notification before due date/time"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
 

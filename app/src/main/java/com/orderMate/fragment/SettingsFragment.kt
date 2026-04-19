@@ -57,6 +57,7 @@ class SettingsFragment : Fragment() {
     private var tabGeneral: TextView? = null
     private var tabItemLevelNotes: TextView? = null
     private var tabOrderLevelNotes: TextView? = null
+    private var tabFilter: TextView? = null
     private var tabNotification: TextView? = null
     private var tabAdvanced: TextView? = null
     
@@ -64,11 +65,21 @@ class SettingsFragment : Fragment() {
     private var panelGeneral: View? = null
     private var panelItemLevelNotes: View? = null
     private var panelOrderLevelNotes: View? = null
+    private var panelFilter: View? = null
     private var panelNotification: View? = null
     private var panelAdvanced: View? = null
     
     // General Panel
     private var switchUseInCloverRegister: Switch? = null
+    private var switchItemNotesEnabledGeneral: Switch? = null
+    private var switchOrderNotesEnabledGeneral: Switch? = null
+    
+    // Filter Panel
+    private var filterItemLevelHeader: TextView? = null
+    private var filterOrderLevelHeader: TextView? = null
+    private var filterItemLevelWidgetsContainer: LinearLayout? = null
+    private var filterOrderLevelWidgetsContainer: LinearLayout? = null
+    private var filterEmptyState: TextView? = null
     
     // Item Level Notes Panel (#34)
     private var switchItemNotesEnabled: Switch? = null
@@ -138,6 +149,7 @@ class SettingsFragment : Fragment() {
         tabGeneral = view.findViewById(R.id.tabGeneral)
         tabItemLevelNotes = view.findViewById(R.id.tabItemLevelNotes)
         tabOrderLevelNotes = view.findViewById(R.id.tabOrderLevelNotes)
+        tabFilter = view.findViewById(R.id.tabFilter)
         tabNotification = view.findViewById(R.id.tabNotification)
         tabAdvanced = view.findViewById(R.id.tabAdvanced)
         
@@ -145,11 +157,21 @@ class SettingsFragment : Fragment() {
         panelGeneral = view.findViewById(R.id.panelGeneral)
         panelItemLevelNotes = view.findViewById(R.id.panelItemLevelNotes)
         panelOrderLevelNotes = view.findViewById(R.id.panelOrderLevelNotes)
+        panelFilter = view.findViewById(R.id.panelFilter)
         panelNotification = view.findViewById(R.id.panelNotification)
         panelAdvanced = view.findViewById(R.id.panelAdvanced)
         
         // General Panel
         switchUseInCloverRegister = view.findViewById(R.id.switchUseInCloverRegister)
+        switchItemNotesEnabledGeneral = view.findViewById(R.id.switchItemNotesEnabledGeneral)
+        switchOrderNotesEnabledGeneral = view.findViewById(R.id.switchOrderNotesEnabledGeneral)
+        
+        // Filter Panel
+        filterItemLevelHeader = view.findViewById(R.id.filterItemLevelHeader)
+        filterOrderLevelHeader = view.findViewById(R.id.filterOrderLevelHeader)
+        filterItemLevelWidgetsContainer = view.findViewById(R.id.filterItemLevelWidgetsContainer)
+        filterOrderLevelWidgetsContainer = view.findViewById(R.id.filterOrderLevelWidgetsContainer)
+        filterEmptyState = view.findViewById(R.id.filterEmptyState)
         
         // Item Level Notes Panel (#34)
         switchItemNotesEnabled = view.findViewById(R.id.switchItemNotesEnabled)
@@ -178,6 +200,7 @@ class SettingsFragment : Fragment() {
         tabGeneral?.setOnClickListener { switchToTab("general") }
         tabItemLevelNotes?.setOnClickListener { switchToTab("item_level") }
         tabOrderLevelNotes?.setOnClickListener { switchToTab("order_level") }
+        tabFilter?.setOnClickListener { switchToTab("filter") }
         tabNotification?.setOnClickListener { switchToTab("notification") }
         tabAdvanced?.setOnClickListener { switchToTab("advanced") }
     }
@@ -186,11 +209,11 @@ class SettingsFragment : Fragment() {
         currentTab = tab
         
         // Update tab appearance
-        val tabs = listOf(tabGeneral, tabItemLevelNotes, tabOrderLevelNotes, tabNotification, tabAdvanced)
-        val tabNames = listOf("general", "item_level", "order_level", "notification", "advanced")
+        val tabs = listOf(tabGeneral, tabItemLevelNotes, tabOrderLevelNotes, tabFilter, tabNotification, tabAdvanced)
+        val tabNames = listOf("general", "item_level", "order_level", "filter", "notification", "advanced")
         
         tabs.forEachIndexed { index, textView ->
-            val isSelected = tabNames[index] == tab
+            val isSelected = tabNames.getOrNull(index) == tab
             textView?.isSelected = isSelected
             textView?.setTextColor(
                 ContextCompat.getColor(
@@ -204,8 +227,14 @@ class SettingsFragment : Fragment() {
         panelGeneral?.visibility = if (tab == "general") View.VISIBLE else View.GONE
         panelItemLevelNotes?.visibility = if (tab == "item_level") View.VISIBLE else View.GONE
         panelOrderLevelNotes?.visibility = if (tab == "order_level") View.VISIBLE else View.GONE
+        panelFilter?.visibility = if (tab == "filter") View.VISIBLE else View.GONE
         panelNotification?.visibility = if (tab == "notification") View.VISIBLE else View.GONE
         panelAdvanced?.visibility = if (tab == "advanced") View.VISIBLE else View.GONE
+        
+        // Load filter widgets when switching to filter tab
+        if (tab == "filter") {
+            loadFilterWidgetToggles()
+        }
     }
 
     // ==================== General Panel ====================
@@ -224,6 +253,42 @@ class SettingsFragment : Fragment() {
                 }
             }
         }
+        
+        // Item Level Notes toggle in General panel - disables ALL item level widgets when off
+        switchItemNotesEnabledGeneral?.setOnCheckedChangeListener { _, isChecked ->
+            widgetManager.setItemNotesEnabled(isChecked) { success ->
+                if (success) {
+                    activity?.runOnUiThread {
+                        // Also update the Item Level Notes tab toggle if visible
+                        switchItemNotesEnabled?.isChecked = isChecked
+                        itemLevelEditorCard?.alpha = if (isChecked) 1.0f else 0.5f
+                        btnAddItemLevelWidget?.isEnabled = isChecked
+                    }
+                } else {
+                    activity?.runOnUiThread {
+                        Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+        
+        // Order Level Notes toggle in General panel - disables ALL order level widgets when off
+        switchOrderNotesEnabledGeneral?.setOnCheckedChangeListener { _, isChecked ->
+            widgetManager.setOrderNotesEnabled(isChecked) { success ->
+                if (success) {
+                    activity?.runOnUiThread {
+                        // Also update the Order Level Notes tab toggle if visible
+                        switchOrderNotesEnabled?.isChecked = isChecked
+                        orderLevelEditorCard?.alpha = if (isChecked) 1.0f else 0.5f
+                        btnAddOrderLevelWidget?.isEnabled = isChecked
+                    }
+                } else {
+                    activity?.runOnUiThread {
+                        Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
     // ==================== Item Level Notes Panel ====================
@@ -234,6 +299,9 @@ class SettingsFragment : Fragment() {
             // Update editor card visibility based on toggle
             itemLevelEditorCard?.alpha = if (isChecked) 1.0f else 0.5f
             btnAddItemLevelWidget?.isEnabled = isChecked
+            
+            // Also update the General panel toggle
+            switchItemNotesEnabledGeneral?.isChecked = isChecked
             
             // Save to Firebase
             widgetManager.setItemNotesEnabled(isChecked) { success ->
@@ -296,6 +364,9 @@ class SettingsFragment : Fragment() {
             // Update editor card visibility based on toggle
             orderLevelEditorCard?.alpha = if (isChecked) 1.0f else 0.5f
             btnAddOrderLevelWidget?.isEnabled = isChecked
+            
+            // Also update the General panel toggle
+            switchOrderNotesEnabledGeneral?.isChecked = isChecked
             
             // Save to Firebase
             widgetManager.setOrderNotesEnabled(isChecked) { success ->
@@ -680,9 +751,11 @@ class SettingsFragment : Fragment() {
                         switchUseInCloverRegister?.isChecked = settings.showOMButtonInRegister
                         settingsManager.setUseOrderMateRegister(settings.showOMButtonInRegister)
                         
-                        // Update item/order notes toggles (#34)
+                        // Update item/order notes toggles (#34) - both in dedicated tabs and General panel
                         switchItemNotesEnabled?.isChecked = settings.itemNotesEnabled
                         switchOrderNotesEnabled?.isChecked = settings.orderNotesEnabled
+                        switchItemNotesEnabledGeneral?.isChecked = settings.itemNotesEnabled
+                        switchOrderNotesEnabledGeneral?.isChecked = settings.orderNotesEnabled
                         
                         // Update editor card visibility based on toggle state
                         itemLevelEditorCard?.alpha = if (settings.itemNotesEnabled) 1.0f else 0.5f
@@ -713,6 +786,134 @@ class SettingsFragment : Fragment() {
                     inputReceiptMinutes?.setText(settings.receiptMinutes.toString())
                 }
             }
+        }
+    }
+    
+    // ==================== Filter Panel ====================
+    
+    /**
+     * Load all enabled widgets (Item + Order level) and display toggles for showInFilter
+     * Only shows widgets that are enabled - TEXT_BOX types excluded since they can't be filtered
+     */
+    private fun loadFilterWidgetToggles() {
+        filterItemLevelWidgetsContainer?.removeAllViews()
+        filterOrderLevelWidgetsContainer?.removeAllViews()
+        
+        val allWidgets = widgetManager.getWidgets()
+        
+        // Get Item Level widgets (enabled, not TEXT_BOX)
+        val itemLevelWidgets = allWidgets.filter { 
+            it.isEnabled && it.type != FirebaseWidgetType.TEXT_BOX && it.level == NoteLevel.ITEM 
+        }.sortedBy { it.order }
+        
+        // Get Order Level widgets (enabled, not TEXT_BOX)
+        val orderLevelWidgets = allWidgets.filter { 
+            it.isEnabled && it.type != FirebaseWidgetType.TEXT_BOX && it.level == NoteLevel.ORDER 
+        }.sortedBy { it.order }
+        
+        val hasItemWidgets = itemLevelWidgets.isNotEmpty()
+        val hasOrderWidgets = orderLevelWidgets.isNotEmpty()
+        
+        // Show/hide section headers
+        filterItemLevelHeader?.visibility = if (hasItemWidgets) View.VISIBLE else View.GONE
+        filterOrderLevelHeader?.visibility = if (hasOrderWidgets) View.VISIBLE else View.GONE
+        
+        // Show empty state if no widgets
+        if (!hasItemWidgets && !hasOrderWidgets) {
+            filterEmptyState?.visibility = View.VISIBLE
+            return
+        }
+        filterEmptyState?.visibility = View.GONE
+        
+        // Add Item Level widget toggles
+        itemLevelWidgets.forEach { widget ->
+            val toggleRow = createFilterWidgetToggleRow(widget)
+            filterItemLevelWidgetsContainer?.addView(toggleRow)
+        }
+        
+        // Add Order Level widget toggles
+        orderLevelWidgets.forEach { widget ->
+            val toggleRow = createFilterWidgetToggleRow(widget)
+            filterOrderLevelWidgetsContainer?.addView(toggleRow)
+        }
+    }
+    
+    /**
+     * Create a toggle row for a widget's showInFilter setting
+     */
+    private fun createFilterWidgetToggleRow(widget: WidgetConfig): View {
+        val context = requireContext()
+        val density = resources.displayMetrics.density
+        
+        return LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            setBackgroundResource(R.drawable.bg_toggle_option_container)
+            setPadding((14 * density).toInt(), (14 * density).toInt(), (14 * density).toInt(), (14 * density).toInt())
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { bottomMargin = (8 * density).toInt() }
+            
+            // Widget type indicator icon
+            val iconRes = when (widget.type) {
+                FirebaseWidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
+                FirebaseWidgetType.MULTI_SELECT -> R.drawable.ic_label
+                FirebaseWidgetType.CALENDAR -> R.drawable.ic_calendar
+                else -> R.drawable.ic_edit
+            }
+            
+            val icon = ImageView(context).apply {
+                setImageResource(iconRes)
+                setColorFilter(ContextCompat.getColor(context, R.color.text_muted))
+                layoutParams = LinearLayout.LayoutParams((18 * density).toInt(), (18 * density).toInt()).apply {
+                    marginEnd = (12 * density).toInt()
+                }
+            }
+            addView(icon)
+            
+            // Widget label
+            val label = TextView(context).apply {
+                text = widget.label
+                setTextColor(ContextCompat.getColor(context, R.color.text_light))
+                textSize = 13f
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            }
+            addView(label)
+            
+            // Widget type badge
+            val typeBadge = TextView(context).apply {
+                text = when (widget.type) {
+                    FirebaseWidgetType.SINGLE_SELECT -> "Single"
+                    FirebaseWidgetType.MULTI_SELECT -> "Multi"
+                    FirebaseWidgetType.CALENDAR -> "Date"
+                    else -> ""
+                }
+                setTextColor(ContextCompat.getColor(context, R.color.text_muted))
+                textSize = 10f
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, 
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { marginEnd = (12 * density).toInt() }
+            }
+            addView(typeBadge)
+            
+            // Toggle switch for showInFilter
+            val toggle = Switch(context).apply {
+                isChecked = widget.showInFilter
+                setOnCheckedChangeListener { _, isChecked ->
+                    widget.showInFilter = isChecked
+                    widgetManager.updateWidget(widget) { success ->
+                        if (!success) {
+                            activity?.runOnUiThread {
+                                this.isChecked = !isChecked // Revert on failure
+                                Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+            }
+            addView(toggle)
         }
     }
     
@@ -752,14 +953,23 @@ class SettingsFragment : Fragment() {
         tabGeneral = null
         tabItemLevelNotes = null
         tabOrderLevelNotes = null
+        tabFilter = null
         tabNotification = null
         tabAdvanced = null
         panelGeneral = null
         panelItemLevelNotes = null
         panelOrderLevelNotes = null
+        panelFilter = null
         panelNotification = null
         panelAdvanced = null
         switchUseInCloverRegister = null
+        switchItemNotesEnabledGeneral = null
+        switchOrderNotesEnabledGeneral = null
+        filterItemLevelHeader = null
+        filterOrderLevelHeader = null
+        filterItemLevelWidgetsContainer = null
+        filterOrderLevelWidgetsContainer = null
+        filterEmptyState = null
         itemLevelWidgetRecyclerView = null
         orderLevelWidgetRecyclerView = null
         btnAddItemLevelWidget = null
