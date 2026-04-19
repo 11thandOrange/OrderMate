@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OrderMate Pills Preview</title>
+    <title>OrderMate Pill Preview - Unified 15% Opacity</title>
     <style>
         * {
             margin: 0;
@@ -13,436 +13,623 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-            padding: 20px;
+            background: #1a1a2e;
             color: #fff;
+            padding: 20px;
+            min-height: 100vh;
         }
         
         h1 {
             text-align: center;
-            margin-bottom: 30px;
-            font-weight: 300;
+            margin-bottom: 10px;
+            color: #fff;
         }
         
-        h2 {
-            margin-bottom: 15px;
-            font-weight: 400;
-            color: #a0a0a0;
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
             font-size: 14px;
+        }
+        
+        .color-legend {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 30px;
+        }
+        
+        .color-legend h3 {
+            margin-bottom: 12px;
+            color: #aaa;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+        }
+        
+        .legend-label {
+            font-size: 13px;
+            color: #ccc;
+        }
+        
         .section {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.05);
             border-radius: 16px;
             padding: 20px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .note-format {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-family: monospace;
             margin-bottom: 20px;
-            font-size: 13px;
-            color: #7dd3fc;
         }
         
-        /* ============ LIST TAB PILLS ============ */
-        .list-card {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 15px;
-        }
-        
-        .list-card-header {
+        .section-header {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         
-        .order-id {
+        .section-title {
+            font-size: 16px;
             font-weight: 600;
-            color: #fff;
         }
         
-        .order-total {
-            color: #4ade80;
-            font-weight: 500;
+        .section-file {
+            font-size: 11px;
+            color: #888;
+            background: rgba(255,255,255,0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
         }
         
         .pills-container {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+            align-items: center;
         }
         
+        /* Base pill with icon */
         .pill {
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-        }
-        
-        .pill-icon {
-            font-size: 11px;
-            opacity: 0.9;
-        }
-        
-        .pill-calendar {
-            background: rgba(251, 146, 60, 0.3);
-            color: #fed7aa;
-        }
-        
-        .pill-single {
-            background: rgba(34, 197, 94, 0.3);
-            color: #86efac;
-        }
-        
-        .pill-multi {
-            background: rgba(59, 130, 246, 0.3);
-            color: #93c5fd;
-        }
-        
-        .pill-text {
-            background: rgba(255, 255, 255, 0.15);
-            color: #d1d5db;
-        }
-        
-        /* ============ ORDER DETAIL PILLS ============ */
-        .detail-item {
-            display: flex;
-            align-items: flex-start;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
+            gap: 6px;
+            padding: 4px 8px;
             border-radius: 10px;
-            margin-bottom: 10px;
+            font-size: 11px;
+            font-weight: 500;
         }
         
-        .item-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
+        .pill svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+        
+        /* Badge (no icon, larger padding) */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        /* Widget Colors - 15% opacity backgrounds with 25% border */
+        .pill-calendar {
+            background: rgba(100, 181, 246, 0.15);
+            border: 1px solid rgba(100, 181, 246, 0.25);
+            color: #64B5F6;
+        }
+        .pill-calendar svg { fill: #64B5F6; }
+        
+        .pill-single-select {
+            background: rgba(206, 147, 216, 0.15);
+            border: 1px solid rgba(206, 147, 216, 0.25);
+            color: #CE93D8;
+        }
+        .pill-single-select svg { fill: #CE93D8; }
+        
+        .pill-multi-select {
+            background: rgba(129, 199, 132, 0.15);
+            border: 1px solid rgba(129, 199, 132, 0.25);
+            color: #81C784;
+        }
+        .pill-multi-select svg { fill: #81C784; }
+        
+        .pill-text-box {
+            background: rgba(161, 136, 127, 0.15);
+            border: 1px solid rgba(161, 136, 127, 0.25);
+            color: #A1887F;
+        }
+        .pill-text-box svg { fill: #A1887F; }
+        
+        /* Clover Filter Colors - 15% opacity backgrounds with 25% border */
+        .badge-order-status {
+            background: rgba(239, 83, 80, 0.15);
+            border: 1px solid rgba(239, 83, 80, 0.25);
+            color: #EF5350;
+        }
+        
+        .badge-payment-status {
+            background: rgba(255, 183, 77, 0.15);
+            border: 1px solid rgba(255, 183, 77, 0.25);
+            color: #FFB74D;
+        }
+        
+        .badge-payment-type {
+            background: rgba(158, 158, 158, 0.15);
+            border: 1px solid rgba(158, 158, 158, 0.25);
+            color: #9E9E9E;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .comparison-box {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        
+        .comparison-box h4 {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        
+        /* OLD solid style for comparison */
+        .badge-solid-red {
+            background: #EF5350;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .badge-solid-yellow {
+            background: #FFB74D;
+            color: #212121;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .badge-solid-grey {
+            background: #9E9E9E;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .card-preview {
+            background: rgba(255,255,255,0.08);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.1);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 12px;
-            font-size: 20px;
         }
         
-        .item-content {
+        .card-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: rgba(255,255,255,0.7);
+        }
+        
+        .card-title {
+            flex: 1;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .card-content {
+            padding: 16px 20px;
+        }
+        
+        .card-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .card-row:last-child {
+            border-bottom: none;
+        }
+        
+        .card-row-label {
+            width: 100px;
+            color: #888;
+            font-size: 13px;
+        }
+        
+        .list-item-preview {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .list-item-content {
+            flex: 1;
+        }
+        
+        .list-item-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .list-item-date {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .note {
+            background: rgba(100, 181, 246, 0.1);
+            border-left: 3px solid #64B5F6;
+            padding: 12px 16px;
+            margin-top: 30px;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            color: #aaa;
+        }
+        
+        .note strong {
+            color: #64B5F6;
+        }
+        
+        .item-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .item-row:last-child {
+            border-bottom: none;
+        }
+        
+        .item-info {
             flex: 1;
         }
         
         .item-name {
             font-weight: 500;
-            margin-bottom: 8px;
-        }
-        
-        .item-pills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        
-        .detail-pill {
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .detail-pill-calendar {
-            background: #ea580c;
-            color: #fff;
-        }
-        
-        .detail-pill-single {
-            background: #16a34a;
-            color: #fff;
-        }
-        
-        .detail-pill-multi {
-            background: #2563eb;
-            color: #fff;
-        }
-        
-        .detail-pill-text {
-            background: #525252;
-            color: #fff;
-        }
-        
-        .item-meta {
-            display: flex;
-            gap: 20px;
-            margin-left: auto;
-            align-items: center;
-        }
-        
-        .item-qty {
-            color: #9ca3af;
             font-size: 14px;
+            margin-bottom: 6px;
         }
         
         .item-price {
-            font-weight: 600;
-            color: #4ade80;
-        }
-        
-        /* ============ COMPARISON ============ */
-        .comparison {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        .before, .after {
-            padding: 15px;
-            border-radius: 10px;
-        }
-        
-        .before {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-        
-        .after {
-            background: rgba(34, 197, 94, 0.2);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-        }
-        
-        .label {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            display: block;
-        }
-        
-        .before .label { color: #fca5a5; }
-        .after .label { color: #86efac; }
-        
-        .single-pill {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 8px 14px;
-            border-radius: 6px;
-            font-size: 13px;
-            display: inline-block;
-        }
-        
-        /* ============ WIDGET TYPES LEGEND ============ */
-        .legend {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .legend-item {
-            text-align: center;
-        }
-        
-        .legend-item .pill {
-            margin-bottom: 8px;
-        }
-        
-        .legend-label {
-            font-size: 11px;
-            color: #9ca3af;
+            color: #81C784;
+            font-weight: 500;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <h1>OrderMate Pills Preview</h1>
+    <h1>OrderMate Pill Preview</h1>
+    <p class="subtitle">Unified 15% Opacity + Border Stroke - All Locations</p>
     
-    <!-- Widget Types Legend -->
-    <div class="section">
-        <h2>Widget Types & Icons</h2>
-        <div class="legend">
+    <!-- Color Legend -->
+    <div class="color-legend">
+        <h3>Widget Colors (with icons)</h3>
+        <div class="legend-grid">
             <div class="legend-item">
-                <span class="pill pill-calendar"><span class="pill-icon">📅</span> Dec 25</span>
-                <div class="legend-label">CALENDAR</div>
+                <div class="legend-swatch" style="background: #64B5F6;"></div>
+                <span class="legend-label">Calendar/Date - Blue (#64B5F6) - ic_calendar</span>
             </div>
             <div class="legend-item">
-                <span class="pill pill-single"><span class="pill-icon">◉</span> Ready</span>
-                <div class="legend-label">SINGLE_SELECT</div>
+                <div class="legend-swatch" style="background: #CE93D8;"></div>
+                <span class="legend-label">Single Select - Purple (#CE93D8) - ic_check_box</span>
             </div>
             <div class="legend-item">
-                <span class="pill pill-multi"><span class="pill-icon">🏷️</span> Rush</span>
-                <div class="legend-label">MULTI_SELECT</div>
+                <div class="legend-swatch" style="background: #81C784;"></div>
+                <span class="legend-label">Multi Select - Green (#81C784) - ic_label</span>
             </div>
             <div class="legend-item">
-                <span class="pill pill-text"><span class="pill-icon">✏️</span> Custom msg</span>
-                <div class="legend-label">TEXT_BOX</div>
+                <div class="legend-swatch" style="background: #A1887F;"></div>
+                <span class="legend-label">Text Box - Brown (#A1887F) - ic_edit</span>
             </div>
         </div>
-    </div>
-    
-    <!-- Note Format -->
-    <div class="section">
-        <h2>Note String Format (saved to Clover)</h2>
-        <div class="note-format">
-            "Pickup Date:Dec 25, 2024 • Status:Ready • Category:Birthday • Tags:Rush,VIP • Description:Custom message"
+        <h3 style="margin-top: 16px;">Clover Filter Colors (text only badges)</h3>
+        <div class="legend-grid">
+            <div class="legend-item">
+                <div class="legend-swatch" style="background: #EF5350;"></div>
+                <span class="legend-label">Order Status - Red (#EF5350)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-swatch" style="background: #FFB74D;"></div>
+                <span class="legend-label">Payment Status - Yellow (#FFB74D)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-swatch" style="background: #9E9E9E;"></div>
+                <span class="legend-label">Payment Type - Grey (#9E9E9E)</span>
+            </div>
         </div>
-        <p style="color: #9ca3af; font-size: 13px;">
-            Delimiter: <strong>•</strong> (bullet symbol) &nbsp;|&nbsp; 
-            Format: <strong>Label:Value</strong> &nbsp;|&nbsp;
-            Multi-values: <strong>comma-separated</strong>
-        </p>
     </div>
     
     <!-- Before/After Comparison -->
-    <div class="section">
-        <h2>Bug Fix Comparison</h2>
-        <div class="comparison">
-            <div class="before">
-                <span class="label">❌ Before (Bug)</span>
-                <div class="single-pill">
-                    Pickup Date:Dec 25 | Status:Ready | Category:Birthday
-                </div>
-                <p style="margin-top: 10px; font-size: 12px; color: #fca5a5;">
-                    All notes in ONE pill, separated by "|"
-                </p>
+    <div class="comparison">
+        <div class="comparison-box">
+            <h4>❌ Before (Inconsistent)</h4>
+            <p style="font-size: 12px; color: #666; margin-bottom: 12px;">Header badges = solid, other pills = 15% opacity</p>
+            <div class="pills-container">
+                <span class="badge-solid-red">CLOSED</span>
+                <span class="badge-solid-yellow">PAID</span>
+                <span class="badge-solid-grey">CASH</span>
             </div>
-            <div class="after">
-                <span class="label">✅ After (Fixed)</span>
+        </div>
+        <div class="comparison-box">
+            <h4>✅ After (Unified)</h4>
+            <p style="font-size: 12px; color: #666; margin-bottom: 12px;">All pills = 15% opacity + border stroke</p>
+            <div class="pills-container">
+                <span class="badge badge-order-status">CLOSED</span>
+                <span class="badge badge-payment-status">PAID</span>
+                <span class="badge badge-payment-type">CASH</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Section 1: Header Badges -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-title">1. Header Badges (Order Details Card)</span>
+            <span class="section-file">OrderDetailFragment.kt:188-209</span>
+        </div>
+        <div class="card-preview">
+            <div class="card-header">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                </div>
+                <span class="card-title">Order Details</span>
                 <div class="pills-container">
-                    <span class="pill pill-calendar"><span class="pill-icon">📅</span> Dec 25</span>
-                    <span class="pill pill-single"><span class="pill-icon">◉</span> Ready</span>
-                    <span class="pill pill-multi"><span class="pill-icon">🏷️</span> Birthday</span>
+                    <span class="badge badge-order-status">CLOSED</span>
+                    <span class="badge badge-payment-status">PAID</span>
+                    <span class="badge badge-payment-type">CASH</span>
                 </div>
-                <p style="margin-top: 10px; font-size: 12px; color: #86efac;">
-                    Each note as SEPARATE pill with icon
-                </p>
             </div>
         </div>
     </div>
     
-    <!-- List Tab Preview -->
+    <!-- Section 2: Order Tags -->
     <div class="section">
-        <h2>List Tab - Order Cards</h2>
-        
-        <div class="list-card">
-            <div class="list-card-header">
-                <span class="order-id">Order #1234</span>
-                <span class="order-total">$45.99</span>
-            </div>
-            <div class="pills-container">
-                <span class="pill pill-calendar"><span class="pill-icon">📅</span> Dec 25, 2024</span>
-                <span class="pill pill-single"><span class="pill-icon">◉</span> Ready</span>
-                <span class="pill pill-multi"><span class="pill-icon">🏷️</span> Birthday</span>
-                <span class="pill pill-multi"><span class="pill-icon">🏷️</span> Rush</span>
-                <span class="pill pill-multi"><span class="pill-icon">🏷️</span> VIP</span>
-            </div>
+        <div class="section-header">
+            <span class="section-title">2. Order Tags (Order Details Card - tagsContainer)</span>
+            <span class="section-file">OrderDetailFragment.kt:417-431</span>
         </div>
-        
-        <div class="list-card">
-            <div class="list-card-header">
-                <span class="order-id">Order #1235</span>
-                <span class="order-total">$128.50</span>
-            </div>
-            <div class="pills-container">
-                <span class="pill pill-calendar"><span class="pill-icon">📅</span> Dec 28, 2024</span>
-                <span class="pill pill-single"><span class="pill-icon">◉</span> In Progress</span>
-                <span class="pill pill-multi"><span class="pill-icon">🏷️</span> Wedding</span>
-                <span class="pill pill-text"><span class="pill-icon">✏️</span> 3-tier cake</span>
-            </div>
-        </div>
-        
-        <div class="list-card">
-            <div class="list-card-header">
-                <span class="order-id">Order #1236</span>
-                <span class="order-total">$22.00</span>
-            </div>
-            <div class="pills-container">
-                <span class="pill pill-single"><span class="pill-icon">◉</span> Pickup</span>
-                <span class="pill pill-single"><span class="pill-icon">◉</span> Completed</span>
+        <div class="card-preview">
+            <div class="card-content">
+                <div class="card-row">
+                    <span class="card-row-label">Order Tags</span>
+                    <div class="pills-container">
+                        <span class="pill pill-single-select">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                            Rush
+                        </span>
+                        <span class="pill pill-multi-select">
+                            <svg viewBox="0 0 24 24"><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/></svg>
+                            Catering
+                        </span>
+                        <span class="pill pill-calendar">
+                            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+                            12/25
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     
-    <!-- Order Detail Preview -->
+    <!-- Section 3: Order Notes Pills -->
     <div class="section">
-        <h2>Order Detail Tab - Line Items</h2>
-        
-        <div class="detail-item">
-            <div class="item-icon">🎂</div>
-            <div class="item-content">
-                <div class="item-name">Custom Birthday Cake</div>
-                <div class="item-pills">
-                    <span class="detail-pill detail-pill-calendar"><span class="pill-icon">📅</span> Dec 25</span>
-                    <span class="detail-pill detail-pill-single"><span class="pill-icon">◉</span> Ready</span>
-                    <span class="detail-pill detail-pill-multi"><span class="pill-icon">🏷️</span> Birthday</span>
-                    <span class="detail-pill detail-pill-multi"><span class="pill-icon">🏷️</span> Rush</span>
-                </div>
-            </div>
-            <div class="item-meta">
-                <span class="item-qty">x1</span>
-                <span class="item-price">$45.99</span>
-            </div>
+        <div class="section-header">
+            <span class="section-title">3. Order Notes Pills</span>
+            <span class="section-file">OrderDetailFragment.kt:566-590</span>
         </div>
-        
-        <div class="detail-item">
-            <div class="item-icon">🧁</div>
-            <div class="item-content">
-                <div class="item-name">Cupcakes (12 pack)</div>
-                <div class="item-pills">
-                    <span class="detail-pill detail-pill-multi"><span class="pill-icon">🏷️</span> Custom</span>
-                    <span class="detail-pill detail-pill-single"><span class="pill-icon">◉</span> Delivery</span>
-                    <span class="detail-pill detail-pill-text"><span class="pill-icon">✏️</span> Extra frosting</span>
+        <div class="card-preview">
+            <div class="card-content">
+                <div class="card-row">
+                    <span class="card-row-label">Order Notes</span>
+                    <div class="pills-container">
+                        <span class="pill pill-text-box">
+                            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                            Special instructions
+                        </span>
+                        <span class="pill pill-calendar">
+                            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+                            Pickup: 3pm
+                        </span>
+                    </div>
                 </div>
-            </div>
-            <div class="item-meta">
-                <span class="item-qty">x2</span>
-                <span class="item-price">$36.00</span>
-            </div>
-        </div>
-        
-        <div class="detail-item">
-            <div class="item-icon">🍪</div>
-            <div class="item-content">
-                <div class="item-name">Cookie Box</div>
-                <div class="item-pills">
-                    <span class="detail-pill detail-pill-single"><span class="pill-icon">◉</span> Completed</span>
-                </div>
-            </div>
-            <div class="item-meta">
-                <span class="item-qty">x1</span>
-                <span class="item-price">$18.00</span>
             </div>
         </div>
     </div>
     
-    <!-- Parsing Logic -->
+    <!-- Section 4: Item Level Pills -->
     <div class="section">
-        <h2>Parsing Logic</h2>
-        <div class="note-format" style="white-space: pre-line;">
-Input:  "Pickup Date:Dec 25 • Status:Ready • Category:Birthday • Tags:Rush,VIP"
-
-Split by "•" →
-  ["Pickup Date:Dec 25", "Status:Ready", "Category:Birthday", "Tags:Rush,VIP"]
-
-For each part, split by ":" →
-  Label           Value         Widget Type      Icon
-  ─────────────────────────────────────────────────────
-  Pickup Date  →  "Dec 25"   →  CALENDAR      →  📅
-  Status       →  "Ready"    →  SINGLE_SELECT →  ◉
-  Category     →  "Birthday" →  MULTI_SELECT  →  🏷️
-  Tags         →  "Rush,VIP" →  MULTI_SELECT  →  🏷️ (split by ",")
+        <div class="section-header">
+            <span class="section-title">4. Item Level Pills (Order Detail Page)</span>
+            <span class="section-file">ItemAdapter.kt:155-181</span>
         </div>
+        <div class="card-preview">
+            <div class="card-content">
+                <div class="item-row">
+                    <div class="item-info">
+                        <div class="item-name">Burger Deluxe</div>
+                        <div class="pills-container">
+                            <span class="pill pill-single-select">
+                                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                                Medium Rare
+                            </span>
+                            <span class="pill pill-multi-select">
+                                <svg viewBox="0 0 24 24"><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/></svg>
+                                Extra Cheese
+                            </span>
+                            <span class="pill pill-multi-select">
+                                <svg viewBox="0 0 24 24"><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/></svg>
+                                Bacon
+                            </span>
+                        </div>
+                    </div>
+                    <span class="item-price">$12.99</span>
+                </div>
+                <div class="item-row">
+                    <div class="item-info">
+                        <div class="item-name">Caesar Salad</div>
+                        <div class="pills-container">
+                            <span class="pill pill-text-box">
+                                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                                No croutons
+                            </span>
+                        </div>
+                    </div>
+                    <span class="item-price">$8.99</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Section 5: List Row Pills -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-title">5. List Row Pills (Order List Page)</span>
+            <span class="section-file">OrderCardRedesignAdapter.kt:205-208, 498-499</span>
+        </div>
+        <div class="list-item-preview">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <div class="list-item-content">
+                <div class="list-item-name">John Smith</div>
+                <div class="list-item-date">Mar 15, 2026 • 2:30 PM</div>
+            </div>
+            <div class="pills-container">
+                <span class="badge badge-order-status">OPEN</span>
+                <span class="pill pill-single-select">
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    Rush
+                </span>
+                <span class="pill pill-calendar">
+                    <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+                    3/20
+                </span>
+            </div>
+        </div>
+        <div class="list-item-preview">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <div class="list-item-content">
+                <div class="list-item-name">Jane Doe</div>
+                <div class="list-item-date">Mar 15, 2026 • 1:15 PM</div>
+            </div>
+            <div class="pills-container">
+                <span class="badge badge-order-status">CLOSED</span>
+                <span class="badge badge-payment-status">PAID</span>
+                <span class="pill pill-multi-select">
+                    <svg viewBox="0 0 24 24"><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/></svg>
+                    Catering
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- All Pill Types Reference -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-title">All Pill Types Reference</span>
+        </div>
+        <h4 style="color: #888; font-size: 12px; margin-bottom: 12px;">Widget Pills (with icons):</h4>
+        <div class="pills-container" style="margin-bottom: 16px;">
+            <span class="pill pill-calendar">
+                <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+                Calendar
+            </span>
+            <span class="pill pill-single-select">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                Single Select
+            </span>
+            <span class="pill pill-multi-select">
+                <svg viewBox="0 0 24 24"><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/></svg>
+                Multi Select
+            </span>
+            <span class="pill pill-text-box">
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                Text Box
+            </span>
+        </div>
+        <h4 style="color: #888; font-size: 12px; margin-bottom: 12px;">Clover Filter Badges (text only):</h4>
+        <div class="pills-container">
+            <span class="badge badge-order-status">OPEN</span>
+            <span class="badge badge-order-status">CLOSED</span>
+            <span class="badge badge-payment-status">PAID</span>
+            <span class="badge badge-payment-status">UNPAID</span>
+            <span class="badge badge-payment-type">CASH</span>
+            <span class="badge badge-payment-type">CREDIT</span>
+        </div>
+    </div>
+    
+    <div class="note">
+        <strong>Implementation Note:</strong> All pills now use consistent styling via <code>WidgetColorUtils.createPillBackground()</code>:
+        <ul style="margin-top: 8px; margin-left: 20px;">
+            <li>Background: 15% opacity of the widget/filter color (0x26)</li>
+            <li>Border: 1px stroke at 25% opacity (0x40)</li>
+            <li>Text/Icon: Full color (100% opacity)</li>
+            <li>Corner radius: 10dp (pills) / 20dp (badges)</li>
+        </ul>
     </div>
 </body>
 </html>

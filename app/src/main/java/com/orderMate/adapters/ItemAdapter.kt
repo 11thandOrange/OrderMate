@@ -152,6 +152,7 @@ class ItemAdapter(
                     listOf(rawValue)
                 }
                 
+                val density = context.resources.displayMetrics.density
                 values.forEach { value ->
                     val pillView = LayoutInflater.from(context)
                         .inflate(R.layout.item_note_pill, container, false) as LinearLayout
@@ -159,10 +160,9 @@ class ItemAdapter(
                     val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
                     val pillText = pillView.findViewById<TextView>(R.id.pillText)
                     
-                    // Whole pill matches widget color (bg 15% opacity, text + icon full color)
+                    // Use WidgetColorUtils for consistent pill styling
                     val iconRes = getIconForLabel(label)
                     val color = getColorForLabel(label)
-                    val bgColor = (color and 0x00FFFFFF) or 0x26000000  // 15% opacity
                     
                     // Truncate to 12 chars, single line, no newlines
                     val displayText = value.replace("\n", " ").take(12).let {
@@ -174,12 +174,8 @@ class ItemAdapter(
                     pillIcon.setImageResource(iconRes)
                     pillIcon.setColorFilter(color)
                     
-                    // Set background with 15% opacity widget color
-                    val bg = android.graphics.drawable.GradientDrawable()
-                    bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                    bg.cornerRadius = 10f * context.resources.displayMetrics.density
-                    bg.setColor(bgColor)
-                    pillView.background = bg
+                    // Unified pill background: 15% opacity + 25% border
+                    pillView.background = WidgetColorUtils.createPillBackground(color, 10f, density)
                     
                     container.addView(pillView)
                 }

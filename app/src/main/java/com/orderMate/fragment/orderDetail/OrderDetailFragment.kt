@@ -185,15 +185,25 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                     createdTime?.formatMillisToDateTime(Constants.yearFormat)
                 binding.merchantName.text = preferenceManager.getString(Constants.merchantName)
 
-                // #45: Clover tags in header - Order Status (red), Payment Status (yellow), Payment Type (grey)
-                // Order Status badge
+                // #45: Clover tags in header - using unified pill styling (15% opacity + border)
+                val density = resources.displayMetrics.density
+                
+                // Order Status badge (Red)
                 val orderState = orderArguments?.state?.uppercase() ?: "OPEN"
                 val isOrderOpen = orderState == "OPEN"
                 binding.orderPlacedStatusValue.text = if (isOrderOpen) "OPEN" else "CLOSED"
+                binding.orderPlacedStatusValue.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
+                    com.orderMate.utils.WidgetColorUtils.COLOR_ORDER_STATUS, 20f, density
+                )
+                binding.orderPlacedStatusValue.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_ORDER_STATUS)
                 
-                // Payment Status badge
+                // Payment Status badge (Yellow)
                 val paymentState = orderArguments?.paymentState?.name ?: "NOT_PAID"
                 binding.paymentStatusBadge.text = formatPaymentState(paymentState).uppercase()
+                binding.paymentStatusBadge.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
+                    com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_STATUS, 20f, density
+                )
+                binding.paymentStatusBadge.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_STATUS)
                 
                 // Payment Type badge - get from order payments
                 populatePaymentTypeBadge()
@@ -415,14 +425,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                     (4 * density).toInt()
                 )
                 
-                // Styled like list row pills - 15% opacity bg with border
-                val bg = android.graphics.drawable.GradientDrawable().apply {
-                    shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                    cornerRadius = 10 * density
-                    setColor(com.orderMate.utils.WidgetColorUtils.getBackgroundColor(tagColor))
-                    setStroke((1 * density).toInt(), (tagColor and 0x00FFFFFF) or 0x40000000)
-                }
-                background = bg
+                // Unified pill background: 15% opacity + 25% border
+                background = com.orderMate.utils.WidgetColorUtils.createPillBackground(tagColor, 10f, density)
             }
             tagsContainer.addView(tagView)
             
@@ -553,32 +557,28 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         // Show section with notes
         section.visibility = View.VISIBLE
         
-        // Parse and display notes
+        // Parse and display notes using unified pill styling
         val notes = parseOrderNote(orderNote)
+        val density = resources.displayMetrics.density
         notes.forEach { noteItem ->
             val pillView = layoutInflater.inflate(R.layout.item_note_pill, container, false) as LinearLayout
             
             val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
             val pillText = pillView.findViewById<TextView>(R.id.pillText)
             
+            // Get color based on label using WidgetColorUtils
+            val pillColor = com.orderMate.utils.WidgetColorUtils.getColorForLabel(noteItem.label)
+            
             pillText.text = noteItem.text
             pillText.maxLines = 1
-            pillText.setTextColor(ContextCompat.getColor(requireContext(), R.color.order_pill_text))
+            pillText.setTextColor(pillColor)
             
             val iconRes = getIconForLabel(noteItem.label)
             pillIcon.setImageResource(iconRes)
-            pillIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.order_pill_icon))
+            pillIcon.setColorFilter(pillColor)
             
-            // Purple background for order-level notes
-            val bg = android.graphics.drawable.GradientDrawable()
-            bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-            bg.cornerRadius = 10f * resources.displayMetrics.density
-            bg.setColor(ContextCompat.getColor(requireContext(), R.color.order_pill_bg))
-            bg.setStroke(
-                (1 * resources.displayMetrics.density).toInt(),
-                ContextCompat.getColor(requireContext(), R.color.order_pill_border)
-            )
-            pillView.background = bg
+            // Unified pill background: 15% opacity + 25% border
+            pillView.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(pillColor, 10f, density)
             
             container.addView(pillView)
         }
@@ -1240,7 +1240,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             ?: firstPayment?.tender?.labelKey
             ?: return
         
+        val density = resources.displayMetrics.density
         binding.paymentTypeBadge.text = tenderType.uppercase()
+        binding.paymentTypeBadge.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
+            com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_TYPE, 20f, density
+        )
+        binding.paymentTypeBadge.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_TYPE)
         binding.paymentTypeBadge.visibility = View.VISIBLE
     }
 }

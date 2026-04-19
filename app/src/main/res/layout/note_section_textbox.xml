@@ -7,6 +7,16 @@
     android:orientation="vertical"
     android:paddingBottom="16dp">
 
+    <!-- Section Label - set programmatically from DB widget label -->
+    <TextView
+        android:id="@+id/sectionLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/text_light"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-medium" />
+
     <!-- Text Input -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout"

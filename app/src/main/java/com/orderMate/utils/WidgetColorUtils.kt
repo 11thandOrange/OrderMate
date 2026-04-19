@@ -68,13 +68,22 @@ object WidgetColorUtils {
     }
     
     /**
-     * Create a rounded background drawable with widget color
+     * Get border color with 25% opacity for pills
+     */
+    fun getBorderColor(color: Int): Int {
+        return (color and 0x00FFFFFF) or 0x40000000
+    }
+    
+    /**
+     * Create a unified pill background drawable with 15% opacity bg + 25% border
+     * This is the SINGLE source of truth for all pill styling across the app
      */
     fun createPillBackground(color: Int, cornerRadiusDp: Float, density: Float): GradientDrawable {
         return GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = cornerRadiusDp * density
             setColor(getBackgroundColor(color))
+            setStroke((1 * density).toInt(), getBorderColor(color))
         }
     }
     

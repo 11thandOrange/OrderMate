@@ -204,14 +204,8 @@ class OrderCardRedesignAdapter(
                     // Use widget color for text, slightly dimmed background
                     setTextColor(tagColor)
                     
-                    // Create rounded background with 15% opacity of the tag color
-                    val bgDrawable = android.graphics.drawable.GradientDrawable().apply {
-                        shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                        cornerRadius = 12f * density
-                        setColor(WidgetColorUtils.getBackgroundColor(tagColor))
-                        setStroke((1 * density).toInt(), (tagColor and 0x00FFFFFF) or 0x40000000)
-                    }
-                    background = bgDrawable
+                    // Unified pill background: 15% opacity + 25% border
+                    background = WidgetColorUtils.createPillBackground(tagColor, 12f, density)
                     
                     // Padding and margin
                     val paddingH = (12 * density).toInt()
@@ -501,14 +495,8 @@ class OrderCardRedesignAdapter(
                 pillIcon.setImageResource(iconRes)
                 pillIcon.setColorFilter(pillColor)
                 
-                // Create colored background with 15% opacity (same as order details page)
-                val bg = android.graphics.drawable.GradientDrawable().apply {
-                    shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                    cornerRadius = 10f * density
-                    setColor(WidgetColorUtils.getBackgroundColor(pillColor))
-                    setStroke((1 * density).toInt(), (pillColor and 0x00FFFFFF) or 0x40000000)
-                }
-                pillView.background = bg
+                // Unified pill background: 15% opacity + 25% border
+                pillView.background = WidgetColorUtils.createPillBackground(pillColor, 10f, density)
                 
                 container.addView(pillView)
             }
