@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Hour label for timeline view -->
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/hourLabel"
+    android:layout_width="50dp"
+    android:layout_height="60dp"
+    android:gravity="end|top"
+    android:paddingEnd="8dp"
+    android:paddingTop="2dp"
+    android:textColor="@color/text_muted"
+    android:textSize="11sp"
+    android:text="9 AM"/>

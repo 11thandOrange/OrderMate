@@ -1,12 +1,12 @@
 <lint-module
     format="1"
-    dir="/Users/chicmic/SHUBHAM/Special_orders/app"
+    dir="/Users/chloe_mac/Desktop/Repos/OrderMate/app"
     name=":app"
     type="APP"
     maven="orderAppClover:app:"
     agpVersion="8.1.1"
     buildFolder="build"
-    bootClassPath="/Users/chicmic/Library/Android/sdk/platforms/android-34/android.jar:/Users/chicmic/Library/Android/sdk/build-tools/33.0.1/core-lambda-stubs.jar"
+    bootClassPath="/Users/chloe_mac/Library/Android/sdk/platforms/android-34/android.jar:/Users/chloe_mac/Library/Android/sdk/build-tools/33.0.1/core-lambda-stubs.jar"
     javaSourceLevel="1.8"
     compileTarget="android-34"
     neverShrinking="true">

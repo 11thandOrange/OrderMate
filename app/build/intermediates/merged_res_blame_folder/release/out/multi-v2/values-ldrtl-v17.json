@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.orderMate.app-mergeReleaseResources-53:/values-ldrtl-v17/values-ldrtl-v17.xml",
+            "outputFile": "com.orderMate.app-mergeReleaseResources-54:/values-ldrtl-v17/values-ldrtl-v17.xml",
             "map": [
                 {
-                    "source": "/Users/chicmic/.gradle/caches/transforms-3/14e04ca5bdd032ef07ac2eb3b0aba2ec/transformed/material-1.11.0/res/values-ldrtl-v17/values-ldrtl-v17.xml",
+                    "source": "/Users/chloe_mac/.gradle/caches/transforms-3/621d9e6fb11f80667c817a3f4a950ecb/transformed/material-1.11.0/res/values-ldrtl-v17/values-ldrtl-v17.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",

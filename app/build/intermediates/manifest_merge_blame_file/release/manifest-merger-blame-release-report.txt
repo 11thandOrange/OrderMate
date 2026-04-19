@@ -1,335 +1,346 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 3    package="com.orderMate"
-4    android:versionCode="30"
-5    android:versionName="1.0.2" >
+4    android:versionCode="31"
+5    android:versionName="1.0.3" >
 6
 7    <uses-sdk
 8        android:minSdkVersion="17"
 9        android:targetSdkVersion="25" />
 10
 11    <uses-permission android:name="android.permission.INTERNET" />
-11-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:5:5-67
-11-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:5:22-64
+11-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:5:5-67
+11-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:5:22-64
 12    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-12-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:6:5-79
-12-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:6:22-76
+12-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:6:5-79
+12-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:6:22-76
 13    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-13-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:7:5-78
-13-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:7:22-75
+13-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:7:5-78
+13-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:7:22-75
 14    <uses-permission android:name="android.permission.WAKE_LOCK" />
-14-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:25:5-68
-14-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:25:22-65
+14-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:25:5-68
+14-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:25:22-65
 15    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE" />
-15-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:26:5-110
-15-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:26:22-107
+15-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:26:5-110
+15-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:26:22-107
 16
 17    <permission
-17-->[androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
+17-->[androidx.core:core:1.9.0] /Users/chloe_mac/.gradle/caches/transforms-3/801460d95be7684741abe3ee32432ede/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
 18        android:name="com.orderMate.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-18-->[androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
+18-->[androidx.core:core:1.9.0] /Users/chloe_mac/.gradle/caches/transforms-3/801460d95be7684741abe3ee32432ede/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
 19        android:protectionLevel="signature" />
-19-->[androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
+19-->[androidx.core:core:1.9.0] /Users/chloe_mac/.gradle/caches/transforms-3/801460d95be7684741abe3ee32432ede/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
 20
 21    <uses-permission android:name="com.orderMate.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-21-->[androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
-21-->[androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+21-->[androidx.core:core:1.9.0] /Users/chloe_mac/.gradle/caches/transforms-3/801460d95be7684741abe3ee32432ede/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
+21-->[androidx.core:core:1.9.0] /Users/chloe_mac/.gradle/caches/transforms-3/801460d95be7684741abe3ee32432ede/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
 22
 23    <application
-23-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:9:5-54:19
+23-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:9:5-60:19
 24        android:name="com.orderMate.utils.MyApp"
-24-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:10:9-49
+24-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:10:9-49
 25        android:allowBackup="true"
-25-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:11:9-35
+25-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:11:9-35
 26        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-26-->[androidx.core:core:1.9.0] /Users/chicmic/.gradle/caches/transforms-3/afa4a50afe859dae80d03e0101c45c20/transformed/core-1.9.0/AndroidManifest.xml:28:18-86
+26-->[androidx.core:core:1.9.0] /Users/chloe_mac/.gradle/caches/transforms-3/801460d95be7684741abe3ee32432ede/transformed/core-1.9.0/AndroidManifest.xml:28:18-86
 27        android:dataExtractionRules="@xml/data_extraction_rules"
-27-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:12:9-65
+27-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:12:9-65
 28        android:extractNativeLibs="true"
 29        android:fullBackupContent="@xml/backup_rules"
-29-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:13:9-54
+29-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:13:9-54
 30        android:icon="@drawable/app_icon"
-30-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:14:9-42
+30-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:14:9-42
 31        android:label="@string/app_name"
-31-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:15:9-41
+31-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:15:9-41
 32        android:roundIcon="@drawable/app_icon"
-32-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:16:9-47
+32-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:16:9-47
 33        android:supportsRtl="true"
-33-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:17:9-35
+33-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:17:9-35
 34        android:theme="@style/Theme.OrderAppClover" >
-34-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:18:9-52
+34-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:18:9-52
 35        <activity
-35-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:20:9-28:20
+35-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:20:9-28:20
 36            android:name="com.orderMate.activities.MainActivity"
-36-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:21:13-65
+36-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:21:13-65
 37            android:exported="true"
-37-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:22:13-36
+37-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:22:13-36
 38            android:windowSoftInputMode="stateAlwaysHidden" >
-38-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:23:13-60
+38-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:23:13-60
 39            <intent-filter>
-39-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:24:13-27:29
+39-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:24:13-27:29
 40                <action android:name="android.intent.action.MAIN" />
-40-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:25:17-69
-40-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:25:25-66
+40-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:25:17-69
+40-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:25:25-66
 41
 42                <category android:name="android.intent.category.LAUNCHER" />
-42-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:26:17-77
-42-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:26:27-74
+42-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:26:17-77
+42-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:26:27-74
 43            </intent-filter>
 44        </activity>
 45        <activity
-45-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:29:9-33:54
+45-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:29:9-33:54
 46            android:name="com.orderMate.activities.OverlayActivity"
-46-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:30:13-68
+46-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:30:13-68
 47            android:excludeFromRecents="true"
-47-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:31:13-46
+47-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:31:13-46
 48            android:taskAffinity="your.unique.task.affinity"
-48-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:32:13-61
+48-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:32:13-61
 49            android:theme="@style/AppTheme.Dialog" />
-49-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:33:13-51
+49-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:33:13-51
 50
 51        <receiver
-51-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:35:9-51:20
+51-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:35:9-51:20
 52            android:name="com.orderMate.broadcast.LineItemAddedReceiver"
-52-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:36:13-73
+52-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:36:13-73
 53            android:enabled="true"
-53-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:37:13-35
+53-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:37:13-35
 54            android:exported="true" >
-54-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:38:13-36
+54-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:38:13-36
 55            <intent-filter>
-55-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:40:13-50:29
+55-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:40:13-50:29
 56                <action android:name="com.clover.intent.action.LINE_ITEM_ADDED" />
-56-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:41:17-83
-56-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:41:25-80
+56-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:41:17-83
+56-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:41:25-80
 57                <action android:name="com.clover.intent.action.LINE_ITEM_DELETED" />
-57-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:42:17-85
-57-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:42:25-82
+57-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:42:17-85
+57-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:42:25-82
 58                <action android:name="clover.intent.action.V1_ORDER_BUILD_START" />
-58-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:43:17-84
-58-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:43:25-81
+58-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:43:17-84
+58-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:43:25-81
 59                <action android:name="clover.intent.action.V1_ORDER_BUILD_STOP" />
-59-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:44:17-83
-59-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:44:25-80
+59-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:44:17-83
+59-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:44:25-80
 60                <action android:name="com.clover.intent.action.ITEM_SELECT" />
-60-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:45:17-79
-60-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:45:25-76
+60-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:45:17-79
+60-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:45:25-76
 61                <action android:name="com.clover.intent.action.ORDER_SAVED" />
-61-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:46:17-79
-61-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:46:25-76
+61-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:46:17-79
+61-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:46:25-76
 62                <action android:name="com.clover.intent.action.ORDER_CREATED" />
-62-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:47:17-81
-62-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:47:25-78
+62-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:47:17-81
+62-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:47:25-78
 63                <action android:name=" clover.intent.action.ACTIVE_REGISTER_ORDER" />
-63-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:48:17-85
-63-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:48:25-83
+63-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:48:17-85
+63-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:48:25-83
 64                <action android:name="com.clover.intent.action.PAYMENT_PROCESSED" />
-64-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:49:17-85
-64-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:49:25-82
+64-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:49:17-85
+64-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:49:25-82
 65            </intent-filter>
 66        </receiver>
 67
 68        <service android:name="com.orderMate.fragment.FloatingWidgetService" />
-68-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:53:9-79
-68-->/Users/chicmic/SHUBHAM/Special_orders/app/src/main/AndroidManifest.xml:53:18-77
-69        <service
-69-->[com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:29:9-35:19
-70            android:name="com.google.firebase.components.ComponentDiscoveryService"
-70-->[com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:30:13-84
-71            android:directBootAware="true"
-71-->[com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:35:13-43
-72            android:exported="false" >
-72-->[com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:31:13-37
-73            <meta-data
-73-->[com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:32:13-34:85
-74                android:name="com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar"
-74-->[com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:33:17-109
-75                android:value="com.google.firebase.components.ComponentRegistrar" />
-75-->[com.google.firebase:firebase-database:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/305316bb7b940903aeff44f908e61be8/transformed/firebase-database-20.0.0/AndroidManifest.xml:34:17-82
-76            <meta-data
-76-->[com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:30:13-32:85
-77                android:name="com.google.firebase.components:com.google.firebase.analytics.connector.internal.AnalyticsConnectorRegistrar"
-77-->[com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:31:17-139
-78                android:value="com.google.firebase.components.ComponentRegistrar" />
-78-->[com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/6326c08f2e1dd77e048a52b9dd64906f/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:32:17-82
-79            <meta-data
-79-->[com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:18:13-20:85
-80                android:name="com.google.firebase.components:com.google.firebase.crashlytics.CrashlyticsRegistrar"
-80-->[com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:19:17-115
-81                android:value="com.google.firebase.components.ComponentRegistrar" />
-81-->[com.google.firebase:firebase-crashlytics:18.0.0] /Users/chicmic/.gradle/caches/transforms-3/cb58184a80a0d90c30bb446cc0e08eb9/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:20:17-82
-82            <meta-data
-82-->[com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:18:13-20:85
-83                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar"
-83-->[com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:19:17-127
-84                android:value="com.google.firebase.components.ComponentRegistrar" />
-84-->[com.google.firebase:firebase-installations:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/f768b4fd50a76e3dc06c4358890d8121/transformed/firebase-installations-17.0.0/AndroidManifest.xml:20:17-82
-85        </service>
-86
-87        <receiver
-87-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:29:9-33:20
-88            android:name="com.google.android.gms.measurement.AppMeasurementReceiver"
-88-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:30:13-85
-89            android:enabled="true"
-89-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:31:13-35
-90            android:exported="false" >
-90-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:32:13-37
-91        </receiver>
-92
-93        <service
-93-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:35:9-38:40
-94            android:name="com.google.android.gms.measurement.AppMeasurementService"
-94-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:36:13-84
-95            android:enabled="true"
-95-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:37:13-35
-96            android:exported="false" />
-96-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:38:13-37
-97        <service
-97-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:39:9-43:72
-98            android:name="com.google.android.gms.measurement.AppMeasurementJobService"
-98-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:40:13-87
-99            android:enabled="true"
-99-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:41:13-35
-100            android:exported="false"
-100-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:42:13-37
-101            android:permission="android.permission.BIND_JOB_SERVICE" />
-101-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chicmic/.gradle/caches/transforms-3/ba912fe4340d39702dd463f3abfa395a/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:43:13-69
-102
-103        <provider
-103-->[com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:26:9-31:39
-104            android:name="com.google.firebase.provider.FirebaseInitProvider"
-104-->[com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:27:13-77
-105            android:authorities="com.orderMate.firebaseinitprovider"
-105-->[com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:28:13-72
-106            android:directBootAware="true"
-106-->[com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:29:13-43
+68-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:53:9-79
+68-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:53:18-77
+69
+70        <!-- Scheduled Order Notification Receiver (#83 requirement) -->
+71        <receiver
+71-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:56:9-59:40
+72            android:name="com.orderMate.services.OrderNotificationReceiver"
+72-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:57:13-76
+73            android:enabled="true"
+73-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:58:13-35
+74            android:exported="false" />
+74-->/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/AndroidManifest.xml:59:13-37
+75
+76        <service
+76-->[com.google.firebase:firebase-database:20.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/f08b71c939c6c2120eea9b120efa3304/transformed/firebase-database-20.0.0/AndroidManifest.xml:29:9-35:19
+77            android:name="com.google.firebase.components.ComponentDiscoveryService"
+77-->[com.google.firebase:firebase-database:20.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/f08b71c939c6c2120eea9b120efa3304/transformed/firebase-database-20.0.0/AndroidManifest.xml:30:13-84
+78            android:directBootAware="true"
+78-->[com.google.firebase:firebase-common:20.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/3e7dab51e6cc67d4cbad7605a3499049/transformed/firebase-common-20.0.0/AndroidManifest.xml:35:13-43
+79            android:exported="false" >
+79-->[com.google.firebase:firebase-database:20.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/f08b71c939c6c2120eea9b120efa3304/transformed/firebase-database-20.0.0/AndroidManifest.xml:31:13-37
+80            <meta-data
+80-->[com.google.firebase:firebase-database:20.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/f08b71c939c6c2120eea9b120efa3304/transformed/firebase-database-20.0.0/AndroidManifest.xml:32:13-34:85
+81                android:name="com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar"
+81-->[com.google.firebase:firebase-database:20.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/f08b71c939c6c2120eea9b120efa3304/transformed/firebase-database-20.0.0/AndroidManifest.xml:33:17-109
+82                android:value="com.google.firebase.components.ComponentRegistrar" />
+82-->[com.google.firebase:firebase-database:20.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/f08b71c939c6c2120eea9b120efa3304/transformed/firebase-database-20.0.0/AndroidManifest.xml:34:17-82
+83            <meta-data
+83-->[com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/c6bc20251e1b480ea7349dc421eec8fd/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:30:13-32:85
+84                android:name="com.google.firebase.components:com.google.firebase.analytics.connector.internal.AnalyticsConnectorRegistrar"
+84-->[com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/c6bc20251e1b480ea7349dc421eec8fd/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:31:17-139
+85                android:value="com.google.firebase.components.ComponentRegistrar" />
+85-->[com.google.android.gms:play-services-measurement-api:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/c6bc20251e1b480ea7349dc421eec8fd/transformed/play-services-measurement-api-19.0.0/AndroidManifest.xml:32:17-82
+86            <meta-data
+86-->[com.google.firebase:firebase-crashlytics:18.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/332a1c2addda9dbefdededd697dd2ca7/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:18:13-20:85
+87                android:name="com.google.firebase.components:com.google.firebase.crashlytics.CrashlyticsRegistrar"
+87-->[com.google.firebase:firebase-crashlytics:18.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/332a1c2addda9dbefdededd697dd2ca7/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:19:17-115
+88                android:value="com.google.firebase.components.ComponentRegistrar" />
+88-->[com.google.firebase:firebase-crashlytics:18.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/332a1c2addda9dbefdededd697dd2ca7/transformed/firebase-crashlytics-18.0.0/AndroidManifest.xml:20:17-82
+89            <meta-data
+89-->[com.google.firebase:firebase-installations:17.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/cf7580403d124e4b59e905845c584ae7/transformed/firebase-installations-17.0.0/AndroidManifest.xml:18:13-20:85
+90                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar"
+90-->[com.google.firebase:firebase-installations:17.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/cf7580403d124e4b59e905845c584ae7/transformed/firebase-installations-17.0.0/AndroidManifest.xml:19:17-127
+91                android:value="com.google.firebase.components.ComponentRegistrar" />
+91-->[com.google.firebase:firebase-installations:17.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/cf7580403d124e4b59e905845c584ae7/transformed/firebase-installations-17.0.0/AndroidManifest.xml:20:17-82
+92        </service>
+93
+94        <receiver
+94-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:29:9-33:20
+95            android:name="com.google.android.gms.measurement.AppMeasurementReceiver"
+95-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:30:13-85
+96            android:enabled="true"
+96-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:31:13-35
+97            android:exported="false" >
+97-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:32:13-37
+98        </receiver>
+99
+100        <service
+100-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:35:9-38:40
+101            android:name="com.google.android.gms.measurement.AppMeasurementService"
+101-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:36:13-84
+102            android:enabled="true"
+102-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:37:13-35
+103            android:exported="false" />
+103-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:38:13-37
+104        <service
+104-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:39:9-43:72
+105            android:name="com.google.android.gms.measurement.AppMeasurementJobService"
+105-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:40:13-87
+106            android:enabled="true"
+106-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:41:13-35
 107            android:exported="false"
-107-->[com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:30:13-37
-108            android:initOrder="100" />
-108-->[com.google.firebase:firebase-common:20.0.0] /Users/chicmic/.gradle/caches/transforms-3/3c4cf9e983aac2c7ca07a3f190570028/transformed/firebase-common-20.0.0/AndroidManifest.xml:31:13-36
+107-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:42:13-37
+108            android:permission="android.permission.BIND_JOB_SERVICE" />
+108-->[com.google.android.gms:play-services-measurement:19.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/5dce4846146d1eba25ca3a04446a0bf4/transformed/play-services-measurement-19.0.0/AndroidManifest.xml:43:13-69
 109
-110        <activity
-110-->[com.google.android.gms:play-services-base:17.1.0] /Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0/AndroidManifest.xml:23:9-26:75
-111            android:name="com.google.android.gms.common.api.GoogleApiActivity"
-111-->[com.google.android.gms:play-services-base:17.1.0] /Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0/AndroidManifest.xml:24:13-79
-112            android:exported="false"
-112-->[com.google.android.gms:play-services-base:17.1.0] /Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0/AndroidManifest.xml:25:13-37
-113            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-113-->[com.google.android.gms:play-services-base:17.1.0] /Users/chicmic/.gradle/caches/transforms-3/000db2598fc724cb9671de0640378b00/transformed/play-services-base-17.1.0/AndroidManifest.xml:26:13-72
-114
-115        <meta-data
-115-->[com.google.android.gms:play-services-basement:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/b73dc83d3a80e324f500d6f71689816c/transformed/play-services-basement-17.0.0/AndroidManifest.xml:23:9-25:69
-116            android:name="com.google.android.gms.version"
-116-->[com.google.android.gms:play-services-basement:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/b73dc83d3a80e324f500d6f71689816c/transformed/play-services-basement-17.0.0/AndroidManifest.xml:24:13-58
-117            android:value="@integer/google_play_services_version" />
-117-->[com.google.android.gms:play-services-basement:17.0.0] /Users/chicmic/.gradle/caches/transforms-3/b73dc83d3a80e324f500d6f71689816c/transformed/play-services-basement-17.0.0/AndroidManifest.xml:25:13-66
-118
-119        <provider
-119-->[androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
-120            android:name="androidx.startup.InitializationProvider"
-120-->[androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:25:13-67
-121            android:authorities="com.orderMate.androidx-startup"
-121-->[androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:26:13-68
-122            android:exported="false" >
-122-->[androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:27:13-37
-123            <meta-data
-123-->[androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
-124                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-124-->[androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:30:17-75
-125                android:value="androidx.startup" />
-125-->[androidx.emoji2:emoji2:1.2.0] /Users/chicmic/.gradle/caches/transforms-3/6dfe56bd5abcba215468765ec536df51/transformed/emoji2-1.2.0/AndroidManifest.xml:31:17-49
-126            <meta-data
-126-->[androidx.lifecycle:lifecycle-process:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:29:13-31:52
-127                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-127-->[androidx.lifecycle:lifecycle-process:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:30:17-78
-128                android:value="androidx.startup" />
-128-->[androidx.lifecycle:lifecycle-process:2.6.2] /Users/chicmic/.gradle/caches/transforms-3/a7ecc0a6edca74913c6ce4b52f873fa3/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:31:17-49
-129            <meta-data
-129-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:29:13-31:52
-130                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-130-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:30:17-85
-131                android:value="androidx.startup" />
-131-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:31:17-49
-132        </provider>
-133
-134        <uses-library
-134-->[androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:25:9-27:40
-135            android:name="androidx.window.extensions"
-135-->[androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:26:13-54
-136            android:required="false" />
-136-->[androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:27:13-37
-137        <uses-library
-137-->[androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:28:9-30:40
-138            android:name="androidx.window.sidecar"
-138-->[androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:29:13-51
-139            android:required="false" />
-139-->[androidx.window:window:1.0.0] /Users/chicmic/.gradle/caches/transforms-3/9f2f186bc6fb4367704dc10e5827246c/transformed/window-1.0.0/AndroidManifest.xml:30:13-37
+110        <provider
+110-->[com.google.firebase:firebase-common:20.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/3e7dab51e6cc67d4cbad7605a3499049/transformed/firebase-common-20.0.0/AndroidManifest.xml:26:9-31:39
+111            android:name="com.google.firebase.provider.FirebaseInitProvider"
+111-->[com.google.firebase:firebase-common:20.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/3e7dab51e6cc67d4cbad7605a3499049/transformed/firebase-common-20.0.0/AndroidManifest.xml:27:13-77
+112            android:authorities="com.orderMate.firebaseinitprovider"
+112-->[com.google.firebase:firebase-common:20.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/3e7dab51e6cc67d4cbad7605a3499049/transformed/firebase-common-20.0.0/AndroidManifest.xml:28:13-72
+113            android:directBootAware="true"
+113-->[com.google.firebase:firebase-common:20.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/3e7dab51e6cc67d4cbad7605a3499049/transformed/firebase-common-20.0.0/AndroidManifest.xml:29:13-43
+114            android:exported="false"
+114-->[com.google.firebase:firebase-common:20.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/3e7dab51e6cc67d4cbad7605a3499049/transformed/firebase-common-20.0.0/AndroidManifest.xml:30:13-37
+115            android:initOrder="100" />
+115-->[com.google.firebase:firebase-common:20.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/3e7dab51e6cc67d4cbad7605a3499049/transformed/firebase-common-20.0.0/AndroidManifest.xml:31:13-36
+116
+117        <activity
+117-->[com.google.android.gms:play-services-base:17.1.0] /Users/chloe_mac/.gradle/caches/transforms-3/825d768d79e0e93575d8cc84dae0de07/transformed/play-services-base-17.1.0/AndroidManifest.xml:23:9-26:75
+118            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+118-->[com.google.android.gms:play-services-base:17.1.0] /Users/chloe_mac/.gradle/caches/transforms-3/825d768d79e0e93575d8cc84dae0de07/transformed/play-services-base-17.1.0/AndroidManifest.xml:24:13-79
+119            android:exported="false"
+119-->[com.google.android.gms:play-services-base:17.1.0] /Users/chloe_mac/.gradle/caches/transforms-3/825d768d79e0e93575d8cc84dae0de07/transformed/play-services-base-17.1.0/AndroidManifest.xml:25:13-37
+120            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+120-->[com.google.android.gms:play-services-base:17.1.0] /Users/chloe_mac/.gradle/caches/transforms-3/825d768d79e0e93575d8cc84dae0de07/transformed/play-services-base-17.1.0/AndroidManifest.xml:26:13-72
+121
+122        <meta-data
+122-->[com.google.android.gms:play-services-basement:17.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/cc0b39c04f19a85100fce2548476a84f/transformed/play-services-basement-17.0.0/AndroidManifest.xml:23:9-25:69
+123            android:name="com.google.android.gms.version"
+123-->[com.google.android.gms:play-services-basement:17.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/cc0b39c04f19a85100fce2548476a84f/transformed/play-services-basement-17.0.0/AndroidManifest.xml:24:13-58
+124            android:value="@integer/google_play_services_version" />
+124-->[com.google.android.gms:play-services-basement:17.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/cc0b39c04f19a85100fce2548476a84f/transformed/play-services-basement-17.0.0/AndroidManifest.xml:25:13-66
+125
+126        <provider
+126-->[androidx.emoji2:emoji2:1.2.0] /Users/chloe_mac/.gradle/caches/transforms-3/7186c95eda9cdb6df703dab77477686b/transformed/emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
+127            android:name="androidx.startup.InitializationProvider"
+127-->[androidx.emoji2:emoji2:1.2.0] /Users/chloe_mac/.gradle/caches/transforms-3/7186c95eda9cdb6df703dab77477686b/transformed/emoji2-1.2.0/AndroidManifest.xml:25:13-67
+128            android:authorities="com.orderMate.androidx-startup"
+128-->[androidx.emoji2:emoji2:1.2.0] /Users/chloe_mac/.gradle/caches/transforms-3/7186c95eda9cdb6df703dab77477686b/transformed/emoji2-1.2.0/AndroidManifest.xml:26:13-68
+129            android:exported="false" >
+129-->[androidx.emoji2:emoji2:1.2.0] /Users/chloe_mac/.gradle/caches/transforms-3/7186c95eda9cdb6df703dab77477686b/transformed/emoji2-1.2.0/AndroidManifest.xml:27:13-37
+130            <meta-data
+130-->[androidx.emoji2:emoji2:1.2.0] /Users/chloe_mac/.gradle/caches/transforms-3/7186c95eda9cdb6df703dab77477686b/transformed/emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+131                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+131-->[androidx.emoji2:emoji2:1.2.0] /Users/chloe_mac/.gradle/caches/transforms-3/7186c95eda9cdb6df703dab77477686b/transformed/emoji2-1.2.0/AndroidManifest.xml:30:17-75
+132                android:value="androidx.startup" />
+132-->[androidx.emoji2:emoji2:1.2.0] /Users/chloe_mac/.gradle/caches/transforms-3/7186c95eda9cdb6df703dab77477686b/transformed/emoji2-1.2.0/AndroidManifest.xml:31:17-49
+133            <meta-data
+133-->[androidx.lifecycle:lifecycle-process:2.6.2] /Users/chloe_mac/.gradle/caches/transforms-3/44ee5f8d0301d7f79662d680ebbf3934/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:29:13-31:52
+134                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+134-->[androidx.lifecycle:lifecycle-process:2.6.2] /Users/chloe_mac/.gradle/caches/transforms-3/44ee5f8d0301d7f79662d680ebbf3934/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:30:17-78
+135                android:value="androidx.startup" />
+135-->[androidx.lifecycle:lifecycle-process:2.6.2] /Users/chloe_mac/.gradle/caches/transforms-3/44ee5f8d0301d7f79662d680ebbf3934/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:31:17-49
+136            <meta-data
+136-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:29:13-31:52
+137                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+137-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:30:17-85
+138                android:value="androidx.startup" />
+138-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:31:17-49
+139        </provider>
 140
-141        <service
-141-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:29:9-35:19
-142            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
-142-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:30:13-103
-143            android:exported="false" >
-143-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:31:13-37
-144            <meta-data
-144-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:32:13-34:39
-145                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
-145-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:33:17-94
-146                android:value="cct" />
-146-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/ee426983f43a1bfb70fd9f19cfc3ef18/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:34:17-36
-147        </service>
+141        <uses-library
+141-->[androidx.window:window:1.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/4e6d3230ed8227a2d1d77c855be3cba7/transformed/window-1.0.0/AndroidManifest.xml:25:9-27:40
+142            android:name="androidx.window.extensions"
+142-->[androidx.window:window:1.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/4e6d3230ed8227a2d1d77c855be3cba7/transformed/window-1.0.0/AndroidManifest.xml:26:13-54
+143            android:required="false" />
+143-->[androidx.window:window:1.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/4e6d3230ed8227a2d1d77c855be3cba7/transformed/window-1.0.0/AndroidManifest.xml:27:13-37
+144        <uses-library
+144-->[androidx.window:window:1.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/4e6d3230ed8227a2d1d77c855be3cba7/transformed/window-1.0.0/AndroidManifest.xml:28:9-30:40
+145            android:name="androidx.window.sidecar"
+145-->[androidx.window:window:1.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/4e6d3230ed8227a2d1d77c855be3cba7/transformed/window-1.0.0/AndroidManifest.xml:29:13-51
+146            android:required="false" />
+146-->[androidx.window:window:1.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/4e6d3230ed8227a2d1d77c855be3cba7/transformed/window-1.0.0/AndroidManifest.xml:30:13-37
+147
 148        <service
-148-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:26:9-30:19
-149            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
-149-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:27:13-117
-150            android:exported="false"
-150-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:28:13-37
-151            android:permission="android.permission.BIND_JOB_SERVICE" >
-151-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:29:13-69
-152        </service>
-153
-154        <receiver
-154-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:32:9-34:40
-155            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
-155-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:33:13-132
-156            android:exported="false" />
-156-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/chicmic/.gradle/caches/transforms-3/8580fecb547b96d718cff7d4ed85473a/transformed/transport-runtime-3.0.0/AndroidManifest.xml:34:13-37
-157        <receiver
-157-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:34:9-52:20
-158            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-158-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:35:13-76
-159            android:directBootAware="false"
-159-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:36:13-44
-160            android:enabled="true"
-160-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:37:13-35
-161            android:exported="true"
-161-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:38:13-36
-162            android:permission="android.permission.DUMP" >
-162-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:39:13-57
-163            <intent-filter>
-163-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:40:13-42:29
-164                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-164-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:17-91
-164-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:25-88
-165            </intent-filter>
-166            <intent-filter>
-166-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:43:13-45:29
-167                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-167-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:17-85
-167-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:25-82
-168            </intent-filter>
-169            <intent-filter>
-169-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:46:13-48:29
-170                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-170-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:17-88
-170-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:25-85
-171            </intent-filter>
-172            <intent-filter>
-172-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:49:13-51:29
-173                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-173-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:17-95
-173-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chicmic/.gradle/caches/transforms-3/ae75b893dffc47db689201a365e8b98d/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:25-92
-174            </intent-filter>
-175        </receiver>
-176    </application>
-177
-178</manifest>
+148-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/20a24d16564ef41b68fac515d0dc10d3/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:29:9-35:19
+149            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+149-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/20a24d16564ef41b68fac515d0dc10d3/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:30:13-103
+150            android:exported="false" >
+150-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/20a24d16564ef41b68fac515d0dc10d3/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:31:13-37
+151            <meta-data
+151-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/20a24d16564ef41b68fac515d0dc10d3/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:32:13-34:39
+152                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+152-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/20a24d16564ef41b68fac515d0dc10d3/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:33:17-94
+153                android:value="cct" />
+153-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/20a24d16564ef41b68fac515d0dc10d3/transformed/transport-backend-cct-3.0.0/AndroidManifest.xml:34:17-36
+154        </service>
+155        <service
+155-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/91e651c559fa7c4dd123a43445e079d3/transformed/transport-runtime-3.0.0/AndroidManifest.xml:26:9-30:19
+156            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+156-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/91e651c559fa7c4dd123a43445e079d3/transformed/transport-runtime-3.0.0/AndroidManifest.xml:27:13-117
+157            android:exported="false"
+157-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/91e651c559fa7c4dd123a43445e079d3/transformed/transport-runtime-3.0.0/AndroidManifest.xml:28:13-37
+158            android:permission="android.permission.BIND_JOB_SERVICE" >
+158-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/91e651c559fa7c4dd123a43445e079d3/transformed/transport-runtime-3.0.0/AndroidManifest.xml:29:13-69
+159        </service>
+160
+161        <receiver
+161-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/91e651c559fa7c4dd123a43445e079d3/transformed/transport-runtime-3.0.0/AndroidManifest.xml:32:9-34:40
+162            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
+162-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/91e651c559fa7c4dd123a43445e079d3/transformed/transport-runtime-3.0.0/AndroidManifest.xml:33:13-132
+163            android:exported="false" />
+163-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/chloe_mac/.gradle/caches/transforms-3/91e651c559fa7c4dd123a43445e079d3/transformed/transport-runtime-3.0.0/AndroidManifest.xml:34:13-37
+164        <receiver
+164-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:34:9-52:20
+165            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+165-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:35:13-76
+166            android:directBootAware="false"
+166-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:36:13-44
+167            android:enabled="true"
+167-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:37:13-35
+168            android:exported="true"
+168-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:38:13-36
+169            android:permission="android.permission.DUMP" >
+169-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:39:13-57
+170            <intent-filter>
+170-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:40:13-42:29
+171                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+171-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:17-91
+171-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:25-88
+172            </intent-filter>
+173            <intent-filter>
+173-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:43:13-45:29
+174                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+174-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:17-85
+174-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:25-82
+175            </intent-filter>
+176            <intent-filter>
+176-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:46:13-48:29
+177                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+177-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:17-88
+177-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:25-85
+178            </intent-filter>
+179            <intent-filter>
+179-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:49:13-51:29
+180                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+180-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:17-95
+180-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/chloe_mac/.gradle/caches/transforms-3/ae623aa0bb6adea9211601f4fbdaa3a8/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:25-92
+181            </intent-filter>
+182        </receiver>
+183    </application>
+184
+185</manifest>

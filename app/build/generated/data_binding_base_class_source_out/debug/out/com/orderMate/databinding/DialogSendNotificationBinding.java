@@ -5,11 +5,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
@@ -20,10 +21,10 @@ import java.lang.String;
 
 public final class DialogSendNotificationBinding implements ViewBinding {
   @NonNull
-  private final ConstraintLayout rootView;
+  private final LinearLayout rootView;
 
   @NonNull
-  public final MaterialTextView cancelButton;
+  public final MaterialButton cancelButton;
 
   @NonNull
   public final MaterialTextView customerEmail;
@@ -53,7 +54,7 @@ public final class DialogSendNotificationBinding implements ViewBinding {
   public final LinearLayout llSubject;
 
   @NonNull
-  public final MaterialTextView sendButton;
+  public final MaterialButton sendButton;
 
   @NonNull
   public final MaterialTextView shareEmail;
@@ -64,14 +65,21 @@ public final class DialogSendNotificationBinding implements ViewBinding {
   @NonNull
   public final TextInputEditText subject;
 
-  private DialogSendNotificationBinding(@NonNull ConstraintLayout rootView,
-      @NonNull MaterialTextView cancelButton, @NonNull MaterialTextView customerEmail,
+  @NonNull
+  public final LinearLayout subjectContainer;
+
+  @NonNull
+  public final Spinner templateSpinner;
+
+  private DialogSendNotificationBinding(@NonNull LinearLayout rootView,
+      @NonNull MaterialButton cancelButton, @NonNull MaterialTextView customerEmail,
       @NonNull TextInputEditText customerNumber, @NonNull MaterialTextView emailData,
       @NonNull MaterialTextView emailSubject, @NonNull TextInputEditText etNotes,
       @NonNull TextInputLayout etNotesParent, @NonNull LinearLayout llEditTex,
       @NonNull LinearLayout llNotes, @NonNull LinearLayout llSubject,
-      @NonNull MaterialTextView sendButton, @NonNull MaterialTextView shareEmail,
-      @NonNull MaterialTextView shareSms, @NonNull TextInputEditText subject) {
+      @NonNull MaterialButton sendButton, @NonNull MaterialTextView shareEmail,
+      @NonNull MaterialTextView shareSms, @NonNull TextInputEditText subject,
+      @NonNull LinearLayout subjectContainer, @NonNull Spinner templateSpinner) {
     this.rootView = rootView;
     this.cancelButton = cancelButton;
     this.customerEmail = customerEmail;
@@ -87,11 +95,13 @@ public final class DialogSendNotificationBinding implements ViewBinding {
     this.shareEmail = shareEmail;
     this.shareSms = shareSms;
     this.subject = subject;
+    this.subjectContainer = subjectContainer;
+    this.templateSpinner = templateSpinner;
   }
 
   @Override
   @NonNull
-  public ConstraintLayout getRoot() {
+  public LinearLayout getRoot() {
     return rootView;
   }
 
@@ -117,7 +127,7 @@ public final class DialogSendNotificationBinding implements ViewBinding {
     int id;
     missingId: {
       id = R.id.cancelButton;
-      MaterialTextView cancelButton = ViewBindings.findChildViewById(rootView, id);
+      MaterialButton cancelButton = ViewBindings.findChildViewById(rootView, id);
       if (cancelButton == null) {
         break missingId;
       }
@@ -177,7 +187,7 @@ public final class DialogSendNotificationBinding implements ViewBinding {
       }
 
       id = R.id.sendButton;
-      MaterialTextView sendButton = ViewBindings.findChildViewById(rootView, id);
+      MaterialButton sendButton = ViewBindings.findChildViewById(rootView, id);
       if (sendButton == null) {
         break missingId;
       }
@@ -200,9 +210,21 @@ public final class DialogSendNotificationBinding implements ViewBinding {
         break missingId;
       }
 
-      return new DialogSendNotificationBinding((ConstraintLayout) rootView, cancelButton,
-          customerEmail, customerNumber, emailData, emailSubject, etNotes, etNotesParent, llEditTex,
-          llNotes, llSubject, sendButton, shareEmail, shareSms, subject);
+      id = R.id.subjectContainer;
+      LinearLayout subjectContainer = ViewBindings.findChildViewById(rootView, id);
+      if (subjectContainer == null) {
+        break missingId;
+      }
+
+      id = R.id.templateSpinner;
+      Spinner templateSpinner = ViewBindings.findChildViewById(rootView, id);
+      if (templateSpinner == null) {
+        break missingId;
+      }
+
+      return new DialogSendNotificationBinding((LinearLayout) rootView, cancelButton, customerEmail,
+          customerNumber, emailData, emailSubject, etNotes, etNotesParent, llEditTex, llNotes,
+          llSubject, sendButton, shareEmail, shareSms, subject, subjectContainer, templateSpinner);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

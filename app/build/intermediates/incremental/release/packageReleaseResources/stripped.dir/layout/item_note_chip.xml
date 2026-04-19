@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Note chip item for order cards -->
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/noteChip"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="4dp"
+    android:layout_marginEnd="6dp"
+    android:layout_marginBottom="6dp"
+    android:textSize="11sp"
+    android:textStyle="bold"
+    tools:text="🎂 Custom Cake"
+    tools:background="@drawable/bg_note_chip_category"/>

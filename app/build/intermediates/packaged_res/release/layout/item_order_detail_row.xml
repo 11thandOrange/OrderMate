@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Order Detail Item Row - matches HTML .detail-item-row -->
+<!-- padding: 12px, background: rgba(0,0,0,0.2), border-radius: 10px, gap: 12px -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/bg_detail_item_row"
+    android:padding="12dp"
+    android:layout_marginBottom="8dp">
+
+    <!-- Item Image - matches HTML .detail-item-image -->
+    <!-- 50x50, border-radius: 8px, background: rgba(255,255,255,0.1) -->
+    <FrameLayout
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/bg_item_image">
+        
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/itemIcon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="🎂"
+            android:textSize="24sp" />
+    </FrameLayout>
+
+    <!-- Item Info - matches HTML .detail-item-info -->
+    <!-- flex: 1 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
+
+        <!-- Item Name - matches HTML .detail-item-name -->
+        <!-- font-size: 14px, font-weight: 500, color: text-light -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/itemName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_light"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="Assorted Pastries" />
+
+        <!-- Item Notes - matches HTML .item-notes -->
+        <!-- margin-top: 6px, gap: 6px -->
+        <LinearLayout
+            android:id="@+id/tagsContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
+
+            <!-- Tags styled as .item-note-pill -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tag1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_note_pill_category"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:textColor="@color/orange_accent"
+                android:textSize="10sp"
+                android:visibility="gone"
+                tools:text="Pastries"
+                tools:visibility="visible" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tag2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_note_pill_tag"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:textColor="@color/closed_status_color"
+                android:textSize="10sp"
+                android:visibility="gone"
+                tools:text="Mixed"
+                tools:visibility="visible" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tag3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_note_pill_tag"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:textColor="@color/closed_status_color"
+                android:textSize="10sp"
+                android:visibility="gone"
+                tools:text="Fresh"
+                tools:visibility="visible" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Quantity - matches HTML .detail-item-qty -->
+    <!-- font-size: 13px, color: text-muted, min-width: 40px -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/itemQuantity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:minWidth="40dp"
+        android:gravity="center"
+        android:textColor="@color/text_muted"
+        android:textSize="13sp"
+        tools:text="x1" />
+
+    <!-- Price - matches HTML .detail-item-price -->
+    <!-- font-size: 14px, font-weight: 600, color: text-light -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/itemPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_light"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        tools:text="$45.00" />
+
+    <!-- Edit Button (hidden by default) -->
+    <ImageView
+        android:id="@+id/editButton"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_button_header"
+        android:padding="8dp"
+        android:src="@drawable/ic_edit"
+        app:tint="@color/text_muted"
+        android:visibility="gone"
+        android:contentDescription="@string/add_note" />
+</LinearLayout>

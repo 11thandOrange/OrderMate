@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Color spectrum with all hues (horizontal) and saturation (vertical) -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Hue gradient (rainbow colors) -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="0"
+                android:startColor="#FF0000"
+                android:centerColor="#00FF00"
+                android:endColor="#0000FF" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+    <!-- White to transparent overlay (saturation) -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="90"
+                android:startColor="#00FFFFFF"
+                android:endColor="#FFFFFFFF" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+</layer-list>

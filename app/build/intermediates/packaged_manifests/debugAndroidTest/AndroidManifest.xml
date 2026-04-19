@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.orderShubham.test" >
+    package="com.orderMate.test" >
 
     <uses-sdk
         android:minSdkVersion="17"
@@ -10,8 +10,8 @@
         android:name="androidx.test.runner.AndroidJUnitRunner"
         android:functionalTest="false"
         android:handleProfiling="false"
-        android:label="Tests for com.orderShubham"
-        android:targetPackage="com.orderShubham" />
+        android:label="Tests for com.orderMate"
+        android:targetPackage="com.orderMate" />
 
     <uses-permission android:name="android.permission.REORDER_TASKS" />
 

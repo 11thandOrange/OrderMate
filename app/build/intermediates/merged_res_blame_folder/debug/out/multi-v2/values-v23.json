@@ -1,48 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.orderMate.app-mergeDebugResources-53:/values-v23/values-v23.xml",
+            "outputFile": "com.orderMate.app-mergeDebugResources-54:/values-v23/values-v23.xml",
             "map": [
                 {
-                    "source": "/Users/chicmic/.gradle/caches/transforms-3/14e04ca5bdd032ef07ac2eb3b0aba2ec/transformed/material-1.11.0/res/values-v23/values-v23.xml",
-                    "from": {
-                        "startLines": "2,5,9,13,16,19,22,25,28,32",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,271,413,574,784,991,1198,1401,1603,1868",
-                        "endLines": "4,8,12,15,18,21,24,27,31,35",
-                        "endColumns": "10,10,10,10,10,10,10,10,10,10",
-                        "endOffsets": "266,408,569,779,986,1193,1396,1598,1863,2136"
-                    },
-                    "to": {
-                        "startLines": "63,66,70,74,77,80,83,86,89,93",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "3803,4019,4161,4322,4532,4739,4946,5149,5351,5616",
-                        "endLines": "65,69,73,76,79,82,85,88,92,96",
-                        "endColumns": "10,10,10,10,10,10,10,10,10,10",
-                        "endOffsets": "4014,4156,4317,4527,4734,4941,5144,5346,5611,5884"
-                    }
-                },
-                {
-                    "source": "/Users/chicmic/.gradle/caches/transforms-3/cb728632fe06b3f1329f20dfcf90e932/transformed/cardview-1.0.0/res/values-v23/values-v23.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endLines": "4",
-                        "endColumns": "12",
-                        "endOffsets": "200"
-                    },
-                    "to": {
-                        "startLines": "57",
-                        "startColumns": "4",
-                        "startOffsets": "3492",
-                        "endLines": "59",
-                        "endColumns": "12",
-                        "endOffsets": "3637"
-                    }
-                },
-                {
-                    "source": "/Users/chicmic/.gradle/caches/transforms-3/f78a8135a1d2c56a982d366d1d05a147/transformed/appcompat-1.6.1/res/values-v23/values-v23.xml",
+                    "source": "/Users/chloe_mac/.gradle/caches/transforms-3/21ea3b44e5e81a6d0c4678c1bec77175/transformed/appcompat-1.6.1/res/values-v23/values-v23.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,20,34,35,36,39,43,44,45,46",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -61,7 +23,45 @@
                     }
                 },
                 {
-                    "source": "/Users/chicmic/SHUBHAM/Special_orders/app/src/main/res/values-v23/themes.xml",
+                    "source": "/Users/chloe_mac/.gradle/caches/transforms-3/c630db37f88a880c4f8dd1600eef73ad/transformed/cardview-1.0.0/res/values-v23/values-v23.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "4",
+                        "endColumns": "12",
+                        "endOffsets": "200"
+                    },
+                    "to": {
+                        "startLines": "57",
+                        "startColumns": "4",
+                        "startOffsets": "3492",
+                        "endLines": "59",
+                        "endColumns": "12",
+                        "endOffsets": "3637"
+                    }
+                },
+                {
+                    "source": "/Users/chloe_mac/.gradle/caches/transforms-3/621d9e6fb11f80667c817a3f4a950ecb/transformed/material-1.11.0/res/values-v23/values-v23.xml",
+                    "from": {
+                        "startLines": "2,5,9,13,16,19,22,25,28,32",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,271,413,574,784,991,1198,1401,1603,1868",
+                        "endLines": "4,8,12,15,18,21,24,27,31,35",
+                        "endColumns": "10,10,10,10,10,10,10,10,10,10",
+                        "endOffsets": "266,408,569,779,986,1193,1396,1598,1863,2136"
+                    },
+                    "to": {
+                        "startLines": "63,66,70,74,77,80,83,86,89,93",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "3803,4019,4161,4322,4532,4739,4946,5149,5351,5616",
+                        "endLines": "65,69,73,76,79,82,85,88,92,96",
+                        "endColumns": "10,10,10,10,10,10,10,10,10,10",
+                        "endOffsets": "4014,4156,4317,4527,4734,4941,5144,5346,5611,5884"
+                    }
+                },
+                {
+                    "source": "/Users/chloe_mac/Desktop/Repos/OrderMate/app/src/main/res/values-v23/themes.xml",
                     "from": {
                         "startLines": "3,11",
                         "startColumns": "4,4",

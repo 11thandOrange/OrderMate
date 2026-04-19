@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Line item in event preview dialog (matches HTML preview) -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingVertical="10dp"
+    android:paddingHorizontal="12dp"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/bg_line_item">
+
+    <!-- Header row: Name + Quantity -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="4dp">
+
+        <TextView
+            android:id="@+id/itemName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Item Name"
+            android:textColor="@color/text_light"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <TextView
+            android:id="@+id/itemQuantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:text="x1"
+            android:textColor="@color/text_muted"
+            android:textSize="12sp"
+            android:background="@drawable/bg_quantity_badge"/>
+    </LinearLayout>
+
+    <!-- Price row -->
+    <TextView
+        android:id="@+id/itemPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="$15.00"
+        android:textColor="@color/text_muted"
+        android:textSize="12sp"/>
+
+    <!-- Custom notes pills container (matches HTML event-item-notes) -->
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/notesPillsContainer"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:visibility="gone"
+        app:flexWrap="wrap"
+        app:alignItems="flex_start"
+        app:justifyContent="flex_start"/>
+
+</LinearLayout>

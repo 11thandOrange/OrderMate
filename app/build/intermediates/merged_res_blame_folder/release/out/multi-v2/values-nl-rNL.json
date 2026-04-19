@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.orderMate.app-mergeReleaseResources-53:/values-nl-rNL/values-nl-rNL.xml",
+            "outputFile": "com.orderMate.app-mergeReleaseResources-54:/values-nl-rNL/values-nl-rNL.xml",
             "map": [
                 {
-                    "source": "/Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/res/values-nl-rNL/values-nl-rNL.xml",
+                    "source": "/Users/chloe_mac/.gradle/caches/transforms-3/dea4978974ad9453142b74f6cb577d79/transformed/clover-android-sdk-304/res/values-nl-rNL/values-nl-rNL.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10",
                         "startColumns": "4,4,4,4,4,4,4,4,4",

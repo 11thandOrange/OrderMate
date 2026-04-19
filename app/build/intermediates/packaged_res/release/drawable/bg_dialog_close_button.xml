@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dialog close button - matches HTML .customer-modal-close -->
+<!-- 32x32, border-radius: 8px, background: rgba(255,255,255,0.1) -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/glass_ripple">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/glass_background"/>
+            <corners android:radius="8dp"/>
+        </shape>
+    </item>
+</ripple>

@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.orderMate.app-mergeReleaseResources-53:/values-de-rDE-sw600dp-v13/values-de-rDE-sw600dp-v13.xml",
+            "outputFile": "com.orderMate.app-mergeReleaseResources-54:/values-de-rDE-sw600dp-v13/values-de-rDE-sw600dp-v13.xml",
             "map": [
                 {
-                    "source": "/Users/chicmic/.gradle/caches/transforms-3/3b371d1f983596483c3f39a18f23fa30/transformed/clover-android-sdk-304/res/values-de-rDE-sw600dp-v13/values-de-rDE-sw600dp-v13.xml",
+                    "source": "/Users/chloe_mac/.gradle/caches/transforms-3/dea4978974ad9453142b74f6cb577d79/transformed/clover-android-sdk-304/res/values-de-rDE-sw600dp-v13/values-de-rDE-sw600dp-v13.xml",
                     "from": {
                         "startLines": "2,3,4",
                         "startColumns": "4,4,4",
