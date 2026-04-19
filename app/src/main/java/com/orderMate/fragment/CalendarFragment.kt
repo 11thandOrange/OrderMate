@@ -1453,21 +1453,24 @@ class CalendarFragment : Fragment() {
      */
     private fun calculateAutoScrollPosition(startDate: Calendar, numDays: Int, hourHeightPx: Int): Int {
         // Get events for the visible date range
-        val endDate = Calendar.getInstance().apply {
+        // Reset startDate to midnight for correct filtering
+        val rangeStart = Calendar.getInstance().apply {
+            time = startDate.time
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val rangeEnd = Calendar.getInstance().apply {
             time = startDate.time
             add(Calendar.DAY_OF_MONTH, numDays - 1)
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
         }
         
         val visibleEvents = filteredEvents.filter { event ->
-            val eventCal = Calendar.getInstance().apply { time = event.dueDate }
-            val eventDate = eventCal.time
-            eventDate >= startDate.time && eventDate <= endDate.time.let {
-                Calendar.getInstance().apply {
-                    time = endDate.time
-                    set(Calendar.HOUR_OF_DAY, 23)
-                    set(Calendar.MINUTE, 59)
-                }.time
-            }
+            event.dueDate >= rangeStart.time && event.dueDate <= rangeEnd.time
         }.sortedBy { it.dueDate }
         
         // If there are events, scroll to the first one
