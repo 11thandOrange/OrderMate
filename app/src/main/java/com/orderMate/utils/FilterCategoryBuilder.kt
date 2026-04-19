@@ -26,7 +26,8 @@ object FilterCategoryBuilder {
         val type: FilterType,              // Type of filter UI
         val source: FilterSource,          // Where options come from
         val options: List<FilterOption>,   // Available options
-        val icon: Int? = null              // Optional icon resource
+        val icon: Int? = null,             // Optional icon resource
+        val level: NoteLevel? = null       // ITEM or ORDER level for widgets (null for Clover filters)
     )
     
     /**
@@ -108,7 +109,7 @@ object FilterCategoryBuilder {
             .sortedBy { it.order }
         
         itemWidgets.forEach { widget ->
-            categories.add(buildWidgetFilter(widget, prefix = "Item: "))
+            categories.add(buildWidgetFilter(widget))
         }
         
         // 4. Order-level widgets (ORDER level, enabled, showInFilter=true, not TEXT_BOX) (#93)
@@ -122,7 +123,7 @@ object FilterCategoryBuilder {
             .sortedBy { it.order }
         
         orderWidgets.forEach { widget ->
-            categories.add(buildWidgetFilter(widget, prefix = "Order: "))
+            categories.add(buildWidgetFilter(widget))
         }
         
         return categories
@@ -237,11 +238,11 @@ object FilterCategoryBuilder {
     
     /**
      * Build filter from OrderMate widget configuration
+     * Labels no longer include "Item: " or "Order: " prefix - sections are separated by dividers
      * 
      * @param widget The widget configuration
-     * @param prefix Optional prefix to distinguish item vs order level (e.g., "Item: ", "Order: ")
      */
-    private fun buildWidgetFilter(widget: WidgetConfig, prefix: String = ""): FilterCategory {
+    private fun buildWidgetFilter(widget: WidgetConfig): FilterCategory {
         val filterType = when (widget.type) {
             WidgetType.CALENDAR -> FilterType.DATE_PICKER
             else -> FilterType.MULTI_SELECT
@@ -260,10 +261,11 @@ object FilterCategoryBuilder {
         
         return FilterCategory(
             id = "$WIDGET_PREFIX${widget.id}$levelSuffix",
-            label = "$prefix${widget.label}",
+            label = widget.label,  // No prefix - just the widget label
             type = filterType,
             source = FilterSource.ORDERMATE,
-            options = options
+            options = options,
+            level = widget.level   // Track level for section dividers
         )
     }
     

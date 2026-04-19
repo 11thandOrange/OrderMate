@@ -16,6 +16,7 @@ import androidx.fragment.app.DialogFragment
 import com.google.android.flexbox.FlexboxLayout
 import com.orderMate.R
 import com.orderMate.databinding.DialogFiltersBinding
+import com.orderMate.modals.NoteLevel
 import com.orderMate.utils.FilterCategoryBuilder
 import com.orderMate.utils.FilterCategoryBuilder.FilterCategory
 import com.orderMate.utils.FilterCategoryBuilder.FilterOption
@@ -136,26 +137,93 @@ class FilterDialogFragment : DialogFragment() {
 
     /**
      * Build all filter sections dynamically from filterCategories
+     * Adds section dividers between Clover filters, Order Level widgets, and Item Level widgets
      */
     private fun buildFilterSections() {
         // Clear existing dynamic sections (keep the static container)
         binding.filterSectionsContainer.removeAllViews()
 
-        // Build each category section
-        filterCategories.forEach { category ->
-            when (category.type) {
-                FilterType.MULTI_SELECT -> {
-                    // Clover filters: always render with all known values
-                    // Widget filters: only render if has options (enabled widgets already filtered upstream)
-                    if (category.options.isNotEmpty()) {
-                        addMultiSelectSection(category)
-                    }
-                }
-                FilterType.DATE_PICKER -> {
-                    addDatePickerSection(category)
-                }
+        // Separate categories by source and level
+        val cloverCategories = filterCategories.filter { it.source == FilterCategoryBuilder.FilterSource.CLOVER }
+        val orderLevelCategories = filterCategories.filter { it.level == NoteLevel.ORDER }
+        val itemLevelCategories = filterCategories.filter { it.level == NoteLevel.ITEM }
+
+        // Build Clover filter sections
+        cloverCategories.forEach { category ->
+            addCategorySection(category)
+        }
+
+        // Build Order Level widget sections with divider
+        if (orderLevelCategories.isNotEmpty()) {
+            addSectionDivider("Order Level")
+            orderLevelCategories.forEach { category ->
+                addCategorySection(category)
             }
         }
+
+        // Build Item Level widget sections with divider
+        if (itemLevelCategories.isNotEmpty()) {
+            addSectionDivider("Item Level")
+            itemLevelCategories.forEach { category ->
+                addCategorySection(category)
+            }
+        }
+    }
+
+    /**
+     * Add a category section based on its type
+     */
+    private fun addCategorySection(category: FilterCategory) {
+        when (category.type) {
+            FilterType.MULTI_SELECT -> {
+                if (category.options.isNotEmpty()) {
+                    addMultiSelectSection(category)
+                }
+            }
+            FilterType.DATE_PICKER -> {
+                addDatePickerSection(category)
+            }
+        }
+    }
+
+    /**
+     * Add a section divider with label (e.g., "Order Level" or "Item Level")
+     */
+    private fun addSectionDivider(label: String) {
+        val dividerView = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            setPadding(0, dpToPx(16), 0, dpToPx(12))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+
+        // Left line
+        val leftLine = View(requireContext()).apply {
+            layoutParams = LinearLayout.LayoutParams(0, dpToPx(1), 1f)
+            setBackgroundColor(0x33FFFFFF)
+        }
+        dividerView.addView(leftLine)
+
+        // Label
+        val labelView = TextView(requireContext()).apply {
+            text = label.uppercase()
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.text_muted))
+            textSize = 11f
+            setPadding(dpToPx(12), 0, dpToPx(12), 0)
+        }
+        dividerView.addView(labelView)
+
+        // Right line
+        val rightLine = View(requireContext()).apply {
+            layoutParams = LinearLayout.LayoutParams(0, dpToPx(1), 1f)
+            setBackgroundColor(0x33FFFFFF)
+        }
+        dividerView.addView(rightLine)
+
+        binding.filterSectionsContainer.addView(dividerView)
     }
 
     /**
