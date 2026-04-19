@@ -564,7 +564,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         }
     }
     
-    private fun addNotePill(container: LinearLayout, text: String, widgetType: WidgetType, density: Float) {
+    private fun addNotePill(container: com.google.android.flexbox.FlexboxLayout, text: String, widgetType: WidgetType, density: Float) {
         val pillView = layoutInflater.inflate(R.layout.item_note_pill, container, false) as LinearLayout
         
         val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)

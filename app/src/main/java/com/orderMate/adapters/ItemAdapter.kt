@@ -151,7 +151,7 @@ class ItemAdapter(
         
         private fun addPillView(
             context: Context,
-            container: LinearLayout,
+            container: com.google.android.flexbox.FlexboxLayout,
             value: String,
             widgetType: WidgetType,
             density: Float
