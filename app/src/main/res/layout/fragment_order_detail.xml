@@ -226,7 +226,7 @@
                                 android:layout_width="14dp"
                                 android:layout_height="14dp"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_box"
+                                android:src="@drawable/ic_thumbs_up"
                                 app:tint="@color/text_light"
                                 android:contentDescription="@string/items" />
                         </FrameLayout>
@@ -490,6 +490,15 @@
                             android:textSize="11sp"
                             android:textStyle="bold"
                             android:textAllCaps="true" />
+
+                        <!-- Task 12: Right-facing carrot to indicate clickable -->
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginStart="8dp"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="@color/text_muted"
+                            android:contentDescription="@string/view_details" />
                     </LinearLayout>
 
                     <!-- Order-level Notes Section (#93 requirement) -->
@@ -659,6 +668,14 @@
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:background="#0DFFFFFF"
+                            android:visibility="gone" />
+
+                        <!-- Task 21: Dynamic Widget Rows Container -->
+                        <LinearLayout
+                            android:id="@+id/dynamicWidgetRowsContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
                             android:visibility="gone" />
 
                         <!-- Employee -->

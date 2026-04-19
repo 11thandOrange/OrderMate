@@ -432,6 +432,25 @@
 
                     </LinearLayout>
 
+                    <!-- Reset to Default Widgets Button -->
+                    <LinearLayout
+                        android:id="@+id/btnResetItemLevelWidgets"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_add_widget_button"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Reset to Default Widgets"
+                            android:textColor="@color/text_muted"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
             </LinearLayout>
@@ -555,6 +574,25 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Add Widget"
+                            android:textColor="@color/text_muted"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                    <!-- Reset to Default Widgets Button -->
+                    <LinearLayout
+                        android:id="@+id/btnResetOrderLevelWidgets"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_add_widget_button"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Reset to Default Widgets"
                             android:textColor="@color/text_muted"
                             android:textSize="13sp" />
 

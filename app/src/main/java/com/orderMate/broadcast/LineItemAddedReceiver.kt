@@ -21,6 +21,7 @@ import com.orderMate.fragment.orderDetail.OrderDetailFragment
 import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.PreferenceManager
+import com.orderMate.utils.SettingsManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -89,8 +90,14 @@ class LineItemAddedReceiver : BroadcastReceiver() {
             OrderDetailFragment.orderIdForReopen = null
             return
         }
+        // Task 14: Check V2 settings for OrderMate in Clover Register
+        // Use the new SettingsManager which stores the setting under "use_ordermate_register" key
+        val settingsManager = p0?.let { SettingsManager.getInstance(it) }
+        val isOrderMateRegisterEnabled = settingsManager?.getUseOrderMateRegister() ?: 
+            prefManager?.getBoolean(Constants.isMenuBasketOptionEnabled) ?: false
+        
         // this is basically the option is enabled and the widget is not currently visible to the user
-        if (prefManager?.getBoolean(Constants.isMenuBasketOptionEnabled) == true) {
+        if (isOrderMateRegisterEnabled) {
             val intent = Intent(p0, FloatingWidgetService::class.java)
             when {
                 (p1.action.equals(ACTION_V1_ORDER_BUILD_START)) -> {

@@ -120,8 +120,9 @@ class ItemNoteDialogFragment : DialogFragment() {
         
         setupHeader()
         setupButtons()
-        buildNoteSections()
+        // Task 10: Parse existing note BEFORE building UI so selections are pre-populated
         parseExistingNote()
+        buildNoteSections()
     }
     
     private fun setupHeader() {

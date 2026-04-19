@@ -111,8 +111,9 @@ class OrderNoteDialogFragment : DialogFragment() {
         widgets = WidgetManager.getInstance(requireContext()).getOrderLevelWidgets()
         
         setupButtons()
-        buildNoteSections()
+        // Task 10: Parse existing note BEFORE building UI so selections are pre-populated
         parseExistingNote()
+        buildNoteSections()
     }
 
     private fun setupButtons() {

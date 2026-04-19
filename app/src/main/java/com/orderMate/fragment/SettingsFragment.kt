@@ -28,6 +28,7 @@ import com.orderMate.utils.NotificationTemplate
 import com.orderMate.utils.PopUpWidget
 import com.orderMate.utils.PreferenceManager
 import com.orderMate.utils.SettingsManager
+import com.orderMate.utils.DefaultWidgetFactory
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.WidgetType
 import java.util.Collections
@@ -86,12 +87,14 @@ class SettingsFragment : Fragment() {
     private var itemLevelEditorCard: View? = null
     private var itemLevelWidgetRecyclerView: RecyclerView? = null
     private var btnAddItemLevelWidget: View? = null
+    private var btnResetItemLevelWidgets: View? = null
     
     // Order Level Notes Panel (#34)
     private var switchOrderNotesEnabled: Switch? = null
     private var orderLevelEditorCard: View? = null
     private var orderLevelWidgetRecyclerView: RecyclerView? = null
     private var btnAddOrderLevelWidget: View? = null
+    private var btnResetOrderLevelWidgets: View? = null
     
     // Notification Panel
     private var templateRecyclerView: RecyclerView? = null
@@ -178,12 +181,14 @@ class SettingsFragment : Fragment() {
         itemLevelEditorCard = view.findViewById(R.id.itemLevelEditorCard)
         itemLevelWidgetRecyclerView = view.findViewById(R.id.itemLevelWidgetRecyclerView)
         btnAddItemLevelWidget = view.findViewById(R.id.btnAddItemLevelWidget)
+        btnResetItemLevelWidgets = view.findViewById(R.id.btnResetItemLevelWidgets)
         
         // Order Level Notes Panel (#34)
         switchOrderNotesEnabled = view.findViewById(R.id.switchOrderNotesEnabled)
         orderLevelEditorCard = view.findViewById(R.id.orderLevelEditorCard)
         orderLevelWidgetRecyclerView = view.findViewById(R.id.orderLevelWidgetRecyclerView)
         btnAddOrderLevelWidget = view.findViewById(R.id.btnAddOrderLevelWidget)
+        btnResetOrderLevelWidgets = view.findViewById(R.id.btnResetOrderLevelWidgets)
         
         // Notification Panel
         templateRecyclerView = view.findViewById(R.id.templateRecyclerView)
@@ -354,6 +359,10 @@ class SettingsFragment : Fragment() {
         btnAddItemLevelWidget?.setOnClickListener {
             showAddWidgetDialog(NoteLevel.ITEM)
         }
+        
+        btnResetItemLevelWidgets?.setOnClickListener {
+            showResetWidgetsConfirmDialog(NoteLevel.ITEM)
+        }
     }
     
     // ==================== Order Level Notes Panel ====================
@@ -418,6 +427,10 @@ class SettingsFragment : Fragment() {
         
         btnAddOrderLevelWidget?.setOnClickListener {
             showAddWidgetDialog(NoteLevel.ORDER)
+        }
+        
+        btnResetOrderLevelWidgets?.setOnClickListener {
+            showResetWidgetsConfirmDialog(NoteLevel.ORDER)
         }
         
         // Load widgets AFTER both adapters are created
@@ -538,6 +551,83 @@ class SettingsFragment : Fragment() {
                 Toast.makeText(context, "Widget deleted", Toast.LENGTH_SHORT).show()
             }
         )
+    }
+    
+    /**
+     * Show confirmation dialog to reset widgets to defaults for a given level
+     */
+    private fun showResetWidgetsConfirmDialog(level: NoteLevel) {
+        val levelName = if (level == NoteLevel.ITEM) "Item Level" else "Order Level"
+        showDeleteConfirmationDialog(
+            title = "Reset to Default Widgets?",
+            message = "This will replace all $levelName widgets with the default widgets. This action cannot be undone.",
+            onConfirm = {
+                resetWidgetsToDefaults(level)
+            }
+        )
+    }
+    
+    /**
+     * Reset widgets for a given level to defaults
+     */
+    private fun resetWidgetsToDefaults(level: NoteLevel) {
+        val defaultWidgets = if (level == NoteLevel.ITEM) {
+            DefaultWidgetFactory.createItemLevelDefaults()
+        } else {
+            DefaultWidgetFactory.createOrderLevelDefaults()
+        }
+        
+        // Delete existing widgets of this level
+        val existingWidgets = if (level == NoteLevel.ITEM) {
+            widgetManager.getAllItemLevelWidgets()
+        } else {
+            widgetManager.getAllOrderLevelWidgets()
+        }
+        
+        // Remove existing widgets first
+        var deleteCount = existingWidgets.size
+        if (deleteCount == 0) {
+            // No existing widgets, just add defaults
+            saveDefaultWidgets(defaultWidgets, level)
+            return
+        }
+        
+        existingWidgets.forEach { widget ->
+            widgetManager.deleteWidget(widget.id) { success ->
+                deleteCount--
+                if (deleteCount == 0) {
+                    // All deletions complete, now add defaults
+                    activity?.runOnUiThread {
+                        saveDefaultWidgets(defaultWidgets, level)
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Save default widgets to Firebase and update UI
+     */
+    private fun saveDefaultWidgets(widgets: List<WidgetConfig>, level: NoteLevel) {
+        var saveCount = widgets.size
+        widgets.forEach { widget ->
+            widgetManager.addWidget(widget) { success ->
+                saveCount--
+                if (saveCount == 0) {
+                    // All saves complete, refresh UI
+                    activity?.runOnUiThread {
+                        if (level == NoteLevel.ITEM) {
+                            val updatedWidgets = widgetManager.getAllItemLevelWidgets()
+                            itemLevelWidgetAdapter?.setWidgets(updatedWidgets.toMutableList())
+                        } else {
+                            val updatedWidgets = widgetManager.getAllOrderLevelWidgets()
+                            orderLevelWidgetAdapter?.setWidgets(updatedWidgets.toMutableList())
+                        }
+                        Toast.makeText(context, "Widgets reset to defaults", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
     // ==================== Notification Panel ====================
@@ -973,7 +1063,9 @@ class SettingsFragment : Fragment() {
         itemLevelWidgetRecyclerView = null
         orderLevelWidgetRecyclerView = null
         btnAddItemLevelWidget = null
+        btnResetItemLevelWidgets = null
         btnAddOrderLevelWidget = null
+        btnResetOrderLevelWidgets = null
         templateRecyclerView = null
         btnAddTemplate = null
         inputNotificationDays = null

@@ -1106,30 +1106,54 @@ class CalendarFragment : Fragment() {
                 setBackgroundResource(R.drawable.bg_timeline_column)
             }
             
-            // Add events to this day column
-            dayEvents.forEach { event ->
+            // Group events by hour to handle overlapping events horizontally (like iCal)
+            val eventsByHour = dayEvents.groupBy { event ->
                 val eventCal = Calendar.getInstance().apply { time = event.dueDate }
-                val hour = eventCal.get(Calendar.HOUR_OF_DAY)
-                val minute = eventCal.get(Calendar.MINUTE)
-                val topPx = (hour * hourHeightPx + minute * hourHeightPx / 60)
-                val eventHeight = (hourHeightPx * 0.8).toInt()
+                eventCal.get(Calendar.HOUR_OF_DAY)
+            }
+            
+            // Add events to this day column with horizontal stacking for same-time events
+            eventsByHour.forEach { (_, eventsAtSameHour) ->
+                val eventCount = eventsAtSameHour.size
                 
-                val eventView = TextView(context).apply {
-                    text = "${event.customerName}\n${event.type.getDisplayName()}"
-                    textSize = 10f
-                    setTextColor(ContextCompat.getColor(context, R.color.text_light))
-                    setPadding((4 * density).toInt(), (2 * density).toInt(), (4 * density).toInt(), (2 * density).toInt())
-                    maxLines = 2
-                    ellipsize = android.text.TextUtils.TruncateAt.END
+                eventsAtSameHour.forEachIndexed { index, event ->
+                    val eventCal = Calendar.getInstance().apply { time = event.dueDate }
+                    val hour = eventCal.get(Calendar.HOUR_OF_DAY)
+                    val minute = eventCal.get(Calendar.MINUTE)
+                    val topPx = (hour * hourHeightPx + minute * hourHeightPx / 60)
+                    val eventHeight = (hourHeightPx * 0.8).toInt()
                     
-                    val bgRes = when (event.type) {
-                        EventType.PICKUP -> R.drawable.bg_calendar_event_pickup
-                        EventType.DELIVERY -> R.drawable.bg_calendar_event_delivery
-                        EventType.PREORDER -> R.drawable.bg_calendar_event_preorder
+                    // Calculate horizontal position for side-by-side stacking
+                    val columnWidthFraction = 1f / eventCount
+                    val leftOffsetFraction = index * columnWidthFraction
+                    
+                    val eventView = TextView(context).apply {
+                        text = "${event.customerName}\n${event.type.getDisplayName()}"
+                        textSize = if (eventCount > 2) 8f else 10f
+                        setTextColor(ContextCompat.getColor(context, R.color.text_light))
+                        setPadding((2 * density).toInt(), (2 * density).toInt(), (2 * density).toInt(), (2 * density).toInt())
+                        maxLines = if (eventCount > 2) 1 else 2
+                        ellipsize = android.text.TextUtils.TruncateAt.END
+                        
+                        val bgRes = when (event.type) {
+                            EventType.PICKUP -> R.drawable.bg_calendar_event_pickup
+                            EventType.DELIVERY -> R.drawable.bg_calendar_event_delivery
+                            EventType.PREORDER -> R.drawable.bg_calendar_event_preorder
+                        }
+                        setBackgroundResource(bgRes)
+                        
+                        setOnClickListener {
+                            // Show event preview dialog
+                            val dialog = EventPreviewDialog.newInstance(listOf(event), event.dueDate)
+                            dialog.setOnEventClickListener { e ->
+                                viewFullOrderDetails(e.orderId)
+                            }
+                            dialog.show(childFragmentManager, EventPreviewDialog.TAG)
+                        }
                     }
-                    setBackgroundResource(bgRes)
                     
-                    layoutParams = android.widget.FrameLayout.LayoutParams(
+                    // Use custom layout params to position horizontally
+                    eventView.layoutParams = android.widget.FrameLayout.LayoutParams(
                         android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
                         eventHeight
                     ).apply {
@@ -1138,16 +1162,24 @@ class CalendarFragment : Fragment() {
                         marginEnd = (2 * density).toInt()
                     }
                     
-                    setOnClickListener {
-                        // Show event preview dialog
-                        val dialog = EventPreviewDialog.newInstance(listOf(event), event.dueDate)
-                        dialog.setOnEventClickListener { e ->
-                            viewFullOrderDetails(e.orderId)
+                    // Post to apply horizontal positioning after layout
+                    eventView.post {
+                        val parent = eventView.parent as? android.widget.FrameLayout ?: return@post
+                        val parentWidth = parent.width - (4 * density).toInt() // account for margins
+                        val eventWidth = (parentWidth * columnWidthFraction).toInt()
+                        val leftOffset = (parentWidth * leftOffsetFraction).toInt()
+                        
+                        eventView.layoutParams = android.widget.FrameLayout.LayoutParams(
+                            eventWidth,
+                            eventHeight
+                        ).apply {
+                            topMargin = topPx
+                            marginStart = leftOffset + (2 * density).toInt()
                         }
-                        dialog.show(childFragmentManager, EventPreviewDialog.TAG)
                     }
+                    
+                    dayColumn.addView(eventView)
                 }
-                dayColumn.addView(eventView)
             }
             
             columnsContainer.addView(dayColumn)

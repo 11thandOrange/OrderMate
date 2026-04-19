@@ -262,7 +262,7 @@
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_box"
+                        android:src="@drawable/ic_thumbs_up"
                         app:tint="@color/text_muted"/>
                 </FrameLayout>
 

@@ -54,6 +54,9 @@ import com.orderMate.utils.runOnMainThread
 import com.orderMate.utils.showView
 import com.orderMate.utils.toDoubleFloatPoint
 import com.orderMate.repository.CloverRepository
+import com.orderMate.utils.WidgetManager
+import com.orderMate.modals.NoteLevel
+import com.orderMate.modals.WidgetType
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -358,6 +361,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         setupOrderNotesPills()
         populateDescriptionRow()  // #46
         populateOrderTags()       // #46
+        populateDynamicWidgetRows()  // Task 21
     }
     
     /**
@@ -488,7 +492,84 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
     
     /**
+     * Task 21: Populate dynamic widget rows in order details card
+     * Only renders widgets that have values saved to the order
+     */
+    private fun populateDynamicWidgetRows() {
+        val container = binding.dynamicWidgetRowsContainer
+        container.removeAllViews()
+        
+        val orderNote = orderArguments?.note
+        if (orderNote.isNullOrBlank()) {
+            container.visibility = View.GONE
+            return
+        }
+        
+        val widgetManager = context?.let { WidgetManager.getInstance(it) } ?: return
+        val orderLevelWidgets = widgetManager.getAllOrderLevelWidgets()
+            .filter { it.isEnabled && it.type == WidgetType.CALENDAR }
+        
+        if (orderLevelWidgets.isEmpty()) {
+            container.visibility = View.GONE
+            return
+        }
+        
+        // Parse order note to find widget values
+        val parsedValues = com.orderMate.utils.OrderNoteParser.parseNotesByWidgetType(
+            orderNote, orderLevelWidgets, NoteLevel.ORDER
+        )
+        
+        if (parsedValues.isEmpty()) {
+            container.visibility = View.GONE
+            return
+        }
+        
+        container.visibility = View.VISIBLE
+        val density = resources.displayMetrics.density
+        
+        parsedValues.forEach { (widget, value) ->
+            // Create row layout
+            val rowLayout = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                setPadding(0, (12 * density).toInt(), 0, (12 * density).toInt())
+            }
+            
+            // Label (widget label)
+            val labelView = TextView(requireContext()).apply {
+                text = widget.label
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_muted))
+                textSize = 13f
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            }
+            
+            // Value
+            val valueView = TextView(requireContext()).apply {
+                text = value
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_light))
+                textSize = 14f
+                typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.BOLD)
+            }
+            
+            rowLayout.addView(labelView)
+            rowLayout.addView(valueView)
+            container.addView(rowLayout)
+            
+            // Add divider
+            val divider = View(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    (1 * density).toInt()
+                )
+                setBackgroundColor(0x0DFFFFFF)
+            }
+            container.addView(divider)
+        }
+    }
+    
+    /**
      * Setup order-level notes pills display (#93)
+     * Task 11: Don't show "no order notes" section if TEXT_BOX type widget exists
      */
     private fun setupOrderNotesPills() {
         val orderNote = orderArguments?.note
@@ -497,19 +578,24 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         
         container.removeAllViews()
         
-        // Always show section so user can add notes
-        section.visibility = View.VISIBLE
+        // Task 11: Check if there's a TEXT_BOX (description) type widget at order level
+        val widgetManager = context?.let { WidgetManager.getInstance(it) }
+        val hasDescriptionWidget = widgetManager?.getAllOrderLevelWidgets()
+            ?.any { it.type == WidgetType.TEXT_BOX && it.isEnabled } == true
         
         if (orderNote.isNullOrBlank()) {
-            // Show placeholder text when no notes
-            val placeholder = TextView(requireContext()).apply {
-                text = "No order notes"
-                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_muted))
-                textSize = 13f
+            // Task 11: If TEXT_BOX widget exists, hide the section entirely (no "no order notes")
+            if (hasDescriptionWidget) {
+                section.visibility = View.GONE
+                return
             }
-            container.addView(placeholder)
+            // Otherwise show section so user can add notes
+            section.visibility = View.VISIBLE
             return
         }
+        
+        // Show section with notes
+        section.visibility = View.VISIBLE
         
         // Parse and display notes
         val notes = parseOrderNote(orderNote)

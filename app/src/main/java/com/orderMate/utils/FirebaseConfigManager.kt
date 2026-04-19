@@ -181,6 +181,8 @@ class FirebaseConfigManager private constructor() {
             updates["$basePath/isRequired"] = widget.isRequired
             updates["$basePath/showInFilter"] = widget.showInFilter
             updates["$basePath/order"] = widget.order
+            // Task 13: Ensure level is always saved to prevent item/order widget mixing
+            updates["$basePath/level"] = widget.level.name
             
             widget.options.forEach { opt ->
                 updates["$basePath/options/${opt.id}/label"] = opt.label

@@ -103,15 +103,16 @@ object OrderNoteParser {
         parsed.forEach { (widget, value) ->
             when (widget.type) {
                 WidgetType.SINGLE_SELECT -> {
-                    tags.add(ParsedTag(widget.label, value, TagType.SINGLE_SELECT))
+                    // Task 15: Include widget type for color coding
+                    tags.add(ParsedTag(widget.label, value, TagType.SINGLE_SELECT, widget.type))
                 }
                 WidgetType.MULTI_SELECT -> {
                     value.split(",").map { it.trim() }.filter { it.isNotBlank() }.forEach { v ->
-                        tags.add(ParsedTag(widget.label, v, TagType.MULTI_SELECT))
+                        tags.add(ParsedTag(widget.label, v, TagType.MULTI_SELECT, widget.type))
                     }
                 }
                 WidgetType.CALENDAR -> {
-                    tags.add(ParsedTag(widget.label, value, TagType.CALENDAR))
+                    tags.add(ParsedTag(widget.label, value, TagType.CALENDAR, widget.type))
                 }
                 else -> { }
             }
@@ -148,10 +149,12 @@ object OrderNoteParser {
         return null
     }
     
+    // Task 15: Added widgetType for consistent color coding in list page
     data class ParsedTag(
         val label: String,
         val value: String,
-        val type: TagType
+        val type: TagType,
+        val widgetType: com.orderMate.modals.WidgetType? = null
     )
     
     enum class TagType {

@@ -17,6 +17,7 @@ import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.utils.Constants
 import com.orderMate.utils.OrderNoteParser
+import com.orderMate.utils.WidgetColorUtils
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatPaymentState
@@ -74,6 +75,9 @@ class OrderCardRedesignAdapter(
 
             // Payment Status Badge
             setupPaymentStatusBadge(order)
+
+            // Order Date (Task 19)
+            binding.orderDate.text = getOrderDate(order)
 
             // Customer Name
             binding.customerName.text = getCustomerName(order)
@@ -168,11 +172,13 @@ class OrderCardRedesignAdapter(
 
         /**
          * (#19) Setup custom order tags from line item notes
-         * Extracts category, type, status, sub-category tags and displays as pills
+         * Task 15: Uses WidgetColorUtils for consistent color coding across app
+         * Task 20: Includes CALENDAR type widgets
          */
         private fun setupCustomTags(order: Order) {
             val context = binding.root.context
             val tagsContainer = binding.tagsContainer
+            val density = context.resources.displayMetrics.density
             
             // Remove any previously added custom tags (keep first 2 - order status and payment status)
             while (tagsContainer.childCount > 2) {
@@ -188,28 +194,35 @@ class OrderCardRedesignAdapter(
                     textSize = 11f
                     typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
                     
-                    // Get colors based on tag type
-                    val (bgColorRes, textColorRes) = getTagColors(tag.type)
-                    setTextColor(ContextCompat.getColor(context, textColorRes))
+                    // Task 15: Use WidgetColorUtils for consistent colors based on widget type
+                    val tagColor = if (tag.widgetType != null) {
+                        WidgetColorUtils.getColorForWidgetType(tag.widgetType)
+                    } else {
+                        WidgetColorUtils.getColorForLabel(tag.type)
+                    }
                     
-                    // Create rounded background
+                    // Use widget color for text, slightly dimmed background
+                    setTextColor(tagColor)
+                    
+                    // Create rounded background with 15% opacity of the tag color
                     val bgDrawable = android.graphics.drawable.GradientDrawable().apply {
                         shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                        cornerRadius = 12f * context.resources.displayMetrics.density
-                        setColor(ContextCompat.getColor(context, bgColorRes))
+                        cornerRadius = 12f * density
+                        setColor(WidgetColorUtils.getBackgroundColor(tagColor))
+                        setStroke((1 * density).toInt(), (tagColor and 0x00FFFFFF) or 0x40000000)
                     }
                     background = bgDrawable
                     
                     // Padding and margin
-                    val paddingH = (12 * context.resources.displayMetrics.density).toInt()
-                    val paddingV = (4 * context.resources.displayMetrics.density).toInt()
+                    val paddingH = (12 * density).toInt()
+                    val paddingV = (4 * density).toInt()
                     setPadding(paddingH, paddingV, paddingH, paddingV)
                     
                     val params = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                     ).apply {
-                        marginStart = (8 * context.resources.displayMetrics.density).toInt()
+                        marginStart = (8 * density).toInt()
                     }
                     layoutParams = params
                 }
@@ -220,8 +233,8 @@ class OrderCardRedesignAdapter(
 
         /**
          * (#19) Extract custom tags from order.note using widget-based parsing.
-         * Reads ORDER-level SINGLE_SELECT and MULTI_SELECT widgets.
-         * Returns list of tag type and value pairs.
+         * Task 20: Reads ORDER-level SINGLE_SELECT, MULTI_SELECT and CALENDAR widgets.
+         * Returns list of tag type, value, and widget type for color coding.
          */
         private fun getCustomTags(order: Order): List<CustomTag> {
             val orderNote = order.note
@@ -230,21 +243,23 @@ class OrderCardRedesignAdapter(
             val tags = mutableListOf<CustomTag>()
             val seenValues = mutableSetOf<String>()
             
-            // (#19) Use widget-based parsing for ORDER-level SELECT widgets
+            // Task 20: Use widget-based parsing for ORDER-level SELECT and CALENDAR widgets
             val widgets = WidgetManager.getCachedWidgets()
             if (widgets.isNotEmpty()) {
-                val selectWidgets = widgets.filter { 
+                val displayWidgets = widgets.filter { 
                     it.level == NoteLevel.ORDER && 
                     (it.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
-                     it.type == com.orderMate.modals.WidgetType.MULTI_SELECT)
+                     it.type == com.orderMate.modals.WidgetType.MULTI_SELECT ||
+                     it.type == com.orderMate.modals.WidgetType.CALENDAR)
                 }
                 
-                val parsedTags = OrderNoteParser.extractTagsFromNote(orderNote, selectWidgets, NoteLevel.ORDER)
+                val parsedTags = OrderNoteParser.extractTagsFromNote(orderNote, displayWidgets, NoteLevel.ORDER)
                 parsedTags.forEach { tag ->
                     val uniqueKey = "${tag.label.lowercase()}:${tag.value}"
                     if (!seenValues.contains(uniqueKey)) {
                         seenValues.add(uniqueKey)
-                        tags.add(CustomTag(tag.label.lowercase(), tag.value))
+                        // Task 15: Store widget type for color coding
+                        tags.add(CustomTag(tag.label.lowercase(), tag.value, tag.widgetType))
                     }
                 }
                 
@@ -271,7 +286,7 @@ class OrderCardRedesignAdapter(
                             val uniqueKey = "$label:$value"
                             if (!seenValues.contains(uniqueKey)) {
                                 seenValues.add(uniqueKey)
-                                tags.add(CustomTag(label, value))
+                                tags.add(CustomTag(label, value, null))
                             }
                         }
                     }
@@ -338,11 +353,17 @@ class OrderCardRedesignAdapter(
         private fun getCustomerName(order: Order): String {
             return try {
                 val customer = order.customers?.firstOrNull()
-                if (customer != null) {
+                val fullName = if (customer != null) {
                     "${customer.firstName ?: ""} ${customer.lastName ?: ""}".trim()
                         .ifEmpty { "-" }
                 } else {
                     "-"
+                }
+                // Task 16: Truncate customer name at 20 chars
+                if (fullName.length > 20) {
+                    fullName.take(20) + "…"
+                } else {
+                    fullName
                 }
             } catch (e: Exception) {
                 "-"
@@ -352,6 +373,21 @@ class OrderCardRedesignAdapter(
         private fun getEmployeeName(order: Order): String {
             return try {
                 order.employee?.jsonObject?.get(Constants.name)?.toString() ?: "-"
+            } catch (e: Exception) {
+                "-"
+            }
+        }
+
+        // Task 19: Get order date formatted
+        private fun getOrderDate(order: Order): String {
+            return try {
+                val createdTime = order.createdTime
+                if (createdTime != null) {
+                    val dateFormat = java.text.SimpleDateFormat("MMM d", java.util.Locale.getDefault())
+                    dateFormat.format(java.util.Date(createdTime))
+                } else {
+                    "-"
+                }
             } catch (e: Exception) {
                 "-"
             }
@@ -497,6 +533,10 @@ class OrderCardRedesignAdapter(
 
     private data class NoteItem(val text: String, val label: String)
     
-    // (#19) Custom tag data class
-    private data class CustomTag(val type: String, val value: String)
+    // (#19) Custom tag data class - Task 15: Added widgetType for proper color coding
+    private data class CustomTag(
+        val type: String, 
+        val value: String,
+        val widgetType: com.orderMate.modals.WidgetType? = null
+    )
 }
