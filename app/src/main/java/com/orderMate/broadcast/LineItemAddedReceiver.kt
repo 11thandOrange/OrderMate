@@ -92,7 +92,7 @@ class LineItemAddedReceiver : BroadcastReceiver() {
         }
         // Task 14: Check V2 settings for OrderMate in Clover Register
         // Use the new SettingsManager which stores the setting under "use_ordermate_register" key
-        val settingsManager = p0?.let { SettingsManager.getInstance(it) }
+        val settingsManager = p0?.let { SettingsManager(it) }
         val isOrderMateRegisterEnabled = settingsManager?.getUseOrderMateRegister() ?: 
             prefManager?.getBoolean(Constants.isMenuBasketOptionEnabled) ?: false
         
