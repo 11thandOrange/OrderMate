@@ -31,6 +31,7 @@ import com.orderMate.utils.SettingsManager
 import com.orderMate.utils.DefaultWidgetFactory
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.WidgetType
+import com.orderMate.utils.WidgetColorUtils
 import java.util.Collections
 import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.WidgetConfig
@@ -1064,20 +1065,20 @@ class SettingsFragment : Fragment() {
     }
     
     /**
-     * Populate the options tags for each Clover filter
+     * Populate the options tags for each Clover filter - uses WidgetColorUtils for consistency
      */
     private fun populateCloverFilterOptions() {
-        // Payment Status options (Yellow/Orange)
+        // Payment Status options (Yellow)
         val paymentStatusValues = listOf("Paid", "Unpaid", "Partial", "Refunded", "Partial Refund", "Open")
-        populateOptionsContainer(paymentStatusOptions, paymentStatusValues, 0xFFFFB74D.toInt())
+        populateOptionsContainer(paymentStatusOptions, paymentStatusValues, WidgetColorUtils.COLOR_PAYMENT_STATUS)
         
         // Order Status options (Red)
         val orderStatusValues = listOf("Open", "Closed")
-        populateOptionsContainer(orderStatusOptions, orderStatusValues, 0xFFEF5350.toInt())
+        populateOptionsContainer(orderStatusOptions, orderStatusValues, WidgetColorUtils.COLOR_ORDER_STATUS)
         
         // Payment Type options (Grey)
         val paymentTypeValues = listOf("Cash", "Credit Card", "Debit Card", "Check", "Gift Card", "Other")
-        populateOptionsContainer(paymentTypeOptions, paymentTypeValues, 0xFF9E9E9E.toInt())
+        populateOptionsContainer(paymentTypeOptions, paymentTypeValues, WidgetColorUtils.COLOR_PAYMENT_TYPE)
     }
     
     /**
@@ -1278,12 +1279,12 @@ class WidgetEditorAdapter(
             widgetToggle.isChecked = widget.enabled
             inputWidgetLabel.setText(widget.label)
 
-            // Set icon and colors based on type - matches HTML widget icon colors
+            // Set icon and colors based on type - uses WidgetColorUtils for consistency
             val (iconRes, bgRes, tintColor) = when (widget.type) {
-                WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, 0xFF64B5F6.toInt())
-                WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, 0xFFCE93D8.toInt())
-                WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, 0xFF81C784.toInt())
-                WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, 0xFFFFB74D.toInt())
+                WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, WidgetColorUtils.COLOR_CALENDAR)
+                WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
+                WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
+                WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
             }
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
@@ -1520,12 +1521,12 @@ class FirebaseWidgetEditorAdapter(
             widgetToggle.isChecked = widget.isEnabled
             inputWidgetLabel.setText(widget.label)
 
-            // Set icon and colors based on type
+            // Set icon and colors based on type - uses WidgetColorUtils for consistency
             val (iconRes, bgRes, tintColor) = when (widget.type) {
-                com.orderMate.modals.WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, 0xFF64B5F6.toInt())
-                com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, 0xFFCE93D8.toInt())
-                com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, 0xFF81C784.toInt())
-                com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, 0xFFFFB74D.toInt())
+                com.orderMate.modals.WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, WidgetColorUtils.COLOR_CALENDAR)
+                com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
+                com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
+                com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
             }
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
@@ -1888,12 +1889,12 @@ class FilterWidgetAdapter(
             widgetType.text = widget.type.displayName
             widgetToggle.isChecked = widget.showInFilter
 
-            // Set icon and colors based on type
+            // Set icon and colors based on type - uses WidgetColorUtils for consistency
             val (iconRes, bgRes, tintColor) = when (widget.type) {
-                com.orderMate.modals.WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, 0xFF64B5F6.toInt())
-                com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, 0xFFCE93D8.toInt())
-                com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, 0xFF81C784.toInt())
-                com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, 0xFFFFB74D.toInt())
+                com.orderMate.modals.WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, WidgetColorUtils.COLOR_CALENDAR)
+                com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
+                com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
+                com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
             }
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)

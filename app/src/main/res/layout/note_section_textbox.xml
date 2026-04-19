@@ -7,23 +7,11 @@
     android:orientation="vertical"
     android:paddingBottom="16dp">
 
-    <!-- Section Label -->
-    <TextView
-        android:id="@+id/sectionLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:textColor="@color/text_light"
-        android:textSize="14sp"
-        android:fontFamily="sans-serif-medium"
-        android:text="Enter Text" />
-
     <!-- Text Input -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter note..."
         app:boxBackgroundMode="outline"
         app:boxBackgroundColor="@color/input_bg"
         app:boxStrokeColor="@color/input_border"
@@ -32,7 +20,7 @@
         app:boxCornerRadiusTopEnd="8dp"
         app:boxCornerRadiusBottomStart="8dp"
         app:boxCornerRadiusBottomEnd="8dp"
-        app:hintTextColor="@color/text_muted"
+        app:hintEnabled="false"
         app:counterEnabled="true"
         app:counterMaxLength="500">
 

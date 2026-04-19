@@ -18,6 +18,7 @@ import com.orderMate.databinding.ItemOrderDetailItemBinding
 import com.orderMate.fragment.orderDetail.OrderDetailFragment
 import com.orderMate.modals.ItemModal
 import com.orderMate.utils.MyApp
+import com.orderMate.utils.WidgetColorUtils
 import com.orderMate.utils.convertToSymbol
 import com.orderMate.utils.convertToTwoDecimal
 import com.orderMate.utils.toDoubleFloatPoint
@@ -195,12 +196,7 @@ class ItemAdapter(
         }
         
         private fun getColorForLabel(label: String): Int {
-            return when {
-                label.contains("date") || label.contains("pickup") -> 0xFF64B5F6.toInt()
-                label.contains("type") || label.contains("status") -> 0xFFCE93D8.toInt()
-                label.contains("category") || label.contains("tag") -> 0xFF81C784.toInt()
-                else -> 0xFFFFB74D.toInt()
-            }
+            return WidgetColorUtils.getColorForLabel(label)
         }
     }
 }

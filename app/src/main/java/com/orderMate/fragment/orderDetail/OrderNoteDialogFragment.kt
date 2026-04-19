@@ -192,9 +192,6 @@ class OrderNoteDialogFragment : DialogFragment() {
         val sectionView = LayoutInflater.from(requireContext())
             .inflate(R.layout.note_section_calendar, noteSectionsContainer, false)
 
-        val labelView = sectionView.findViewById<TextView>(R.id.sectionLabel)
-        labelView.text = widget.label
-
         val dateInput = sectionView.findViewById<TextInputEditText>(R.id.dateInput)
         dateSelections[widget.id]?.let { dateInput.setText(it) }
         dateInput.setOnClickListener { showDatePicker(widget.id, dateInput) }
@@ -205,9 +202,6 @@ class OrderNoteDialogFragment : DialogFragment() {
     private fun addTextBoxSection(widget: WidgetConfig) {
         val sectionView = LayoutInflater.from(requireContext())
             .inflate(R.layout.note_section_textbox, noteSectionsContainer, false)
-
-        val labelView = sectionView.findViewById<TextView>(R.id.sectionLabel)
-        labelView.text = widget.label
 
         val textInput = sectionView.findViewById<TextInputEditText>(R.id.textInput)
         textSelections[widget.id]?.let { textInput.setText(it) }

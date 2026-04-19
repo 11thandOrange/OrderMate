@@ -6,11 +6,18 @@ import com.orderMate.modals.WidgetType
 /**
  * Centralized widget color utility for consistent color coding across the app.
  * 
- * Color scheme:
+ * Widget Color Scheme:
  * - Calendar/Date: Blue (#64B5F6)
  * - Single Select: Purple (#CE93D8)
  * - Multi Select: Green (#81C784)
  * - Text Box: Brown (#A1887F)
+ * 
+ * Clover Filter Color Scheme:
+ * - Payment Status: Yellow (#FFB74D)
+ * - Order Status: Red (#EF5350)
+ * - Payment Type: Grey (#9E9E9E)
+ * - Employee: Purple (#CE93D8)
+ * - Order Date: Blue (#64B5F6)
  */
 object WidgetColorUtils {
     
@@ -19,6 +26,13 @@ object WidgetColorUtils {
     const val COLOR_SINGLE_SELECT = 0xFFCE93D8.toInt() // Purple
     const val COLOR_MULTI_SELECT = 0xFF81C784.toInt()  // Green
     const val COLOR_TEXT_BOX = 0xFFA1887F.toInt()      // Brown
+    
+    // Clover filter colors
+    const val COLOR_PAYMENT_STATUS = 0xFFFFB74D.toInt()  // Yellow
+    const val COLOR_ORDER_STATUS = 0xFFEF5350.toInt()    // Red
+    const val COLOR_PAYMENT_TYPE = 0xFF9E9E9E.toInt()    // Grey
+    const val COLOR_EMPLOYEE = 0xFFCE93D8.toInt()        // Purple (same as Single Select)
+    const val COLOR_ORDER_DATE = 0xFF64B5F6.toInt()      // Blue (same as Calendar)
     
     /**
      * Get color for a widget type

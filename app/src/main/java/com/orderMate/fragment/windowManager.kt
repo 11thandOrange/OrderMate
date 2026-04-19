@@ -228,19 +228,10 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     }
     
     /**
-     * Get color for widget label - matches ItemAdapter color coding
-     * Blue: Date/Calendar/Pickup
-     * Purple: Single Select/Type/Status  
-     * Green: Multi Select/Category/Tag
-     * Orange: Text/Default
+     * Get color for widget label - uses WidgetColorUtils for consistency
      */
     private fun getColorForLabel(label: String): Int {
-        return when {
-            label.contains("date") || label.contains("pickup") || label.contains("calendar") -> 0xFF64B5F6.toInt()  // Blue
-            label.contains("type") || label.contains("status") || label.contains("select") -> 0xFFCE93D8.toInt()    // Purple
-            label.contains("category") || label.contains("tag") -> 0xFF81C784.toInt()                               // Green
-            else -> 0xFFFFB74D.toInt()  // Orange (text/default)
-        }
+        return com.orderMate.utils.WidgetColorUtils.getColorForLabel(label)
     }
     
     private fun dpToPx(dp: Int): Int {
