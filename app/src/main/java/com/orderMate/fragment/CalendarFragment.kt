@@ -1410,26 +1410,56 @@ class CalendarFragment : Fragment() {
             }
             column.addView(rowsContainer)
             
-            // Events overlay
-            dayEvents.forEach { event ->
-                val eventCal = Calendar.getInstance()
-                eventCal.time = event.dueDate
-                val eventHour = eventCal.get(Calendar.HOUR_OF_DAY)
-                val eventMinute = eventCal.get(Calendar.MINUTE)
-                val topPx = ((eventHour * 60 + eventMinute) * density).toInt()
-                val heightPx = (50 * density).toInt()
-                
-                val eventView = createTimelineEventView(context, event)
-                eventView.layoutParams = android.widget.FrameLayout.LayoutParams(
-                    android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
-                    heightPx
-                ).apply {
-                    topMargin = topPx
-                    marginStart = (4 * density).toInt()
-                    marginEnd = (4 * density).toInt()
+            // Group events by hour to handle overlapping events horizontally (like iCal)
+            val eventsByHour = dayEvents.groupBy { event ->
+                val eventCal = Calendar.getInstance().apply { time = event.dueDate }
+                eventCal.get(Calendar.HOUR_OF_DAY)
+            }
+            
+            // Add events with horizontal stacking for same-time events
+            eventsByHour.forEach { (_, eventsInHour) ->
+                val eventCount = eventsInHour.size
+                eventsInHour.forEachIndexed { index, event ->
+                    val eventCal = Calendar.getInstance().apply { time = event.dueDate }
+                    val eventHour = eventCal.get(Calendar.HOUR_OF_DAY)
+                    val eventMinute = eventCal.get(Calendar.MINUTE)
+                    val topPx = ((eventHour * 60 + eventMinute) * density).toInt()
+                    val heightPx = (50 * density).toInt()
+                    
+                    // Calculate horizontal position for side-by-side stacking
+                    val columnWidthFraction = 1f / eventCount
+                    val leftOffsetFraction = index * columnWidthFraction
+                    
+                    val eventView = createTimelineEventView(context, event)
+                    
+                    // Position horizontally after layout
+                    eventView.post {
+                        val parent = eventView.parent as? android.widget.FrameLayout ?: return@post
+                        val parentWidth = parent.width - (8 * density).toInt()
+                        val eventWidth = (parentWidth * columnWidthFraction).toInt()
+                        val leftOffset = (parentWidth * leftOffsetFraction).toInt()
+                        
+                        eventView.layoutParams = android.widget.FrameLayout.LayoutParams(
+                            eventWidth,
+                            heightPx
+                        ).apply {
+                            topMargin = topPx
+                            marginStart = leftOffset + (4 * density).toInt()
+                        }
+                    }
+                    
+                    // Initial layout params
+                    eventView.layoutParams = android.widget.FrameLayout.LayoutParams(
+                        android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+                        heightPx
+                    ).apply {
+                        topMargin = topPx
+                        marginStart = (4 * density).toInt()
+                        marginEnd = (4 * density).toInt()
+                    }
+                    
+                    column.addView(eventView)
                 }
-                
-                column.addView(eventView)
             }
             
             columnsContainer.addView(column)
