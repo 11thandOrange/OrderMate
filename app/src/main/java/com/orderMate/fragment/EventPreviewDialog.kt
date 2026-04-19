@@ -167,35 +167,20 @@ class EventPreviewDialog : DialogFragment() {
      */
     private fun setupOrderNotesPills(view: View, event: ScheduledEvent) {
         val container = view.findViewById<FlexboxLayout>(R.id.orderNotesPillsContainer)
-        container.removeAllViews()
+        // Don't removeAllViews - event type badge is already in container from XML
         
-        // (#30) Use pre-parsed customTags if available
-        val tags = if (event.customTags.isNotEmpty()) {
-            event.customTags
-        } else {
-            // Legacy fallback: parse orderNote directly
-            val orderNote = event.orderNote
-            if (orderNote.isNullOrBlank()) {
-                emptyList()
-            } else {
-                parseOrderNote(orderNote).map { it.text }
-            }
-        }
+        val density = resources.displayMetrics.density
         
-        if (tags.isEmpty()) {
-            container.visibility = View.GONE
-            return
-        }
-        
-        container.visibility = View.VISIBLE
-        
-        tags.forEach { tagText ->
+        // Add order-level note pills after the event type badge
+        event.customTags.forEach { tag ->
+            val color = com.orderMate.utils.WidgetColorUtils.getColorForWidgetType(tag.widgetType)
+            
             val pill = TextView(requireContext()).apply {
-                text = tagText
-                setBackgroundResource(R.drawable.bg_order_note_pill)
-                setTextColor(ContextCompat.getColor(requireContext(), R.color.order_pill_text))
+                text = tag.text
                 textSize = 11f
+                setTextColor(color)
                 setPadding(dpToPx(10), dpToPx(4), dpToPx(10), dpToPx(4))
+                background = com.orderMate.utils.WidgetColorUtils.createPillBackground(color, 10f, density)
                 
                 val lp = FlexboxLayout.LayoutParams(
                     FlexboxLayout.LayoutParams.WRAP_CONTENT,
@@ -208,36 +193,8 @@ class EventPreviewDialog : DialogFragment() {
         }
     }
     
-    private data class NoteItem(val text: String, val label: String)
-    
     private fun dpToPx(dp: Int): Int {
         return (dp * resources.displayMetrics.density).toInt()
-    }
-    
-    private fun parseOrderNote(noteString: String): List<NoteItem> {
-        val notes = mutableListOf<NoteItem>()
-        val delimiter = if (noteString.contains("•")) "•" else "|"
-        val parts = noteString.split(delimiter).map { it.trim() }.filter { it.isNotEmpty() }
-        
-        parts.forEach { part ->
-            val colonIndex = part.indexOf(':')
-            if (colonIndex > 0) {
-                val label = part.substring(0, colonIndex).trim().lowercase()
-                val rawValue = part.substring(colonIndex + 1).trim()
-                
-                val isMultiSelect = label.contains("category") || label.contains("tag")
-                if (isMultiSelect) {
-                    rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { value ->
-                        notes.add(NoteItem(value, label))
-                    }
-                } else if (rawValue.isNotBlank()) {
-                    notes.add(NoteItem(rawValue, label))
-                }
-            } else if (part.isNotBlank()) {
-                notes.add(NoteItem(part, ""))
-            }
-        }
-        return notes
     }
 
     inner class LineItemAdapter(

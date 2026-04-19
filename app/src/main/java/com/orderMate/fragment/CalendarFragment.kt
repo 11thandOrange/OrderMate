@@ -491,11 +491,11 @@ class CalendarFragment : Fragment() {
      * (#30) Extract order-level tags from order.note using widget configuration.
      * Returns list of formatted "Label: Value" strings.
      */
-    private fun extractOrderLevelTags(orderNote: String?, widgets: List<com.orderMate.modals.WidgetConfig>): List<String> {
+    private fun extractOrderLevelTags(orderNote: String?, widgets: List<com.orderMate.modals.WidgetConfig>): List<com.orderMate.model.EventTag> {
         if (orderNote.isNullOrBlank() || widgets.isEmpty()) return emptyList()
         
         val tags = OrderNoteParser.extractTagsFromNote(orderNote, widgets, NoteLevel.ORDER)
-        return tags.map { "${it.label}: ${it.value}" }
+        return tags.map { com.orderMate.model.EventTag("${it.label}: ${it.value}", it.widgetType) }
     }
     
     private fun determineEventType(order: Order): EventType {
@@ -1550,24 +1550,23 @@ class CalendarFragment : Fragment() {
             EventType.PREORDER -> ContextCompat.getColor(context, R.color.event_preorder)
         }
         
-        // Time label
+        // Time - Customer name (or order number if no customer)
         val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
-        val timeView = TextView(context).apply {
-            text = timeFormat.format(event.dueDate)
-            textSize = 10f
-            setTextColor(textColor)
+        val timeStr = timeFormat.format(event.dueDate)
+        val displayName = if (event.customerName.isNotBlank() && event.customerName != "-") {
+            event.customerName
+        } else {
+            "#${event.orderId}"
         }
-        container.addView(timeView)
         
-        // Customer name
-        val nameView = TextView(context).apply {
-            text = event.customerName
+        val eventLabel = TextView(context).apply {
+            text = "$timeStr - $displayName"
             textSize = 11f
             setTextColor(textColor)
-            maxLines = 1
+            maxLines = 2
             ellipsize = android.text.TextUtils.TruncateAt.END
         }
-        container.addView(nameView)
+        container.addView(eventLabel)
         
         return container
     }

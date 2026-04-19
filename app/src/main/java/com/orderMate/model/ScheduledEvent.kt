@@ -1,5 +1,6 @@
 package com.orderMate.model
 
+import com.orderMate.modals.WidgetType
 import java.util.Date
 
 /**
@@ -22,12 +23,20 @@ data class ScheduledEvent(
     val notificationScheduled: Boolean = false,
     val lineItems: List<LineItemPreview> = emptyList(),
     val orderNote: String? = null,  // Order-level note from Order.note (#93)
-    val customTags: List<String> = emptyList()  // (#30) Order-level tags for event preview
+    val customTags: List<EventTag> = emptyList()  // (#30) Order-level tags with widgetType for colors
 ) {
     // For backwards compatibility
     val lineItemNames: List<String>
         get() = lineItems.map { it.name }
 }
+
+/**
+ * Event tag with widget type for proper color coding
+ */
+data class EventTag(
+    val text: String,
+    val widgetType: WidgetType
+)
 
 /**
  * Line item preview for event dialog

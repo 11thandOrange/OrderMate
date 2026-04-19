@@ -9,28 +9,13 @@
     android:padding="24dp"
     android:background="@drawable/bg_event_preview_glass">
 
-        <!-- Header: Type Badge + Order Title + Full Details Button -->
+        <!-- Header: Order Title + Full Details Button -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
-
-            <!-- Event Type Badge -->
-            <TextView
-                android:id="@+id/eventTypeBadge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="6dp"
-                android:text="PICKUP"
-                android:textColor="@color/event_pickup"
-                android:textSize="10sp"
-                android:textAllCaps="true"
-                android:fontFamily="sans-serif-bold"
-                android:letterSpacing="0.05"
-                android:background="@drawable/bg_event_badge_pickup"/>
+            android:layout_marginBottom="8dp">
 
             <!-- Order Title -->
             <TextView
@@ -38,7 +23,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="12dp"
                 android:text="Order #1234"
                 android:textColor="@color/text_light"
                 android:textSize="18sp"
@@ -75,16 +59,34 @@
 
         </LinearLayout>
 
-        <!-- Order-level Notes Pills (#93 requirement) -->
+        <!-- All Pills Container (event type + order-level notes) -->
         <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/orderNotesPillsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:visibility="gone"
+            android:layout_marginBottom="8dp"
             app:flexWrap="wrap"
             app:alignItems="center"
-            app:justifyContent="flex_start"/>
+            app:justifyContent="flex_start">
+            
+            <!-- Event Type Badge (first pill) -->
+            <TextView
+                android:id="@+id/eventTypeBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
+                android:text="PICKUP"
+                android:textColor="@color/event_pickup"
+                android:textSize="10sp"
+                android:textAllCaps="true"
+                android:fontFamily="sans-serif-bold"
+                android:letterSpacing="0.05"
+                android:background="@drawable/bg_event_badge_pickup"/>
+                
+        </com.google.android.flexbox.FlexboxLayout>
 
         <!-- Order Details Section -->
         <LinearLayout
