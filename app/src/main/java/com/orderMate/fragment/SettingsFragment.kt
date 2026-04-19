@@ -86,12 +86,22 @@ class SettingsFragment : Fragment() {
     private var filterOrderLevelAdapter: FilterWidgetAdapter? = null
     private var filterEmptyState: TextView? = null
     
-    // Clover Filter Toggles
-    private var switchFilterOrderDate: Switch? = null
+    // Clover Filter Cards (expandable)
     private var switchFilterPaymentStatus: Switch? = null
     private var switchFilterOrderStatus: Switch? = null
     private var switchFilterPaymentType: Switch? = null
-    private var switchFilterEmployee: Switch? = null
+    private var paymentStatusHeader: View? = null
+    private var paymentStatusBody: View? = null
+    private var paymentStatusChevron: ImageView? = null
+    private var paymentStatusOptions: com.google.android.flexbox.FlexboxLayout? = null
+    private var orderStatusHeader: View? = null
+    private var orderStatusBody: View? = null
+    private var orderStatusChevron: ImageView? = null
+    private var orderStatusOptions: com.google.android.flexbox.FlexboxLayout? = null
+    private var paymentTypeHeader: View? = null
+    private var paymentTypeBody: View? = null
+    private var paymentTypeChevron: ImageView? = null
+    private var paymentTypeOptions: com.google.android.flexbox.FlexboxLayout? = null
     
     // Item Level Notes Panel (#34)
     private var switchItemNotesEnabled: Switch? = null
@@ -189,12 +199,22 @@ class SettingsFragment : Fragment() {
         filterOrderLevelRecyclerView = view.findViewById(R.id.filterOrderLevelRecyclerView)
         filterEmptyState = view.findViewById(R.id.filterEmptyState)
         
-        // Clover Filter Toggles
-        switchFilterOrderDate = view.findViewById(R.id.switchFilterOrderDate)
+        // Clover Filter Cards (expandable)
         switchFilterPaymentStatus = view.findViewById(R.id.switchFilterPaymentStatus)
         switchFilterOrderStatus = view.findViewById(R.id.switchFilterOrderStatus)
         switchFilterPaymentType = view.findViewById(R.id.switchFilterPaymentType)
-        switchFilterEmployee = view.findViewById(R.id.switchFilterEmployee)
+        paymentStatusHeader = view.findViewById(R.id.paymentStatusHeader)
+        paymentStatusBody = view.findViewById(R.id.paymentStatusBody)
+        paymentStatusChevron = view.findViewById(R.id.paymentStatusChevron)
+        paymentStatusOptions = view.findViewById(R.id.paymentStatusOptions)
+        orderStatusHeader = view.findViewById(R.id.orderStatusHeader)
+        orderStatusBody = view.findViewById(R.id.orderStatusBody)
+        orderStatusChevron = view.findViewById(R.id.orderStatusChevron)
+        orderStatusOptions = view.findViewById(R.id.orderStatusOptions)
+        paymentTypeHeader = view.findViewById(R.id.paymentTypeHeader)
+        paymentTypeBody = view.findViewById(R.id.paymentTypeBody)
+        paymentTypeChevron = view.findViewById(R.id.paymentTypeChevron)
+        paymentTypeOptions = view.findViewById(R.id.paymentTypeOptions)
         
         // Item Level Notes Panel (#34)
         switchItemNotesEnabled = view.findViewById(R.id.switchItemNotesEnabled)
@@ -984,20 +1004,16 @@ class SettingsFragment : Fragment() {
     }
     
     /**
-     * Setup Clover filter toggles - load saved state and add listeners
+     * Setup Clover filter cards - load saved state, add listeners, populate options
+     * Only shows Payment Status, Order Status, Payment Type (Order Date and Employee always show in popup)
      */
     private fun setupCloverFilterToggles() {
         // Load saved states
-        switchFilterOrderDate?.isChecked = settingsManager.getShowFilterOrderDate()
         switchFilterPaymentStatus?.isChecked = settingsManager.getShowFilterPaymentStatus()
         switchFilterOrderStatus?.isChecked = settingsManager.getShowFilterOrderStatus()
         switchFilterPaymentType?.isChecked = settingsManager.getShowFilterPaymentType()
-        switchFilterEmployee?.isChecked = settingsManager.getShowFilterEmployee()
         
-        // Set up listeners
-        switchFilterOrderDate?.setOnCheckedChangeListener { _, isChecked ->
-            settingsManager.setShowFilterOrderDate(isChecked)
-        }
+        // Set up toggle listeners
         switchFilterPaymentStatus?.setOnCheckedChangeListener { _, isChecked ->
             settingsManager.setShowFilterPaymentStatus(isChecked)
         }
@@ -1007,9 +1023,83 @@ class SettingsFragment : Fragment() {
         switchFilterPaymentType?.setOnCheckedChangeListener { _, isChecked ->
             settingsManager.setShowFilterPaymentType(isChecked)
         }
-        switchFilterEmployee?.setOnCheckedChangeListener { _, isChecked ->
-            settingsManager.setShowFilterEmployee(isChecked)
+        
+        // Set up expand/collapse for Payment Status
+        paymentStatusHeader?.setOnClickListener {
+            toggleCloverFilterExpansion(paymentStatusBody, paymentStatusChevron)
         }
+        
+        // Set up expand/collapse for Order Status
+        orderStatusHeader?.setOnClickListener {
+            toggleCloverFilterExpansion(orderStatusBody, orderStatusChevron)
+        }
+        
+        // Set up expand/collapse for Payment Type
+        paymentTypeHeader?.setOnClickListener {
+            toggleCloverFilterExpansion(paymentTypeBody, paymentTypeChevron)
+        }
+        
+        // Populate options
+        populateCloverFilterOptions()
+    }
+    
+    /**
+     * Toggle expand/collapse state for a Clover filter card
+     */
+    private fun toggleCloverFilterExpansion(body: View?, chevron: ImageView?) {
+        val isExpanded = body?.visibility == View.VISIBLE
+        body?.visibility = if (isExpanded) View.GONE else View.VISIBLE
+        chevron?.animate()?.rotation(if (isExpanded) 0f else 180f)?.setDuration(200)?.start()
+    }
+    
+    /**
+     * Populate the options tags for each Clover filter
+     */
+    private fun populateCloverFilterOptions() {
+        // Payment Status options
+        val paymentStatusValues = listOf("Paid", "Unpaid", "Partial", "Refunded", "Partial Refund", "Open")
+        populateOptionsContainer(paymentStatusOptions, paymentStatusValues, 0xFFCE93D8.toInt())
+        
+        // Order Status options
+        val orderStatusValues = listOf("Open", "Closed")
+        populateOptionsContainer(orderStatusOptions, orderStatusValues, 0xFF81C784.toInt())
+        
+        // Payment Type options
+        val paymentTypeValues = listOf("Cash", "Credit Card", "Debit Card", "Check", "Gift Card", "Other")
+        populateOptionsContainer(paymentTypeOptions, paymentTypeValues, 0xFFFFB74D.toInt())
+    }
+    
+    /**
+     * Populate a FlexboxLayout with option tags
+     */
+    private fun populateOptionsContainer(
+        container: com.google.android.flexbox.FlexboxLayout?, 
+        values: List<String>,
+        tintColor: Int
+    ) {
+        container?.removeAllViews()
+        values.forEach { value ->
+            val tag = TextView(requireContext()).apply {
+                text = value
+                setTextColor(tintColor)
+                textSize = 12f
+                setPadding(dpToPx(10), dpToPx(4), dpToPx(10), dpToPx(4))
+                setBackgroundResource(R.drawable.bg_value_tag)
+                background.setTint(tintColor and 0x33FFFFFF.toInt() or 0x33000000)
+                
+                val lp = com.google.android.flexbox.FlexboxLayout.LayoutParams(
+                    com.google.android.flexbox.FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                    com.google.android.flexbox.FlexboxLayout.LayoutParams.WRAP_CONTENT
+                )
+                lp.setMargins(0, 0, dpToPx(6), dpToPx(6))
+                layoutParams = lp
+            }
+            container?.addView(tag)
+        }
+    }
+    
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
     }
     
     // ==================== Delete Confirmation Dialog ====================
@@ -1069,11 +1159,21 @@ class SettingsFragment : Fragment() {
         filterItemLevelAdapter = null
         filterOrderLevelAdapter = null
         filterEmptyState = null
-        switchFilterOrderDate = null
         switchFilterPaymentStatus = null
         switchFilterOrderStatus = null
         switchFilterPaymentType = null
-        switchFilterEmployee = null
+        paymentStatusHeader = null
+        paymentStatusBody = null
+        paymentStatusChevron = null
+        paymentStatusOptions = null
+        orderStatusHeader = null
+        orderStatusBody = null
+        orderStatusChevron = null
+        orderStatusOptions = null
+        paymentTypeHeader = null
+        paymentTypeBody = null
+        paymentTypeChevron = null
+        paymentTypeOptions = null
         itemLevelWidgetRecyclerView = null
         orderLevelWidgetRecyclerView = null
         btnAddItemLevelWidget = null
