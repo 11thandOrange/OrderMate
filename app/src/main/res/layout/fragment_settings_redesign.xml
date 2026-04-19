@@ -630,8 +630,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:checked="true"
-                                android:thumb="@drawable/switch_thumb"
-                                android:track="@drawable/switch_track" />
+                                android:thumb="@drawable/bg_toggle_thumb"
+                                android:track="@drawable/bg_toggle_track" />
 
                         </LinearLayout>
 
@@ -656,8 +656,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:checked="true"
-                                android:thumb="@drawable/switch_thumb"
-                                android:track="@drawable/switch_track" />
+                                android:thumb="@drawable/bg_toggle_thumb"
+                                android:track="@drawable/bg_toggle_track" />
 
                         </LinearLayout>
 
@@ -682,8 +682,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:checked="true"
-                                android:thumb="@drawable/switch_thumb"
-                                android:track="@drawable/switch_track" />
+                                android:thumb="@drawable/bg_toggle_thumb"
+                                android:track="@drawable/bg_toggle_track" />
 
                         </LinearLayout>
 
@@ -708,8 +708,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:checked="true"
-                                android:thumb="@drawable/switch_thumb"
-                                android:track="@drawable/switch_track" />
+                                android:thumb="@drawable/bg_toggle_thumb"
+                                android:track="@drawable/bg_toggle_track" />
 
                         </LinearLayout>
 
@@ -734,8 +734,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:checked="true"
-                                android:thumb="@drawable/switch_thumb"
-                                android:track="@drawable/switch_track" />
+                                android:thumb="@drawable/bg_toggle_thumb"
+                                android:track="@drawable/bg_toggle_track" />
 
                         </LinearLayout>
 
