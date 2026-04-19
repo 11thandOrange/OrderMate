@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Payment Status badge background - Yellow/Orange (#FFB74D) -->
+<!-- Payment Status badge background - Yellow/Orange (#FFB74D) solid -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="#33FFB74D" />
+    <solid android:color="#FFB74D" />
     <corners android:radius="20dp" />
 </shape>
