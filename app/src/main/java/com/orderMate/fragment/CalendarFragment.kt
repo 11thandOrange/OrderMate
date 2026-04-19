@@ -1188,6 +1188,15 @@ class CalendarFragment : Fragment() {
         }
         
         timelineBody?.addView(columnsContainer)
+        
+        // Auto-scroll to first event (1 hour before) or current time
+        if (dates.isNotEmpty()) {
+            val startDate = Calendar.getInstance().apply { time = dates.first() }
+            timelineScrollView?.post {
+                val scrollPosition = calculateAutoScrollPosition(startDate, dates.size, hourHeightPx)
+                timelineScrollView?.scrollTo(0, scrollPosition)
+            }
+        }
     }
     
     private fun renderMonthView() {
