@@ -11,7 +11,6 @@ import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import com.clover.sdk.v1.customer.Customer as V1Customer
 
 
@@ -255,28 +254,20 @@ class CloverRepository private constructor(private val context: Context) {
         try {
             val customerConnector = myApp.getCustomerConnector() ?: return@withContext null
             
-            // Create v1 customer using JSONObject constructor (required for CustomerConnector.createCustomer)
-            val customerJson = JSONObject().apply {
-                put("firstName", firstName ?: "")
-                put("lastName", lastName ?: "")
-            }
-            val v1Customer = V1Customer(customerJson)
-            
-            // Create customer in Clover
-            val createdV1Customer = customerConnector.createCustomer(v1Customer) ?: return@withContext null
+            // Create customer in Clover using firstName and lastName strings
+            val createdV1Customer = customerConnector.createCustomer(
+                firstName ?: "",
+                lastName ?: ""
+            ) ?: return@withContext null
             
             // Add phone number if provided
             if (!phone.isNullOrBlank()) {
-                val phoneJson = JSONObject().put("phoneNumber", phone)
-                val v1Phone = com.clover.sdk.v1.customer.PhoneNumber(phoneJson)
-                customerConnector.addPhoneNumber(createdV1Customer.id, v1Phone)
+                customerConnector.addPhoneNumber(createdV1Customer.id, phone)
             }
             
             // Add email if provided
             if (!email.isNullOrBlank()) {
-                val emailJson = JSONObject().put("emailAddress", email)
-                val v1Email = com.clover.sdk.v1.customer.EmailAddress(emailJson)
-                customerConnector.addEmailAddress(createdV1Customer.id, v1Email)
+                customerConnector.addEmailAddress(createdV1Customer.id, email)
             }
             
             // Convert to v3 Customer for return
@@ -326,9 +317,7 @@ class CloverRepository private constructor(private val context: Context) {
                 existingCustomer.phoneNumbers?.firstOrNull()?.let { existingPhone ->
                     customerConnector.deletePhoneNumber(customerId, existingPhone.id)
                 }
-                val phoneJson = JSONObject().put("phoneNumber", phone)
-                val v1Phone = com.clover.sdk.v1.customer.PhoneNumber(phoneJson)
-                customerConnector.addPhoneNumber(customerId, v1Phone)
+                customerConnector.addPhoneNumber(customerId, phone)
             }
             
             // Update email - delete existing and add new
@@ -336,9 +325,7 @@ class CloverRepository private constructor(private val context: Context) {
                 existingCustomer.emailAddresses?.firstOrNull()?.let { existingEmail ->
                     customerConnector.deleteEmailAddress(customerId, existingEmail.id)
                 }
-                val emailJson = JSONObject().put("emailAddress", email)
-                val v1Email = com.clover.sdk.v1.customer.EmailAddress(emailJson)
-                customerConnector.addEmailAddress(customerId, v1Email)
+                customerConnector.addEmailAddress(customerId, email)
             }
             
             // Get updated customer and convert
