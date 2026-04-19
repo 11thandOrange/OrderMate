@@ -136,7 +136,7 @@ class OrderCardRedesignAdapter(
             val widgets = WidgetManager.getCachedWidgets()
             if (widgets.isNotEmpty()) {
                 val textWidgets = widgets.filter { 
-                    it.level == NoteLevel.ORDER && it.type == com.orderMate.modals.WidgetType.TEXT
+                    it.level == NoteLevel.ORDER && it.type == com.orderMate.modals.WidgetType.TEXT_BOX
                 }
                 for (widget in textWidgets) {
                     val label = widget.label

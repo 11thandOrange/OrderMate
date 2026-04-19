@@ -41,6 +41,14 @@ class WidgetManager private constructor(private val context: Context) {
         fun getInstance(): WidgetManager {
             return instance ?: throw IllegalStateException("WidgetManager not initialized. Call getInstance(context) first.")
         }
+
+        /**
+         * Get cached widgets without requiring instance context.
+         * Returns empty list if WidgetManager not initialized.
+         */
+        fun getCachedWidgets(): List<WidgetConfig> {
+            return instance?.getWidgets() ?: emptyList()
+        }
     }
     
     // ==================== Initialization ====================

@@ -54,7 +54,7 @@ object OrderSearchFilter {
         // Line item notes and names
         val lineItemMatch = order.lineItems?.any { lineItem ->
             val note = lineItem?.note?.lowercase() ?: ""
-            val itemName = lineItem?.name?.lowercase() ?: ""
+            val itemName = lineItem?.item?.name?.lowercase() ?: ""
             note.contains(lowerQuery) || itemName.contains(lowerQuery)
         } ?: false
         if (lineItemMatch) return true

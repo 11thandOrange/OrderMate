@@ -1087,8 +1087,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         val lineItemGroup = lineItems.getOrNull(orderPosition)
         val lineItem = lineItemGroup?.order
         val existingNote = lineItem?.note
-        val itemName = lineItem?.name ?: lineItem?.item?.name
-        val itemQuantity = lineItemGroup?.count ?: lineItem?.unitQty?.toInt() ?: 1
+        val itemName = lineItem?.item?.name
+        val itemQuantity = lineItemGroup?.itemCount ?: lineItem?.unitQty?.toInt() ?: 1
         
         // Build modifiers string from modifications
         val modifiersString = lineItem?.modifications?.mapNotNull { it?.name }

@@ -11,6 +11,7 @@ import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import com.clover.sdk.v1.customer.Customer as V1Customer
 
 
@@ -254,25 +255,27 @@ class CloverRepository private constructor(private val context: Context) {
         try {
             val customerConnector = myApp.getCustomerConnector() ?: return@withContext null
             
-            // Create v1 customer (required for CustomerConnector.createCustomer)
-            val v1Customer = V1Customer()
-            v1Customer.firstName = firstName ?: ""
-            v1Customer.lastName = lastName ?: ""
+            // Create v1 customer using JSONObject constructor (required for CustomerConnector.createCustomer)
+            val customerJson = JSONObject().apply {
+                put("firstName", firstName ?: "")
+                put("lastName", lastName ?: "")
+            }
+            val v1Customer = V1Customer(customerJson)
             
             // Create customer in Clover
             val createdV1Customer = customerConnector.createCustomer(v1Customer) ?: return@withContext null
             
             // Add phone number if provided
             if (!phone.isNullOrBlank()) {
-                val v1Phone = com.clover.sdk.v1.customer.PhoneNumber()
-                v1Phone.phoneNumber = phone
+                val phoneJson = JSONObject().put("phoneNumber", phone)
+                val v1Phone = com.clover.sdk.v1.customer.PhoneNumber(phoneJson)
                 customerConnector.addPhoneNumber(createdV1Customer.id, v1Phone)
             }
             
             // Add email if provided
             if (!email.isNullOrBlank()) {
-                val v1Email = com.clover.sdk.v1.customer.EmailAddress()
-                v1Email.emailAddress = email
+                val emailJson = JSONObject().put("emailAddress", email)
+                val v1Email = com.clover.sdk.v1.customer.EmailAddress(emailJson)
                 customerConnector.addEmailAddress(createdV1Customer.id, v1Email)
             }
             
@@ -315,20 +318,16 @@ class CloverRepository private constructor(private val context: Context) {
             // Get existing customer
             val existingCustomer = customerConnector.getCustomer(customerId) ?: return@withContext null
             
-            // Update basic info
-            existingCustomer.firstName = firstName ?: ""
-            existingCustomer.lastName = lastName ?: ""
-            
-            // Update customer in Clover
-            customerConnector.setName(customerId, existingCustomer.firstName, existingCustomer.lastName)
+            // Update customer name in Clover
+            customerConnector.setName(customerId, firstName ?: "", lastName ?: "")
             
             // Update phone - delete existing and add new
             if (!phone.isNullOrBlank()) {
                 existingCustomer.phoneNumbers?.firstOrNull()?.let { existingPhone ->
                     customerConnector.deletePhoneNumber(customerId, existingPhone.id)
                 }
-                val v1Phone = com.clover.sdk.v1.customer.PhoneNumber()
-                v1Phone.phoneNumber = phone
+                val phoneJson = JSONObject().put("phoneNumber", phone)
+                val v1Phone = com.clover.sdk.v1.customer.PhoneNumber(phoneJson)
                 customerConnector.addPhoneNumber(customerId, v1Phone)
             }
             
@@ -337,8 +336,8 @@ class CloverRepository private constructor(private val context: Context) {
                 existingCustomer.emailAddresses?.firstOrNull()?.let { existingEmail ->
                     customerConnector.deleteEmailAddress(customerId, existingEmail.id)
                 }
-                val v1Email = com.clover.sdk.v1.customer.EmailAddress()
-                v1Email.emailAddress = email
+                val emailJson = JSONObject().put("emailAddress", email)
+                val v1Email = com.clover.sdk.v1.customer.EmailAddress(emailJson)
                 customerConnector.addEmailAddress(customerId, v1Email)
             }
             

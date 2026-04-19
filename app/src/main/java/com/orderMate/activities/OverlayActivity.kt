@@ -92,7 +92,7 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
         // Get line item data
         val lineItem = orderData?.lineItems?.find { it?.item?.id == lineItemId }
         val existingNote = lineItem?.note
-        val itemName = lineItem?.name ?: lineItem?.item?.name
+        val itemName = lineItem?.item?.name
         val itemQuantity = lineItem?.unitQty?.toInt() ?: 1
         
         // Build modifiers string from modifications
