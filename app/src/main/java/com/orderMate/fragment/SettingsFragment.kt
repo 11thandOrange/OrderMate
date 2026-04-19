@@ -76,8 +76,8 @@ class SettingsFragment : Fragment() {
     private var switchOrderNotesEnabledGeneral: Switch? = null
     
     // Filter Panel
-    private var filterItemLevelHeader: TextView? = null
-    private var filterOrderLevelHeader: TextView? = null
+    private var filterItemLevelHeader: View? = null
+    private var filterOrderLevelHeader: View? = null
     private var filterItemLevelWidgetsContainer: LinearLayout? = null
     private var filterOrderLevelWidgetsContainer: LinearLayout? = null
     private var filterItemLevelRecyclerView: RecyclerView? = null

@@ -321,49 +321,12 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Enable Item Notes Toggle (#34) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:background="@drawable/bg_settings_card_glass"
-                    android:padding="16dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Enable Item Level Notes"
-                            android:textColor="@color/text_light"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="Show notes popup for individual line items"
-                            android:textColor="@color/text_muted"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                    <Switch
-                        android:id="@+id/switchItemNotesEnabled"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="true"
-                        android:thumb="@drawable/bg_toggle_thumb"
-                        android:track="@drawable/bg_toggle_track" />
-
-                </LinearLayout>
+                <!-- Hidden toggle for programmatic control (moved to General tab) -->
+                <Switch
+                    android:id="@+id/switchItemNotesEnabled"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone" />
 
                 <!-- Item Level Notes Editor Card -->
                 <LinearLayout
@@ -468,49 +431,12 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Enable Order Notes Toggle (#34) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:background="@drawable/bg_settings_card_glass"
-                    android:padding="16dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Enable Order Level Notes"
-                            android:textColor="@color/text_light"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="Show notes popup for entire orders"
-                            android:textColor="@color/text_muted"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                    <Switch
-                        android:id="@+id/switchOrderNotesEnabled"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="true"
-                        android:thumb="@drawable/bg_toggle_thumb"
-                        android:track="@drawable/bg_toggle_track" />
-
-                </LinearLayout>
+                <!-- Hidden toggle for programmatic control (moved to General tab) -->
+                <Switch
+                    android:id="@+id/switchOrderNotesEnabled"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone" />
 
                 <!-- Order Level Notes Editor Card -->
                 <LinearLayout
@@ -645,20 +571,39 @@
                         android:gravity="center"
                         android:textAlignment="center" />
 
-                    <!-- Order Level Widgets Section (moved to top) -->
-                    <TextView
+                    <!-- Order Level Section Divider -->
+                    <LinearLayout
                         android:id="@+id/filterOrderLevelHeader"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:text="Order Level Widgets"
-                        android:textColor="@color/text_light"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:textAlignment="center"
-                        android:visibility="gone" />
+                        android:layout_marginBottom="12dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:visibility="gone">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1"
+                            android:background="#33FFFFFF" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="12dp"
+                            android:text="Order Level"
+                            android:textColor="@color/text_muted"
+                            android:textSize="11sp"
+                            android:textAllCaps="true" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1"
+                            android:background="#33FFFFFF" />
+
+                    </LinearLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/filterOrderLevelRecyclerView"
@@ -674,20 +619,39 @@
                         android:orientation="vertical"
                         android:visibility="gone" />
 
-                    <!-- Item Level Widgets Section (moved below order level) -->
-                    <TextView
+                    <!-- Item Level Section Divider -->
+                    <LinearLayout
                         android:id="@+id/filterItemLevelHeader"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginBottom="8dp"
-                        android:text="Item Level Widgets"
-                        android:textColor="@color/text_light"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:textAlignment="center"
-                        android:visibility="gone" />
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="12dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:visibility="gone">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1"
+                            android:background="#33FFFFFF" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="12dp"
+                            android:text="Item Level"
+                            android:textColor="@color/text_muted"
+                            android:textSize="11sp"
+                            android:textAllCaps="true" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1"
+                            android:background="#33FFFFFF" />
+
+                    </LinearLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/filterItemLevelRecyclerView"
