@@ -327,7 +327,7 @@ class CalendarFragment : Fragment() {
                 syncButton?.isEnabled = true
                 syncButton?.alpha = 1.0f
                 
-                renderCurrentView()
+                renderCalendar()
                 Toast.makeText(requireContext(), "Calendar synced", Toast.LENGTH_SHORT).show()
             }
         }
