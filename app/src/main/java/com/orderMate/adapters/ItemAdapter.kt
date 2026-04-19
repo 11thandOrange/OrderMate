@@ -17,8 +17,12 @@ import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.databinding.ItemOrderDetailItemBinding
 import com.orderMate.fragment.orderDetail.OrderDetailFragment
 import com.orderMate.modals.ItemModal
+import com.orderMate.modals.NoteLevel
+import com.orderMate.modals.WidgetType
 import com.orderMate.utils.MyApp
+import com.orderMate.utils.OrderNoteParser
 import com.orderMate.utils.WidgetColorUtils
+import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.convertToSymbol
 import com.orderMate.utils.convertToTwoDecimal
 import com.orderMate.utils.toDoubleFloatPoint
@@ -133,7 +137,23 @@ class ItemAdapter(
             
             if (noteString.isNullOrEmpty() || noteString.trim().isEmpty()) return
 
-            // Parse note string format: "Label:Value • Label:Value" (or legacy "|" delimiter)
+            val density = context.resources.displayMetrics.density
+            
+            // Try widget-based parsing first for accurate colors
+            val widgets = WidgetManager.getCachedWidgets()
+            val itemLevelWidgets = widgets.filter { it.level == NoteLevel.ITEM }
+            
+            if (itemLevelWidgets.isNotEmpty()) {
+                val parsedTags = OrderNoteParser.extractTagsFromNote(noteString, itemLevelWidgets, NoteLevel.ITEM)
+                if (parsedTags.isNotEmpty()) {
+                    parsedTags.forEach { tag ->
+                        addPillView(context, container, tag.label, tag.value, tag.widgetType, density)
+                    }
+                    return
+                }
+            }
+            
+            // Legacy fallback: parse from note string directly
             val delimiter = if (noteString.contains("•")) "•" else "|"
             val parts = noteString.split(delimiter).map { it.trim() }.filter { it.isNotEmpty() }
             
@@ -152,33 +172,57 @@ class ItemAdapter(
                     listOf(rawValue)
                 }
                 
-                val density = context.resources.displayMetrics.density
                 values.forEach { value ->
-                    val pillView = LayoutInflater.from(context)
-                        .inflate(R.layout.item_note_pill, container, false) as LinearLayout
-                    
-                    val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-                    val pillText = pillView.findViewById<TextView>(R.id.pillText)
-                    
-                    // Use WidgetColorUtils for consistent pill styling
-                    val iconRes = getIconForLabel(label)
-                    val color = getColorForLabel(label)
-                    
-                    // Truncate to 12 chars, single line, no newlines
-                    val displayText = value.replace("\n", " ").take(12).let {
-                        if (value.length > 12) "$it..." else it
-                    }
-                    pillText.text = displayText
-                    pillText.maxLines = 1
-                    pillText.setTextColor(color)
-                    pillIcon.setImageResource(iconRes)
-                    pillIcon.setColorFilter(color)
-                    
-                    // Unified pill background: 15% opacity + 25% border
-                    pillView.background = WidgetColorUtils.createPillBackground(color, 10f, density)
-                    
-                    container.addView(pillView)
+                    addPillView(context, container, label, value, null, density)
                 }
+            }
+        }
+        
+        private fun addPillView(
+            context: Context,
+            container: LinearLayout,
+            label: String,
+            value: String,
+            widgetType: WidgetType?,
+            density: Float
+        ) {
+            val pillView = LayoutInflater.from(context)
+                .inflate(R.layout.item_note_pill, container, false) as LinearLayout
+            
+            val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
+            val pillText = pillView.findViewById<TextView>(R.id.pillText)
+            
+            // Use widgetType for color if available, otherwise fall back to label-based
+            val color = if (widgetType != null) {
+                WidgetColorUtils.getColorForWidgetType(widgetType)
+            } else {
+                WidgetColorUtils.getColorForLabel(label)
+            }
+            val iconRes = getIconForWidgetType(widgetType, label)
+            
+            // Truncate to 12 chars, single line, no newlines
+            val displayText = value.replace("\n", " ").take(12).let {
+                if (value.length > 12) "$it..." else it
+            }
+            pillText.text = displayText
+            pillText.maxLines = 1
+            pillText.setTextColor(color)
+            pillIcon.setImageResource(iconRes)
+            pillIcon.setColorFilter(color)
+            
+            // Unified pill background: 15% opacity + 25% border
+            pillView.background = WidgetColorUtils.createPillBackground(color, 10f, density)
+            
+            container.addView(pillView)
+        }
+        
+        private fun getIconForWidgetType(widgetType: WidgetType?, label: String): Int {
+            return when (widgetType) {
+                WidgetType.CALENDAR -> R.drawable.ic_calendar
+                WidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
+                WidgetType.MULTI_SELECT -> R.drawable.ic_label
+                WidgetType.TEXT_BOX -> R.drawable.ic_edit
+                null -> getIconForLabel(label)
             }
         }
         
@@ -189,10 +233,6 @@ class ItemAdapter(
                 label.contains("category") || label.contains("tag") -> R.drawable.ic_label
                 else -> R.drawable.ic_edit
             }
-        }
-        
-        private fun getColorForLabel(label: String): Int {
-            return WidgetColorUtils.getColorForLabel(label)
         }
     }
 }

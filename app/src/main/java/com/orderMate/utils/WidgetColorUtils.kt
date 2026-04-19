@@ -48,14 +48,20 @@ object WidgetColorUtils {
     
     /**
      * Get color for a label string (used when parsing notes)
-     * Matches existing logic in ItemAdapter, OrderCardRedesignAdapter, windowManager
+     * Priority: Calendar > Multi-Select > Single-Select > Text
+     * 
+     * Note: This is a fallback for when widgetType is not available.
+     * Always prefer getColorForWidgetType() when WidgetType is known.
      */
     fun getColorForLabel(label: String): Int {
         val lowerLabel = label.lowercase()
         return when {
-            lowerLabel.contains("date") || lowerLabel.contains("pickup") || lowerLabel.contains("calendar") -> COLOR_CALENDAR
+            // Calendar keywords
+            lowerLabel.contains("date") || lowerLabel.contains("pickup") || lowerLabel.contains("calendar") || lowerLabel.contains("due") -> COLOR_CALENDAR
+            // Multi-select keywords (check BEFORE single-select to avoid "category" matching "type")
+            lowerLabel.contains("category") || lowerLabel.contains("categories") || lowerLabel.contains("tags") -> COLOR_MULTI_SELECT
+            // Single-select keywords
             lowerLabel.contains("type") || lowerLabel.contains("status") || lowerLabel.contains("select") -> COLOR_SINGLE_SELECT
-            lowerLabel.contains("category") || lowerLabel.contains("tag") -> COLOR_MULTI_SELECT
             else -> COLOR_TEXT_BOX
         }
     }
