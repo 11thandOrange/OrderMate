@@ -35,7 +35,8 @@ object WidgetColorUtils {
     const val COLOR_ORDER_DATE = 0xFF64B5F6.toInt()      // Blue (same as Calendar)
     
     /**
-     * Get color for a widget type
+     * Get color for a widget type - THE ONLY WIDGET COLOR FUNCTION
+     * 4 types, 4 colors. No defaults.
      */
     fun getColorForWidgetType(type: WidgetType): Int {
         return when (type) {
@@ -43,26 +44,6 @@ object WidgetColorUtils {
             WidgetType.SINGLE_SELECT -> COLOR_SINGLE_SELECT
             WidgetType.MULTI_SELECT -> COLOR_MULTI_SELECT
             WidgetType.TEXT_BOX -> COLOR_TEXT_BOX
-        }
-    }
-    
-    /**
-     * Get color for a label string (used when parsing notes)
-     * Priority: Calendar > Multi-Select > Single-Select > Text
-     * 
-     * Note: This is a fallback for when widgetType is not available.
-     * Always prefer getColorForWidgetType() when WidgetType is known.
-     */
-    fun getColorForLabel(label: String): Int {
-        val lowerLabel = label.lowercase()
-        return when {
-            // Calendar keywords
-            lowerLabel.contains("date") || lowerLabel.contains("pickup") || lowerLabel.contains("calendar") || lowerLabel.contains("due") -> COLOR_CALENDAR
-            // Multi-select keywords (check BEFORE single-select to avoid "category" matching "type")
-            lowerLabel.contains("category") || lowerLabel.contains("categories") || lowerLabel.contains("tags") -> COLOR_MULTI_SELECT
-            // Single-select keywords
-            lowerLabel.contains("type") || lowerLabel.contains("status") || lowerLabel.contains("select") -> COLOR_SINGLE_SELECT
-            else -> COLOR_TEXT_BOX
         }
     }
     

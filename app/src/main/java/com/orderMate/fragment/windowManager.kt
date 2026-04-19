@@ -23,9 +23,14 @@ import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.databinding.OrdermateBasketLayoutBinding
 import com.orderMate.fragment.orderDetail.OrderDetailFragment
 import com.orderMate.modals.ItemModal
+import com.orderMate.modals.NoteLevel
+import com.orderMate.modals.WidgetType
 import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
+import com.orderMate.utils.OrderNoteParser
 import com.orderMate.utils.PreferenceManager
+import com.orderMate.utils.WidgetColorUtils
+import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.countElementsByUniqueKeys
 import com.orderMate.utils.exceptionHandlerWithReturn
 import com.orderMate.utils.getCustomerName
@@ -159,79 +164,43 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             return
         }
         
-        // Parse order note with labels preserved for color coding
-        val parsedNotes = parseOrderNoteWithLabels(orderNote)
+        // Use widget-based parsing for ORDER-level widgets
+        val widgets = WidgetManager.getCachedWidgets()
+        val orderLevelWidgets = widgets.filter { it.level == NoteLevel.ORDER }
+        val density = resources.displayMetrics.density
         
-        if (parsedNotes.isEmpty()) {
+        val parsedTags = OrderNoteParser.extractTagsFromNote(orderNote, orderLevelWidgets, NoteLevel.ORDER)
+        if (parsedTags.isEmpty()) {
             container.visibility = View.GONE
             return
         }
         
         container.visibility = View.VISIBLE
+        parsedTags.forEach { tag ->
+            addPill(container, tag.value, tag.widgetType, density)
+        }
+    }
+    
+    private fun addPill(container: FlexboxLayout, text: String, widgetType: WidgetType, density: Float) {
+        val color = WidgetColorUtils.getColorForWidgetType(widgetType)
         
-        parsedNotes.forEach { (label, value) ->
-            // Get widget-specific color based on label
-            val color = getColorForLabel(label)
-            val bgColor = (color and 0x00FFFFFF) or 0x26000000  // 15% opacity
+        val pill = TextView(this).apply {
+            this.text = text
+            textSize = 11f
+            setTextColor(color)
+            setPadding(dpToPx(10), dpToPx(4), dpToPx(10), dpToPx(4))
             
-            val pill = TextView(this).apply {
-                text = value
-                textSize = 11f
-                setTextColor(color)
-                setPadding(dpToPx(10), dpToPx(4), dpToPx(10), dpToPx(4))
-                
-                // Create background with widget-specific color
-                val bg = android.graphics.drawable.GradientDrawable()
-                bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                bg.cornerRadius = 12f * resources.displayMetrics.density
-                bg.setColor(bgColor)
-                background = bg
-                
-                val lp = FlexboxLayout.LayoutParams(
-                    FlexboxLayout.LayoutParams.WRAP_CONTENT,
-                    FlexboxLayout.LayoutParams.WRAP_CONTENT
-                )
-                lp.setMargins(0, 0, dpToPx(6), dpToPx(4))
-                layoutParams = lp
-            }
-            container.addView(pill)
+            // Unified pill background: 15% opacity + 25% border
+            background = WidgetColorUtils.createPillBackground(color, 12f, density)
+            
+            val lp = FlexboxLayout.LayoutParams(
+                FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                FlexboxLayout.LayoutParams.WRAP_CONTENT
+            )
+            lp.setMargins(0, 0, dpToPx(6), dpToPx(4))
+            layoutParams = lp
         }
-    }
-    
-    /**
-     * Parse order note preserving labels for color coding
-     */
-    private fun parseOrderNoteWithLabels(noteString: String): List<Pair<String, String>> {
-        val notes = mutableListOf<Pair<String, String>>()
-        val delimiter = if (noteString.contains("•")) "•" else "|"
-        val parts = noteString.split(delimiter).map { it.trim() }.filter { it.isNotEmpty() }
-        
-        parts.forEach { part ->
-            val colonIndex = part.indexOf(':')
-            if (colonIndex > 0) {
-                val label = part.substring(0, colonIndex).trim().lowercase()
-                val rawValue = part.substring(colonIndex + 1).trim()
-                
-                val isMultiSelect = label.contains("category") || label.contains("tag")
-                if (isMultiSelect) {
-                    rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { value ->
-                        notes.add(label to value)
-                    }
-                } else if (rawValue.isNotBlank()) {
-                    notes.add(label to rawValue)
-                }
-            } else if (part.isNotBlank()) {
-                notes.add("text" to part)
-            }
-        }
-        return notes
-    }
-    
-    /**
-     * Get color for widget label - uses WidgetColorUtils for consistency
-     */
-    private fun getColorForLabel(label: String): Int {
-        return com.orderMate.utils.WidgetColorUtils.getColorForLabel(label)
+        container.addView(pill)
     }
     
     private fun dpToPx(dp: Int): Int {

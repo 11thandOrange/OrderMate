@@ -194,12 +194,8 @@ class OrderCardRedesignAdapter(
                     textSize = 11f
                     typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
                     
-                    // Task 15: Use WidgetColorUtils for consistent colors based on widget type
-                    val tagColor = if (tag.widgetType != null) {
-                        WidgetColorUtils.getColorForWidgetType(tag.widgetType)
-                    } else {
-                        WidgetColorUtils.getColorForLabel(tag.type)
-                    }
+                    // Use WidgetColorUtils for consistent colors based on widget type
+                    val tagColor = WidgetColorUtils.getColorForWidgetType(tag.widgetType)
                     
                     // Use widget color for text, slightly dimmed background
                     setTextColor(tagColor)
@@ -237,53 +233,21 @@ class OrderCardRedesignAdapter(
             val tags = mutableListOf<CustomTag>()
             val seenValues = mutableSetOf<String>()
             
-            // Task 20: Use widget-based parsing for ORDER-level SELECT and CALENDAR widgets
+            // Use widget-based parsing for ORDER-level SELECT and CALENDAR widgets
             val widgets = WidgetManager.getCachedWidgets()
-            if (widgets.isNotEmpty()) {
-                val displayWidgets = widgets.filter { 
-                    it.level == NoteLevel.ORDER && 
-                    (it.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
-                     it.type == com.orderMate.modals.WidgetType.MULTI_SELECT ||
-                     it.type == com.orderMate.modals.WidgetType.CALENDAR)
-                }
-                
-                val parsedTags = OrderNoteParser.extractTagsFromNote(orderNote, displayWidgets, NoteLevel.ORDER)
-                parsedTags.forEach { tag ->
-                    val uniqueKey = "${tag.label.lowercase()}:${tag.value}"
-                    if (!seenValues.contains(uniqueKey)) {
-                        seenValues.add(uniqueKey)
-                        // Task 15: Store widget type for color coding
-                        tags.add(CustomTag(tag.label.lowercase(), tag.value, tag.widgetType))
-                    }
-                }
-                
-                if (tags.isNotEmpty()) {
-                    return tags.take(3)
-                }
+            val displayWidgets = widgets.filter { 
+                it.level == NoteLevel.ORDER && 
+                (it.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
+                 it.type == com.orderMate.modals.WidgetType.MULTI_SELECT ||
+                 it.type == com.orderMate.modals.WidgetType.CALENDAR)
             }
             
-            // Legacy fallback: parse from order.note directly
-            val tagLabels = setOf("category", "type", "status", "sub-category", "subcategory")
-            val delimiter = if (orderNote.contains("•")) "•" else "|"
-            val parts = orderNote.split(delimiter).map { it.trim() }
-            
-            for (part in parts) {
-                val colonIndex = part.indexOf(':')
-                if (colonIndex > 0) {
-                    val label = part.substring(0, colonIndex).trim().lowercase()
-                    if (tagLabels.contains(label)) {
-                        val rawValue = part.substring(colonIndex + 1).trim()
-                        
-                        // Handle comma-separated values for multi-select
-                        val values = rawValue.split(",").map { it.trim() }.filter { it.isNotBlank() }
-                        values.forEach { value ->
-                            val uniqueKey = "$label:$value"
-                            if (!seenValues.contains(uniqueKey)) {
-                                seenValues.add(uniqueKey)
-                                tags.add(CustomTag(label, value, null))
-                            }
-                        }
-                    }
+            val parsedTags = OrderNoteParser.extractTagsFromNote(orderNote, displayWidgets, NoteLevel.ORDER)
+            parsedTags.forEach { tag ->
+                val uniqueKey = "${tag.label.lowercase()}:${tag.value}"
+                if (!seenValues.contains(uniqueKey)) {
+                    seenValues.add(uniqueKey)
+                    tags.add(CustomTag(tag.label.lowercase(), tag.value, tag.widgetType))
                 }
             }
             
@@ -427,7 +391,7 @@ class OrderCardRedesignAdapter(
         private fun setupNotesPills(order: Order) {
             val notes = mutableListOf<NoteItem>()
             
-            // Extract notes from line items using widget-based parsing for proper color coding
+            // Use widget-based parsing for ITEM-level SELECT and CALENDAR widgets
             val widgets = WidgetManager.getCachedWidgets()
             val itemLevelWidgets = widgets.filter { 
                 it.level == NoteLevel.ITEM && 
@@ -439,15 +403,9 @@ class OrderCardRedesignAdapter(
             order.lineItems?.forEach { lineItem ->
                 lineItem?.note?.let { note ->
                     if (note.isNotBlank()) {
-                        if (itemLevelWidgets.isNotEmpty()) {
-                            // Use widget-based parsing for proper widget type colors
-                            val parsedTags = OrderNoteParser.extractTagsFromNote(note, itemLevelWidgets, NoteLevel.ITEM)
-                            parsedTags.forEach { tag ->
-                                notes.add(NoteItem(tag.label.lowercase(), tag.value, tag.widgetType))
-                            }
-                        } else {
-                            // Legacy fallback
-                            parseNotes(note, notes)
+                        val parsedTags = OrderNoteParser.extractTagsFromNote(note, itemLevelWidgets, NoteLevel.ITEM)
+                        parsedTags.forEach { tag ->
+                            notes.add(NoteItem(tag.label.lowercase(), tag.value, tag.widgetType))
                         }
                     }
                 }
@@ -474,14 +432,10 @@ class OrderCardRedesignAdapter(
                 val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
                 val pillText = pillView.findViewById<TextView>(R.id.pillText)
                 
-                // Get widget color - use widgetType if available, otherwise infer from label
-                val pillColor = if (noteItem.widgetType != null) {
-                    WidgetColorUtils.getColorForWidgetType(noteItem.widgetType)
-                } else {
-                    WidgetColorUtils.getColorForLabel(noteItem.label)
-                }
+                // Get widget color from widgetType
+                val pillColor = WidgetColorUtils.getColorForWidgetType(noteItem.widgetType)
                 
-                val iconRes = getIconForLabel(noteItem.label)
+                val iconRes = getIconForWidgetType(noteItem.widgetType)
                 
                 // Truncate to 12 chars, single line, no newlines
                 val displayText = noteItem.text.replace("\n", " ").take(12).let {
@@ -502,57 +456,25 @@ class OrderCardRedesignAdapter(
             }
         }
         
-        private fun getIconForLabel(label: String): Int {
-            return when {
-                label.contains("date") || label.contains("pickup") -> R.drawable.ic_calendar
-                label.contains("type") || label.contains("status") -> R.drawable.ic_check_box
-                label.contains("category") || label.contains("tag") -> R.drawable.ic_label
-                else -> R.drawable.ic_edit
-            }
-        }
-        
-        private fun getColorForLabel(label: String): Int {
-            return WidgetColorUtils.getColorForLabel(label)
-        }
-
-        private fun parseNotes(noteString: String, notes: MutableList<NoteItem>) {
-            // Parse format: "Label:Value • Label:Value" (or legacy "|" delimiter)
-            val delimiter = if (noteString.contains("•")) "•" else "|"
-            val parts = noteString.split(delimiter).map { it.trim() }.filter { it.isNotEmpty() }
-            
-            parts.forEach { part ->
-                val colonIndex = part.indexOf(':')
-                if (colonIndex > 0) {
-                    val label = part.substring(0, colonIndex).trim().lowercase()
-                    val rawValue = part.substring(colonIndex + 1).trim()
-                    
-                    // Only split multi-select fields (category/tag) by comma
-                    val isMultiSelect = label.contains("category") || label.contains("tag")
-                    if (isMultiSelect) {
-                        rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { value ->
-                            notes.add(NoteItem(label, value))
-                        }
-                    } else if (rawValue.isNotBlank()) {
-                        notes.add(NoteItem(label, rawValue))
-                    }
-                } else if (part.isNotBlank()) {
-                    notes.add(NoteItem("", part))
-                }
+        private fun getIconForWidgetType(widgetType: com.orderMate.modals.WidgetType): Int {
+            return when (widgetType) {
+                com.orderMate.modals.WidgetType.CALENDAR -> R.drawable.ic_calendar
+                com.orderMate.modals.WidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
+                com.orderMate.modals.WidgetType.MULTI_SELECT -> R.drawable.ic_label
+                com.orderMate.modals.WidgetType.TEXT_BOX -> R.drawable.ic_edit
             }
         }
     }
 
-    // Item level note data class - includes widgetType for proper color coding
     private data class NoteItem(
         val label: String, 
         val text: String,
-        val widgetType: com.orderMate.modals.WidgetType? = null
+        val widgetType: com.orderMate.modals.WidgetType
     )
     
-    // (#19) Custom tag data class - Task 15: Added widgetType for proper color coding
     private data class CustomTag(
         val type: String, 
         val value: String,
-        val widgetType: com.orderMate.modals.WidgetType? = null
+        val widgetType: com.orderMate.modals.WidgetType
     )
 }

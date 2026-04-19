@@ -408,11 +408,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         
         tags.forEachIndexed { index, tag ->
             // Use WidgetColorUtils for consistent colors
-            val tagColor = if (tag.widgetType != null) {
-                com.orderMate.utils.WidgetColorUtils.getColorForWidgetType(tag.widgetType)
-            } else {
-                com.orderMate.utils.WidgetColorUtils.getColorForLabel(tag.type.name)
-            }
+            val tagColor = com.orderMate.utils.WidgetColorUtils.getColorForWidgetType(tag.widgetType)
             
             val tagView = TextView(requireContext()).apply {
                 text = tag.value
@@ -557,67 +553,45 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         // Show section with notes
         section.visibility = View.VISIBLE
         
-        // Parse and display notes using unified pill styling
-        val notes = parseOrderNote(orderNote)
+        // Use widget-based parsing for ORDER-level widgets
+        val widgets = com.orderMate.utils.WidgetManager.getCachedWidgets()
+        val orderLevelWidgets = widgets.filter { it.level == NoteLevel.ORDER }
         val density = resources.displayMetrics.density
-        notes.forEach { noteItem ->
-            val pillView = layoutInflater.inflate(R.layout.item_note_pill, container, false) as LinearLayout
-            
-            val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-            val pillText = pillView.findViewById<TextView>(R.id.pillText)
-            
-            // Get color based on label using WidgetColorUtils
-            val pillColor = com.orderMate.utils.WidgetColorUtils.getColorForLabel(noteItem.label)
-            
-            pillText.text = noteItem.text
-            pillText.maxLines = 1
-            pillText.setTextColor(pillColor)
-            
-            val iconRes = getIconForLabel(noteItem.label)
-            pillIcon.setImageResource(iconRes)
-            pillIcon.setColorFilter(pillColor)
-            
-            // Unified pill background: 15% opacity + 25% border
-            pillView.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(pillColor, 10f, density)
-            
-            container.addView(pillView)
-        }
-    }
-    
-    private data class NoteItem(val text: String, val label: String)
-    
-    private fun parseOrderNote(noteString: String): List<NoteItem> {
-        val notes = mutableListOf<NoteItem>()
-        val delimiter = if (noteString.contains("•")) "•" else "|"
-        val parts = noteString.split(delimiter).map { it.trim() }.filter { it.isNotEmpty() }
         
-        parts.forEach { part ->
-            val colonIndex = part.indexOf(':')
-            if (colonIndex > 0) {
-                val label = part.substring(0, colonIndex).trim().lowercase()
-                val rawValue = part.substring(colonIndex + 1).trim()
-                
-                val isMultiSelect = label.contains("category") || label.contains("tag")
-                if (isMultiSelect) {
-                    rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { value ->
-                        notes.add(NoteItem(value, label))
-                    }
-                } else if (rawValue.isNotBlank()) {
-                    notes.add(NoteItem(rawValue, label))
-                }
-            } else if (part.isNotBlank()) {
-                notes.add(NoteItem(part, ""))
-            }
+        val parsedTags = com.orderMate.utils.OrderNoteParser.extractTagsFromNote(orderNote, orderLevelWidgets, NoteLevel.ORDER)
+        parsedTags.forEach { tag ->
+            addNotePill(container, tag.value, tag.widgetType, density)
         }
-        return notes
     }
     
-    private fun getIconForLabel(label: String): Int {
-        return when {
-            label.contains("date") || label.contains("pickup") -> R.drawable.ic_calendar
-            label.contains("type") || label.contains("status") -> R.drawable.ic_check_box
-            label.contains("category") || label.contains("tag") -> R.drawable.ic_label
-            else -> R.drawable.ic_edit
+    private fun addNotePill(container: LinearLayout, text: String, widgetType: WidgetType, density: Float) {
+        val pillView = layoutInflater.inflate(R.layout.item_note_pill, container, false) as LinearLayout
+        
+        val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
+        val pillText = pillView.findViewById<TextView>(R.id.pillText)
+        
+        val pillColor = com.orderMate.utils.WidgetColorUtils.getColorForWidgetType(widgetType)
+        
+        pillText.text = text
+        pillText.maxLines = 1
+        pillText.setTextColor(pillColor)
+        
+        val iconRes = getIconForWidgetType(widgetType)
+        pillIcon.setImageResource(iconRes)
+        pillIcon.setColorFilter(pillColor)
+        
+        // Unified pill background: 15% opacity + 25% border
+        pillView.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(pillColor, 10f, density)
+        
+        container.addView(pillView)
+    }
+    
+    private fun getIconForWidgetType(widgetType: WidgetType): Int {
+        return when (widgetType) {
+            WidgetType.CALENDAR -> R.drawable.ic_calendar
+            WidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
+            WidgetType.MULTI_SELECT -> R.drawable.ic_label
+            WidgetType.TEXT_BOX -> R.drawable.ic_edit
         }
     }
     

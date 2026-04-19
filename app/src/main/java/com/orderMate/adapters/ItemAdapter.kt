@@ -139,51 +139,21 @@ class ItemAdapter(
 
             val density = context.resources.displayMetrics.density
             
-            // Try widget-based parsing first for accurate colors
+            // Use widget-based parsing for ITEM-level widgets
             val widgets = WidgetManager.getCachedWidgets()
             val itemLevelWidgets = widgets.filter { it.level == NoteLevel.ITEM }
             
-            if (itemLevelWidgets.isNotEmpty()) {
-                val parsedTags = OrderNoteParser.extractTagsFromNote(noteString, itemLevelWidgets, NoteLevel.ITEM)
-                if (parsedTags.isNotEmpty()) {
-                    parsedTags.forEach { tag ->
-                        addPillView(context, container, tag.label, tag.value, tag.widgetType, density)
-                    }
-                    return
-                }
-            }
-            
-            // Legacy fallback: parse from note string directly
-            val delimiter = if (noteString.contains("•")) "•" else "|"
-            val parts = noteString.split(delimiter).map { it.trim() }.filter { it.isNotEmpty() }
-            
-            parts.forEach { part ->
-                val colonIndex = part.indexOf(':')
-                val label = if (colonIndex > 0) part.substring(0, colonIndex).trim().lowercase() else ""
-                val rawValue = if (colonIndex > 0) part.substring(colonIndex + 1).trim() else part
-                
-                if (rawValue.isEmpty()) return@forEach
-                
-                // Only split multi-select fields (category/tag) by comma
-                val isMultiSelect = label.contains("category") || label.contains("tag")
-                val values = if (isMultiSelect) {
-                    rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                } else {
-                    listOf(rawValue)
-                }
-                
-                values.forEach { value ->
-                    addPillView(context, container, label, value, null, density)
-                }
+            val parsedTags = OrderNoteParser.extractTagsFromNote(noteString, itemLevelWidgets, NoteLevel.ITEM)
+            parsedTags.forEach { tag ->
+                addPillView(context, container, tag.value, tag.widgetType, density)
             }
         }
         
         private fun addPillView(
             context: Context,
             container: LinearLayout,
-            label: String,
             value: String,
-            widgetType: WidgetType?,
+            widgetType: WidgetType,
             density: Float
         ) {
             val pillView = LayoutInflater.from(context)
@@ -192,13 +162,8 @@ class ItemAdapter(
             val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
             val pillText = pillView.findViewById<TextView>(R.id.pillText)
             
-            // Use widgetType for color if available, otherwise fall back to label-based
-            val color = if (widgetType != null) {
-                WidgetColorUtils.getColorForWidgetType(widgetType)
-            } else {
-                WidgetColorUtils.getColorForLabel(label)
-            }
-            val iconRes = getIconForWidgetType(widgetType, label)
+            val color = WidgetColorUtils.getColorForWidgetType(widgetType)
+            val iconRes = getIconForWidgetType(widgetType)
             
             // Truncate to 12 chars, single line, no newlines
             val displayText = value.replace("\n", " ").take(12).let {
@@ -216,22 +181,12 @@ class ItemAdapter(
             container.addView(pillView)
         }
         
-        private fun getIconForWidgetType(widgetType: WidgetType?, label: String): Int {
+        private fun getIconForWidgetType(widgetType: WidgetType): Int {
             return when (widgetType) {
                 WidgetType.CALENDAR -> R.drawable.ic_calendar
                 WidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
                 WidgetType.MULTI_SELECT -> R.drawable.ic_label
                 WidgetType.TEXT_BOX -> R.drawable.ic_edit
-                null -> getIconForLabel(label)
-            }
-        }
-        
-        private fun getIconForLabel(label: String): Int {
-            return when {
-                label.contains("date") || label.contains("pickup") -> R.drawable.ic_calendar
-                label.contains("type") || label.contains("status") -> R.drawable.ic_check_box
-                label.contains("category") || label.contains("tag") -> R.drawable.ic_label
-                else -> R.drawable.ic_edit
             }
         }
     }
