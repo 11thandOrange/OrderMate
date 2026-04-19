@@ -49,6 +49,9 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     private val binding: OrdermateBasketLayoutBinding? by lazy {
         OrdermateBasketLayoutBinding.inflate(LayoutInflater.from(this))
     }
+    
+    // Flag to prevent immediate close when opening drawer
+    private var isDrawerOpening = false
 
     private val prefManager: PreferenceManager by lazy {
         PreferenceManager.getInstance(applicationContext)
@@ -289,6 +292,9 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         }
 
         binding?.container1?.setOnClickListener {
+            // Set flag to prevent immediate close from transparentContainer click
+            isDrawerOpening = true
+            
             binding?.orderMateButton?.hideView()
             // when the cart is empty (#42 - use new emptyStateContainer)
             if (prefManager.getString((Constants.isOrderSaved)) == Constants.isTrue && OrderDetailFragment.orderIdForReopen == null) {
@@ -309,13 +315,24 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                 )
             )
 
+            // Show drawer and overlay
             binding?.container?.showView()
+            binding?.transparentContainer?.showView()
+            
+            // Reset flag after a short delay to allow layout to settle
+            binding?.root?.postDelayed({
+                isDrawerOpening = false
+            }, 300)
         }
         binding?.cancelButton?.setOnClickListener {
             closeHandler()
         }
 
         binding?.transparentContainer?.setOnClickListener {
+            // Ignore clicks if drawer is still opening (prevents accidental close)
+            if (isDrawerOpening) {
+                return@setOnClickListener
+            }
             closeHandler()
         }
         
@@ -343,6 +360,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             )
         )
         binding?.container?.hideView()
+        binding?.transparentContainer?.hideView()
     }
 
     fun visibleRecycler() {

@@ -433,11 +433,28 @@ class OrderCardRedesignAdapter(
         private fun setupNotesPills(order: Order) {
             val notes = mutableListOf<NoteItem>()
             
-            // Extract notes from line items
+            // Extract notes from line items using widget-based parsing for proper color coding
+            val widgets = WidgetManager.getCachedWidgets()
+            val itemLevelWidgets = widgets.filter { 
+                it.level == NoteLevel.ITEM && 
+                (it.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
+                 it.type == com.orderMate.modals.WidgetType.MULTI_SELECT ||
+                 it.type == com.orderMate.modals.WidgetType.CALENDAR)
+            }
+            
             order.lineItems?.forEach { lineItem ->
                 lineItem?.note?.let { note ->
                     if (note.isNotBlank()) {
-                        parseNotes(note, notes)
+                        if (itemLevelWidgets.isNotEmpty()) {
+                            // Use widget-based parsing for proper widget type colors
+                            val parsedTags = OrderNoteParser.extractTagsFromNote(note, itemLevelWidgets, NoteLevel.ITEM)
+                            parsedTags.forEach { tag ->
+                                notes.add(NoteItem(tag.label.lowercase(), tag.value, tag.widgetType))
+                            }
+                        } else {
+                            // Legacy fallback
+                            parseNotes(note, notes)
+                        }
                     }
                 }
             }
@@ -454,6 +471,8 @@ class OrderCardRedesignAdapter(
             container.removeAllViews()
             
             val context = binding.root.context
+            val density = context.resources.displayMetrics.density
+            
             notes.forEach { noteItem ->
                 val pillView = LayoutInflater.from(context)
                     .inflate(R.layout.item_note_pill, container, false) as LinearLayout
@@ -461,9 +480,14 @@ class OrderCardRedesignAdapter(
                 val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
                 val pillText = pillView.findViewById<TextView>(R.id.pillText)
                 
-                // Light bg with dark text, icon with widget color
+                // Get widget color - use widgetType if available, otherwise infer from label
+                val pillColor = if (noteItem.widgetType != null) {
+                    WidgetColorUtils.getColorForWidgetType(noteItem.widgetType)
+                } else {
+                    WidgetColorUtils.getColorForLabel(noteItem.label)
+                }
+                
                 val iconRes = getIconForLabel(noteItem.label)
-                val iconColor = getColorForLabel(noteItem.label)
                 
                 // Truncate to 12 chars, single line, no newlines
                 val displayText = noteItem.text.replace("\n", " ").take(12).let {
@@ -471,15 +495,19 @@ class OrderCardRedesignAdapter(
                 }
                 pillText.text = displayText
                 pillText.maxLines = 1
-                pillText.setTextColor(ContextCompat.getColor(context, R.color.list_chip_text))
-                pillIcon.setImageResource(iconRes)
-                pillIcon.setColorFilter(iconColor)
                 
-                // Set solid background color
-                val bg = android.graphics.drawable.GradientDrawable()
-                bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                bg.cornerRadius = 10f * context.resources.displayMetrics.density
-                bg.setColor(ContextCompat.getColor(context, R.color.list_chip_bg))
+                // Use widget color for text and icon (same as order details page)
+                pillText.setTextColor(pillColor)
+                pillIcon.setImageResource(iconRes)
+                pillIcon.setColorFilter(pillColor)
+                
+                // Create colored background with 15% opacity (same as order details page)
+                val bg = android.graphics.drawable.GradientDrawable().apply {
+                    shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                    cornerRadius = 10f * density
+                    setColor(WidgetColorUtils.getBackgroundColor(pillColor))
+                    setStroke((1 * density).toInt(), (pillColor and 0x00FFFFFF) or 0x40000000)
+                }
                 pillView.background = bg
                 
                 container.addView(pillView)
@@ -519,19 +547,24 @@ class OrderCardRedesignAdapter(
                     val isMultiSelect = label.contains("category") || label.contains("tag")
                     if (isMultiSelect) {
                         rawValue.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { value ->
-                            notes.add(NoteItem(value, label))
+                            notes.add(NoteItem(label, value))
                         }
                     } else if (rawValue.isNotBlank()) {
-                        notes.add(NoteItem(rawValue, label))
+                        notes.add(NoteItem(label, rawValue))
                     }
                 } else if (part.isNotBlank()) {
-                    notes.add(NoteItem(part, ""))
+                    notes.add(NoteItem("", part))
                 }
             }
         }
     }
 
-    private data class NoteItem(val text: String, val label: String)
+    // Item level note data class - includes widgetType for proper color coding
+    private data class NoteItem(
+        val label: String, 
+        val text: String,
+        val widgetType: com.orderMate.modals.WidgetType? = null
+    )
     
     // (#19) Custom tag data class - Task 15: Added widgetType for proper color coding
     private data class CustomTag(

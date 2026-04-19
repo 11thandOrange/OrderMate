@@ -627,7 +627,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Filter Popup Settings"
+                        android:text="Filter Popup"
                         android:textColor="@color/text_light"
                         android:textSize="14sp"
                         android:textStyle="bold"
@@ -645,41 +645,12 @@
                         android:gravity="center"
                         android:textAlignment="center" />
 
-                    <!-- Item Level Widgets Section -->
-                    <TextView
-                        android:id="@+id/filterItemLevelHeader"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:text="Item Level Widgets"
-                        android:textColor="@color/text_light"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:textAlignment="center"
-                        android:visibility="gone" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/filterItemLevelRecyclerView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false" />
-
-                    <!-- Keep legacy container for compatibility -->
-                    <LinearLayout
-                        android:id="@+id/filterItemLevelWidgetsContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:visibility="gone" />
-
-                    <!-- Order Level Widgets Section -->
+                    <!-- Order Level Widgets Section (moved to top) -->
                     <TextView
                         android:id="@+id/filterOrderLevelHeader"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="8dp"
                         android:layout_marginBottom="8dp"
                         android:text="Order Level Widgets"
                         android:textColor="@color/text_light"
@@ -698,6 +669,35 @@
                     <!-- Keep legacy container for compatibility -->
                     <LinearLayout
                         android:id="@+id/filterOrderLevelWidgetsContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone" />
+
+                    <!-- Item Level Widgets Section (moved below order level) -->
+                    <TextView
+                        android:id="@+id/filterItemLevelHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="Item Level Widgets"
+                        android:textColor="@color/text_light"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:textAlignment="center"
+                        android:visibility="gone" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/filterItemLevelRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false" />
+
+                    <!-- Keep legacy container for compatibility -->
+                    <LinearLayout
+                        android:id="@+id/filterItemLevelWidgetsContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
