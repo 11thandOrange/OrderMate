@@ -410,6 +410,12 @@ class OrderNoteDialogFragment : DialogFragment() {
         btnSave = null
     }
 
+    override fun onCancel(dialog: android.content.DialogInterface) {
+        super.onCancel(dialog)
+        // Called when dialog is dismissed by clicking outside or pressing back
+        listener?.onOrderNoteCancelled()
+    }
+
     fun setListener(listener: OrderNoteListener) {
         this.listener = listener
     }
