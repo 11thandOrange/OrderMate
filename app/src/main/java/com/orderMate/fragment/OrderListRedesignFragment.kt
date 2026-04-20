@@ -168,7 +168,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 currentSearchQuery = query
                 // Update search input without triggering listener
                 if (_binding != null) {
-                    binding.searchInput.apply {
+                    binding.header.searchInput.apply {
                         if (text.toString() != query) {
                             setText(query)
                             setSelection(query.length)
@@ -215,22 +215,22 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     private fun setupClickListeners() {
         // Filter button
-        binding.filterButton.setOnClickListener {
+        binding.header.filterButton.setOnClickListener {
             showFilterDialog()
         }
 
         // Reset button
-        binding.resetButton.setOnClickListener {
+        binding.header.resetButton.setOnClickListener {
             resetFilters()
         }
 
         // Calendar icon for date picker (#14 - expanded click area)
-        binding.calendarIconContainer.setOnClickListener {
+        binding.header.calendarIconContainer.setOnClickListener {
             showDatePicker()
         }
 
         // Sync button (#15)
-        binding.syncButton.setOnClickListener {
+        binding.header.syncButton.setOnClickListener {
             if (!isSyncing) {
                 syncOrders()
             }
@@ -253,12 +253,12 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         // Sync reset to shared ViewModel for cross-tab persistence
         sharedFilterViewModel.resetAll()
         
-        binding.searchInput.text?.clear()
-        binding.searchInput.hint = getString(R.string.search_orders)
+        binding.header.searchInput.text?.clear()
+        binding.header.searchInput.hint = getString(R.string.search_orders)
         
         // Hide pills
-        binding.filterPillsScroll.visibility = View.GONE
-        binding.filterPillsContainer.removeAllViews()
+        binding.header.filterPillsScroll.visibility = View.GONE
+        binding.header.filterPillsContainer.removeAllViews()
         
         // Reload all orders
         orderItems.clear()
@@ -273,7 +273,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun setupSearchListener() {
-        binding.searchInput.doAfterTextChanged { text ->
+        binding.header.searchInput.doAfterTextChanged { text ->
             if (this::searchRunnable.isInitialized) {
                 handler.removeCallbacks(searchRunnable)
             }
@@ -332,13 +332,13 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     private fun syncOrders() {
         isSyncing = true
-        binding.searchInput.text?.clear()
+        binding.header.searchInput.text?.clear()
         selectedDateFilter = null
         
         // Show syncing indicator (#15)
-        binding.syncingContainer.showView()
-        binding.syncButton.isEnabled = false
-        binding.syncButton.alpha = 0.5f
+        binding.header.syncingContainer.showView()
+        binding.header.syncButton.isEnabled = false
+        binding.header.syncButton.alpha = 0.5f
 
         runOnBackgroundThread {
             try {
@@ -357,9 +357,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
             runOnMainThread {
                 isSyncing = false
-                binding.syncingContainer.hideView()
-                binding.syncButton.isEnabled = true
-                binding.syncButton.alpha = 1.0f
+                binding.header.syncingContainer.hideView()
+                binding.header.syncButton.isEnabled = true
+                binding.header.syncButton.alpha = 1.0f
                 
                 updateResultsInfo()
                 notifyAdapter()
@@ -564,7 +564,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         // Deprecated - now using pills instead
         selectedDateFilter?.let {
             val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
-            binding.searchInput.hint = "Filtering: ${dateFormat.format(it)}"
+            binding.header.searchInput.hint = "Filtering: ${dateFormat.format(it)}"
         }
     }
 
@@ -718,7 +718,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun updateFilterPills(filters: FilterDialogFragment.FilterState) {
-        binding.filterPillsContainer.removeAllViews()
+        binding.header.filterPillsContainer.removeAllViews()
 
         val dateFormat = java.text.SimpleDateFormat("MMM d", java.util.Locale.getDefault())
         var hasPills = false
@@ -735,7 +735,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 val pill = createFilterPillWithClose(displayValue) {
                     removeSelectionFilter(categoryId, value)
                 }
-                binding.filterPillsContainer.addView(pill)
+                binding.header.filterPillsContainer.addView(pill)
             }
         }
         
@@ -754,11 +754,11 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 val pill = createFilterPillWithClose("$label: ${dateFormat.format(date)}") {
                     removeDateFilter(categoryId, index)
                 }
-                binding.filterPillsContainer.addView(pill)
+                binding.header.filterPillsContainer.addView(pill)
             }
         }
 
-        binding.filterPillsScroll.visibility = if (hasPills) View.VISIBLE else View.GONE
+        binding.header.filterPillsScroll.visibility = if (hasPills) View.VISIBLE else View.GONE
     }
     
     private fun removeSelectionFilter(categoryId: String, value: String) {
