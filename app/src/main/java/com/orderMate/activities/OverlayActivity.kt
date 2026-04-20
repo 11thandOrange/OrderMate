@@ -12,7 +12,6 @@ import com.orderMate.fragment.orderDetail.OrderNoteDialogFragment
 import com.orderMate.repository.CloverRepository
 import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
-import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.exceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -90,12 +89,6 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
     }
     
     private fun showItemNoteDialog() {
-        // Check if item-level notes are enabled in settings
-        if (!WidgetManager.getInstance(this).isItemNotesEnabled()) {
-            finish() // Item notes disabled, close overlay
-            return
-        }
-        
         // Get line item data
         val lineItem = orderData?.lineItems?.find { it?.item?.id == lineItemId }
         val existingNote = lineItem?.note
@@ -148,12 +141,6 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
      * Show order-level note dialog (#93)
      */
     private fun showOrderNoteDialog() {
-        // Check if order-level notes are enabled in settings
-        if (!WidgetManager.getInstance(this).isOrderNotesEnabled()) {
-            finish() // Order notes disabled, close overlay
-            return
-        }
-        
         val existingNote = orderData?.note
         
         OrderNoteDialogFragment.newInstance(
