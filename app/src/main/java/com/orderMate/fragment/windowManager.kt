@@ -52,9 +52,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     private var params: WindowManager.LayoutParams? = null
     private var lineItems: MutableList<ItemModal?> = mutableListOf()
     private val binding: OrdermateBasketLayoutBinding? by lazy {
-        // Wrap context with AppCompat theme to support Material views in Service
-        val themedContext = android.view.ContextThemeWrapper(this, R.style.Theme_OrderAppClover)
-        OrdermateBasketLayoutBinding.inflate(LayoutInflater.from(themedContext))
+        OrdermateBasketLayoutBinding.inflate(LayoutInflater.from(this))
     }
     
     // Flag to prevent immediate close when opening drawer
@@ -300,11 +298,14 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         
         // Edit Order Notes button (#42) - opens order-level notes popup
         binding?.btnEditOrderNotes?.setOnClickListener {
-            val data = Intent(applicationContext, OverlayActivity::class.java)
-            data.putExtra(Constants.overlayIntentExtraOrder, lastOrder?.id)
-            data.putExtra(OverlayActivity.EXTRA_OVERLAY_MODE, OverlayActivity.OVERLAY_MODE_ORDER_NOTE)
-            data.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            applicationContext?.startActivity(data)
+            // Check if order-level notes are enabled
+            if (WidgetManager.getInstance(applicationContext).isOrderNotesEnabled()) {
+                val data = Intent(applicationContext, OverlayActivity::class.java)
+                data.putExtra(Constants.overlayIntentExtraOrder, lastOrder?.id)
+                data.putExtra(OverlayActivity.EXTRA_OVERLAY_MODE, OverlayActivity.OVERLAY_MODE_ORDER_NOTE)
+                data.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                applicationContext?.startActivity(data)
+            }
         }
     }
 
@@ -405,6 +406,11 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     }
 
     override fun onOrderItemClick(orderPosition: Int, lineItemId: String?) {
+        // Check if item-level notes are enabled
+        if (!WidgetManager.getInstance(applicationContext).isItemNotesEnabled()) {
+            return // Item notes disabled, don't show popup
+        }
+        
         val data = Intent(applicationContext, OverlayActivity::class.java)
         data.putExtra(Constants.overlayIntentExtraOrder, lastOrder?.id)
         data.putExtra(Constants.overlayIntentExtraLinePosition, orderPosition.toString())

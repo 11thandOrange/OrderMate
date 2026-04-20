@@ -72,7 +72,7 @@
     <!-- Main Drawer Container - Glassmorphism style, full screen height (#42) -->
     <LinearLayout
         android:id="@+id/container"
-        android:layout_width="320dp"
+        android:layout_width="340dp"
         android:layout_height="0dp"
         android:background="@drawable/bg_event_preview_glass"
         android:orientation="vertical"
