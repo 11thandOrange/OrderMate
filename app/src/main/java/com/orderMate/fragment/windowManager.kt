@@ -52,7 +52,9 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     private var params: WindowManager.LayoutParams? = null
     private var lineItems: MutableList<ItemModal?> = mutableListOf()
     private val binding: OrdermateBasketLayoutBinding? by lazy {
-        OrdermateBasketLayoutBinding.inflate(LayoutInflater.from(this))
+        // Wrap context with AppCompat theme to support Material views in Service
+        val themedContext = android.view.ContextThemeWrapper(this, R.style.Theme_OrderMate)
+        OrdermateBasketLayoutBinding.inflate(LayoutInflater.from(themedContext))
     }
     
     // Flag to prevent immediate close when opening drawer
