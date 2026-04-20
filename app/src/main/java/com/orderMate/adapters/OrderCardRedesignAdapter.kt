@@ -16,6 +16,7 @@ import com.orderMate.databinding.ItemOrderCardRedesignBinding
 import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.utils.Constants
+import com.orderMate.utils.MyApp
 import com.orderMate.utils.OrderNoteParser
 import com.orderMate.utils.WidgetColorUtils
 import com.orderMate.utils.WidgetManager
