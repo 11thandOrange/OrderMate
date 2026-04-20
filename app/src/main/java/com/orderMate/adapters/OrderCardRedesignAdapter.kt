@@ -323,7 +323,11 @@ class OrderCardRedesignAdapter(
 
         private fun getEmployeeName(order: Order): String {
             return try {
-                order.employee?.jsonObject?.get(Constants.name)?.toString() ?: "-"
+                // First try to get from jsonObject (rarely populated)
+                order.employee?.jsonObject?.get(Constants.name)?.toString()
+                    // Fallback: get from cached employee lookup using ID
+                    ?: order.employee?.id?.let { MyApp.getInstance().getCachedEmployeeName(it) }
+                    ?: "-"
             } catch (e: Exception) {
                 "-"
             }

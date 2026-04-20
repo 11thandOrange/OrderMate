@@ -254,19 +254,10 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 }
 
 
-                exceptionHandler({
-                        binding.orderPlacedEmployeeValue.text =
-                            employee?.jsonObject?.get(Constants.name)?.toString()
-                })
-                {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val value = MyApp.getInstance().getEmployeeName(employee?.id)
-                        CoroutineScope(Dispatchers.Main).launch {
-                            binding.orderPlacedEmployeeValue.text = value
-                                ?: getString(R.string.dash)
-                        }
-                    }
-                }
+                // Get employee name - try jsonObject first, then use cached lookup
+                val employeeName = employee?.jsonObject?.get(Constants.name)?.toString()
+                    ?: employee?.id?.let { MyApp.getInstance().getCachedEmployeeName(it) }
+                binding.orderPlacedEmployeeValue.text = employeeName ?: getString(R.string.dash)
                 setUpTheScreen()
             }
         }
@@ -1028,6 +1019,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
      * Open order note dialog for editing order-level notes (#93)
      */
     private fun openOrderNoteDialog() {
+        // Check if order-level notes are enabled in settings
+        val widgetManager = context?.let { WidgetManager.getInstance(it) }
+        if (widgetManager?.isOrderNotesEnabled() != true) {
+            return // Order notes disabled, don't show popup
+        }
+        
         val existingNote = orderArguments?.note
         OrderNoteDialogFragment.newInstance(
             orderId = orderArguments?.id,
@@ -1099,6 +1096,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
 
     // When user clicks on an item row, open the OrderMate popup to add/edit notes
     override fun onOrderItemClick(orderPosition: Int, lineItemId: String?) {
+        // Check if item-level notes are enabled in settings
+        val widgetManager = context?.let { WidgetManager.getInstance(it) }
+        if (widgetManager?.isItemNotesEnabled() != true) {
+            return // Item notes disabled, don't show popup
+        }
+        
         // Get line item data
         val lineItemGroup = lineItems.getOrNull(orderPosition)
         val lineItem = lineItemGroup?.order

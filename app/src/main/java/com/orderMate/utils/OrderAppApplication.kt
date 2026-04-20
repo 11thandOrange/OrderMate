@@ -21,6 +21,10 @@ class MyApp : Application() {
     private var employeeConnector: EmployeeConnector? = null
     private var merchantConnector: MerchantConnector? = null
     private var customerConnector: CustomerConnector? = null
+    
+    // Cache of employee ID -> employee name for fast lookups
+    private val employeeNameCache: MutableMap<String, String> = mutableMapOf()
+    private var employeeCacheLoaded = false
 
     companion object {
          var latestAxis: Pair<Int?, Int?>? = Pair(700, 700)
@@ -52,6 +56,52 @@ class MyApp : Application() {
         instance = this
         FirebaseApp.initializeApp(applicationContext)
         storeIntoPreference()
+        // Load employee cache in background
+        loadEmployeeCache()
+    }
+    
+    /**
+     * Load all employees into cache for fast name lookups
+     */
+    private fun loadEmployeeCache() {
+        Thread {
+            try {
+                val connector = getEmployeeConnector()
+                val employees = connector?.employees
+                employees?.forEach { employee ->
+                    employee?.id?.let { id ->
+                        employee.name?.let { name ->
+                            employeeNameCache[id] = name
+                        }
+                    }
+                }
+                employeeCacheLoaded = true
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }.start()
+    }
+    
+    /**
+     * Get employee name from cache, falling back to API if not cached
+     */
+    fun getCachedEmployeeName(employeeId: String?): String? {
+        if (employeeId.isNullOrBlank()) return null
+        
+        // Try cache first
+        employeeNameCache[employeeId]?.let { return it }
+        
+        // Fallback to API call and cache the result
+        return try {
+            val name = employeeConnector?.getEmployee(employeeId)?.name
+            if (name != null) {
+                employeeNameCache[employeeId] = name
+            }
+            name
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
 

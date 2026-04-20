@@ -38,7 +38,7 @@ object WidgetColorUtils {
     // Clover filter colors
     const val COLOR_PAYMENT_STATUS = 0xFFFFB74D.toInt()  // Yellow
     const val COLOR_ORDER_STATUS = 0xFFEF5350.toInt()    // Red
-    const val COLOR_PAYMENT_TYPE = 0xFF9E9E9E.toInt()    // Grey
+    const val COLOR_PAYMENT_TYPE = 0xFF616161.toInt()    // Darker Grey (was 9E9E9E)
     const val COLOR_EMPLOYEE = 0xFFCE93D8.toInt()        // Purple (same as Single Select)
     const val COLOR_ORDER_DATE = 0xFF64B5F6.toInt()      // Blue (same as Calendar)
     
