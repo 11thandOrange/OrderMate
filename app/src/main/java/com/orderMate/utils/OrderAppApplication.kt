@@ -83,25 +83,12 @@ class MyApp : Application() {
     }
     
     /**
-     * Get employee name from cache, falling back to API if not cached
+     * Get employee name from cache only (no network calls)
+     * Returns null if not cached - cache is populated at app startup
      */
     fun getCachedEmployeeName(employeeId: String?): String? {
         if (employeeId.isNullOrBlank()) return null
-        
-        // Try cache first
-        employeeNameCache[employeeId]?.let { return it }
-        
-        // Fallback to API call and cache the result
-        return try {
-            val name = employeeConnector?.getEmployee(employeeId)?.name
-            if (name != null) {
-                employeeNameCache[employeeId] = name
-            }
-            name
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
+        return employeeNameCache[employeeId]
     }
 
 
