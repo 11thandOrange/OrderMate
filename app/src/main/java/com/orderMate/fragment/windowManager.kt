@@ -18,7 +18,7 @@ import com.clover.sdk.v3.order.Order
 import com.google.android.flexbox.FlexboxLayout
 import com.orderMate.R
 import com.orderMate.activities.OverlayActivity
-import com.orderMate.adapters.ItemAdapter
+import com.orderMate.adapters.DrawerItemAdapter
 import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.databinding.OrdermateBasketLayoutBinding
 import com.orderMate.fragment.orderDetail.OrderDetailFragment
@@ -144,7 +144,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             progressLayout.hideView()
             
             itemRecycler.layoutManager = LinearLayoutManager(this@FloatingWidgetService)
-            val adapter = ItemAdapter(lineItems, this@FloatingWidgetService)
+            val adapter = DrawerItemAdapter(lineItems, this@FloatingWidgetService)
             itemRecycler.adapter = adapter
             itemRecycler.showView()
         }
