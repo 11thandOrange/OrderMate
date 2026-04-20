@@ -53,7 +53,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     private var lineItems: MutableList<ItemModal?> = mutableListOf()
     private val binding: OrdermateBasketLayoutBinding? by lazy {
         // Wrap context with AppCompat theme to support Material views in Service
-        val themedContext = android.view.ContextThemeWrapper(this, R.style.Theme_OrderMate)
+        val themedContext = android.view.ContextThemeWrapper(this, R.style.Theme_OrderAppClover)
         OrdermateBasketLayoutBinding.inflate(LayoutInflater.from(themedContext))
     }
     
