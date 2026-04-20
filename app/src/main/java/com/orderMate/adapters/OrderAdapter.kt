@@ -54,10 +54,18 @@ class OrderAdapter(
                 return
             }
             val item = data[position]
-            // Get employee name - try jsonObject first, then use cached lookup
-            val employeeName = item?.employee?.jsonObject?.get(Constants.name)?.toString()
-                ?: item?.employee?.id?.let { MyApp.getInstance().getCachedEmployeeName(it) }
-            orderEmployeeName.text = employeeName ?: root.context.getString(R.string.dash)
+            exceptionHandler({
+                orderEmployeeName.text = item?.employee?.jsonObject?.get(Constants.name).toString()
+            }) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val value = MyApp.getInstance().getEmployeeName(item?.employee?.id)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        orderEmployeeName.text = value
+                            ?: root.context.getString(R.string.dash)
+                    }
+                }
+
+            }
             orderType.text = if (item?.orderType?.label?.trim()?.isEmpty() == false) {
                 item.orderType.label
             } else {

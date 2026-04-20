@@ -254,10 +254,19 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 }
 
 
-                // Get employee name - try jsonObject first, then use cached lookup
-                val employeeName = employee?.jsonObject?.get(Constants.name)?.toString()
-                    ?: employee?.id?.let { MyApp.getInstance().getCachedEmployeeName(it) }
-                binding.orderPlacedEmployeeValue.text = employeeName ?: getString(R.string.dash)
+                exceptionHandler({
+                        binding.orderPlacedEmployeeValue.text =
+                            employee?.jsonObject?.get(Constants.name)?.toString()
+                })
+                {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val value = MyApp.getInstance().getEmployeeName(employee?.id)
+                        CoroutineScope(Dispatchers.Main).launch {
+                            binding.orderPlacedEmployeeValue.text = value
+                                ?: getString(R.string.dash)
+                        }
+                    }
+                }
                 setUpTheScreen()
             }
         }

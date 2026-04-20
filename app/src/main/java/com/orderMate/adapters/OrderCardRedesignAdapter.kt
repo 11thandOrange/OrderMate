@@ -16,7 +16,6 @@ import com.orderMate.databinding.ItemOrderCardRedesignBinding
 import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.utils.Constants
-import com.orderMate.utils.MyApp
 import com.orderMate.utils.OrderNoteParser
 import com.orderMate.utils.WidgetColorUtils
 import com.orderMate.utils.WidgetManager
@@ -324,11 +323,7 @@ class OrderCardRedesignAdapter(
 
         private fun getEmployeeName(order: Order): String {
             return try {
-                // First try to get from jsonObject (rarely populated)
-                order.employee?.jsonObject?.get(Constants.name)?.toString()
-                    // Fallback: get from cached employee lookup using ID
-                    ?: order.employee?.id?.let { MyApp.getInstance().getCachedEmployeeName(it) }
-                    ?: "-"
+                order.employee?.jsonObject?.get(Constants.name)?.toString() ?: "-"
             } catch (e: Exception) {
                 "-"
             }

@@ -175,10 +175,18 @@ class OrderCardAdapter(
         }
 
         private fun setupEmployeeName(order: Order, context: Context) {
-            // Get employee name - try jsonObject first, then use cached lookup
-            val employeeName = order.employee?.jsonObject?.get(Constants.name)?.toString()
-                ?: order.employee?.id?.let { MyApp.getInstance().getCachedEmployeeName(it) }
-            binding.employeeName.text = employeeName ?: context.getString(R.string.hypen_text)
+            exceptionHandler({
+                binding.employeeName.text = order.employee?.jsonObject?.get(Constants.name)?.toString()
+                    ?: context.getString(R.string.hypen_text)
+            }) {
+                // Fallback: fetch employee name asynchronously
+                CoroutineScope(Dispatchers.IO).launch {
+                    val name = MyApp.getInstance().getEmployeeName(order.employee?.id)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        binding.employeeName.text = name ?: context.getString(R.string.hypen_text)
+                    }
+                }
+            }
         }
 
         private fun setupNotes(order: Order, context: Context) {
