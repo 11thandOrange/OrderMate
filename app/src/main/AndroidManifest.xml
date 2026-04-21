@@ -57,6 +57,12 @@
             android:name="com.orderMate.services.OrderNotificationReceiver"
             android:enabled="true"
             android:exported="false" />
+        
+        <!-- Scheduled Receipt Print Receiver (#83 requirement) -->
+        <receiver
+            android:name="com.orderMate.services.ReceiptPrintReceiver"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>

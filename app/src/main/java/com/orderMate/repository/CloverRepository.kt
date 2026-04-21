@@ -7,6 +7,7 @@ import com.clover.sdk.v3.customers.PhoneNumber
 import com.orderMate.modals.ShareMessageJson
 import com.orderMate.modals.ShareSmsModal
 import com.orderMate.networkManager.RetrofitInstanceWithAuth
+import com.orderMate.services.ScheduledTaskManager
 import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
 import kotlinx.coroutines.Dispatchers
@@ -427,6 +428,8 @@ class CloverRepository private constructor(private val context: Context) {
     /**
      * Save order-level note to Order.note field
      * Format: "Label:Value • Label:Value"
+     * 
+     * Also schedules notifications and receipt printing based on Advanced Settings (#83)
      */
     suspend fun saveOrderNote(orderId: String, note: String): Boolean = withContext(Dispatchers.IO) {
         try {
@@ -438,6 +441,11 @@ class CloverRepository private constructor(private val context: Context) {
             // Update the note field
             order.setNote(note)
             orderConnector.updateOrder(order)
+            
+            // Schedule notification and print tasks based on settings (#83)
+            // This uses the due date from the order note (CALENDAR widget)
+            ScheduledTaskManager.rescheduleTasksForOrder(context, order)
+            
             true
         } catch (e: Exception) {
             e.printStackTrace()

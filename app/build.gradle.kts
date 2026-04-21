@@ -118,4 +118,7 @@ dependencies {
     // Glide for image loading (#59 - dynamic item icons from Clover)
     implementation("com.github.bumptech.glide:glide:4.15.1")
     kapt("com.github.bumptech.glide:compiler:4.15.1")
+    
+    // WorkManager for scheduled notifications and printing (#83 requirement)
+    implementation("androidx.work:work-runtime-ktx:2.7.1")
 }
