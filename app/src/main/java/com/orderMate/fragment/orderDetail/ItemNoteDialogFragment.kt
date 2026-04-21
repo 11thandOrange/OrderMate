@@ -2,6 +2,7 @@ package com.orderMate.fragment.orderDetail
 
 import android.app.DatePickerDialog
 import android.app.Dialog
+import android.app.TimePickerDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -57,6 +58,7 @@ class ItemNoteDialogFragment : DialogFragment() {
     private val textInputViews = mutableMapOf<String, TextInputEditText>()
 
     private val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+    private val dateTimeFormat = SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault())
 
     interface ItemNoteListener {
         fun onNoteSaved(lineItemId: String?, note: String)
@@ -338,30 +340,57 @@ class ItemNoteDialogFragment : DialogFragment() {
     }
 
     /**
-     * Show date picker dialog
+     * Show date and time picker dialog (date first, then time)
      */
     private fun showDatePicker(widgetId: String, dateInput: TextInputEditText) {
         val calendar = Calendar.getInstance()
 
-        // If there's an existing date, parse it
+        // If there's an existing datetime, parse it
         dateSelections[widgetId]?.let { existing ->
             try {
-                dateFormat.parse(existing)?.let { calendar.time = it }
-            } catch (e: Exception) { /* ignore */ }
+                dateTimeFormat.parse(existing)?.let { calendar.time = it }
+            } catch (e: Exception) {
+                try {
+                    dateFormat.parse(existing)?.let { calendar.time = it }
+                } catch (e2: Exception) { /* ignore */ }
+            }
         }
 
         DatePickerDialog(
             requireContext(),
             R.style.Theme_OrderMate_DatePicker,
             { _, year, month, day ->
-                calendar.set(year, month, day)
-                val formattedDate = dateFormat.format(calendar.time)
-                dateSelections[widgetId] = formattedDate
-                dateInput.setText(formattedDate)
+                calendar.set(Calendar.YEAR, year)
+                calendar.set(Calendar.MONTH, month)
+                calendar.set(Calendar.DAY_OF_MONTH, day)
+                
+                // After date selection, show time picker
+                showTimePicker(widgetId, dateInput, calendar)
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+    
+    /**
+     * Show time picker dialog after date selection
+     */
+    private fun showTimePicker(widgetId: String, dateInput: TextInputEditText, calendar: Calendar) {
+        TimePickerDialog(
+            requireContext(),
+            R.style.Theme_OrderMate_DatePicker,
+            { _, hourOfDay, minute ->
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                calendar.set(Calendar.MINUTE, minute)
+                
+                val formattedDateTime = dateTimeFormat.format(calendar.time)
+                dateSelections[widgetId] = formattedDateTime
+                dateInput.setText(formattedDateTime)
+            },
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            false // 12-hour format
         ).show()
     }
 

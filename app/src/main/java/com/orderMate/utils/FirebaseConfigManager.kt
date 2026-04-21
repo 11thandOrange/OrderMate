@@ -381,8 +381,10 @@ class FirebaseConfigManager private constructor() {
             .addOnSuccessListener { snapshot ->
                 val settings = AdvancedSettings(
                     useOrderMateInRegister = snapshot.child("useOrderMateInRegister").getValue(Boolean::class.java) ?: true,
+                    scheduledNotificationsEnabled = snapshot.child("scheduledNotificationsEnabled").getValue(Boolean::class.java) ?: false,
                     notificationDays = snapshot.child("notificationDays").getValue(Int::class.java) ?: 3,
                     notificationMinutes = snapshot.child("notificationMinutes").getValue(Int::class.java) ?: 0,
+                    scheduledReceiptEnabled = snapshot.child("scheduledReceiptEnabled").getValue(Boolean::class.java) ?: false,
                     receiptDays = snapshot.child("receiptDays").getValue(Int::class.java) ?: 0,
                     receiptMinutes = snapshot.child("receiptMinutes").getValue(Int::class.java) ?: 60
                 )
@@ -396,8 +398,10 @@ class FirebaseConfigManager private constructor() {
     fun saveAdvancedSettings(merchantId: String, settings: AdvancedSettings, callback: (Boolean) -> Unit) {
         val updates = mapOf<String, Any>(
             "useOrderMateInRegister" to settings.useOrderMateInRegister,
+            "scheduledNotificationsEnabled" to settings.scheduledNotificationsEnabled,
             "notificationDays" to settings.notificationDays,
             "notificationMinutes" to settings.notificationMinutes,
+            "scheduledReceiptEnabled" to settings.scheduledReceiptEnabled,
             "receiptDays" to settings.receiptDays,
             "receiptMinutes" to settings.receiptMinutes
         )
@@ -480,8 +484,10 @@ data class NotificationTemplate(
  */
 data class AdvancedSettings(
     val useOrderMateInRegister: Boolean = true,
+    val scheduledNotificationsEnabled: Boolean = false,
     val notificationDays: Int = 3,
     val notificationMinutes: Int = 0,
+    val scheduledReceiptEnabled: Boolean = false,
     val receiptDays: Int = 0,
     val receiptMinutes: Int = 60
 )

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Drawer line item row - NO icon, simpler layout -->
+<!-- Drawer line item row - Vertical layout: Container1 (header) above Container2 (pills) -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,86 +7,93 @@
     android:id="@+id/itemRowContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:padding="12dp"
-    android:gravity="center_vertical"
     android:background="@drawable/bg_item_row"
     android:clickable="true"
     android:focusable="true"
     android:layout_marginBottom="12dp">
 
-    <!-- Item Info -->
+    <!-- Container 1: Title, Quantity, Price, Chevron -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:layout_marginEnd="12dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-        <!-- Item Name -->
+        <!-- Item Info (name + modifiers) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="12dp">
+
+            <!-- Item Name -->
+            <TextView
+                android:id="@+id/itemName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_light"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="Custom Birthday Cake"/>
+
+            <!-- Item Modifiers (from Clover) -->
+            <TextView
+                android:id="@+id/itemModifiers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp"
+                android:visibility="gone"
+                tools:text="Vanilla, Extra Frosting"/>
+        </LinearLayout>
+
+        <!-- Quantity Badge -->
         <TextView
-            android:id="@+id/itemName"
+            android:id="@+id/itemQty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_qty_badge"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:textColor="@color/text_muted"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            tools:text="x1"/>
+
+        <!-- Price -->
+        <TextView
+            android:id="@+id/itemPrice"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:layout_marginStart="12dp"
             android:textColor="@color/text_light"
             android:textSize="14sp"
             android:textStyle="bold"
-            tools:text="Custom Birthday Cake"/>
+            tools:text="$85.00"/>
 
-        <!-- Item Modifiers (from Clover) -->
-        <TextView
-            android:id="@+id/itemModifiers"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textColor="@color/text_muted"
-            android:textSize="12sp"
-            android:visibility="gone"
-            tools:text="Vanilla, Extra Frosting"/>
-
-        <!-- Notes Pills -->
-        <com.google.android.flexbox.FlexboxLayout
-            android:id="@+id/itemNotesContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            app:flexWrap="wrap"
-            app:alignItems="flex_start"/>
+        <!-- Chevron Indicator (indicates row is clickable) -->
+        <ImageView
+            android:id="@+id/itemChevron"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_chevron_right"
+            app:tint="@color/text_muted"
+            android:contentDescription="@string/edit_item"/>
     </LinearLayout>
 
-    <!-- Quantity Badge -->
-    <TextView
-        android:id="@+id/itemQty"
-        android:layout_width="wrap_content"
+    <!-- Container 2: Pills Row (below header) -->
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/itemNotesContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_qty_badge"
-        android:paddingHorizontal="10dp"
-        android:paddingVertical="4dp"
-        android:textColor="@color/text_muted"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        tools:text="x1"/>
-
-    <!-- Price -->
-    <TextView
-        android:id="@+id/itemPrice"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        android:layout_marginStart="12dp"
-        android:textColor="@color/text_light"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        tools:text="$85.00"/>
-
-    <!-- Chevron Indicator (indicates row is clickable) -->
-    <ImageView
-        android:id="@+id/itemChevron"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_marginStart="8dp"
-        android:src="@drawable/ic_chevron_right"
-        app:tint="@color/text_muted"
-        android:contentDescription="@string/edit_item"/>
+        android:layout_marginTop="8dp"
+        app:flexWrap="wrap"
+        app:alignItems="flex_start"/>
 
 </LinearLayout>

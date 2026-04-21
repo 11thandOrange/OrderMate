@@ -141,16 +141,25 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Order-level Notes Pills Container (#42) -->
+        <!-- Order-level Notes Pills Container (#42) - single, multi, calendar only -->
         <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/orderNotesPillsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="12dp"
             android:visibility="gone"
             app:flexWrap="wrap"
             app:alignItems="center"
             app:justifyContent="flex_start"/>
+
+        <!-- Dynamic Widget Rows Container - for TEXT_BOX and CALENDAR dedicated rows -->
+        <LinearLayout
+            android:id="@+id/dynamicWidgetRowsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="12dp"
+            android:visibility="gone"/>
 
         <!-- Order Details Section (matches Event Preview) -->
         <LinearLayout

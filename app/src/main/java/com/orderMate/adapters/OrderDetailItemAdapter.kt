@@ -4,8 +4,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -13,7 +13,11 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.clover.sdk.v3.order.LineItem
 import com.orderMate.R
 import com.orderMate.databinding.ItemOrderDetailItemBinding
+import com.orderMate.modals.NoteLevel
 import com.orderMate.utils.MyApp
+import com.orderMate.utils.OrderNoteParser
+import com.orderMate.utils.WidgetColorUtils
+import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.toDoubleFloatPoint
 
 /**
@@ -97,38 +101,50 @@ class OrderDetailItemAdapter(
             }
         }
 
+        /**
+         * Setup item-level note pills using widget-based parsing.
+         * Renders all 4 widget types (SINGLE_SELECT, MULTI_SELECT, CALENDAR, TEXT_BOX).
+         */
         private fun setupNotePills(context: Context, item: LineItem) {
             binding.itemNotesContainer.removeAllViews()
             
             val noteString = item.note?.trim()
             if (noteString.isNullOrEmpty()) return
 
-            // Parse note string format: "Label:Value • Label:Value" (or legacy "|" delimiter)
-            val delimiter = if (noteString.contains("•")) "•" else "|"
-            val parts = noteString.split(delimiter).map { it.trim() }.filter { it.isNotEmpty() }
+            // Get item-level widgets for parsing
+            val widgets = WidgetManager.getCachedWidgets()
+            val itemLevelWidgets = widgets.filter { it.level == NoteLevel.ITEM }
             
-            parts.forEach { part ->
-                val pill = LayoutInflater.from(context)
-                    .inflate(R.layout.item_note_pill, binding.itemNotesContainer, false) as TextView
+            if (itemLevelWidgets.isEmpty()) return
+            
+            // Parse using widget-based approach (all 4 types including TEXT_BOX)
+            val density = context.resources.displayMetrics.density
+            val parsedTags = OrderNoteParser.extractTagsFromNote(noteString, itemLevelWidgets, NoteLevel.ITEM, includeTextBox = true)
+            
+            parsedTags.forEach { tag ->
+                val pillView = LayoutInflater.from(context)
+                    .inflate(R.layout.item_note_pill, binding.itemNotesContainer, false) as LinearLayout
                 
-                val isCategory = part.lowercase().startsWith("category:")
-                val displayText = if (isCategory) {
-                    part.replace(Regex("^category:\\s*", RegexOption.IGNORE_CASE), "")
-                } else {
-                    part
+                val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
+                val pillText = pillView.findViewById<TextView>(R.id.pillText)
+                
+                val color = WidgetColorUtils.getColorForWidgetType(tag.widgetType)
+                val iconRes = WidgetColorUtils.getIconForWidgetType(tag.widgetType)
+                
+                // Truncate TEXT_BOX values to 12 chars for compact display
+                val displayText = tag.value.replace("\n", " ").take(12).let {
+                    if (tag.value.length > 12) "$it..." else it
                 }
                 
-                pill.text = displayText
+                pillText.text = displayText
+                pillText.maxLines = 1
+                pillText.setTextColor(color)
+                pillIcon.setImageResource(iconRes)
+                pillIcon.setColorFilter(color)
                 
-                if (isCategory) {
-                    pill.setBackgroundResource(R.drawable.bg_note_chip_category)
-                    pill.setTextColor(ContextCompat.getColor(context, R.color.tag_category_text))
-                } else {
-                    pill.setBackgroundResource(R.drawable.bg_note_chip_tag)
-                    pill.setTextColor(ContextCompat.getColor(context, R.color.tag_pill_text))
-                }
+                pillView.background = WidgetColorUtils.createPillBackground(color, 10f, density)
                 
-                binding.itemNotesContainer.addView(pill)
+                binding.itemNotesContainer.addView(pillView)
             }
         }
     }

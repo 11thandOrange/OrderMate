@@ -1,6 +1,7 @@
 package com.orderMate.utils
 
 import android.graphics.drawable.GradientDrawable
+import com.orderMate.R
 import com.orderMate.modals.WidgetType
 
 /**
@@ -51,6 +52,18 @@ object WidgetColorUtils {
             WidgetType.SINGLE_SELECT -> COLOR_SINGLE_SELECT
             WidgetType.MULTI_SELECT -> COLOR_MULTI_SELECT
             WidgetType.TEXT_BOX -> COLOR_TEXT_BOX
+        }
+    }
+    
+    /**
+     * Get icon resource for a widget type - centralized to avoid duplicate functions
+     */
+    fun getIconForWidgetType(type: WidgetType): Int {
+        return when (type) {
+            WidgetType.CALENDAR -> R.drawable.ic_calendar
+            WidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
+            WidgetType.MULTI_SELECT -> R.drawable.ic_label
+            WidgetType.TEXT_BOX -> R.drawable.ic_edit
         }
     }
     

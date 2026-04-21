@@ -143,7 +143,7 @@ class ItemAdapter(
             val widgets = WidgetManager.getCachedWidgets()
             val itemLevelWidgets = widgets.filter { it.level == NoteLevel.ITEM }
             
-            val parsedTags = OrderNoteParser.extractTagsFromNote(noteString, itemLevelWidgets, NoteLevel.ITEM)
+            val parsedTags = OrderNoteParser.extractTagsFromNote(noteString, itemLevelWidgets, NoteLevel.ITEM, includeTextBox = true)
             parsedTags.forEach { tag ->
                 addPillView(context, container, tag.value, tag.widgetType, density)
             }
@@ -163,7 +163,7 @@ class ItemAdapter(
             val pillText = pillView.findViewById<TextView>(R.id.pillText)
             
             val color = WidgetColorUtils.getColorForWidgetType(widgetType)
-            val iconRes = getIconForWidgetType(widgetType)
+            val iconRes = WidgetColorUtils.getIconForWidgetType(widgetType)
             
             // Truncate to 12 chars, single line, no newlines
             val displayText = value.replace("\n", " ").take(12).let {
@@ -179,15 +179,6 @@ class ItemAdapter(
             pillView.background = WidgetColorUtils.createPillBackground(color, 10f, density)
             
             container.addView(pillView)
-        }
-        
-        private fun getIconForWidgetType(widgetType: WidgetType): Int {
-            return when (widgetType) {
-                WidgetType.CALENDAR -> R.drawable.ic_calendar
-                WidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
-                WidgetType.MULTI_SELECT -> R.drawable.ic_label
-                WidgetType.TEXT_BOX -> R.drawable.ic_edit
-            }
         }
     }
 }

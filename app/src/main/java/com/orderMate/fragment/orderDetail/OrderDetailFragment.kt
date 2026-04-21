@@ -526,6 +526,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     /**
      * Setup order-level notes pills display (#93)
      * Task 11: Don't show "no order notes" section if TEXT_BOX type widget exists
+     * QA spec: Header pills show SINGLE_SELECT and MULTI_SELECT only.
+     * TEXT_BOX and CALENDAR are shown in dedicated rows (handled elsewhere).
      */
     private fun setupOrderNotesPills() {
         val orderNote = orderArguments?.note
@@ -558,8 +560,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         val orderLevelWidgets = widgets.filter { it.level == NoteLevel.ORDER }
         val density = resources.displayMetrics.density
         
-        val parsedTags = com.orderMate.utils.OrderNoteParser.extractTagsFromNote(orderNote, orderLevelWidgets, NoteLevel.ORDER)
-        parsedTags.forEach { tag ->
+        // QA spec: Header pills = SINGLE_SELECT + MULTI_SELECT only
+        // TEXT_BOX and CALENDAR get their own dedicated rows
+        val parsedTags = com.orderMate.utils.OrderNoteParser.extractTagsFromNote(orderNote, orderLevelWidgets, NoteLevel.ORDER, includeTextBox = false)
+        parsedTags.filter { 
+            it.widgetType == WidgetType.SINGLE_SELECT || it.widgetType == WidgetType.MULTI_SELECT 
+        }.forEach { tag ->
             addNotePill(container, tag.value, tag.widgetType, density)
         }
     }
@@ -576,7 +582,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         pillText.maxLines = 1
         pillText.setTextColor(pillColor)
         
-        val iconRes = getIconForWidgetType(widgetType)
+        val iconRes = com.orderMate.utils.WidgetColorUtils.getIconForWidgetType(widgetType)
         pillIcon.setImageResource(iconRes)
         pillIcon.setColorFilter(pillColor)
         
@@ -584,15 +590,6 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         pillView.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(pillColor, 10f, density)
         
         container.addView(pillView)
-    }
-    
-    private fun getIconForWidgetType(widgetType: WidgetType): Int {
-        return when (widgetType) {
-            WidgetType.CALENDAR -> R.drawable.ic_calendar
-            WidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
-            WidgetType.MULTI_SELECT -> R.drawable.ic_label
-            WidgetType.TEXT_BOX -> R.drawable.ic_edit
-        }
     }
     
     /**

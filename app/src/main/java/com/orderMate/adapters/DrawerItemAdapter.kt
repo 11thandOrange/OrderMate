@@ -103,7 +103,7 @@ class DrawerItemAdapter(
             val widgets = WidgetManager.getCachedWidgets()
             val itemLevelWidgets = widgets.filter { it.level == NoteLevel.ITEM }
             
-            val parsedTags = OrderNoteParser.extractTagsFromNote(noteString, itemLevelWidgets, NoteLevel.ITEM)
+            val parsedTags = OrderNoteParser.extractTagsFromNote(noteString, itemLevelWidgets, NoteLevel.ITEM, includeTextBox = true)
             parsedTags.forEach { tag ->
                 addPillView(context, container, tag.value, tag.widgetType, density)
             }
@@ -123,7 +123,7 @@ class DrawerItemAdapter(
             val pillText = pillView.findViewById<TextView>(R.id.pillText)
             
             val color = WidgetColorUtils.getColorForWidgetType(widgetType)
-            val iconRes = getIconForWidgetType(widgetType)
+            val iconRes = WidgetColorUtils.getIconForWidgetType(widgetType)
             
             val displayText = value.replace("\n", " ").take(12).let {
                 if (value.length > 12) "$it..." else it
@@ -137,15 +137,6 @@ class DrawerItemAdapter(
             pillView.background = WidgetColorUtils.createPillBackground(color, 10f, density)
             
             container.addView(pillView)
-        }
-        
-        private fun getIconForWidgetType(widgetType: WidgetType): Int {
-            return when (widgetType) {
-                WidgetType.CALENDAR -> R.drawable.ic_calendar
-                WidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
-                WidgetType.MULTI_SELECT -> R.drawable.ic_label
-                WidgetType.TEXT_BOX -> R.drawable.ic_edit
-            }
         }
     }
 }

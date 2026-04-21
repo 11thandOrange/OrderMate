@@ -126,8 +126,12 @@ class SettingsFragment : Fragment() {
     private var templateAdapter: FirebaseTemplateAdapter? = null
     
     // Advanced Panel
+    private var switchScheduledNotifications: Switch? = null
+    private var notificationInputsContainer: View? = null
     private var inputNotificationDays: EditText? = null
     private var inputNotificationMinutes: EditText? = null
+    private var switchScheduledReceipt: Switch? = null
+    private var receiptInputsContainer: View? = null
     private var inputReceiptDays: EditText? = null
     private var inputReceiptMinutes: EditText? = null
     
@@ -240,8 +244,12 @@ class SettingsFragment : Fragment() {
         btnAddTemplate = view.findViewById(R.id.btnAddTemplate)
         
         // Advanced Panel
+        switchScheduledNotifications = view.findViewById(R.id.switchScheduledNotifications)
+        notificationInputsContainer = view.findViewById(R.id.notificationInputsContainer)
         inputNotificationDays = view.findViewById(R.id.inputNotificationDays)
         inputNotificationMinutes = view.findViewById(R.id.inputNotificationMinutes)
+        switchScheduledReceipt = view.findViewById(R.id.switchScheduledReceipt)
+        receiptInputsContainer = view.findViewById(R.id.receiptInputsContainer)
         inputReceiptDays = view.findViewById(R.id.inputReceiptDays)
         inputReceiptMinutes = view.findViewById(R.id.inputReceiptMinutes)
     }
@@ -770,6 +778,32 @@ class SettingsFragment : Fragment() {
             handler.postDelayed(saveJob!!, 500) // Debounce 500ms
         }
         
+        fun updateInputsVisibility() {
+            val notificationEnabled = switchScheduledNotifications?.isChecked ?: false
+            notificationInputsContainer?.alpha = if (notificationEnabled) 1.0f else 0.5f
+            inputNotificationDays?.isEnabled = notificationEnabled
+            inputNotificationMinutes?.isEnabled = notificationEnabled
+            
+            val receiptEnabled = switchScheduledReceipt?.isChecked ?: false
+            receiptInputsContainer?.alpha = if (receiptEnabled) 1.0f else 0.5f
+            inputReceiptDays?.isEnabled = receiptEnabled
+            inputReceiptMinutes?.isEnabled = receiptEnabled
+        }
+        
+        // Toggle listeners for scheduled notifications and receipts
+        switchScheduledNotifications?.setOnCheckedChangeListener { _, _ ->
+            updateInputsVisibility()
+            scheduleAdvancedSettingsSave()
+        }
+        
+        switchScheduledReceipt?.setOnCheckedChangeListener { _, _ ->
+            updateInputsVisibility()
+            scheduleAdvancedSettingsSave()
+        }
+        
+        // Initial visibility state
+        updateInputsVisibility()
+        
         // Notification time listeners (days/hours and minutes) with validation (#40, #41)
         inputNotificationDays?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
@@ -845,8 +879,10 @@ class SettingsFragment : Fragment() {
         merchantId?.let { mid ->
             val settings = AdvancedSettings(
                 useOrderMateInRegister = switchUseInCloverRegister?.isChecked ?: true,
+                scheduledNotificationsEnabled = switchScheduledNotifications?.isChecked ?: false,
                 notificationDays = settingsManager.getNotificationDays(),
                 notificationMinutes = settingsManager.getNotificationMinutes(),
+                scheduledReceiptEnabled = switchScheduledReceipt?.isChecked ?: false,
                 receiptDays = settingsManager.getReceiptDays(),
                 receiptMinutes = settingsManager.getReceiptMinutes()
             )
@@ -915,11 +951,26 @@ class SettingsFragment : Fragment() {
                     settingsManager.setReceiptMinutes(settings.receiptMinutes)
                     settingsManager.setUseOrderMateRegister(settings.useOrderMateInRegister)
                     
-                    // Update UI
+                    // Update UI - toggles
+                    switchScheduledNotifications?.isChecked = settings.scheduledNotificationsEnabled
+                    switchScheduledReceipt?.isChecked = settings.scheduledReceiptEnabled
+                    
+                    // Update UI - inputs
                     inputNotificationDays?.setText(settings.notificationDays.toString())
                     inputNotificationMinutes?.setText(settings.notificationMinutes.toString())
                     inputReceiptDays?.setText(settings.receiptDays.toString())
                     inputReceiptMinutes?.setText(settings.receiptMinutes.toString())
+                    
+                    // Update input visibility based on toggle state
+                    val notificationEnabled = settings.scheduledNotificationsEnabled
+                    notificationInputsContainer?.alpha = if (notificationEnabled) 1.0f else 0.5f
+                    inputNotificationDays?.isEnabled = notificationEnabled
+                    inputNotificationMinutes?.isEnabled = notificationEnabled
+                    
+                    val receiptEnabled = settings.scheduledReceiptEnabled
+                    receiptInputsContainer?.alpha = if (receiptEnabled) 1.0f else 0.5f
+                    inputReceiptDays?.isEnabled = receiptEnabled
+                    inputReceiptMinutes?.isEnabled = receiptEnabled
                 }
             }
         }

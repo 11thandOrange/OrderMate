@@ -153,14 +153,19 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     /**
      * Setup order-level notes pills (#42)
      * Parses order note and displays as pills with widget-specific color coding
+     * Pills: SINGLE_SELECT, MULTI_SELECT, CALENDAR only
+     * TEXT_BOX gets dedicated rows (wrapped, not truncated)
      */
     private fun setupOrderNotesPills(order: Order?) {
         val container = binding?.orderNotesPillsContainer ?: return
+        val dynamicRowsContainer = binding?.dynamicWidgetRowsContainer
         container.removeAllViews()
+        dynamicRowsContainer?.removeAllViews()
         
         val orderNote = order?.note
         if (orderNote.isNullOrBlank()) {
             container.visibility = View.GONE
+            dynamicRowsContainer?.visibility = View.GONE
             return
         }
         
@@ -169,16 +174,114 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         val orderLevelWidgets = widgets.filter { it.level == NoteLevel.ORDER }
         val density = resources.displayMetrics.density
         
-        val parsedTags = OrderNoteParser.extractTagsFromNote(orderNote, orderLevelWidgets, NoteLevel.ORDER)
-        if (parsedTags.isEmpty()) {
+        // Get all tags including TEXT_BOX for dedicated rows
+        val allTags = OrderNoteParser.extractTagsFromNote(orderNote, orderLevelWidgets, NoteLevel.ORDER, includeTextBox = true)
+        
+        // Separate pills (single, multi, calendar) from dedicated rows (TEXT_BOX)
+        val pillTags = allTags.filter { 
+            it.widgetType == WidgetType.SINGLE_SELECT || 
+            it.widgetType == WidgetType.MULTI_SELECT || 
+            it.widgetType == WidgetType.CALENDAR 
+        }
+        val textBoxTags = allTags.filter { it.widgetType == WidgetType.TEXT_BOX }
+        
+        // Setup pill container
+        if (pillTags.isEmpty()) {
             container.visibility = View.GONE
-            return
+        } else {
+            container.visibility = View.VISIBLE
+            pillTags.forEach { tag ->
+                addPill(container, tag.value, tag.widgetType, density)
+            }
         }
         
-        container.visibility = View.VISIBLE
-        parsedTags.forEach { tag ->
-            addPill(container, tag.value, tag.widgetType, density)
+        // Setup dedicated TEXT_BOX rows (wrapped, not truncated)
+        if (textBoxTags.isEmpty()) {
+            dynamicRowsContainer?.visibility = View.GONE
+        } else {
+            dynamicRowsContainer?.visibility = View.VISIBLE
+            textBoxTags.forEach { tag ->
+                // Find the widget config to get the label
+                val widget = orderLevelWidgets.find { 
+                    it.type == WidgetType.TEXT_BOX && it.label.equals(tag.label, ignoreCase = true)
+                }
+                val label = widget?.label ?: tag.label
+                addDynamicWidgetRow(dynamicRowsContainer!!, label, tag.value, tag.widgetType, density)
+            }
         }
+    }
+    
+    /**
+     * Add a dedicated row for TEXT_BOX widgets (wrapped, not truncated)
+     * Matches the style of Order Details card rows
+     */
+    private fun addDynamicWidgetRow(container: android.widget.LinearLayout, label: String, value: String, widgetType: WidgetType, density: Float) {
+        val color = WidgetColorUtils.getColorForWidgetType(widgetType)
+        val iconRes = WidgetColorUtils.getIconForWidgetType(widgetType)
+        
+        // Row container
+        val rowLayout = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.TOP
+            setPadding(0, dpToPx(8), 0, dpToPx(8))
+        }
+        
+        // Icon container (matches Order Details style)
+        val iconFrame = android.widget.FrameLayout(this).apply {
+            val size = dpToPx(32)
+            layoutParams = android.widget.LinearLayout.LayoutParams(size, size)
+            setBackgroundResource(R.drawable.bg_detail_icon)
+        }
+        
+        val icon = android.widget.ImageView(this).apply {
+            val iconSize = dpToPx(16)
+            layoutParams = android.widget.FrameLayout.LayoutParams(iconSize, iconSize).apply {
+                gravity = android.view.Gravity.CENTER
+            }
+            setImageResource(iconRes)
+            setColorFilter(ContextCompat.getColor(this@FloatingWidgetService, R.color.text_muted))
+        }
+        iconFrame.addView(icon)
+        rowLayout.addView(iconFrame)
+        
+        // Text container (label + value)
+        val textLayout = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            layoutParams = android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                marginStart = dpToPx(12)
+            }
+        }
+        
+        // Label
+        val labelView = TextView(this).apply {
+            text = label.uppercase()
+            setTextColor(ContextCompat.getColor(this@FloatingWidgetService, R.color.text_muted))
+            textSize = 11f
+        }
+        textLayout.addView(labelView)
+        
+        // Value - wrapped, not truncated
+        val valueView = TextView(this).apply {
+            text = value
+            setTextColor(ContextCompat.getColor(this@FloatingWidgetService, R.color.text_light))
+            textSize = 14f
+            maxLines = 3  // Allow wrapping up to 3 lines
+        }
+        textLayout.addView(valueView)
+        
+        rowLayout.addView(textLayout)
+        
+        // Add divider
+        val divider = View(this).apply {
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 
+                dpToPx(1)
+            )
+            setBackgroundColor(0x1AFFFFFF.toInt())
+        }
+        
+        container.addView(rowLayout)
+        container.addView(divider)
     }
     
     private fun addPill(container: FlexboxLayout, text: String, widgetType: WidgetType, density: Float) {

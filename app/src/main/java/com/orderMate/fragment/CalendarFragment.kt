@@ -498,14 +498,15 @@ class CalendarFragment : Fragment() {
                 order.lineItems?.size ?: 0
             } catch (e: Exception) { 0 }
             
-            // Get line items for preview
+            // Get line items for preview (include note for widget-based parsing)
             val lineItems = try {
                 order.lineItems?.mapNotNull { lineItem ->
                     lineItem?.let {
                         LineItemPreview(
                             name = it.name ?: "Unknown",
                             price = (it.price ?: 0L) / 100.0,
-                            quantity = it.unitQty?.toInt() ?: 1
+                            quantity = it.unitQty?.toInt() ?: 1,
+                            note = it.note
                         )
                     }
                 }?.take(5) ?: emptyList()
@@ -536,11 +537,13 @@ class CalendarFragment : Fragment() {
     /**
      * (#30) Extract order-level tags from order.note using widget configuration.
      * Returns list of formatted "Label: Value" strings.
+     * Includes all 4 widget types (SINGLE_SELECT, MULTI_SELECT, CALENDAR, TEXT_BOX).
      */
     private fun extractOrderLevelTags(orderNote: String?, widgets: List<com.orderMate.modals.WidgetConfig>): List<com.orderMate.model.EventTag> {
         if (orderNote.isNullOrBlank() || widgets.isEmpty()) return emptyList()
         
-        val tags = OrderNoteParser.extractTagsFromNote(orderNote, widgets, NoteLevel.ORDER)
+        // Include TEXT_BOX for event preview (will be truncated in EventPreviewDialog)
+        val tags = OrderNoteParser.extractTagsFromNote(orderNote, widgets, NoteLevel.ORDER, includeTextBox = true)
         // Only return tags that have actual values (not empty)
         return tags
             .filter { it.value.isNotBlank() }

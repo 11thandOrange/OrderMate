@@ -40,11 +40,14 @@ data class EventTag(
 
 /**
  * Line item preview for event dialog
+ * note: Raw note string for widget-based parsing
+ * customNotes: Legacy field, kept for backwards compatibility
  */
 data class LineItemPreview(
     val name: String,
     val price: Double,
     val quantity: Int = 1,
+    val note: String? = null,
     val customNotes: List<CustomNote> = emptyList()
 )
 

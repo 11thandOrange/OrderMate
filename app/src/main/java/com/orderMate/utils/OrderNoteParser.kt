@@ -16,6 +16,12 @@ import java.util.Locale
 object OrderNoteParser {
     
     private val dateFormats = listOf(
+        // DateTime formats (with time) - check these first
+        SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault()),
+        SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault()),
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()),
+        SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()),
+        // Date-only formats
         SimpleDateFormat("MMM d, yyyy", Locale.getDefault()),
         SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()),
         SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()),
@@ -90,12 +96,14 @@ object OrderNoteParser {
     }
     
     /**
-     * (#30) Extract all tag values (SINGLE_SELECT, MULTI_SELECT, CALENDAR) from note.
+     * (#30) Extract all tag values (SINGLE_SELECT, MULTI_SELECT, CALENDAR, TEXT_BOX) from note.
+     * Use includeTextBox parameter to control whether TEXT_BOX widgets are included.
      */
     fun extractTagsFromNote(
         note: String?,
         widgets: List<WidgetConfig>,
-        level: NoteLevel
+        level: NoteLevel,
+        includeTextBox: Boolean = true
     ): List<ParsedTag> {
         val parsed = parseNotesByWidgetType(note, widgets, level)
         val tags = mutableListOf<ParsedTag>()
@@ -103,7 +111,6 @@ object OrderNoteParser {
         parsed.forEach { (widget, value) ->
             when (widget.type) {
                 WidgetType.SINGLE_SELECT -> {
-                    // Task 15: Include widget type for color coding
                     tags.add(ParsedTag(widget.label, value, TagType.SINGLE_SELECT, widget.type))
                 }
                 WidgetType.MULTI_SELECT -> {
@@ -114,7 +121,11 @@ object OrderNoteParser {
                 WidgetType.CALENDAR -> {
                     tags.add(ParsedTag(widget.label, value, TagType.CALENDAR, widget.type))
                 }
-                else -> { }
+                WidgetType.TEXT_BOX -> {
+                    if (includeTextBox && value.isNotBlank()) {
+                        tags.add(ParsedTag(widget.label, value, TagType.TEXT_BOX, widget.type))
+                    }
+                }
             }
         }
         
@@ -135,7 +146,7 @@ object OrderNoteParser {
     }
     
     /**
-     * Parse a date string using multiple formats.
+     * Parse a date string using multiple formats (supports both date-only and datetime).
      */
     fun parseDate(dateString: String): Date? {
         for (format in dateFormats) {
@@ -159,6 +170,7 @@ object OrderNoteParser {
     enum class TagType {
         SINGLE_SELECT,
         MULTI_SELECT,
-        CALENDAR
+        CALENDAR,
+        TEXT_BOX
     }
 }

@@ -20,6 +20,10 @@ import com.orderMate.model.CustomNote
 import com.orderMate.model.EventType
 import com.orderMate.model.LineItemPreview
 import com.orderMate.model.ScheduledEvent
+import com.orderMate.modals.NoteLevel
+import com.orderMate.utils.OrderNoteParser
+import com.orderMate.utils.WidgetColorUtils
+import com.orderMate.utils.WidgetManager
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -145,7 +149,7 @@ class EventPreviewDialog : DialogFragment() {
     /**
      * (#30) Setup order-level notes pills display.
      * Uses pre-parsed customTags from ScheduledEvent (widget-based parsing done in CalendarFragment).
-     * Falls back to legacy parsing if customTags is empty.
+     * All 4 widget types supported: SINGLE_SELECT, MULTI_SELECT, CALENDAR, TEXT_BOX (truncated).
      */
     private fun setupOrderNotesPills(view: View, event: ScheduledEvent) {
         val container = view.findViewById<FlexboxLayout>(R.id.orderNotesPillsContainer)
@@ -160,13 +164,20 @@ class EventPreviewDialog : DialogFragment() {
         container.visibility = View.VISIBLE
         val density = resources.displayMetrics.density
         
-        // Add order-level widget pills (CALENDAR, SINGLE_SELECT, MULTI_SELECT)
+        // Add order-level widget pills (all 4 types: CALENDAR, SINGLE_SELECT, MULTI_SELECT, TEXT_BOX)
         // All use WidgetColorUtils for consistent color coding
         event.customTags.forEach { tag ->
             val color = com.orderMate.utils.WidgetColorUtils.getColorForWidgetType(tag.widgetType)
             
+            // Truncate TEXT_BOX values to 30 chars for event preview
+            val displayText = if (tag.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX && tag.text.length > 30) {
+                tag.text.take(30) + "..."
+            } else {
+                tag.text
+            }
+            
             val pill = TextView(requireContext()).apply {
-                text = tag.text
+                text = displayText
                 textSize = 11f
                 setTextColor(color)
                 setPadding(dpToPx(10), dpToPx(4), dpToPx(10), dpToPx(4))
@@ -216,59 +227,67 @@ class EventPreviewDialog : DialogFragment() {
                 itemPrice.text = "$${String.format("%.2f", item.price)}"
                 itemQuantity.text = "x${item.quantity}"
                 
-                // Render custom notes as pills (matches HTML)
-                renderNotePills(item.customNotes)
+                // Use widget-based parsing for item-level notes (all 4 types)
+                renderNotePillsWithWidgets(item.note)
             }
             
-            private fun renderNotePills(customNotes: List<CustomNote>) {
+            /**
+             * Render item-level pills using widget-based parsing.
+             * Uses OrderNoteParser.extractTagsFromNote() and WidgetColorUtils.
+             * Supports all 4 widget types with truncation for TEXT_BOX.
+             */
+            private fun renderNotePillsWithWidgets(note: String?) {
                 notesPillsContainer.removeAllViews()
                 
-                if (customNotes.isEmpty()) {
+                if (note.isNullOrBlank()) {
+                    notesPillsContainer.visibility = View.GONE
+                    return
+                }
+                
+                // Get item-level widgets for parsing
+                val widgets = WidgetManager.getCachedWidgets()
+                val itemLevelWidgets = widgets.filter { it.level == NoteLevel.ITEM }
+                
+                if (itemLevelWidgets.isEmpty()) {
+                    notesPillsContainer.visibility = View.GONE
+                    return
+                }
+                
+                // Parse using widget-based approach (all 4 types including TEXT_BOX)
+                val parsedTags = OrderNoteParser.extractTagsFromNote(note, itemLevelWidgets, NoteLevel.ITEM, includeTextBox = true)
+                
+                if (parsedTags.isEmpty()) {
                     notesPillsContainer.visibility = View.GONE
                     return
                 }
                 
                 notesPillsContainer.visibility = View.VISIBLE
+                val density = itemView.resources.displayMetrics.density
                 
-                customNotes.forEach { note ->
-                    when (note.type) {
-                        "select" -> {
-                            // Category style pill (purple)
-                            note.getStringValue()?.let { value ->
-                                addPill(value, R.drawable.bg_note_pill_category, R.color.note_pill_category_text)
-                            }
-                        }
-                        "multiselect" -> {
-                            // Multiple tag pills (green)
-                            note.getListValue().forEach { tag ->
-                                addPill(tag, R.drawable.bg_note_pill_tag, R.color.note_pill_tag_text)
-                            }
-                        }
-                        "text" -> {
-                            // Text description pill (orange) - truncate if >30 chars
-                            note.getStringValue()?.let { value ->
-                                if (value.isNotBlank()) {
-                                    val displayText = if (value.length > 30) {
-                                        value.take(30) + "..."
-                                    } else {
-                                        value
-                                    }
-                                    addPill(displayText, R.drawable.bg_note_pill_text, R.color.note_pill_text_text)
-                                }
-                            }
-                        }
+                parsedTags.forEach { tag ->
+                    val color = WidgetColorUtils.getColorForWidgetType(tag.widgetType)
+                    val iconRes = WidgetColorUtils.getIconForWidgetType(tag.widgetType)
+                    
+                    // Truncate TEXT_BOX values to 30 chars
+                    val displayText = if (tag.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX && tag.value.length > 30) {
+                        tag.value.take(30) + "..."
+                    } else {
+                        tag.value
                     }
+                    
+                    addWidgetPill(displayText, color, iconRes, density)
                 }
             }
             
-            private fun addPill(text: String, backgroundRes: Int, textColorRes: Int) {
+            private fun addWidgetPill(text: String, color: Int, iconRes: Int, density: Float) {
                 val context = itemView.context
                 val pill = TextView(context).apply {
                     this.text = text
-                    setBackgroundResource(backgroundRes)
-                    setTextColor(ContextCompat.getColor(context, textColorRes))
+                    setTextColor(color)
                     textSize = 10f
                     setPadding(dpToPx(8), dpToPx(2), dpToPx(8), dpToPx(2))
+                    // Use WidgetColorUtils for consistent pill styling
+                    background = WidgetColorUtils.createPillBackground(color, 8f, density)
                     
                     val lp = FlexboxLayout.LayoutParams(
                         FlexboxLayout.LayoutParams.WRAP_CONTENT,
