@@ -207,10 +207,16 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
 
-        .time-scroll {
+        .time-columns {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .time-column {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -234,20 +240,14 @@
             color: rgba(255, 255, 255, 0.9);
         }
 
-        .time-display {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            margin: 4px 0;
-        }
-
         /* Time value - 28sp, bold, text_light */
         .time-value {
             font-size: 28px;
             font-weight: 700;
             color: rgba(255, 255, 255, 0.9);
-            width: 40px;
+            min-width: 40px;
             text-align: center;
+            margin: 4px 0;
         }
 
         /* Separator - 24sp, text_muted */
@@ -429,27 +429,40 @@
                     <div class="section-label">TIME</div>
                     <div class="time-container">
                         <div class="time-picker">
-                            <div class="time-scroll">
-                                <!-- Up arrow -->
-                                <button class="time-scroll-btn">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M7.41,15.41L12,10.83l4.59,4.58L18,14l-6,-6l-6,6z"/>
-                                    </svg>
-                                </button>
-                                
-                                <!-- Time display: HH:MM -->
-                                <div class="time-display">
+                            <!-- Hour and Minute columns side by side -->
+                            <div class="time-columns">
+                                <!-- Hour Column -->
+                                <div class="time-column">
+                                    <button class="time-scroll-btn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M7.41,15.41L12,10.83l4.59,4.58L18,14l-6,-6l-6,6z"/>
+                                        </svg>
+                                    </button>
                                     <div class="time-value">02</div>
-                                    <div class="time-separator">:</div>
-                                    <div class="time-value">30</div>
+                                    <button class="time-scroll-btn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M7.41,8.59L12,13.17l4.59,-4.58L18,10l-6,6l-6,-6z"/>
+                                        </svg>
+                                    </button>
                                 </div>
                                 
-                                <!-- Down arrow -->
-                                <button class="time-scroll-btn">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M7.41,8.59L12,13.17l4.59,-4.58L18,10l-6,6l-6,-6z"/>
-                                    </svg>
-                                </button>
+                                <!-- Colon separator -->
+                                <div class="time-separator">:</div>
+                                
+                                <!-- Minute Column -->
+                                <div class="time-column">
+                                    <button class="time-scroll-btn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M7.41,15.41L12,10.83l4.59,4.58L18,14l-6,-6l-6,6z"/>
+                                        </svg>
+                                    </button>
+                                    <div class="time-value">30</div>
+                                    <button class="time-scroll-btn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M7.41,8.59L12,13.17l4.59,-4.58L18,10l-6,6l-6,-6z"/>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                             
                             <!-- AM/PM Toggle -->

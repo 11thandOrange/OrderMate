@@ -246,6 +246,7 @@ class DateTimePickerDialog : DialogFragment() {
         updateTimeDisplay()
         updateAmPmButtons()
 
+        // Hour controls
         binding.btnHourUp.setOnClickListener {
             calendar.add(Calendar.HOUR_OF_DAY, 1)
             updateTimeDisplay()
@@ -258,6 +259,18 @@ class DateTimePickerDialog : DialogFragment() {
             updateAmPmButtons()
         }
 
+        // Minute controls
+        binding.btnMinuteUp.setOnClickListener {
+            calendar.add(Calendar.MINUTE, 1)
+            updateTimeDisplay()
+        }
+
+        binding.btnMinuteDown.setOnClickListener {
+            calendar.add(Calendar.MINUTE, -1)
+            updateTimeDisplay()
+        }
+
+        // AM/PM toggle
         binding.btnAM.setOnClickListener {
             if (calendar.get(Calendar.AM_PM) == Calendar.PM) {
                 calendar.add(Calendar.HOUR_OF_DAY, -12)

@@ -180,35 +180,57 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="12dp">
+                    android:padding="8dp">
 
-                    <!-- Hour -->
-                    <ImageView
-                        android:id="@+id/btnHourUp"
-                        android:layout_width="32dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_chevron_up"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="Increase hour"
-                        app:tint="@color/text_tertiary"
-                        xmlns:app="http://schemas.android.com/apk/res-auto" />
-
+                    <!-- Hour and Minute with separate controls -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginVertical="4dp">
+                        android:gravity="center">
 
-                        <TextView
-                            android:id="@+id/hourText"
+                        <!-- Hour Column -->
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="28sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/text_light"
-                            tools:text="02" />
+                            android:orientation="vertical"
+                            android:gravity="center">
 
+                            <ImageView
+                                android:id="@+id/btnHourUp"
+                                android:layout_width="32dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_chevron_up"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:contentDescription="Increase hour"
+                                app:tint="@color/text_muted"
+                                xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+                            <TextView
+                                android:id="@+id/hourText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="28sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_light"
+                                android:minWidth="40dp"
+                                android:gravity="center"
+                                android:layout_marginVertical="4dp"
+                                tools:text="02" />
+
+                            <ImageView
+                                android:id="@+id/btnHourDown"
+                                android:layout_width="32dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_chevron_down"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:contentDescription="Decrease hour"
+                                app:tint="@color/text_muted"
+                                xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+                        </LinearLayout>
+
+                        <!-- Colon separator -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -218,26 +240,48 @@
                             android:textColor="@color/text_muted"
                             android:layout_marginHorizontal="2dp" />
 
-                        <TextView
-                            android:id="@+id/minuteText"
+                        <!-- Minute Column -->
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="28sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/text_light"
-                            tools:text="30" />
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:id="@+id/btnMinuteUp"
+                                android:layout_width="32dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_chevron_up"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:contentDescription="Increase minute"
+                                app:tint="@color/text_muted"
+                                xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+                            <TextView
+                                android:id="@+id/minuteText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="28sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_light"
+                                android:minWidth="40dp"
+                                android:gravity="center"
+                                android:layout_marginVertical="4dp"
+                                tools:text="30" />
+
+                            <ImageView
+                                android:id="@+id/btnMinuteDown"
+                                android:layout_width="32dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_chevron_down"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:contentDescription="Decrease minute"
+                                app:tint="@color/text_muted"
+                                xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/btnHourDown"
-                        android:layout_width="32dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_chevron_down"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="Decrease hour"
-                        app:tint="@color/text_tertiary"
-                        xmlns:app="http://schemas.android.com/apk/res-auto" />
 
                     <!-- AM/PM Toggle -->
                     <LinearLayout
@@ -256,7 +300,7 @@
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="6dp"
                             android:background="@drawable/bg_period_button"
-                            android:textColor="@color/text_secondary" />
+                            android:textColor="@color/text_muted" />
 
                         <TextView
                             android:id="@+id/btnPM"
