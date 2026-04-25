@@ -525,9 +525,9 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     
     /**
      * Setup order-level notes pills display (#93)
-     * Task 11: Don't show "no order notes" section if TEXT_BOX type widget exists
      * QA spec: Header pills show SINGLE_SELECT and MULTI_SELECT only.
      * TEXT_BOX and CALENDAR are shown in dedicated rows (handled elsewhere).
+     * Section is hidden when there are no pills to display.
      */
     private fun setupOrderNotesPills() {
         val orderNote = orderArguments?.note
@@ -536,24 +536,11 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         
         container.removeAllViews()
         
-        // Task 11: Check if there's a TEXT_BOX (description) type widget at order level
-        val widgetManager = context?.let { WidgetManager.getInstance(it) }
-        val hasDescriptionWidget = widgetManager?.getAllOrderLevelWidgets()
-            ?.any { it.type == WidgetType.TEXT_BOX && it.isEnabled } == true
-        
         if (orderNote.isNullOrBlank()) {
-            // Task 11: If TEXT_BOX widget exists, hide the section entirely (no "no order notes")
-            if (hasDescriptionWidget) {
-                section.visibility = View.GONE
-                return
-            }
-            // Otherwise show section so user can add notes
-            section.visibility = View.VISIBLE
+            // No notes, hide section entirely
+            section.visibility = View.GONE
             return
         }
-        
-        // Show section with notes
-        section.visibility = View.VISIBLE
         
         // Use widget-based parsing for ORDER-level widgets
         val widgets = com.orderMate.utils.WidgetManager.getCachedWidgets()
@@ -563,9 +550,19 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         // QA spec: Header pills = SINGLE_SELECT + MULTI_SELECT only
         // TEXT_BOX and CALENDAR get their own dedicated rows
         val parsedTags = com.orderMate.utils.OrderNoteParser.extractTagsFromNote(orderNote, orderLevelWidgets, NoteLevel.ORDER, includeTextBox = false)
-        parsedTags.filter { 
+        val pillTags = parsedTags.filter { 
             it.widgetType == WidgetType.SINGLE_SELECT || it.widgetType == WidgetType.MULTI_SELECT 
-        }.forEach { tag ->
+        }
+        
+        if (pillTags.isEmpty()) {
+            // No pills to display, hide section entirely
+            section.visibility = View.GONE
+            return
+        }
+        
+        // Show section with pills
+        section.visibility = View.VISIBLE
+        pillTags.forEach { tag ->
             addNotePill(container, tag.value, tag.widgetType, density)
         }
     }

@@ -517,6 +517,7 @@
                     </LinearLayout>
 
                     <!-- Order-level Notes Section (#93 requirement) -->
+                    <!-- Hidden when no pills to display -->
                     <LinearLayout
                         android:id="@+id/orderNotesSection"
                         android:layout_width="match_parent"
