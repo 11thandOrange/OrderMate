@@ -22,8 +22,14 @@ object DefaultWidgetFactory {
     
     /**
      * Creates default item-level widgets (enabled by default)
+     * WARNING: Each call generates NEW UUIDs - only call when truly creating new widgets!
      */
-    fun createItemLevelDefaults(): List<WidgetConfig> = listOf(
+    fun createItemLevelDefaults(): List<WidgetConfig> {
+        android.util.Log.w("WidgetFactoryDebug", "⚠️ createItemLevelDefaults() CALLED - GENERATING NEW UUIDs!")
+        Thread.currentThread().stackTrace.take(10).forEach { 
+            android.util.Log.d("WidgetFactoryDebug", "  at ${it.className}.${it.methodName}(${it.fileName}:${it.lineNumber})")
+        }
+        return listOf(
         createWidget(
             type = WidgetType.CALENDAR,
             label = "Due Date",
@@ -64,11 +70,18 @@ object DefaultWidgetFactory {
             order = 3
         )
     )
+    }
     
     /**
      * Creates default order-level widgets (disabled by default)
+     * WARNING: Each call generates NEW UUIDs - only call when truly creating new widgets!
      */
-    fun createOrderLevelDefaults(): List<WidgetConfig> = listOf(
+    fun createOrderLevelDefaults(): List<WidgetConfig> {
+        android.util.Log.w("WidgetFactoryDebug", "⚠️ createOrderLevelDefaults() CALLED - GENERATING NEW UUIDs!")
+        Thread.currentThread().stackTrace.take(10).forEach { 
+            android.util.Log.d("WidgetFactoryDebug", "  at ${it.className}.${it.methodName}(${it.fileName}:${it.lineNumber})")
+        }
+        return listOf(
         createWidget(
             type = WidgetType.CALENDAR,
             label = "Deadline",
@@ -109,6 +122,7 @@ object DefaultWidgetFactory {
             order = 3
         )
     )
+    }
     
     /**
      * Create a widget with new UUID

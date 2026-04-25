@@ -113,15 +113,21 @@ class FirebaseConfigManager private constructor() {
      * Get only ORDER level widgets (for order popup settings)
      */
     fun getOrderWidgets(merchantId: String, callback: (List<WidgetConfig>) -> Unit) {
+        android.util.Log.d("FirebaseWidgetDebug", "getOrderWidgets: fetching from Firebase for merchant=$merchantId")
         db.getReference(FirebasePaths.widgets(merchantId))
             .orderByChild("level")
             .equalTo(NoteLevel.ORDER.name)
             .get()
             .addOnSuccessListener { snapshot ->
                 val widgets = snapshot.children.mapNotNull { parseWidget(it) }
+                android.util.Log.d("FirebaseWidgetDebug", "getOrderWidgets: Firebase returned ${widgets.size} ORDER widgets")
+                widgets.forEach { w ->
+                    android.util.Log.d("FirebaseWidgetDebug", "  FIREBASE ORDER: id=${w.id}, label=${w.label}")
+                }
                 callback(widgets.sortedBy { it.order })
             }
             .addOnFailureListener {
+                android.util.Log.e("FirebaseWidgetDebug", "getOrderWidgets: FAILED", it)
                 it.printStackTrace()
                 callback(emptyList())
             }
@@ -131,15 +137,21 @@ class FirebaseConfigManager private constructor() {
      * Get only ITEM level widgets (for item popup settings)
      */
     fun getItemWidgets(merchantId: String, callback: (List<WidgetConfig>) -> Unit) {
+        android.util.Log.d("FirebaseWidgetDebug", "getItemWidgets: fetching from Firebase for merchant=$merchantId")
         db.getReference(FirebasePaths.widgets(merchantId))
             .orderByChild("level")
             .equalTo(NoteLevel.ITEM.name)
             .get()
             .addOnSuccessListener { snapshot ->
                 val widgets = snapshot.children.mapNotNull { parseWidget(it) }
+                android.util.Log.d("FirebaseWidgetDebug", "getItemWidgets: Firebase returned ${widgets.size} ITEM widgets")
+                widgets.forEach { w ->
+                    android.util.Log.d("FirebaseWidgetDebug", "  FIREBASE ITEM: id=${w.id}, label=${w.label}")
+                }
                 callback(widgets.sortedBy { it.order })
             }
             .addOnFailureListener {
+                android.util.Log.e("FirebaseWidgetDebug", "getItemWidgets: FAILED", it)
                 it.printStackTrace()
                 callback(emptyList())
             }

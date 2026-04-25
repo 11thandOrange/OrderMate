@@ -72,20 +72,32 @@ class WidgetManager private constructor(private val context: Context) {
     private fun getItemWidgetsFromCache(): List<WidgetConfig> {
         return try {
             val json = prefs.getString(KEY_ITEM_WIDGETS, null)
+            android.util.Log.d("WidgetCacheDebug", "getItemWidgetsFromCache: json=${if (json != null) "${json.take(100)}..." else "NULL"}")
             if (json != null) {
                 val type = object : TypeToken<List<WidgetConfig>>() {}.type
                 val widgets = gson.fromJson<List<WidgetConfig>>(json, type)
-                widgets?.sortedBy { it.order } ?: emptyList()
+                val result = widgets?.sortedBy { it.order } ?: emptyList()
+                android.util.Log.d("WidgetCacheDebug", "getItemWidgetsFromCache: parsed ${result.size} widgets")
+                result.forEach { w ->
+                    android.util.Log.d("WidgetCacheDebug", "  CACHED ITEM: id=${w.id}, label=${w.label}")
+                }
+                result
             } else {
+                android.util.Log.d("WidgetCacheDebug", "getItemWidgetsFromCache: CACHE IS EMPTY/NULL")
                 emptyList()
             }
         } catch (e: Exception) {
+            android.util.Log.e("WidgetCacheDebug", "getItemWidgetsFromCache: EXCEPTION", e)
             e.printStackTrace()
             emptyList()
         }
     }
     
     private fun saveItemWidgetsToCache(widgets: List<WidgetConfig>) {
+        android.util.Log.d("WidgetCacheDebug", "saveItemWidgetsToCache: saving ${widgets.size} widgets")
+        widgets.forEach { w ->
+            android.util.Log.d("WidgetCacheDebug", "  SAVING ITEM: id=${w.id}, label=${w.label}")
+        }
         prefs.edit().putString(KEY_ITEM_WIDGETS, gson.toJson(widgets)).apply()
     }
     
@@ -94,20 +106,32 @@ class WidgetManager private constructor(private val context: Context) {
     private fun getOrderWidgetsFromCache(): List<WidgetConfig> {
         return try {
             val json = prefs.getString(KEY_ORDER_WIDGETS, null)
+            android.util.Log.d("WidgetCacheDebug", "getOrderWidgetsFromCache: json=${if (json != null) "${json.take(100)}..." else "NULL"}")
             if (json != null) {
                 val type = object : TypeToken<List<WidgetConfig>>() {}.type
                 val widgets = gson.fromJson<List<WidgetConfig>>(json, type)
-                widgets?.sortedBy { it.order } ?: emptyList()
+                val result = widgets?.sortedBy { it.order } ?: emptyList()
+                android.util.Log.d("WidgetCacheDebug", "getOrderWidgetsFromCache: parsed ${result.size} widgets")
+                result.forEach { w ->
+                    android.util.Log.d("WidgetCacheDebug", "  CACHED ORDER: id=${w.id}, label=${w.label}")
+                }
+                result
             } else {
+                android.util.Log.d("WidgetCacheDebug", "getOrderWidgetsFromCache: CACHE IS EMPTY/NULL")
                 emptyList()
             }
         } catch (e: Exception) {
+            android.util.Log.e("WidgetCacheDebug", "getOrderWidgetsFromCache: EXCEPTION", e)
             e.printStackTrace()
             emptyList()
         }
     }
     
     private fun saveOrderWidgetsToCache(widgets: List<WidgetConfig>) {
+        android.util.Log.d("WidgetCacheDebug", "saveOrderWidgetsToCache: saving ${widgets.size} widgets")
+        widgets.forEach { w ->
+            android.util.Log.d("WidgetCacheDebug", "  SAVING ORDER: id=${w.id}, label=${w.label}")
+        }
         prefs.edit().putString(KEY_ORDER_WIDGETS, gson.toJson(widgets)).apply()
     }
     
@@ -820,8 +844,13 @@ class WidgetManager private constructor(private val context: Context) {
      * Force reload item widgets from Firebase
      */
     fun reloadItemWidgets(callback: ((Boolean) -> Unit)? = null) {
-        val mid = merchantId ?: return
+        android.util.Log.d("WidgetReloadDebug", "reloadItemWidgets: starting...")
+        val mid = merchantId ?: run {
+            android.util.Log.w("WidgetReloadDebug", "reloadItemWidgets: merchantId is NULL!")
+            return
+        }
         firebase.getItemWidgets(mid) { widgets ->
+            android.util.Log.d("WidgetReloadDebug", "reloadItemWidgets: received ${widgets.size} widgets from Firebase, saving to cache")
             saveItemWidgetsToCache(widgets)
             callback?.invoke(true)
         }
@@ -831,8 +860,13 @@ class WidgetManager private constructor(private val context: Context) {
      * Force reload order widgets from Firebase
      */
     fun reloadOrderWidgets(callback: ((Boolean) -> Unit)? = null) {
-        val mid = merchantId ?: return
+        android.util.Log.d("WidgetReloadDebug", "reloadOrderWidgets: starting...")
+        val mid = merchantId ?: run {
+            android.util.Log.w("WidgetReloadDebug", "reloadOrderWidgets: merchantId is NULL!")
+            return
+        }
         firebase.getOrderWidgets(mid) { widgets ->
+            android.util.Log.d("WidgetReloadDebug", "reloadOrderWidgets: received ${widgets.size} widgets from Firebase, saving to cache")
             saveOrderWidgetsToCache(widgets)
             callback?.invoke(true)
         }
@@ -842,13 +876,20 @@ class WidgetManager private constructor(private val context: Context) {
      * Force reload all widgets and settings from Firebase
      */
     fun reloadAll(callback: ((Boolean) -> Unit)? = null) {
-        val mid = merchantId ?: return
+        android.util.Log.d("WidgetReloadDebug", "reloadAll: starting...")
+        val mid = merchantId ?: run {
+            android.util.Log.w("WidgetReloadDebug", "reloadAll: merchantId is NULL!")
+            return
+        }
         firebase.getItemWidgets(mid) { itemWidgets ->
+            android.util.Log.d("WidgetReloadDebug", "reloadAll: received ${itemWidgets.size} ITEM widgets")
             saveItemWidgetsToCache(itemWidgets)
             firebase.getOrderWidgets(mid) { orderWidgets ->
+                android.util.Log.d("WidgetReloadDebug", "reloadAll: received ${orderWidgets.size} ORDER widgets")
                 saveOrderWidgetsToCache(orderWidgets)
                 firebase.getSettings(mid) { settings ->
                     saveSettings(settings)
+                    android.util.Log.d("WidgetReloadDebug", "reloadAll: COMPLETE")
                     callback?.invoke(true)
                 }
             }
