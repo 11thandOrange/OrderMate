@@ -185,8 +185,8 @@ class ReceiptPrintReceiver : BroadcastReceiver() {
             
             // Create and execute print job
             val printJob = StaticOrderPrintJob.Builder()
-                .order(orderId)
-                .build(context)
+                .order(order)
+                .build()
             
             printJob.print(context, cloverAccount)
             
