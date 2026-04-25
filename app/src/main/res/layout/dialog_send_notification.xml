@@ -91,9 +91,12 @@
                 android:letterSpacing="0.05" />
 
             <FrameLayout
+                android:id="@+id/templateSpinnerContainer"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:background="@drawable/bg_modal_input">
+                android:background="@drawable/bg_modal_input"
+                android:clickable="true"
+                android:focusable="true">
 
                 <Spinner
                     android:id="@+id/templateSpinner"
@@ -102,10 +105,8 @@
                     android:background="@android:color/transparent"
                     android:paddingStart="16dp"
                     android:paddingEnd="40dp"
-                    android:popupBackground="@drawable/bg_dialog"
-                    android:spinnerMode="dropdown"
-                    android:clickable="true"
-                    android:focusable="true" />
+                    android:spinnerMode="dialog"
+                    android:prompt="@string/select_template" />
 
                 <ImageView
                     android:layout_width="24dp"
@@ -114,9 +115,7 @@
                     android:layout_marginEnd="12dp"
                     android:src="@drawable/ic_arrow_down"
                     app:tint="@color/text_muted"
-                    android:importantForAccessibility="no"
-                    android:clickable="false"
-                    android:focusable="false" />
+                    android:importantForAccessibility="no" />
             </FrameLayout>
         </LinearLayout>
 

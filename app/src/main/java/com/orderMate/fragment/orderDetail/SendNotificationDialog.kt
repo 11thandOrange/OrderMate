@@ -176,6 +176,11 @@ class SendNotificationDialog(
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.templateSpinner.adapter = adapter
         
+        // Make container click also trigger spinner
+        binding.templateSpinnerContainer.setOnClickListener {
+            binding.templateSpinner.performClick()
+        }
+        
         binding.templateSpinner.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (position > 0 && position <= templates.size) {
