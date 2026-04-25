@@ -104,7 +104,6 @@
                     android:paddingStart="16dp"
                     android:paddingEnd="40dp"
                     android:spinnerMode="dropdown"
-                    android:dropDownWidth="match_parent"
                     android:dropDownVerticalOffset="52dp"
                     android:popupBackground="@drawable/bg_dropdown_popup" />
 

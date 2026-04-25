@@ -222,9 +222,13 @@ class SendNotificationDialog(
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.templateSpinner.adapter = adapter
         
-        // Set dropdown width to match the container width
+        // Set dropdown width and position to match the container
         binding.templateSpinnerContainer.post {
-            binding.templateSpinner.dropDownWidth = binding.templateSpinnerContainer.width
+            val containerWidth = binding.templateSpinnerContainer.width
+            binding.templateSpinner.dropDownWidth = containerWidth
+            // Center dropdown under container (spinner has padding that offsets it)
+            val spinnerPaddingStart = binding.templateSpinner.paddingStart
+            binding.templateSpinner.dropDownHorizontalOffset = -spinnerPaddingStart
         }
         
         // Make container click also trigger spinner
