@@ -231,7 +231,7 @@ class ItemNoteDialogFragment : DialogFragment() {
      */
     private fun addCalendarSection(widget: WidgetConfig) {
         val sectionView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.note_section_calendar, binding.noteSectionsContainer, false)
+            .inflate(R.layout.section_calendar, binding.noteSectionsContainer, false)
 
         // Set label from DB widget config
         val labelView = sectionView.findViewById<TextView>(R.id.sectionLabel)

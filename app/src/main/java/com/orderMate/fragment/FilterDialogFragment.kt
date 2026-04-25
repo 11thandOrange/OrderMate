@@ -249,7 +249,7 @@ class FilterDialogFragment : DialogFragment() {
      */
     private fun addDatePickerSection(category: FilterCategory) {
         val sectionView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.filter_section_date, binding.filterSectionsContainer, false)
+            .inflate(R.layout.section_calendar, binding.filterSectionsContainer, false)
 
         // Set section label
         val labelView = sectionView.findViewById<TextView>(R.id.sectionLabel)
@@ -258,6 +258,9 @@ class FilterDialogFragment : DialogFragment() {
         // Setup date input
         val dateInput = sectionView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.dateInput)
         val dateChips = sectionView.findViewById<FlexboxLayout>(R.id.dateChips)
+        
+        // Make dateChips visible for filter multi-select
+        dateChips.visibility = View.VISIBLE
 
         dateInput.setOnClickListener { showDatePicker(category.id, dateInput, dateChips) }
 

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Shared Calendar Section for note dialogs and filter dialogs -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -6,7 +7,7 @@
     android:orientation="vertical"
     android:paddingBottom="16dp">
 
-    <!-- Section Label -->
+    <!-- Section Label - set programmatically -->
     <TextView
         android:id="@+id/sectionLabel"
         android:layout_width="wrap_content"
@@ -14,17 +15,16 @@
         android:layout_marginBottom="8dp"
         android:textColor="@color/text_light"
         android:textSize="14sp"
-        android:fontFamily="sans-serif-medium"
-        android:text="Date Filter" />
+        android:fontFamily="sans-serif-medium" />
 
-    <!-- Date Input + Chips Row -->
+    <!-- Date Input Row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <!-- Date Input (shrinks when chips present) -->
+        <!-- Date Input -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/dateInputLayout"
             android:layout_width="0dp"
@@ -57,12 +57,13 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Date Chips (to the right of input) -->
+        <!-- Date Chips (for multi-select in filters, hidden in note dialogs) -->
         <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/dateChips"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:visibility="gone"
             app:flexWrap="wrap"
             app:alignItems="center"
             app:justifyContent="flex_start" />
