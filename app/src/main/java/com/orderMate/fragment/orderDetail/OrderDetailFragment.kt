@@ -941,10 +941,9 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             }
             
             // Order Details Card click - opens order-level notes popup
-            // Set click on both card and scrollview to ensure entire card is clickable
-            val openOrderPopup = View.OnClickListener { openOrderNoteDialog() }
-            orderDetailsCard.setOnClickListener(openOrderPopup)
-            orderDetailsScrollView.setOnClickListener(openOrderPopup)
+            orderDetailsClickOverlay.setOnClickListener {
+                openOrderNoteDialog()
+            }
             
             // Order History Card click - opens order history dialog
             orderHistoryCard.setOnClickListener {

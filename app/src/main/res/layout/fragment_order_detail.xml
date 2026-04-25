@@ -414,9 +414,6 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginBottom="20dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
                 app:cardBackgroundColor="@color/glass_background"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
@@ -426,6 +423,10 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/customerCard">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -667,6 +668,17 @@
                         android:layout_height="0dp"
                         android:visibility="gone" />
                 </LinearLayout>
+                
+                <!-- Transparent clickable overlay for entire card -->
+                <View
+                    android:id="@+id/orderDetailsClickOverlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground" />
+                    
+                </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Customer Card - fixed height, above Order History -->
