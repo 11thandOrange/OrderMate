@@ -154,7 +154,7 @@ class CalendarFragment : Fragment() {
                 if (allOrders.isNotEmpty()) {
                     allEvents = convertOrdersToEvents(allOrders)
                     filteredEvents = convertOrdersToEvents(filteredOrders)
-                    updateCalendarView()
+                    renderCalendar()
                 }
             }
         }
