@@ -557,7 +557,7 @@ class CalendarFragment : Fragment() {
                             note = it.note
                         )
                     }
-                }?.take(5) ?: emptyList()
+                } ?: emptyList()
             } catch (e: Exception) { emptyList() }
             
             // Determine event type based on order data
@@ -1728,8 +1728,7 @@ class CalendarFragment : Fragment() {
                     eventsContainer.removeAllViews()
                     eventsContainer.visibility = View.VISIBLE
                     
-                    // Show up to 3 events
-                    weekDay.events.take(3).forEach { event ->
+                    weekDay.events.forEach { event ->
                         val eventView = createEventRow(context, event)
                         eventsContainer.addView(eventView)
                     }

@@ -256,8 +256,7 @@ class OrderCardRedesignAdapter(
                 }
             }
             
-            // Limit to 3 tags to avoid overflow
-            return tags.take(3)
+            return tags
         }
 
         /**
