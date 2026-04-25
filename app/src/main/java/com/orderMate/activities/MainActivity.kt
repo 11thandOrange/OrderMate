@@ -306,44 +306,36 @@ class MainActivity : AppCompatActivity() {
     /**
      * V2: Sync widgets with Firebase in background.
      * Uses level-specific fetches to prevent cross-contamination.
-     * Only creates defaults for genuinely new merchants (no existing data).
      */
     private fun syncWidgetsFromFirebase(merchantId: String) {
         val widgetManager = WidgetManager.getInstance(this)
         widgetManager.setMerchantId(merchantId)
 
         CoroutineScope(Dispatchers.IO).launch {
-            // First check if merchant already exists in Firebase to avoid overwriting existing IDs
-            firebaseConfigManager.merchantExists(merchantId) { exists ->
-                if (exists) {
-                    // Merchant exists - just sync, never create defaults
-                    firebaseConfigManager.getItemWidgets(merchantId) { itemWidgets ->
-                        if (itemWidgets.isNotEmpty()) {
-                            widgetManager.saveItemWidgets(itemWidgets)
-                        }
+            // Fetch item widgets
+            firebaseConfigManager.getItemWidgets(merchantId) { itemWidgets ->
+                if (itemWidgets.isNotEmpty()) {
+                    widgetManager.saveItemWidgets(itemWidgets)
+                }
+                
+                // Fetch order widgets
+                firebaseConfigManager.getOrderWidgets(merchantId) { orderWidgets ->
+                    if (orderWidgets.isNotEmpty()) {
+                        widgetManager.saveOrderWidgets(orderWidgets)
+                    }
+                    
+                    // Fetch settings
+                    firebaseConfigManager.getSettings(merchantId) { settings ->
+                        widgetManager.saveSettings(settings)
                         
-                        firebaseConfigManager.getOrderWidgets(merchantId) { orderWidgets ->
-                            if (orderWidgets.isNotEmpty()) {
-                                widgetManager.saveOrderWidgets(orderWidgets)
-                            }
-                            
-                            firebaseConfigManager.getSettings(merchantId) { settings ->
-                                widgetManager.saveSettings(settings)
-                            }
+                        // If no widgets exist, initialize with defaults
+                        if (itemWidgets.isEmpty() && orderWidgets.isEmpty()) {
+                            val defaultItemWidgets = DefaultWidgetFactory.createItemLevelDefaults()
+                            val defaultOrderWidgets = DefaultWidgetFactory.createOrderLevelDefaults()
+                            val allDefaults = defaultItemWidgets + defaultOrderWidgets
+                            firebaseConfigManager.initializeMerchant(merchantId, allDefaults, settings) { _ -> }
                         }
                     }
-                } else {
-                    // Genuinely new merchant - create defaults only once
-                    val defaultItemWidgets = DefaultWidgetFactory.createItemLevelDefaults()
-                    val defaultOrderWidgets = DefaultWidgetFactory.createOrderLevelDefaults()
-                    val allDefaults = defaultItemWidgets + defaultOrderWidgets
-                    val defaultSettings = PopupSettings()
-                    
-                    widgetManager.saveItemWidgets(defaultItemWidgets)
-                    widgetManager.saveOrderWidgets(defaultOrderWidgets)
-                    widgetManager.saveSettings(defaultSettings)
-                    
-                    firebaseConfigManager.initializeMerchant(merchantId, allDefaults, defaultSettings) { _ -> }
                 }
             }
         }

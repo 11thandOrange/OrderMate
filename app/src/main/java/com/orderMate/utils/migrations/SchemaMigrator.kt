@@ -8,8 +8,6 @@ import com.orderMate.utils.FirebaseConfigManager
 /**
  * Coordinates schema migrations
  * Checks current schema version and migrates if needed
- * 
- * IMPORTANT: Never overwrites existing widget IDs - they are embedded in notes.
  */
 object SchemaMigrator {
     
@@ -51,50 +49,26 @@ object SchemaMigrator {
     
     /**
      * Check if legacy data exists and migrate, otherwise create defaults
-     * Only creates defaults if merchant has NO existing widgets in Firebase.
      */
     private fun checkLegacyAndMigrate(merchantId: String, callback: (Boolean) -> Unit) {
         val firebase = FirebaseConfigManager.getInstance()
         
         android.util.Log.d(TAG, "Checking for legacy data...")
         
-        firebase.legacyDataExists(merchantId) { legacyExists ->
-            if (legacyExists) {
+        firebase.legacyDataExists(merchantId) { exists ->
+            if (exists) {
                 android.util.Log.d(TAG, "Legacy data found, migrating...")
                 V1ToV2Migrator.migrate(merchantId) { success ->
                     if (success) {
                         android.util.Log.d(TAG, "Migration successful")
                         firebase.setSchemaVersion(merchantId, MerchantMeta.CURRENT_SCHEMA_VERSION, callback)
                     } else {
-                        // Migration failed - check if widgets already exist before creating defaults
-                        android.util.Log.e(TAG, "Migration failed, checking for existing widgets...")
-                        checkAndCreateDefaultsIfNeeded(merchantId, callback)
+                        android.util.Log.e(TAG, "Migration failed, creating defaults")
+                        createDefaults(merchantId, callback)
                     }
                 }
             } else {
-                // No legacy data - check if V2 widgets already exist before creating defaults
-                android.util.Log.d(TAG, "No legacy data, checking for existing widgets...")
-                checkAndCreateDefaultsIfNeeded(merchantId, callback)
-            }
-        }
-    }
-    
-    /**
-     * Only create defaults if merchant has NO existing widgets.
-     * This prevents overwriting existing widget IDs.
-     */
-    private fun checkAndCreateDefaultsIfNeeded(merchantId: String, callback: (Boolean) -> Unit) {
-        val firebase = FirebaseConfigManager.getInstance()
-        
-        // Check if widgets already exist in Firebase
-        firebase.getWidgets(merchantId) { existingWidgets ->
-            if (existingWidgets.isNotEmpty()) {
-                // Widgets already exist - DON'T overwrite them!
-                android.util.Log.d(TAG, "Found ${existingWidgets.size} existing widgets, preserving IDs")
-                firebase.setSchemaVersion(merchantId, MerchantMeta.CURRENT_SCHEMA_VERSION, callback)
-            } else {
-                // No widgets exist - safe to create defaults
-                android.util.Log.d(TAG, "No existing widgets, creating defaults...")
+                android.util.Log.d(TAG, "No legacy data, creating defaults...")
                 createDefaults(merchantId, callback)
             }
         }
@@ -115,22 +89,20 @@ object SchemaMigrator {
                     if (success) {
                         firebase.setSchemaVersion(merchantId, MerchantMeta.CURRENT_SCHEMA_VERSION, callback)
                     } else {
-                        // Migration failed - don't blindly create defaults, check first
-                        checkAndCreateDefaultsIfNeeded(merchantId, callback)
+                        callback(false)
                     }
                 }
             }
             else -> {
-                // Unknown version - check for existing widgets before creating defaults
+                // Unknown version, try to create defaults
                 android.util.Log.w(TAG, "Unknown schema version: $fromVersion")
-                checkAndCreateDefaultsIfNeeded(merchantId, callback)
+                createDefaults(merchantId, callback)
             }
         }
     }
     
     /**
-     * Create default widgets and settings for new merchant.
-     * Should ONLY be called when we've verified no widgets exist.
+     * Create default widgets and settings for new merchant
      */
     private fun createDefaults(merchantId: String, callback: (Boolean) -> Unit) {
         val defaults = DefaultWidgetFactory.createDefaults()
@@ -150,10 +122,7 @@ object SchemaMigrator {
     
     /**
      * Force reset to defaults (for debugging/testing)
-     * WARNING: This will overwrite existing widget IDs! Use with caution.
-     * @deprecated Use WidgetManager.resetItemWidgetsToDefaults() instead which preserves IDs.
      */
-    @Deprecated("Use WidgetManager.resetItemWidgetsToDefaults() which preserves IDs")
     fun resetToDefaults(merchantId: String, callback: (Boolean) -> Unit) {
         createDefaults(merchantId, callback)
     }

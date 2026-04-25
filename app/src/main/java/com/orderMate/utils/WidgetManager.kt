@@ -143,18 +143,26 @@ class WidgetManager private constructor(private val context: Context) {
     
     /**
      * Get item-level widgets (all, including disabled) sorted by order.
-     * Returns cached widgets only - never creates new defaults to preserve widget IDs.
      */
     fun getItemWidgets(): List<WidgetConfig> {
-        return getItemWidgetsFromCache()
+        val cached = getItemWidgetsFromCache()
+        return if (cached.isEmpty()) {
+            DefaultWidgetFactory.createItemLevelDefaults()
+        } else {
+            cached
+        }
     }
     
     /**
      * Get order-level widgets (all, including disabled) sorted by order.
-     * Returns cached widgets only - never creates new defaults to preserve widget IDs.
      */
     fun getOrderWidgets(): List<WidgetConfig> {
-        return getOrderWidgetsFromCache()
+        val cached = getOrderWidgetsFromCache()
+        return if (cached.isEmpty()) {
+            DefaultWidgetFactory.createOrderLevelDefaults()
+        } else {
+            cached
+        }
     }
     
     /**
@@ -355,50 +363,12 @@ class WidgetManager private constructor(private val context: Context) {
      */
     fun resetItemWidgetsToDefaults(callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
-        val currentItemWidgets = getItemWidgetsFromCache()
+        val defaults = DefaultWidgetFactory.createItemLevelDefaults()
         val currentOrderWidgets = getOrderWidgetsFromCache()
         
-        // If we have existing widgets, preserve their IDs and reset values
-        // If no widgets exist, create new defaults
-        val resetWidgets = if (currentItemWidgets.isNotEmpty()) {
-            // Preserve existing widget IDs, reset to default values
-            val defaultTemplates = DefaultWidgetFactory.createItemLevelDefaults()
-            currentItemWidgets.mapIndexed { index, existing ->
-                // Find matching default by label or type, or use existing
-                val template = defaultTemplates.find { it.label == existing.label && it.type == existing.type }
-                    ?: defaultTemplates.getOrNull(index)
-                    ?: existing
-                
-                // Preserve ID, reset other values from template
-                existing.copy(
-                    label = template.label,
-                    type = template.type,
-                    isEnabled = template.isEnabled,
-                    isRequired = template.isRequired,
-                    showInFilter = template.showInFilter,
-                    order = index,
-                    options = template.options.mapIndexed { optIndex, templateOpt ->
-                        // Preserve existing option IDs if available
-                        val existingOpt = existing.options.getOrNull(optIndex)
-                        if (existingOpt != null) {
-                            existingOpt.copy(
-                                label = templateOpt.label,
-                                value = templateOpt.value,
-                                isDefault = templateOpt.isDefault
-                            )
-                        } else {
-                            templateOpt
-                        }
-                    }.toMutableList()
-                )
-            }
-        } else {
-            DefaultWidgetFactory.createItemLevelDefaults()
-        }
-        
-        firebase.replaceAllWidgets(mid, resetWidgets + currentOrderWidgets) { success ->
+        firebase.replaceAllWidgets(mid, defaults + currentOrderWidgets) { success ->
             if (success) {
-                saveItemWidgetsToCache(resetWidgets)
+                saveItemWidgetsToCache(defaults)
             }
             callback(success)
         }
@@ -527,54 +497,15 @@ class WidgetManager private constructor(private val context: Context) {
     /**
      * Reset order-level widgets to defaults.
      * Atomically replaces all order widgets with default set.
-     * Preserves existing widget IDs to maintain note-widget mapping.
      */
     fun resetOrderWidgetsToDefaults(callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
+        val defaults = DefaultWidgetFactory.createOrderLevelDefaults()
         val currentItemWidgets = getItemWidgetsFromCache()
-        val currentOrderWidgets = getOrderWidgetsFromCache()
         
-        // If we have existing widgets, preserve their IDs and reset values
-        // If no widgets exist, create new defaults
-        val resetWidgets = if (currentOrderWidgets.isNotEmpty()) {
-            // Preserve existing widget IDs, reset to default values
-            val defaultTemplates = DefaultWidgetFactory.createOrderLevelDefaults()
-            currentOrderWidgets.mapIndexed { index, existing ->
-                // Find matching default by label or type, or use existing
-                val template = defaultTemplates.find { it.label == existing.label && it.type == existing.type }
-                    ?: defaultTemplates.getOrNull(index)
-                    ?: existing
-                
-                // Preserve ID, reset other values from template
-                existing.copy(
-                    label = template.label,
-                    type = template.type,
-                    isEnabled = template.isEnabled,
-                    isRequired = template.isRequired,
-                    showInFilter = template.showInFilter,
-                    order = index,
-                    options = template.options.mapIndexed { optIndex, templateOpt ->
-                        // Preserve existing option IDs if available
-                        val existingOpt = existing.options.getOrNull(optIndex)
-                        if (existingOpt != null) {
-                            existingOpt.copy(
-                                label = templateOpt.label,
-                                value = templateOpt.value,
-                                isDefault = templateOpt.isDefault
-                            )
-                        } else {
-                            templateOpt
-                        }
-                    }.toMutableList()
-                )
-            }
-        } else {
-            DefaultWidgetFactory.createOrderLevelDefaults()
-        }
-        
-        firebase.replaceAllWidgets(mid, currentItemWidgets + resetWidgets) { success ->
+        firebase.replaceAllWidgets(mid, currentItemWidgets + defaults) { success ->
             if (success) {
-                saveOrderWidgetsToCache(resetWidgets)
+                saveOrderWidgetsToCache(defaults)
             }
             callback(success)
         }
