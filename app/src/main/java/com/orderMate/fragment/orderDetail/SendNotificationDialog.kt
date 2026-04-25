@@ -126,32 +126,24 @@ class SendNotificationDialog(
         // Setup spinner with default option immediately
         setupTemplateSpinner()
         
-        // Load templates on background thread (getMerchantId requires background thread)
-        runOnBackgroundThread {
-            try {
-                val app = requireContext().applicationContext as? MyApp ?: run {
-                    android.util.Log.e("SendNotificationDialog", "Failed to get MyApp")
-                    return@runOnBackgroundThread
+        // Get merchantId from PreferenceManager (same source as Settings)
+        val prefManager = com.orderMate.utils.PreferenceManager.getInstance(requireContext())
+        val merchantId = prefManager.getString("merchantId")
+        
+        if (merchantId.isNullOrEmpty()) {
+            android.util.Log.e("SendNotificationDialog", "Failed to get merchantId from PreferenceManager")
+            return
+        }
+        
+        android.util.Log.d("SendNotificationDialog", "Loading templates for merchant: $merchantId")
+        
+        FirebaseConfigManager.getInstance().getTemplates(merchantId) { loadedTemplates ->
+            android.util.Log.d("SendNotificationDialog", "Loaded ${loadedTemplates.size} templates: ${loadedTemplates.map { it.name }}")
+            templates = loadedTemplates
+            runOnMainThread {
+                if (isAdded) {
+                    setupTemplateSpinner()
                 }
-                val merchantId = app.getMerchantId() ?: run {
-                    android.util.Log.e("SendNotificationDialog", "Failed to get merchantId")
-                    return@runOnBackgroundThread
-                }
-                
-                android.util.Log.d("SendNotificationDialog", "Loading templates for merchant: $merchantId")
-                
-                FirebaseConfigManager.getInstance().getTemplates(merchantId) { loadedTemplates ->
-                    android.util.Log.d("SendNotificationDialog", "Loaded ${loadedTemplates.size} templates: ${loadedTemplates.map { it.name }}")
-                    templates = loadedTemplates
-                    runOnMainThread {
-                        if (isAdded) {
-                            setupTemplateSpinner()
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                android.util.Log.e("SendNotificationDialog", "Error loading templates", e)
-                e.printStackTrace()
             }
         }
     }
