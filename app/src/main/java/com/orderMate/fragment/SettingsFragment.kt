@@ -293,6 +293,9 @@ class SettingsFragment : Fragment() {
     private fun switchToTab(tab: String) {
         currentTab = tab
         
+        // All tabs save immediately on user change via their own listeners
+        // No need to save on tab leave
+        
         // Update tab appearance
         val tabs = listOf(tabGeneral, tabItemLevelNotes, tabOrderLevelNotes, tabFilter, tabNotification, tabAdvanced)
         val tabNames = listOf("general", "item_level", "order_level", "filter", "notification", "advanced")
@@ -322,7 +325,7 @@ class SettingsFragment : Fragment() {
             setupCloverFilterToggles()
         }
     }
-
+    
     // ==================== General Panel ====================
     
     private fun setupGeneralPanel() {
@@ -1684,6 +1687,7 @@ class FirebaseWidgetEditorAdapter(
         private var currentWidgetTintColor: Int = 0xFFFFFFFF.toInt()
         private var saveHandler = android.os.Handler(android.os.Looper.getMainLooper())
         private var saveRunnable: Runnable? = null
+        private var labelWatcher: TextWatcher? = null
 
         @SuppressLint("ClickableViewAccessibility")
         fun bind(widget: WidgetConfig) {
@@ -1728,23 +1732,24 @@ class FirebaseWidgetEditorAdapter(
                 animateExpand(expanding)
             }
 
-            // Toggle enabled
-            widgetToggle.setOnCheckedChangeListener { _, isChecked ->
-                widget.isEnabled = isChecked
+            // Toggle - setOnClickListener only fires on USER click, not when setting isChecked
+            widgetToggle.setOnClickListener {
+                widget.isEnabled = widgetToggle.isChecked
                 scheduleSave(widget)
             }
 
-            // Label change
-            inputWidgetLabel.addTextChangedListener(object : TextWatcher {
+            // Label change - remove old watcher to prevent duplicates on rebind
+            labelWatcher?.let { inputWidgetLabel.removeTextChangedListener(it) }
+            labelWatcher = object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
-                    val newLabel = s?.toString() ?: ""
-                    widget.label = newLabel
-                    widgetTitle.text = newLabel
+                    widget.label = s?.toString() ?: ""
+                    widgetTitle.text = widget.label
                     scheduleSave(widget)
                 }
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            })
+            }
+            inputWidgetLabel.addTextChangedListener(labelWatcher)
 
             // Add option
             inputAddOption.setOnEditorActionListener { _, actionId, event ->
