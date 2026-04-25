@@ -174,11 +174,13 @@ class OrderCardRedesignAdapter(
          * (#19) Setup custom order tags from line item notes
          * Task 15: Uses WidgetColorUtils for consistent color coding across app
          * Task 20: Includes CALENDAR type widgets
+         * Uses item_note_pill layout with icons matching item-level pills
          */
         private fun setupCustomTags(order: Order) {
             val context = binding.root.context
             val tagsContainer = binding.tagsContainer
             val density = context.resources.displayMetrics.density
+            val inflater = LayoutInflater.from(context)
             
             // Remove any previously added custom tags (keep first 2 - order status and payment status)
             while (tagsContainer.childCount > 2) {
@@ -189,35 +191,36 @@ class OrderCardRedesignAdapter(
             if (customTags.isEmpty()) return
             
             customTags.forEach { tag ->
-                val tagView = android.widget.TextView(context).apply {
-                    text = tag.value
-                    textSize = 11f
-                    typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
-                    
-                    // Use WidgetColorUtils for consistent colors based on widget type
-                    val tagColor = WidgetColorUtils.getColorForWidgetType(tag.widgetType)
-                    
-                    // Use widget color for text, slightly dimmed background
-                    setTextColor(tagColor)
-                    
-                    // Unified pill background: 15% opacity + 25% border
-                    background = WidgetColorUtils.createPillBackground(tagColor, 12f, density)
-                    
-                    // Padding and margin
-                    val paddingH = (12 * density).toInt()
-                    val paddingV = (4 * density).toInt()
-                    setPadding(paddingH, paddingV, paddingH, paddingV)
-                    
-                    val params = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    ).apply {
-                        marginStart = (8 * density).toInt()
-                    }
-                    layoutParams = params
-                }
+                // Use WidgetColorUtils for consistent colors and icons based on widget type
+                val tagColor = WidgetColorUtils.getColorForWidgetType(tag.widgetType)
+                val iconRes = WidgetColorUtils.getIconForWidgetType(tag.widgetType)
                 
-                tagsContainer.addView(tagView)
+                // Inflate the same pill layout used by item-level widgets
+                val pillView = inflater.inflate(R.layout.item_note_pill, tagsContainer, false) as LinearLayout
+                
+                val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
+                val pillText = pillView.findViewById<TextView>(R.id.pillText)
+                
+                pillText.text = tag.value
+                pillText.textSize = 11f
+                pillText.setTextColor(tagColor)
+                
+                pillIcon.setImageResource(iconRes)
+                pillIcon.setColorFilter(tagColor)
+                
+                // Unified pill background: 15% opacity + 25% border
+                pillView.background = WidgetColorUtils.createPillBackground(tagColor, 12f, density)
+                
+                // Margin between pills
+                val params = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    marginStart = (8 * density).toInt()
+                }
+                pillView.layoutParams = params
+                
+                tagsContainer.addView(pillView)
             }
         }
 

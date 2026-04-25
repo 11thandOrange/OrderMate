@@ -150,6 +150,7 @@ class EventPreviewDialog : DialogFragment() {
      * (#30) Setup order-level notes pills display.
      * Uses pre-parsed customTags from ScheduledEvent (widget-based parsing done in CalendarFragment).
      * All 4 widget types supported: SINGLE_SELECT, MULTI_SELECT, CALENDAR, TEXT_BOX (truncated).
+     * Uses item_note_pill layout with icons matching item-level pills.
      */
     private fun setupOrderNotesPills(view: View, event: ScheduledEvent) {
         val container = view.findViewById<FlexboxLayout>(R.id.orderNotesPillsContainer)
@@ -163,11 +164,13 @@ class EventPreviewDialog : DialogFragment() {
         
         container.visibility = View.VISIBLE
         val density = resources.displayMetrics.density
+        val inflater = LayoutInflater.from(requireContext())
         
         // Add order-level widget pills (all 4 types: CALENDAR, SINGLE_SELECT, MULTI_SELECT, TEXT_BOX)
-        // All use WidgetColorUtils for consistent color coding
+        // All use WidgetColorUtils for consistent color coding and icons
         event.customTags.forEach { tag ->
-            val color = com.orderMate.utils.WidgetColorUtils.getColorForWidgetType(tag.widgetType)
+            val color = WidgetColorUtils.getColorForWidgetType(tag.widgetType)
+            val iconRes = WidgetColorUtils.getIconForWidgetType(tag.widgetType)
             
             // Truncate TEXT_BOX values to 30 chars for event preview
             val displayText = if (tag.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX && tag.text.length > 30) {
@@ -176,22 +179,29 @@ class EventPreviewDialog : DialogFragment() {
                 tag.text
             }
             
-            val pill = TextView(requireContext()).apply {
-                text = displayText
-                textSize = 11f
-                setTextColor(color)
-                setPadding(dpToPx(10), dpToPx(4), dpToPx(10), dpToPx(4))
-                // Same pill styling as everywhere else: 15% opacity bg + 25% border
-                background = com.orderMate.utils.WidgetColorUtils.createPillBackground(color, 10f, density)
-                
-                val lp = FlexboxLayout.LayoutParams(
-                    FlexboxLayout.LayoutParams.WRAP_CONTENT,
-                    FlexboxLayout.LayoutParams.WRAP_CONTENT
-                )
-                lp.setMargins(0, 0, dpToPx(6), dpToPx(4))
-                layoutParams = lp
-            }
-            container.addView(pill)
+            // Inflate the same pill layout used by item-level widgets
+            val pillView = inflater.inflate(R.layout.item_note_pill, container, false) as android.widget.LinearLayout
+            
+            val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
+            val pillText = pillView.findViewById<TextView>(R.id.pillText)
+            
+            pillText.text = displayText
+            pillText.setTextColor(color)
+            
+            pillIcon.setImageResource(iconRes)
+            pillIcon.setColorFilter(color)
+            
+            // Same pill styling as everywhere else: 15% opacity bg + 25% border
+            pillView.background = WidgetColorUtils.createPillBackground(color, 10f, density)
+            
+            val lp = FlexboxLayout.LayoutParams(
+                FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                FlexboxLayout.LayoutParams.WRAP_CONTENT
+            )
+            lp.setMargins(0, 0, dpToPx(6), dpToPx(4))
+            pillView.layoutParams = lp
+            
+            container.addView(pillView)
         }
     }
     
