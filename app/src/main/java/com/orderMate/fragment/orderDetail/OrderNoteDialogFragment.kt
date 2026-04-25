@@ -339,27 +339,27 @@ class OrderNoteDialogFragment : DialogFragment() {
             when (widget.type) {
                 WidgetType.SINGLE_SELECT -> {
                     singleSelections[widget.id]?.let { value ->
-                        parts.add("${widget.label}:$value")
+                        parts.add("[${widget.id}]${widget.label}:$value")
                     }
                 }
                 WidgetType.MULTI_SELECT -> {
                     multiSelections[widget.id]?.let { values ->
                         if (values.isNotEmpty()) {
-                            parts.add("${widget.label}:${values.joinToString(",")}")
+                            parts.add("[${widget.id}]${widget.label}:${values.joinToString(",")}")
                         }
                     }
                 }
                 WidgetType.CALENDAR -> {
                     dateSelections[widget.id]?.let { value ->
                         if (value.isNotEmpty()) {
-                            parts.add("${widget.label}:$value")
+                            parts.add("[${widget.id}]${widget.label}:$value")
                         }
                     }
                 }
                 WidgetType.TEXT_BOX -> {
                     val value = textInputViews[widget.id]?.text?.toString()?.trim()
                     if (!value.isNullOrEmpty()) {
-                        parts.add("${widget.label}:$value")
+                        parts.add("[${widget.id}]${widget.label}:$value")
                     }
                 }
             }
@@ -376,10 +376,19 @@ class OrderNoteDialogFragment : DialogFragment() {
             val trimmed = part.trim()
             val colonIndex = trimmed.indexOf(':')
             if (colonIndex > 0) {
-                val label = trimmed.substring(0, colonIndex).trim()
+                val keyPart = trimmed.substring(0, colonIndex).trim()
                 val value = trimmed.substring(colonIndex + 1).trim()
 
-                val widget = widgets.find { it.label.equals(label, ignoreCase = true) }
+                // Try to extract widget ID from new format: [widgetId]label
+                val widget = if (keyPart.startsWith("[") && keyPart.contains("]")) {
+                    val closeBracket = keyPart.indexOf(']')
+                    val widgetId = keyPart.substring(1, closeBracket)
+                    widgets.find { it.id == widgetId }
+                } else {
+                    // Fallback to old format: match by label (first match only)
+                    widgets.find { it.label.equals(keyPart, ignoreCase = true) }
+                }
+                
                 widget?.let {
                     when (it.type) {
                         WidgetType.SINGLE_SELECT -> {
