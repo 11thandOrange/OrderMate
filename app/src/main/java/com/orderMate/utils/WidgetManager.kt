@@ -265,11 +265,8 @@ class WidgetManager private constructor(private val context: Context) {
     fun updateWidget(widget: WidgetConfig, callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
         
-        // Fix: Preserve original level from cache to prevent accidental level changes
-        val originalWidget = getWidgetById(widget.id)
-        if (originalWidget != null && widget.level != originalWidget.level) {
-            widget.level = originalWidget.level
-        }
+        // Note: Level is now enforced by saveItemWidget/saveOrderWidget in SettingsFragment
+        // The widget's level should already be correct when this method is called
         
         firebase.saveWidget(mid, widget) { success ->
             if (success) {

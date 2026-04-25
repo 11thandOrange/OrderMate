@@ -533,15 +533,18 @@ class SettingsFragment : Fragment() {
         
         val firebase = FirebaseConfigManager.getInstance()
         
-        // Use direct Firebase queries to ensure level separation
-        firebase.getItemWidgets(merchantId) { itemWidgets ->
+        // Fetch ALL widgets first, then filter by level
+        // This ensures widgets without level field are handled correctly
+        firebase.getWidgets(merchantId) { allWidgets ->
             activity?.runOnUiThread {
+                // Update cache with latest from Firebase
+                widgetManager.saveToCache(allWidgets, widgetManager.getSettings())
+                
+                // Filter by level for each adapter
+                val itemWidgets = allWidgets.filter { it.level == NoteLevel.ITEM }.sortedBy { it.order }
+                val orderWidgets = allWidgets.filter { it.level == NoteLevel.ORDER }.sortedBy { it.order }
+                
                 itemLevelWidgetAdapter?.setWidgets(itemWidgets.toMutableList())
-            }
-        }
-        
-        firebase.getOrderWidgets(merchantId) { orderWidgets ->
-            activity?.runOnUiThread {
                 orderLevelWidgetAdapter?.setWidgets(orderWidgets.toMutableList())
             }
         }
