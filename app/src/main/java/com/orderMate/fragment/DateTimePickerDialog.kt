@@ -99,9 +99,12 @@ class DateTimePickerDialog : DialogFragment() {
         super.onStart()
         dialog?.window?.let { window ->
             val displayMetrics = resources.displayMetrics
+            val density = displayMetrics.density
             val screenWidth = displayMetrics.widthPixels
-            val dialogWidth = (screenWidth * 0.92).toInt()
-            window.setLayout(dialogWidth, ViewGroup.LayoutParams.WRAP_CONTENT)
+            // Max width 420dp for compact datetime picker
+            val maxWidthPx = (420 * density).toInt()
+            val targetWidth = minOf((screenWidth * 0.9).toInt(), maxWidthPx)
+            window.setLayout(targetWidth, ViewGroup.LayoutParams.WRAP_CONTENT)
             window.setGravity(Gravity.CENTER)
         }
     }
