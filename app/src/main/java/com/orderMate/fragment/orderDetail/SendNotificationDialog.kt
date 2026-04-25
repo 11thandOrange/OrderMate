@@ -123,27 +123,23 @@ class SendNotificationDialog(
     }
 
     private fun loadTemplates() {
-        // Setup spinner with default option immediately
         setupTemplateSpinner()
         
-        // Get merchantId from PreferenceManager (same source as Settings)
-        val prefManager = com.orderMate.utils.PreferenceManager.getInstance(requireContext())
-        val merchantId = prefManager.getString("merchantId")
-        
-        if (merchantId.isNullOrEmpty()) {
-            android.util.Log.e("SendNotificationDialog", "Failed to get merchantId from PreferenceManager")
-            return
-        }
-        
-        android.util.Log.d("SendNotificationDialog", "Loading templates for merchant: $merchantId")
-        
-        FirebaseConfigManager.getInstance().getTemplates(merchantId) { loadedTemplates ->
-            android.util.Log.d("SendNotificationDialog", "Loaded ${loadedTemplates.size} templates: ${loadedTemplates.map { it.name }}")
-            templates = loadedTemplates
-            runOnMainThread {
-                if (isAdded) {
-                    setupTemplateSpinner()
+        runOnBackgroundThread {
+            try {
+                val app = requireContext().applicationContext as? MyApp ?: return@runOnBackgroundThread
+                val merchantId = app.getMerchantId() ?: return@runOnBackgroundThread
+                
+                FirebaseConfigManager.getInstance().getTemplates(merchantId) { loadedTemplates ->
+                    templates = loadedTemplates
+                    runOnMainThread {
+                        if (isAdded) {
+                            setupTemplateSpinner()
+                        }
+                    }
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

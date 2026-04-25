@@ -36,6 +36,9 @@ import java.util.Collections
 import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.modals.WidgetType as FirebaseWidgetType
+import com.orderMate.utils.MyApp
+import com.orderMate.utils.runOnBackgroundThread
+import com.orderMate.utils.runOnMainThread
 
 /**
  * Settings Fragment with Sub-tabs (#83 requirement)
@@ -157,10 +160,25 @@ class SettingsFragment : Fragment() {
         
         settingsManager = SettingsManager(requireContext())
         
-        // Get merchantId from PreferenceManager
-        val prefManager = PreferenceManager.getInstance(requireContext())
-        merchantId = prefManager.getString("merchantId")
-        merchantId?.let { widgetManager.setMerchantId(it) }
+        // Get merchantId from MyApp (Clover SDK) on background thread
+        runOnBackgroundThread {
+            try {
+                val app = requireContext().applicationContext as? MyApp
+                val mid = app?.getMerchantId()
+                if (!mid.isNullOrEmpty()) {
+                    merchantId = mid
+                    runOnMainThread {
+                        if (isAdded) {
+                            widgetManager.setMerchantId(mid)
+                            // Now that we have merchantId, load templates
+                            loadTemplatesFromFirebase()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
         
         initViews(view)
         setupSubTabs()
