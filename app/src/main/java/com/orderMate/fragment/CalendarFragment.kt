@@ -119,8 +119,7 @@ class CalendarFragment : Fragment() {
     private var filterPillsScroll: HorizontalScrollView? = null
     private var filterPillsContainer: LinearLayout? = null
     private var syncButton: View? = null
-    private var syncingContainer: View? = null
-    private var syncingIcon: View? = null
+    private var syncIcon: ImageView? = null
     private var isSyncing = false
     
     // Search pill views
@@ -188,8 +187,7 @@ class CalendarFragment : Fragment() {
         filterPillsScroll = view.findViewById(R.id.filterPillsScroll)
         filterPillsContainer = view.findViewById(R.id.filterPillsContainer)
         syncButton = view.findViewById(R.id.syncButton)
-        syncingContainer = view.findViewById(R.id.syncingContainer)
-        syncingIcon = view.findViewById(R.id.syncingIcon)
+        syncIcon = view.findViewById(R.id.syncIcon)
         
         // Search pill views
         searchPillContainer = view.findViewById(R.id.searchPillContainer)
@@ -327,20 +325,22 @@ class CalendarFragment : Fragment() {
     }
     
     private fun syncOrders() {
-        // Show syncing indicator with blink animation on the icon
-        syncingContainer?.visibility = View.VISIBLE
-        syncingIcon?.startAnimation(
+        // Change sync icon to orange and blink
+        syncIcon?.setColorFilter(
+            ContextCompat.getColor(requireContext(), R.color.accent_orange)
+        )
+        syncIcon?.startAnimation(
             android.view.animation.AnimationUtils.loadAnimation(requireContext(), R.anim.blink_sync)
         )
         syncButton?.isEnabled = false
-        syncButton?.alpha = 0.5f
         
         loadOrders {
-            // Hide syncing indicator after load completes
-            syncingIcon?.clearAnimation()
-            syncingContainer?.visibility = View.GONE
+            // Stop animation and restore icon color
+            syncIcon?.clearAnimation()
+            syncIcon?.setColorFilter(
+                ContextCompat.getColor(requireContext(), R.color.text_light)
+            )
             syncButton?.isEnabled = true
-            syncButton?.alpha = 1.0f
             Toast.makeText(requireContext(), "Calendar synced", Toast.LENGTH_SHORT).show()
         }
     }

@@ -363,20 +363,22 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun syncOrders() {
-        // Show syncing indicator with blink animation on the icon
-        binding.header.syncingContainer.showView()
-        binding.header.syncingIcon.startAnimation(
+        // Change sync icon to orange and blink
+        binding.header.syncIcon.setColorFilter(
+            ContextCompat.getColor(requireContext(), R.color.accent_orange)
+        )
+        binding.header.syncIcon.startAnimation(
             android.view.animation.AnimationUtils.loadAnimation(requireContext(), R.anim.blink_sync)
         )
         binding.header.syncButton.isEnabled = false
-        binding.header.syncButton.alpha = 0.5f
         
         loadOrders {
-            // Hide syncing indicator after load completes
-            binding.header.syncingIcon.clearAnimation()
-            binding.header.syncingContainer.hideView()
+            // Stop animation and restore icon color
+            binding.header.syncIcon.clearAnimation()
+            binding.header.syncIcon.setColorFilter(
+                ContextCompat.getColor(requireContext(), R.color.text_light)
+            )
             binding.header.syncButton.isEnabled = true
-            binding.header.syncButton.alpha = 1.0f
             Toast.makeText(requireContext(), "Orders synced", Toast.LENGTH_SHORT).show()
         }
     }

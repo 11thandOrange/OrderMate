@@ -156,25 +156,6 @@
                 app:tint="@color/text_light"/>
         </FrameLayout>
 
-        <!-- Syncing Indicator (blinking sync icon with bg/border) -->
-        <FrameLayout
-            android:id="@+id/syncingContainer"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/bg_header_button"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-            <ImageView
-                android:id="@+id/syncingIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_sync"
-                app:tint="@color/accent_orange"/>
-        </FrameLayout>
-
     </LinearLayout>
 
     <!-- Search Query Pill (shown when searching) -->
