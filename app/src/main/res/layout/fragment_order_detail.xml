@@ -524,8 +524,8 @@
                         android:layout_marginHorizontal="16dp"
                         android:background="#1AFFFFFF" />
                     
-                    <!-- Scrollable content area -->
-                    <androidx.core.widget.NestedScrollView
+                    <!-- Scrollable content area - using ScrollView instead of NestedScrollView to isolate scroll -->
+                    <ScrollView
                         android:id="@+id/orderDetailsScrollView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -638,7 +638,7 @@
                         
                     </LinearLayout>
                     
-                    </androidx.core.widget.NestedScrollView>
+                    </ScrollView>
                     
                     <!-- Scroll indicator - shown when content overflows -->
                     <LinearLayout

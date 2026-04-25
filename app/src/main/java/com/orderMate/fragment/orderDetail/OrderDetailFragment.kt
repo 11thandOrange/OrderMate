@@ -137,9 +137,6 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         val scrollIndicator = binding.orderDetailsScrollIndicator
         val orderDetailsHeader = binding.orderDetailsHeader
         
-        // Disable nested scrolling to prevent scroll events from propagating to parent
-        scrollView.isNestedScrollingEnabled = false
-        
         // Wait for layout to be measured
         sidebar.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
