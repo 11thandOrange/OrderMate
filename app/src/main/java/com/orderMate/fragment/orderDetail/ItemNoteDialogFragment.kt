@@ -117,8 +117,8 @@ class ItemNoteDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Read item-level widgets only (not order-level)
-        widgets = WidgetManager.getInstance(requireContext()).getItemLevelWidgets()
+        // Read item-level widgets only (enabled widgets)
+        widgets = WidgetManager.getInstance(requireContext()).getEnabledItemWidgets()
         
         setupHeader()
         setupButtons()

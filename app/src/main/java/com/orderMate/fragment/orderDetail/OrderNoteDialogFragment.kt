@@ -109,8 +109,8 @@ class OrderNoteDialogFragment : DialogFragment() {
         btnCancel = view.findViewById(R.id.btnCancel)
         btnSave = view.findViewById(R.id.btnSave)
 
-        // Read order-level widgets only
-        widgets = WidgetManager.getInstance(requireContext()).getOrderLevelWidgets()
+        // Read order-level widgets only (enabled widgets)
+        widgets = WidgetManager.getInstance(requireContext()).getEnabledOrderWidgets()
         
         setupButtons()
         // Task 10: Parse existing note BEFORE building UI so selections are pre-populated

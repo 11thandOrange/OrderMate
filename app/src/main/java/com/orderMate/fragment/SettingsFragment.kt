@@ -171,7 +171,7 @@ class SettingsFragment : Fragment() {
                         if (isAdded) {
                             widgetManager.setMerchantId(mid)
                             // Now that we have merchantId, reload widgets from Firebase (not cache)
-                            loadWidgetsFromFirebase()
+                            loadAllWidgetsFromFirebase()
                             // Also load templates
                             loadTemplatesFromFirebase()
                         }
@@ -199,7 +199,7 @@ class SettingsFragment : Fragment() {
         super.onResume()
         // Refresh widget lists when returning to this fragment
         // This prevents stale data after switching tabs in the main activity
-        loadWidgetsFromFirebase()
+        loadAllWidgetsFromFirebase()
     }
 
     private fun initViews(view: View) {
@@ -404,7 +404,7 @@ class SettingsFragment : Fragment() {
         
         itemLevelWidgetAdapter = FirebaseWidgetEditorAdapter(
             onWidgetUpdate = { widget -> saveItemWidget(widget) },
-            onWidgetDelete = { widget -> showDeleteWidgetDialog(widget, NoteLevel.ITEM) }
+            onWidgetDelete = { widget -> showDeleteItemWidgetDialog(widget) }
         )
         
         itemLevelWidgetRecyclerView?.apply {
@@ -424,8 +424,8 @@ class SettingsFragment : Fragment() {
                 val fromPos = viewHolder.adapterPosition
                 val toPos = target.adapterPosition
                 itemLevelWidgetAdapter?.moveWidget(fromPos, toPos)
-                // Use level-specific reorder to prevent index mismatch with order-level widgets
-                widgetManager.reorderWidgetsForLevel(NoteLevel.ITEM, fromPos, toPos) { success ->
+                // Use level-specific reorder
+                widgetManager.reorderItemWidgets(fromPos, toPos) { success ->
                     if (!success) {
                         activity?.runOnUiThread {
                             Toast.makeText(context, "Failed to save order", Toast.LENGTH_SHORT).show()
@@ -442,11 +442,11 @@ class SettingsFragment : Fragment() {
         itemLevelWidgetAdapter?.setDragHelper(itemTouchHelper)
         
         btnAddItemLevelWidget?.setOnClickListener {
-            showAddWidgetDialog(NoteLevel.ITEM)
+            showAddItemWidgetDialog()
         }
         
         btnResetItemLevelWidgets?.setOnClickListener {
-            showResetWidgetsConfirmDialog(NoteLevel.ITEM)
+            showResetItemWidgetsConfirmDialog()
         }
     }
     
@@ -474,7 +474,7 @@ class SettingsFragment : Fragment() {
         
         orderLevelWidgetAdapter = FirebaseWidgetEditorAdapter(
             onWidgetUpdate = { widget -> saveOrderWidget(widget) },
-            onWidgetDelete = { widget -> showDeleteWidgetDialog(widget, NoteLevel.ORDER) }
+            onWidgetDelete = { widget -> showDeleteOrderWidgetDialog(widget) }
         )
         
         orderLevelWidgetRecyclerView?.apply {
@@ -494,8 +494,8 @@ class SettingsFragment : Fragment() {
                 val fromPos = viewHolder.adapterPosition
                 val toPos = target.adapterPosition
                 orderLevelWidgetAdapter?.moveWidget(fromPos, toPos)
-                // Use level-specific reorder to prevent index mismatch with item-level widgets
-                widgetManager.reorderWidgetsForLevel(NoteLevel.ORDER, fromPos, toPos) { success ->
+                // Use level-specific reorder
+                widgetManager.reorderOrderWidgets(fromPos, toPos) { success ->
                     if (!success) {
                         activity?.runOnUiThread {
                             Toast.makeText(context, "Failed to save order", Toast.LENGTH_SHORT).show()
@@ -512,75 +512,87 @@ class SettingsFragment : Fragment() {
         orderLevelWidgetAdapter?.setDragHelper(orderTouchHelper)
         
         btnAddOrderLevelWidget?.setOnClickListener {
-            showAddWidgetDialog(NoteLevel.ORDER)
+            showAddOrderWidgetDialog()
         }
         
         btnResetOrderLevelWidgets?.setOnClickListener {
-            showResetWidgetsConfirmDialog(NoteLevel.ORDER)
+            showResetOrderWidgetsConfirmDialog()
         }
         
         // Load widgets AFTER both adapters are created
-        loadWidgetsFromFirebase()
+        loadAllWidgetsFromFirebase()
     }
     
-    // ==================== Shared Widget Methods ====================
+    // ==================== Level-Specific Widget Methods ====================
     
-    private fun loadWidgetsFromFirebase() {
+    /**
+     * Load item widgets from Firebase and update UI.
+     * Uses level-specific fetch to prevent cross-contamination.
+     */
+    private fun loadItemWidgetsFromFirebase() {
         val merchantId = widgetManager.getMerchantId()
         if (merchantId == null) {
-            android.util.Log.d("SettingsFragment", "loadWidgetsFromFirebase: merchantId is null, using cache")
-            // Fallback to cache if merchantId not available
-            val itemWidgets = widgetManager.getAllItemLevelWidgets()
+            android.util.Log.d("SettingsFragment", "loadItemWidgetsFromFirebase: merchantId is null, using cache")
+            val itemWidgets = widgetManager.getItemWidgets()
             itemLevelWidgetAdapter?.setWidgets(itemWidgets.toMutableList())
-            val orderWidgets = widgetManager.getAllOrderLevelWidgets()
+            return
+        }
+        
+        firebase.getItemWidgets(merchantId) { widgets ->
+            android.util.Log.d("SettingsFragment", "loadItemWidgetsFromFirebase: fetched ${widgets.size} item widgets")
+            widgets.forEach { w ->
+                android.util.Log.d("SettingsFragment", "  Item Widget: ${w.label}, id=${w.id}")
+            }
+            
+            activity?.runOnUiThread {
+                widgetManager.saveItemWidgets(widgets)
+                itemLevelWidgetAdapter?.setWidgets(widgets.toMutableList())
+            }
+        }
+    }
+    
+    /**
+     * Load order widgets from Firebase and update UI.
+     * Uses level-specific fetch to prevent cross-contamination.
+     */
+    private fun loadOrderWidgetsFromFirebase() {
+        val merchantId = widgetManager.getMerchantId()
+        if (merchantId == null) {
+            android.util.Log.d("SettingsFragment", "loadOrderWidgetsFromFirebase: merchantId is null, using cache")
+            val orderWidgets = widgetManager.getOrderWidgets()
             orderLevelWidgetAdapter?.setWidgets(orderWidgets.toMutableList())
             return
         }
         
-        val firebase = FirebaseConfigManager.getInstance()
-        
-        // Fetch ALL widgets first, then filter by level
-        // This ensures widgets without level field are handled correctly
-        firebase.getWidgets(merchantId) { allWidgets ->
-            android.util.Log.d("SettingsFragment", "loadWidgetsFromFirebase: fetched ${allWidgets.size} widgets from Firebase")
-            allWidgets.forEach { w ->
-                android.util.Log.d("SettingsFragment", "  Widget: ${w.label}, level=${w.level}, id=${w.id}")
+        firebase.getOrderWidgets(merchantId) { widgets ->
+            android.util.Log.d("SettingsFragment", "loadOrderWidgetsFromFirebase: fetched ${widgets.size} order widgets")
+            widgets.forEach { w ->
+                android.util.Log.d("SettingsFragment", "  Order Widget: ${w.label}, id=${w.id}")
             }
             
             activity?.runOnUiThread {
-                // Update cache with latest from Firebase
-                widgetManager.saveToCache(allWidgets, widgetManager.getSettings())
-                
-                // Filter by level for each adapter
-                val itemWidgets = allWidgets.filter { it.level == NoteLevel.ITEM }.sortedBy { it.order }
-                val orderWidgets = allWidgets.filter { it.level == NoteLevel.ORDER }.sortedBy { it.order }
-                
-                android.util.Log.d("SettingsFragment", "loadWidgetsFromFirebase: itemWidgets=${itemWidgets.size}, orderWidgets=${orderWidgets.size}")
-                
-                itemLevelWidgetAdapter?.setWidgets(itemWidgets.toMutableList())
-                orderLevelWidgetAdapter?.setWidgets(orderWidgets.toMutableList())
-            }
-        }
-    }
-    
-    private fun saveWidgetToFirebase(widget: WidgetConfig) {
-        widgetManager.updateWidget(widget) { success ->
-            if (!success) {
-                activity?.runOnUiThread {
-                    Toast.makeText(context, "Failed to save widget", Toast.LENGTH_SHORT).show()
-                }
+                widgetManager.saveOrderWidgets(widgets)
+                orderLevelWidgetAdapter?.setWidgets(widgets.toMutableList())
             }
         }
     }
     
     /**
-     * Save item-level widget with enforced level
+     * Load both item and order widgets from Firebase.
+     */
+    private fun loadAllWidgetsFromFirebase() {
+        loadItemWidgetsFromFirebase()
+        loadOrderWidgetsFromFirebase()
+    }
+    
+    /**
+     * Save item-level widget using level-specific method.
+     * Only updates the single widget, does not affect order widgets.
      */
     private fun saveItemWidget(widget: WidgetConfig) {
-        android.util.Log.d("SettingsFragment", "saveItemWidget: ${widget.label}, current level=${widget.level}")
-        widget.level = NoteLevel.ITEM  // Enforce level
-        widgetManager.updateWidget(widget) { success ->
-            android.util.Log.d("SettingsFragment", "saveItemWidget result: success=$success, level=${widget.level}")
+        android.util.Log.d("SettingsFragment", "saveItemWidget: ${widget.label}, id=${widget.id}")
+        widgetManager.updateItemWidget(widget) { success ->
+            android.util.Log.d("SettingsFragment", "saveItemWidget result: success=$success")
             if (!success) {
                 activity?.runOnUiThread {
                     Toast.makeText(context, "Failed to save widget", Toast.LENGTH_SHORT).show()
@@ -590,13 +602,13 @@ class SettingsFragment : Fragment() {
     }
     
     /**
-     * Save order-level widget with enforced level
+     * Save order-level widget using level-specific method.
+     * Only updates the single widget, does not affect item widgets.
      */
     private fun saveOrderWidget(widget: WidgetConfig) {
-        android.util.Log.d("SettingsFragment", "saveOrderWidget: ${widget.label}, current level=${widget.level}")
-        widget.level = NoteLevel.ORDER  // Enforce level
-        widgetManager.updateWidget(widget) { success ->
-            android.util.Log.d("SettingsFragment", "saveOrderWidget result: success=$success, level=${widget.level}")
+        android.util.Log.d("SettingsFragment", "saveOrderWidget: ${widget.label}, id=${widget.id}")
+        widgetManager.updateOrderWidget(widget) { success ->
+            android.util.Log.d("SettingsFragment", "saveOrderWidget result: success=$success")
             if (!success) {
                 activity?.runOnUiThread {
                     Toast.makeText(context, "Failed to save widget", Toast.LENGTH_SHORT).show()
@@ -605,13 +617,23 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun showAddWidgetDialog(level: NoteLevel) {
-        if (!widgetManager.canAddWidget(level)) {
-            val levelName = if (level == NoteLevel.ITEM) "item-level" else "order-level"
-            Toast.makeText(requireContext(), "Maximum 7 $levelName widgets allowed", Toast.LENGTH_SHORT).show()
+    private fun showAddItemWidgetDialog() {
+        if (!widgetManager.canAddItemWidget()) {
+            Toast.makeText(requireContext(), "Maximum 7 item-level widgets allowed", Toast.LENGTH_SHORT).show()
             return
         }
+        showAddWidgetDialogInternal(NoteLevel.ITEM)
+    }
+    
+    private fun showAddOrderWidgetDialog() {
+        if (!widgetManager.canAddOrderWidget()) {
+            Toast.makeText(requireContext(), "Maximum 7 order-level widgets allowed", Toast.LENGTH_SHORT).show()
+            return
+        }
+        showAddWidgetDialogInternal(NoteLevel.ORDER)
+    }
 
+    private fun showAddWidgetDialogInternal(level: NoteLevel) {
         // Create styled dialog matching filter modal (#36)
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_add_widget, null)
@@ -628,16 +650,24 @@ class SettingsFragment : Fragment() {
         
         // Helper function to add widget and dismiss dialog
         fun addWidgetOfType(type: FirebaseWidgetType) {
-            widgetManager.addWidget(type, level) { newWidget ->
-                activity?.runOnUiThread {
-                    if (newWidget != null) {
-                        if (level == NoteLevel.ITEM) {
+            if (level == NoteLevel.ITEM) {
+                widgetManager.addItemWidget(type) { newWidget ->
+                    activity?.runOnUiThread {
+                        if (newWidget != null) {
                             itemLevelWidgetAdapter?.addWidget(newWidget)
                         } else {
-                            orderLevelWidgetAdapter?.addWidget(newWidget)
+                            Toast.makeText(context, "Failed to add widget", Toast.LENGTH_SHORT).show()
                         }
-                    } else {
-                        Toast.makeText(context, "Failed to add widget", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                widgetManager.addOrderWidget(type) { newWidget ->
+                    activity?.runOnUiThread {
+                        if (newWidget != null) {
+                            orderLevelWidgetAdapter?.addWidget(newWidget)
+                        } else {
+                            Toast.makeText(context, "Failed to add widget", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }
@@ -664,19 +694,34 @@ class SettingsFragment : Fragment() {
         dialog.show()
     }
     
-    private fun showDeleteWidgetDialog(widget: WidgetConfig, level: NoteLevel) {
+    private fun showDeleteItemWidgetDialog(widget: WidgetConfig) {
         showDeleteConfirmationDialog(
             title = "Delete Widget?",
             message = "Are you sure you want to delete \"${widget.label}\"? This action cannot be undone.",
             onConfirm = {
-                widgetManager.deleteWidget(widget.id) { success ->
+                widgetManager.deleteItemWidget(widget.id) { success ->
                     activity?.runOnUiThread {
                         if (success) {
-                            if (level == NoteLevel.ITEM) {
-                                itemLevelWidgetAdapter?.removeWidget(widget)
-                            } else {
-                                orderLevelWidgetAdapter?.removeWidget(widget)
-                            }
+                            itemLevelWidgetAdapter?.removeWidget(widget)
+                            Toast.makeText(context, "Widget deleted", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Failed to delete widget", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        )
+    }
+    
+    private fun showDeleteOrderWidgetDialog(widget: WidgetConfig) {
+        showDeleteConfirmationDialog(
+            title = "Delete Widget?",
+            message = "Are you sure you want to delete \"${widget.label}\"? This action cannot be undone.",
+            onConfirm = {
+                widgetManager.deleteOrderWidget(widget.id) { success ->
+                    activity?.runOnUiThread {
+                        if (success) {
+                            orderLevelWidgetAdapter?.removeWidget(widget)
                             Toast.makeText(context, "Widget deleted", Toast.LENGTH_SHORT).show()
                         } else {
                             Toast.makeText(context, "Failed to delete widget", Toast.LENGTH_SHORT).show()
@@ -694,116 +739,76 @@ class SettingsFragment : Fragment() {
             message = "Are you sure you want to delete \"${widget.label}\"? This action cannot be undone.",
             onConfirm = {
                 settingsManager.removeWidget(widget.id)
-                // Note: Legacy widgetAdapter removed - use itemLevelWidgetAdapter or orderLevelWidgetAdapter
                 Toast.makeText(context, "Widget deleted", Toast.LENGTH_SHORT).show()
             }
         )
     }
     
     /**
-     * Show confirmation dialog to reset widgets to defaults for a given level
+     * Show confirmation dialog to reset item widgets to defaults
      */
-    private fun showResetWidgetsConfirmDialog(level: NoteLevel) {
-        val levelName = if (level == NoteLevel.ITEM) "Item Level" else "Order Level"
+    private fun showResetItemWidgetsConfirmDialog() {
         showDeleteConfirmationDialog(
             title = "Reset to Default Widgets?",
-            message = "This will replace all $levelName widgets with the default widgets. This action cannot be undone.",
+            message = "This will replace all Item Level widgets with the default widgets. This action cannot be undone.",
             onConfirm = {
-                resetWidgetsToDefaults(level)
+                resetItemWidgetsToDefaults()
             }
         )
     }
     
     /**
-     * Reset widgets for a given level to defaults
-     * Fetches fresh data from Firebase, deletes all widgets of this level, then adds defaults
+     * Show confirmation dialog to reset order widgets to defaults
      */
-    private fun resetWidgetsToDefaults(level: NoteLevel) {
-        val merchantId = widgetManager.getMerchantId() ?: return
-        val firebase = FirebaseConfigManager.getInstance()
-        
-        val defaultWidgets = if (level == NoteLevel.ITEM) {
-            DefaultWidgetFactory.createItemLevelDefaults()
-        } else {
-            DefaultWidgetFactory.createOrderLevelDefaults()
-        }
-        
-        // Fetch fresh widget list from Firebase (not cache) to ensure we delete all
-        firebase.getWidgets(merchantId) { allWidgets ->
-            val existingWidgets = allWidgets.filter { it.level == level }
-            
-            android.util.Log.d("SettingsFragment", "resetWidgetsToDefaults: found ${existingWidgets.size} existing ${level.name} widgets to delete")
-            
-            if (existingWidgets.isEmpty()) {
-                // No existing widgets, just add defaults
-                activity?.runOnUiThread {
-                    saveDefaultWidgets(defaultWidgets, level)
-                }
-                return@getWidgets
+    private fun showResetOrderWidgetsConfirmDialog() {
+        showDeleteConfirmationDialog(
+            title = "Reset to Default Widgets?",
+            message = "This will replace all Order Level widgets with the default widgets. This action cannot be undone.",
+            onConfirm = {
+                resetOrderWidgetsToDefaults()
             }
-            
-            // Delete all existing widgets of this level sequentially
-            deleteWidgetsSequentially(existingWidgets, 0) {
-                android.util.Log.d("SettingsFragment", "resetWidgetsToDefaults: all deletions complete, adding ${defaultWidgets.size} defaults")
-                activity?.runOnUiThread {
-                    saveDefaultWidgets(defaultWidgets, level)
+        )
+    }
+    
+    /**
+     * Reset item widgets to defaults using atomic operation.
+     */
+    private fun resetItemWidgetsToDefaults() {
+        android.util.Log.d("SettingsFragment", "resetItemWidgetsToDefaults: starting atomic reset")
+        
+        widgetManager.resetItemWidgetsToDefaults { success ->
+            activity?.runOnUiThread {
+                if (success) {
+                    android.util.Log.d("SettingsFragment", "resetItemWidgetsToDefaults: success, updating UI")
+                    val defaults = widgetManager.getItemWidgets()
+                    itemLevelWidgetAdapter?.setWidgets(defaults.toMutableList())
+                    Toast.makeText(context, "Item widgets reset to defaults", Toast.LENGTH_SHORT).show()
+                } else {
+                    android.util.Log.e("SettingsFragment", "resetItemWidgetsToDefaults: failed")
+                    Toast.makeText(context, "Failed to reset widgets", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
     
     /**
-     * Delete widgets one by one to avoid race conditions
+     * Reset order widgets to defaults using atomic operation.
      */
-    private fun deleteWidgetsSequentially(widgets: List<WidgetConfig>, index: Int, onComplete: () -> Unit) {
-        if (index >= widgets.size) {
-            onComplete()
-            return
-        }
+    private fun resetOrderWidgetsToDefaults() {
+        android.util.Log.d("SettingsFragment", "resetOrderWidgetsToDefaults: starting atomic reset")
         
-        val widget = widgets[index]
-        android.util.Log.d("SettingsFragment", "deleteWidgetsSequentially: deleting ${widget.label} id=${widget.id} (${index + 1}/${widgets.size}), merchantId=${widgetManager.getMerchantId()}")
-        
-        widgetManager.deleteWidget(widget.id) { success ->
-            android.util.Log.d("SettingsFragment", "deleteWidgetsSequentially: delete ${widget.label} result=$success")
-            if (!success) {
-                android.util.Log.e("SettingsFragment", "deleteWidgetsSequentially: FAILED to delete ${widget.label} - merchantId may be null")
+        widgetManager.resetOrderWidgetsToDefaults { success ->
+            activity?.runOnUiThread {
+                if (success) {
+                    android.util.Log.d("SettingsFragment", "resetOrderWidgetsToDefaults: success, updating UI")
+                    val defaults = widgetManager.getOrderWidgets()
+                    orderLevelWidgetAdapter?.setWidgets(defaults.toMutableList())
+                    Toast.makeText(context, "Order widgets reset to defaults", Toast.LENGTH_SHORT).show()
+                } else {
+                    android.util.Log.e("SettingsFragment", "resetOrderWidgetsToDefaults: failed")
+                    Toast.makeText(context, "Failed to reset widgets", Toast.LENGTH_SHORT).show()
+                }
             }
-            // Continue to next widget regardless of success/failure
-            deleteWidgetsSequentially(widgets, index + 1, onComplete)
-        }
-    }
-    
-    /**
-     * Save default widgets to Firebase sequentially and update UI
-     */
-    private fun saveDefaultWidgets(widgets: List<WidgetConfig>, level: NoteLevel) {
-        saveWidgetsSequentially(widgets, level, 0) {
-            android.util.Log.d("SettingsFragment", "saveDefaultWidgets: all ${widgets.size} widgets saved")
-            // Refresh from Firebase to get accurate state
-            loadWidgetsFromFirebase()
-            Toast.makeText(context, "Widgets reset to defaults", Toast.LENGTH_SHORT).show()
-        }
-    }
-    
-    /**
-     * Save widgets one by one to avoid race conditions
-     */
-    private fun saveWidgetsSequentially(widgets: List<WidgetConfig>, level: NoteLevel, index: Int, onComplete: () -> Unit) {
-        if (index >= widgets.size) {
-            onComplete()
-            return
-        }
-        
-        val widget = widgets[index]
-        android.util.Log.d("SettingsFragment", "saveWidgetsSequentially: saving ${widget.label} (${index + 1}/${widgets.size})")
-        
-        widgetManager.addWidget(widget) { success ->
-            if (!success) {
-                android.util.Log.e("SettingsFragment", "saveWidgetsSequentially: failed to save ${widget.label}")
-            }
-            // Continue to next widget regardless of success/failure
-            saveWidgetsSequentially(widgets, level, index + 1, onComplete)
         }
     }
 
@@ -1107,17 +1112,11 @@ class SettingsFragment : Fragment() {
      * Uses expandable card layout matching Item/Order Level settings pages
      */
     private fun loadFilterWidgetToggles() {
-        val allWidgets = widgetManager.getWidgets()
-        
         // Get Item Level widgets (enabled, not TEXT_BOX)
-        val itemLevelWidgets = allWidgets.filter { 
-            it.isEnabled && it.type != FirebaseWidgetType.TEXT_BOX && it.level == NoteLevel.ITEM 
-        }.sortedBy { it.order }
+        val itemLevelWidgets = widgetManager.getFilterableItemWidgets()
         
         // Get Order Level widgets (enabled, not TEXT_BOX)
-        val orderLevelWidgets = allWidgets.filter { 
-            it.isEnabled && it.type != FirebaseWidgetType.TEXT_BOX && it.level == NoteLevel.ORDER 
-        }.sortedBy { it.order }
+        val orderLevelWidgets = widgetManager.getFilterableOrderWidgets()
         
         val hasItemWidgets = itemLevelWidgets.isNotEmpty()
         val hasOrderWidgets = orderLevelWidgets.isNotEmpty()
@@ -1140,7 +1139,7 @@ class SettingsFragment : Fragment() {
             filterItemLevelRecyclerView?.visibility = View.VISIBLE
             if (filterItemLevelAdapter == null) {
                 filterItemLevelAdapter = FilterWidgetAdapter { widget ->
-                    widgetManager.updateWidget(widget) { success ->
+                    widgetManager.updateItemWidget(widget) { success ->
                         if (!success) {
                             activity?.runOnUiThread {
                                 Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
@@ -1163,7 +1162,7 @@ class SettingsFragment : Fragment() {
             filterOrderLevelRecyclerView?.visibility = View.VISIBLE
             if (filterOrderLevelAdapter == null) {
                 filterOrderLevelAdapter = FilterWidgetAdapter { widget ->
-                    widgetManager.updateWidget(widget) { success ->
+                    widgetManager.updateOrderWidget(widget) { success ->
                         if (!success) {
                             activity?.runOnUiThread {
                                 Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()

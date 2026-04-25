@@ -12,8 +12,9 @@ import com.orderMate.modals.WidgetType
 
 /**
  * Singleton manager for widget operations.
- * Follows production pattern: Firebase listener saves to SharedPreferences,
- * UI reads from SharedPreferences synchronously.
+ * 
+ * IMPORTANT: Widgets are stored separately by level (ITEM vs ORDER) to prevent
+ * cross-contamination bugs. Use level-specific methods for all operations.
  */
 class WidgetManager private constructor(private val context: Context) {
     
@@ -25,7 +26,8 @@ class WidgetManager private constructor(private val context: Context) {
     
     companion object {
         private const val PREFS_NAME = "widget_config_v2"
-        private const val KEY_WIDGETS = "widgets"
+        private const val KEY_ITEM_WIDGETS = "widgets_item"
+        private const val KEY_ORDER_WIDGETS = "widgets_order"
         private const val KEY_SETTINGS = "settings"
         const val MAX_WIDGETS_PER_LEVEL = 7
         
@@ -43,11 +45,11 @@ class WidgetManager private constructor(private val context: Context) {
         }
 
         /**
-         * Get cached widgets without requiring instance context.
+         * Get all cached widgets (both levels) without requiring instance context.
          * Returns empty list if WidgetManager not initialized.
          */
         fun getCachedWidgets(): List<WidgetConfig> {
-            return instance?.getWidgets() ?: emptyList()
+            return instance?.getAllWidgets() ?: emptyList()
         }
     }
     
@@ -65,109 +67,124 @@ class WidgetManager private constructor(private val context: Context) {
      */
     fun getMerchantId(): String? = merchantId
     
-    // ==================== Read from Cache (synchronous) ====================
+    // ==================== Item Level Cache (Private) ====================
     
-    /**
-     * Get widgets from local cache.
-     * Returns defaults if cache is empty - popup is never empty.
-     */
-    fun getWidgets(): List<WidgetConfig> {
+    private fun getItemWidgetsFromCache(): List<WidgetConfig> {
         return try {
-            val json = prefs.getString(KEY_WIDGETS, null)
+            val json = prefs.getString(KEY_ITEM_WIDGETS, null)
             if (json != null) {
                 val type = object : TypeToken<List<WidgetConfig>>() {}.type
                 val widgets = gson.fromJson<List<WidgetConfig>>(json, type)
-                if (widgets.isNullOrEmpty()) {
-                    DefaultWidgetFactory.createDefaults()
-                } else {
-                    // Normalize: set level to ITEM if null (backward compatibility)
-                    widgets.forEach { if (it.level == null) it.level = NoteLevel.ITEM }
-                    widgets
-                }
+                widgets?.sortedBy { it.order } ?: emptyList()
             } else {
-                // Cache empty → return defaults
-                DefaultWidgetFactory.createDefaults()
+                emptyList()
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            DefaultWidgetFactory.createDefaults()
+            emptyList()
+        }
+    }
+    
+    private fun saveItemWidgetsToCache(widgets: List<WidgetConfig>) {
+        prefs.edit().putString(KEY_ITEM_WIDGETS, gson.toJson(widgets)).apply()
+    }
+    
+    // ==================== Order Level Cache (Private) ====================
+    
+    private fun getOrderWidgetsFromCache(): List<WidgetConfig> {
+        return try {
+            val json = prefs.getString(KEY_ORDER_WIDGETS, null)
+            if (json != null) {
+                val type = object : TypeToken<List<WidgetConfig>>() {}.type
+                val widgets = gson.fromJson<List<WidgetConfig>>(json, type)
+                widgets?.sortedBy { it.order } ?: emptyList()
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+    
+    private fun saveOrderWidgetsToCache(widgets: List<WidgetConfig>) {
+        prefs.edit().putString(KEY_ORDER_WIDGETS, gson.toJson(widgets)).apply()
+    }
+    
+    // ==================== Public Read Methods ====================
+    
+    /**
+     * Get all widgets (both levels combined).
+     * Use level-specific methods when possible.
+     */
+    fun getAllWidgets(): List<WidgetConfig> {
+        return getItemWidgetsFromCache() + getOrderWidgetsFromCache()
+    }
+    
+    /**
+     * Get item-level widgets (all, including disabled) sorted by order.
+     */
+    fun getItemWidgets(): List<WidgetConfig> {
+        val cached = getItemWidgetsFromCache()
+        return if (cached.isEmpty()) {
+            DefaultWidgetFactory.createItemLevelDefaults()
+        } else {
+            cached
         }
     }
     
     /**
-     * Get enabled widgets sorted by order.
+     * Get order-level widgets (all, including disabled) sorted by order.
      */
-    fun getEnabledWidgets(): List<WidgetConfig> {
-        return getWidgets().filter { it.isEnabled }.sortedBy { it.order }
+    fun getOrderWidgets(): List<WidgetConfig> {
+        val cached = getOrderWidgetsFromCache()
+        return if (cached.isEmpty()) {
+            DefaultWidgetFactory.createOrderLevelDefaults()
+        } else {
+            cached
+        }
     }
     
     /**
-     * Get filterable widgets (enabled, excluding TEXT_BOX).
+     * Get enabled item-level widgets sorted by order.
      */
-    fun getFilterableWidgets(): List<WidgetConfig> {
-        return getWidgets()
-            .filter { it.isEnabled && it.type != WidgetType.TEXT_BOX }
-            .sortedBy { it.order }
-    }
-    
-    // ==================== Level-based Filtering ====================
-    
-    /**
-     * Get item-level widgets (enabled) sorted by order.
-     */
-    fun getItemLevelWidgets(): List<WidgetConfig> {
-        return getWidgets()
-            .filter { it.level == NoteLevel.ITEM && it.isEnabled }
-            .sortedBy { it.order }
+    fun getEnabledItemWidgets(): List<WidgetConfig> {
+        return getItemWidgets().filter { it.isEnabled }
     }
     
     /**
-     * Get order-level widgets (enabled) sorted by order.
+     * Get enabled order-level widgets sorted by order.
      */
-    fun getOrderLevelWidgets(): List<WidgetConfig> {
-        return getWidgets()
-            .filter { it.level == NoteLevel.ORDER && it.isEnabled }
-            .sortedBy { it.order }
+    fun getEnabledOrderWidgets(): List<WidgetConfig> {
+        return getOrderWidgets().filter { it.isEnabled }
     }
     
     /**
-     * Get all item-level widgets (including disabled) sorted by order.
+     * Get filterable item-level widgets (enabled, excluding TEXT_BOX).
      */
-    fun getAllItemLevelWidgets(): List<WidgetConfig> {
-        return getWidgets()
-            .filter { it.level == NoteLevel.ITEM }
-            .sortedBy { it.order }
+    fun getFilterableItemWidgets(): List<WidgetConfig> {
+        return getItemWidgets().filter { it.isEnabled && it.type != WidgetType.TEXT_BOX }
     }
     
     /**
-     * Get all order-level widgets (including disabled) sorted by order.
+     * Get filterable order-level widgets (enabled, excluding TEXT_BOX).
      */
-    fun getAllOrderLevelWidgets(): List<WidgetConfig> {
-        return getWidgets()
-            .filter { it.level == NoteLevel.ORDER }
-            .sortedBy { it.order }
+    fun getFilterableOrderWidgets(): List<WidgetConfig> {
+        return getOrderWidgets().filter { it.isEnabled && it.type != WidgetType.TEXT_BOX }
     }
     
     /**
-     * Get count of item-level widgets.
+     * Check if can add more item-level widgets (max 7).
      */
-    fun getItemLevelWidgetCount(): Int {
-        return getWidgets().count { it.level == NoteLevel.ITEM }
+    fun canAddItemWidget(): Boolean {
+        return getItemWidgetsFromCache().size < MAX_WIDGETS_PER_LEVEL
     }
     
     /**
-     * Get count of order-level widgets.
+     * Check if can add more order-level widgets (max 7).
      */
-    fun getOrderLevelWidgetCount(): Int {
-        return getWidgets().count { it.level == NoteLevel.ORDER }
-    }
-    
-    /**
-     * Check if can add more widgets for a given level (max 7 per level).
-     */
-    fun canAddWidget(level: NoteLevel): Boolean {
-        val count = if (level == NoteLevel.ITEM) getItemLevelWidgetCount() else getOrderLevelWidgetCount()
-        return count < MAX_WIDGETS_PER_LEVEL
+    fun canAddOrderWidget(): Boolean {
+        return getOrderWidgetsFromCache().size < MAX_WIDGETS_PER_LEVEL
     }
     
     /**
@@ -188,54 +205,64 @@ class WidgetManager private constructor(private val context: Context) {
     }
     
     /**
-     * Check if any widgets are enabled.
+     * Check if any item-level widgets are enabled.
      */
-    fun hasEnabledWidgets(): Boolean {
-        return getEnabledWidgets().isNotEmpty()
+    fun hasEnabledItemWidgets(): Boolean {
+        return getEnabledItemWidgets().isNotEmpty()
+    }
+    
+    /**
+     * Check if any order-level widgets are enabled.
+     */
+    fun hasEnabledOrderWidgets(): Boolean {
+        return getEnabledOrderWidgets().isNotEmpty()
     }
     
     // ==================== Save to Cache ====================
     
     /**
-     * Save widgets and settings to local cache.
-     * Called from MainActivityRedesign after Firebase fetch.
+     * Save item widgets to cache.
      */
-    fun saveToCache(widgets: List<WidgetConfig>, settings: PopupSettings) {
-        prefs.edit().apply {
-            putString(KEY_WIDGETS, gson.toJson(widgets))
-            putString(KEY_SETTINGS, gson.toJson(settings))
-            apply()
-        }
+    fun saveItemWidgets(widgets: List<WidgetConfig>) {
+        saveItemWidgetsToCache(widgets)
     }
     
-    private fun saveWidgetsToCache(widgets: List<WidgetConfig>) {
-        prefs.edit().putString(KEY_WIDGETS, gson.toJson(widgets)).apply()
+    /**
+     * Save order widgets to cache.
+     */
+    fun saveOrderWidgets(widgets: List<WidgetConfig>) {
+        saveOrderWidgetsToCache(widgets)
     }
     
-    private fun saveSettingsToCache(settings: PopupSettings) {
+    /**
+     * Save settings to cache.
+     */
+    fun saveSettings(settings: PopupSettings) {
         prefs.edit().putString(KEY_SETTINGS, gson.toJson(settings)).apply()
     }
     
-    // ==================== Widget CRUD ====================
+    // ==================== Item Level CRUD ====================
     
-    fun addWidget(type: WidgetType, level: NoteLevel = NoteLevel.ITEM, callback: (WidgetConfig?) -> Unit) {
+    /**
+     * Add a new item-level widget.
+     */
+    fun addItemWidget(type: WidgetType, callback: (WidgetConfig?) -> Unit) {
         val mid = merchantId ?: return callback(null)
         
-        // Check max widgets per level
-        if (!canAddWidget(level)) {
+        if (!canAddItemWidget()) {
             callback(null)
             return
         }
         
-        val widgetsForLevel = if (level == NoteLevel.ITEM) getAllItemLevelWidgets() else getAllOrderLevelWidgets()
-        val order = (widgetsForLevel.maxOfOrNull { it.order } ?: -1) + 1
-        val widget = DefaultWidgetFactory.createEmpty(type, order, level)
+        val currentWidgets = getItemWidgetsFromCache()
+        val order = (currentWidgets.maxOfOrNull { it.order } ?: -1) + 1
+        val widget = DefaultWidgetFactory.createEmpty(type, order, NoteLevel.ITEM)
         
         firebase.saveWidget(mid, widget) { success ->
             if (success) {
-                val widgets = getWidgets().toMutableList()
+                val widgets = currentWidgets.toMutableList()
                 widgets.add(widget)
-                saveWidgetsToCache(widgets)
+                saveItemWidgetsToCache(widgets)
                 callback(widget)
             } else {
                 callback(null)
@@ -243,90 +270,96 @@ class WidgetManager private constructor(private val context: Context) {
         }
     }
     
-    fun addWidget(widget: WidgetConfig, callback: (Boolean) -> Unit) {
+    /**
+     * Add a pre-configured item-level widget.
+     */
+    fun addItemWidget(widget: WidgetConfig, callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
         
-        // Check max widgets per level
-        if (!canAddWidget(widget.level)) {
+        if (!canAddItemWidget()) {
             callback(false)
             return
         }
         
+        widget.level = NoteLevel.ITEM
+        val currentWidgets = getItemWidgetsFromCache()
+        
         firebase.saveWidget(mid, widget) { success ->
             if (success) {
-                val widgets = getWidgets().toMutableList()
+                val widgets = currentWidgets.toMutableList()
                 widgets.add(widget)
-                saveWidgetsToCache(widgets)
+                saveItemWidgetsToCache(widgets)
             }
             callback(success)
         }
     }
     
-    fun updateWidget(widget: WidgetConfig, callback: (Boolean) -> Unit) {
+    /**
+     * Update a single item-level widget by ID.
+     * Only updates the specified widget, does not affect others.
+     */
+    fun updateItemWidget(widget: WidgetConfig, callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
         
-        // Note: Level is now enforced by saveItemWidget/saveOrderWidget in SettingsFragment
-        // The widget's level should already be correct when this method is called
+        widget.level = NoteLevel.ITEM
+        val currentWidgets = getItemWidgetsFromCache().toMutableList()
+        val index = currentWidgets.indexOfFirst { it.id == widget.id }
+        
+        if (index < 0) {
+            callback(false)
+            return
+        }
         
         firebase.saveWidget(mid, widget) { success ->
             if (success) {
-                val widgets = getWidgets().toMutableList()
-                val index = widgets.indexOfFirst { it.id == widget.id }
-                if (index >= 0) {
-                    widgets[index] = widget
-                    saveWidgetsToCache(widgets)
-                }
+                currentWidgets[index] = widget
+                saveItemWidgetsToCache(currentWidgets)
             }
             callback(success)
         }
     }
     
-    fun updateWidgetLabel(widgetId: String, newLabel: String, callback: (Boolean) -> Unit) {
-        val widget = getWidgetById(widgetId)
-        if (widget == null) {
-            callback(false)
-            return
-        }
-        widget.label = newLabel
-        updateWidget(widget, callback)
-    }
-    
-    fun toggleWidgetEnabled(widgetId: String, callback: (Boolean) -> Unit) {
-        val widget = getWidgetById(widgetId)
-        if (widget == null) {
-            callback(false)
-            return
-        }
-        widget.isEnabled = !widget.isEnabled
-        updateWidget(widget, callback)
-    }
-    
-    fun toggleShowInFilter(widgetId: String, callback: (Boolean) -> Unit) {
-        val widget = getWidgetById(widgetId)
-        if (widget == null) {
-            callback(false)
-            return
-        }
-        widget.showInFilter = !widget.showInFilter
-        updateWidget(widget, callback)
-    }
-    
-    fun deleteWidget(widgetId: String, callback: (Boolean) -> Unit) {
+    /**
+     * Delete a single item-level widget by ID.
+     */
+    fun deleteItemWidget(widgetId: String, callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
+        
+        val currentWidgets = getItemWidgetsFromCache().toMutableList()
+        
         firebase.deleteWidget(mid, widgetId) { success ->
             if (success) {
-                val widgets = getWidgets().toMutableList()
-                widgets.removeAll { it.id == widgetId }
-                widgets.forEachIndexed { index, w -> w.order = index }
-                saveWidgetsToCache(widgets)
+                currentWidgets.removeAll { it.id == widgetId }
+                currentWidgets.forEachIndexed { idx, w -> w.order = idx }
+                saveItemWidgetsToCache(currentWidgets)
             }
             callback(success)
         }
     }
     
-    fun reorderWidgets(fromIndex: Int, toIndex: Int, callback: (Boolean) -> Unit) {
+    /**
+     * Reset item-level widgets to defaults.
+     * Atomically replaces all item widgets with default set.
+     */
+    fun resetItemWidgetsToDefaults(callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
-        val widgets = getWidgets().toMutableList()
+        val defaults = DefaultWidgetFactory.createItemLevelDefaults()
+        val currentOrderWidgets = getOrderWidgetsFromCache()
+        
+        firebase.replaceAllWidgets(mid, defaults + currentOrderWidgets) { success ->
+            if (success) {
+                saveItemWidgetsToCache(defaults)
+            }
+            callback(success)
+        }
+    }
+    
+    /**
+     * Reorder item-level widgets.
+     */
+    fun reorderItemWidgets(fromIndex: Int, toIndex: Int, callback: (Boolean) -> Unit) {
+        val mid = merchantId ?: return callback(false)
+        val widgets = getItemWidgetsFromCache().toMutableList()
         
         if (fromIndex < 0 || toIndex < 0 || fromIndex >= widgets.size || toIndex >= widgets.size) {
             callback(false)
@@ -336,46 +369,157 @@ class WidgetManager private constructor(private val context: Context) {
         val widget = widgets.removeAt(fromIndex)
         widgets.add(toIndex, widget)
         widgets.forEachIndexed { index, w -> w.order = index }
-        saveWidgetsToCache(widgets)
         
-        firebase.saveWidgetsBatch(mid, widgets, callback)
+        firebase.saveWidgetsBatch(mid, widgets) { success ->
+            if (success) {
+                saveItemWidgetsToCache(widgets)
+            }
+            callback(success)
+        }
+    }
+    
+    // ==================== Order Level CRUD ====================
+    
+    /**
+     * Add a new order-level widget.
+     */
+    fun addOrderWidget(type: WidgetType, callback: (WidgetConfig?) -> Unit) {
+        val mid = merchantId ?: return callback(null)
+        
+        if (!canAddOrderWidget()) {
+            callback(null)
+            return
+        }
+        
+        val currentWidgets = getOrderWidgetsFromCache()
+        val order = (currentWidgets.maxOfOrNull { it.order } ?: -1) + 1
+        val widget = DefaultWidgetFactory.createEmpty(type, order, NoteLevel.ORDER)
+        
+        firebase.saveWidget(mid, widget) { success ->
+            if (success) {
+                val widgets = currentWidgets.toMutableList()
+                widgets.add(widget)
+                saveOrderWidgetsToCache(widgets)
+                callback(widget)
+            } else {
+                callback(null)
+            }
+        }
     }
     
     /**
-     * Reorder widgets within a specific level only.
-     * This prevents index mismatches when reordering in level-specific adapters.
+     * Add a pre-configured order-level widget.
      */
-    fun reorderWidgetsForLevel(level: NoteLevel, fromIndex: Int, toIndex: Int, callback: (Boolean) -> Unit) {
+    fun addOrderWidget(widget: WidgetConfig, callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
         
-        // Get widgets for this level only
-        val levelWidgets = getWidgets().filter { it.level == level }.sortedBy { it.order }.toMutableList()
-        
-        if (fromIndex < 0 || toIndex < 0 || fromIndex >= levelWidgets.size || toIndex >= levelWidgets.size) {
+        if (!canAddOrderWidget()) {
             callback(false)
             return
         }
         
-        // Reorder within level
-        val widget = levelWidgets.removeAt(fromIndex)
-        levelWidgets.add(toIndex, widget)
+        widget.level = NoteLevel.ORDER
+        val currentWidgets = getOrderWidgetsFromCache()
         
-        // Update order values for the level
-        levelWidgets.forEachIndexed { index, w -> w.order = index }
-        
-        // Merge back with other level's widgets
-        val otherLevelWidgets = getWidgets().filter { it.level != level }
-        val allWidgets = (levelWidgets + otherLevelWidgets).toMutableList()
-        
-        saveWidgetsToCache(allWidgets)
-        firebase.saveWidgetsBatch(mid, allWidgets, callback)
+        firebase.saveWidget(mid, widget) { success ->
+            if (success) {
+                val widgets = currentWidgets.toMutableList()
+                widgets.add(widget)
+                saveOrderWidgetsToCache(widgets)
+            }
+            callback(success)
+        }
     }
     
-    // ==================== Option CRUD ====================
+    /**
+     * Update a single order-level widget by ID.
+     * Only updates the specified widget, does not affect others.
+     */
+    fun updateOrderWidget(widget: WidgetConfig, callback: (Boolean) -> Unit) {
+        val mid = merchantId ?: return callback(false)
+        
+        widget.level = NoteLevel.ORDER
+        val currentWidgets = getOrderWidgetsFromCache().toMutableList()
+        val index = currentWidgets.indexOfFirst { it.id == widget.id }
+        
+        if (index < 0) {
+            callback(false)
+            return
+        }
+        
+        firebase.saveWidget(mid, widget) { success ->
+            if (success) {
+                currentWidgets[index] = widget
+                saveOrderWidgetsToCache(currentWidgets)
+            }
+            callback(success)
+        }
+    }
     
-    fun addOption(widgetId: String, label: String, value: String = label, callback: (WidgetOption?) -> Unit) {
+    /**
+     * Delete a single order-level widget by ID.
+     */
+    fun deleteOrderWidget(widgetId: String, callback: (Boolean) -> Unit) {
+        val mid = merchantId ?: return callback(false)
+        
+        val currentWidgets = getOrderWidgetsFromCache().toMutableList()
+        
+        firebase.deleteWidget(mid, widgetId) { success ->
+            if (success) {
+                currentWidgets.removeAll { it.id == widgetId }
+                currentWidgets.forEachIndexed { idx, w -> w.order = idx }
+                saveOrderWidgetsToCache(currentWidgets)
+            }
+            callback(success)
+        }
+    }
+    
+    /**
+     * Reset order-level widgets to defaults.
+     * Atomically replaces all order widgets with default set.
+     */
+    fun resetOrderWidgetsToDefaults(callback: (Boolean) -> Unit) {
+        val mid = merchantId ?: return callback(false)
+        val defaults = DefaultWidgetFactory.createOrderLevelDefaults()
+        val currentItemWidgets = getItemWidgetsFromCache()
+        
+        firebase.replaceAllWidgets(mid, currentItemWidgets + defaults) { success ->
+            if (success) {
+                saveOrderWidgetsToCache(defaults)
+            }
+            callback(success)
+        }
+    }
+    
+    /**
+     * Reorder order-level widgets.
+     */
+    fun reorderOrderWidgets(fromIndex: Int, toIndex: Int, callback: (Boolean) -> Unit) {
+        val mid = merchantId ?: return callback(false)
+        val widgets = getOrderWidgetsFromCache().toMutableList()
+        
+        if (fromIndex < 0 || toIndex < 0 || fromIndex >= widgets.size || toIndex >= widgets.size) {
+            callback(false)
+            return
+        }
+        
+        val widget = widgets.removeAt(fromIndex)
+        widgets.add(toIndex, widget)
+        widgets.forEachIndexed { index, w -> w.order = index }
+        
+        firebase.saveWidgetsBatch(mid, widgets) { success ->
+            if (success) {
+                saveOrderWidgetsToCache(widgets)
+            }
+            callback(success)
+        }
+    }
+    
+    // ==================== Item Level Option CRUD ====================
+    
+    fun addItemWidgetOption(widgetId: String, label: String, value: String = label, callback: (WidgetOption?) -> Unit) {
         val mid = merchantId ?: return callback(null)
-        val widgets = getWidgets().toMutableList()
+        val widgets = getItemWidgetsFromCache().toMutableList()
         val widget = widgets.find { it.id == widgetId }
         if (widget == null) {
             callback(null)
@@ -387,7 +531,7 @@ class WidgetManager private constructor(private val context: Context) {
         
         firebase.saveWidget(mid, widget) { success ->
             if (success) {
-                saveWidgetsToCache(widgets)
+                saveItemWidgetsToCache(widgets)
                 callback(option)
             } else {
                 widget.options.removeAll { it.id == option.id }
@@ -396,9 +540,9 @@ class WidgetManager private constructor(private val context: Context) {
         }
     }
     
-    fun updateOption(widgetId: String, option: WidgetOption, callback: (Boolean) -> Unit) {
+    fun updateItemWidgetOption(widgetId: String, option: WidgetOption, callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
-        val widgets = getWidgets().toMutableList()
+        val widgets = getItemWidgetsFromCache().toMutableList()
         val widget = widgets.find { it.id == widgetId }
         if (widget == null) {
             callback(false)
@@ -409,7 +553,7 @@ class WidgetManager private constructor(private val context: Context) {
         if (index >= 0) {
             widget.options[index] = option
             firebase.saveWidget(mid, widget) { success ->
-                if (success) saveWidgetsToCache(widgets)
+                if (success) saveItemWidgetsToCache(widgets)
                 callback(success)
             }
         } else {
@@ -417,9 +561,9 @@ class WidgetManager private constructor(private val context: Context) {
         }
     }
     
-    fun deleteOption(widgetId: String, optionId: String, callback: (Boolean) -> Unit) {
+    fun deleteItemWidgetOption(widgetId: String, optionId: String, callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
-        val widgets = getWidgets().toMutableList()
+        val widgets = getItemWidgetsFromCache().toMutableList()
         val widget = widgets.find { it.id == widgetId }
         if (widget == null) {
             callback(false)
@@ -429,7 +573,7 @@ class WidgetManager private constructor(private val context: Context) {
         val removed = widget.options.removeAll { it.id == optionId }
         if (removed) {
             firebase.saveWidget(mid, widget) { success ->
-                if (success) saveWidgetsToCache(widgets)
+                if (success) saveItemWidgetsToCache(widgets)
                 callback(success)
             }
         } else {
@@ -437,9 +581,9 @@ class WidgetManager private constructor(private val context: Context) {
         }
     }
     
-    fun reorderOptions(widgetId: String, fromIndex: Int, toIndex: Int, callback: (Boolean) -> Unit) {
+    fun reorderItemWidgetOptions(widgetId: String, fromIndex: Int, toIndex: Int, callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
-        val widgets = getWidgets().toMutableList()
+        val widgets = getItemWidgetsFromCache().toMutableList()
         val widget = widgets.find { it.id == widgetId }
         if (widget == null || fromIndex < 0 || toIndex < 0 || 
             fromIndex >= widget.options.size || toIndex >= widget.options.size) {
@@ -450,7 +594,91 @@ class WidgetManager private constructor(private val context: Context) {
         val option = widget.options.removeAt(fromIndex)
         widget.options.add(toIndex, option)
         firebase.saveWidget(mid, widget) { success ->
-            if (success) saveWidgetsToCache(widgets)
+            if (success) saveItemWidgetsToCache(widgets)
+            callback(success)
+        }
+    }
+    
+    // ==================== Order Level Option CRUD ====================
+    
+    fun addOrderWidgetOption(widgetId: String, label: String, value: String = label, callback: (WidgetOption?) -> Unit) {
+        val mid = merchantId ?: return callback(null)
+        val widgets = getOrderWidgetsFromCache().toMutableList()
+        val widget = widgets.find { it.id == widgetId }
+        if (widget == null) {
+            callback(null)
+            return
+        }
+        
+        val option = DefaultWidgetFactory.createOption(label, value)
+        widget.options.add(option)
+        
+        firebase.saveWidget(mid, widget) { success ->
+            if (success) {
+                saveOrderWidgetsToCache(widgets)
+                callback(option)
+            } else {
+                widget.options.removeAll { it.id == option.id }
+                callback(null)
+            }
+        }
+    }
+    
+    fun updateOrderWidgetOption(widgetId: String, option: WidgetOption, callback: (Boolean) -> Unit) {
+        val mid = merchantId ?: return callback(false)
+        val widgets = getOrderWidgetsFromCache().toMutableList()
+        val widget = widgets.find { it.id == widgetId }
+        if (widget == null) {
+            callback(false)
+            return
+        }
+        
+        val index = widget.options.indexOfFirst { it.id == option.id }
+        if (index >= 0) {
+            widget.options[index] = option
+            firebase.saveWidget(mid, widget) { success ->
+                if (success) saveOrderWidgetsToCache(widgets)
+                callback(success)
+            }
+        } else {
+            callback(false)
+        }
+    }
+    
+    fun deleteOrderWidgetOption(widgetId: String, optionId: String, callback: (Boolean) -> Unit) {
+        val mid = merchantId ?: return callback(false)
+        val widgets = getOrderWidgetsFromCache().toMutableList()
+        val widget = widgets.find { it.id == widgetId }
+        if (widget == null) {
+            callback(false)
+            return
+        }
+        
+        val removed = widget.options.removeAll { it.id == optionId }
+        if (removed) {
+            firebase.saveWidget(mid, widget) { success ->
+                if (success) saveOrderWidgetsToCache(widgets)
+                callback(success)
+            }
+        } else {
+            callback(false)
+        }
+    }
+    
+    fun reorderOrderWidgetOptions(widgetId: String, fromIndex: Int, toIndex: Int, callback: (Boolean) -> Unit) {
+        val mid = merchantId ?: return callback(false)
+        val widgets = getOrderWidgetsFromCache().toMutableList()
+        val widget = widgets.find { it.id == widgetId }
+        if (widget == null || fromIndex < 0 || toIndex < 0 || 
+            fromIndex >= widget.options.size || toIndex >= widget.options.size) {
+            callback(false)
+            return
+        }
+        
+        val option = widget.options.removeAt(fromIndex)
+        widget.options.add(toIndex, option)
+        firebase.saveWidget(mid, widget) { success ->
+            if (success) saveOrderWidgetsToCache(widgets)
             callback(success)
         }
     }
@@ -461,7 +689,7 @@ class WidgetManager private constructor(private val context: Context) {
         val mid = merchantId ?: return callback(false)
         firebase.saveSettings(mid, settings) { success ->
             if (success) {
-                saveSettingsToCache(settings)
+                saveSettings(settings)
             }
             callback(success)
         }
@@ -505,31 +733,65 @@ class WidgetManager private constructor(private val context: Context) {
     
     // ==================== Helpers ====================
     
-    fun getWidgetById(widgetId: String): WidgetConfig? {
-        return getWidgets().find { it.id == widgetId }
+    fun getItemWidgetById(widgetId: String): WidgetConfig? {
+        return getItemWidgetsFromCache().find { it.id == widgetId }
     }
     
-    fun getWidgetByLabel(label: String): WidgetConfig? {
-        return getWidgets().find { it.label.equals(label, ignoreCase = true) }
+    fun getOrderWidgetById(widgetId: String): WidgetConfig? {
+        return getOrderWidgetsFromCache().find { it.id == widgetId }
     }
     
-    fun getOptionsForWidget(widgetId: String): List<WidgetOption> {
-        return getWidgetById(widgetId)?.options ?: emptyList()
+    fun getItemWidgetByLabel(label: String): WidgetConfig? {
+        return getItemWidgetsFromCache().find { it.label.equals(label, ignoreCase = true) }
     }
     
-    fun getWidgetCount(): Int = getWidgets().size
+    fun getOrderWidgetByLabel(label: String): WidgetConfig? {
+        return getOrderWidgetsFromCache().find { it.label.equals(label, ignoreCase = true) }
+    }
     
-    fun getEnabledWidgetCount(): Int = getWidgets().count { it.isEnabled }
+    fun getItemWidgetCount(): Int = getItemWidgetsFromCache().size
+    
+    fun getOrderWidgetCount(): Int = getOrderWidgetsFromCache().size
+    
+    fun getEnabledItemWidgetCount(): Int = getItemWidgetsFromCache().count { it.isEnabled }
+    
+    fun getEnabledOrderWidgetCount(): Int = getOrderWidgetsFromCache().count { it.isEnabled }
     
     /**
-     * Force reload from Firebase (e.g., after settings change)
+     * Force reload item widgets from Firebase
      */
-    fun reload(callback: ((Boolean) -> Unit)? = null) {
+    fun reloadItemWidgets(callback: ((Boolean) -> Unit)? = null) {
         val mid = merchantId ?: return
-        firebase.getWidgets(mid) { widgets ->
-            firebase.getSettings(mid) { settings ->
-                saveToCache(widgets, settings)
-                callback?.invoke(true)
+        firebase.getItemWidgets(mid) { widgets ->
+            saveItemWidgetsToCache(widgets)
+            callback?.invoke(true)
+        }
+    }
+    
+    /**
+     * Force reload order widgets from Firebase
+     */
+    fun reloadOrderWidgets(callback: ((Boolean) -> Unit)? = null) {
+        val mid = merchantId ?: return
+        firebase.getOrderWidgets(mid) { widgets ->
+            saveOrderWidgetsToCache(widgets)
+            callback?.invoke(true)
+        }
+    }
+    
+    /**
+     * Force reload all widgets and settings from Firebase
+     */
+    fun reloadAll(callback: ((Boolean) -> Unit)? = null) {
+        val mid = merchantId ?: return
+        firebase.getItemWidgets(mid) { itemWidgets ->
+            saveItemWidgetsToCache(itemWidgets)
+            firebase.getOrderWidgets(mid) { orderWidgets ->
+                saveOrderWidgetsToCache(orderWidgets)
+                firebase.getSettings(mid) { settings ->
+                    saveSettings(settings)
+                    callback?.invoke(true)
+                }
             }
         }
     }

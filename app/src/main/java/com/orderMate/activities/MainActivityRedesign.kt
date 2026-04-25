@@ -329,20 +329,35 @@ class MainActivityRedesign : AppCompatActivity() {
      */
     private fun loadWidgetData(merchantId: String) {
         val widgetManager = WidgetManager.getInstance(this)
+        widgetManager.setMerchantId(merchantId)
         
         CoroutineScope(Dispatchers.IO).launch {
-            firebaseConfigManager.getWidgets(merchantId) { widgets ->
-                firebaseConfigManager.getSettings(merchantId) { settings ->
-                    if (widgets.isNotEmpty()) {
-                        // Firebase has data → save to cache IMMEDIATELY
-                        widgetManager.saveToCache(widgets, settings)
-                    } else {
-                        // Firebase empty → save DEFAULTS to cache
-                        val defaultWidgets = DefaultWidgetFactory.createDefaults()
-                        val defaultSettings = PopupSettings()
-                        widgetManager.saveToCache(defaultWidgets, defaultSettings)
-                        // Also push defaults to Firebase
-                        firebaseConfigManager.initializeMerchant(merchantId, defaultWidgets, defaultSettings) { _ -> }
+            // Fetch item widgets
+            firebaseConfigManager.getItemWidgets(merchantId) { itemWidgets ->
+                if (itemWidgets.isNotEmpty()) {
+                    widgetManager.saveItemWidgets(itemWidgets)
+                }
+                
+                // Fetch order widgets
+                firebaseConfigManager.getOrderWidgets(merchantId) { orderWidgets ->
+                    if (orderWidgets.isNotEmpty()) {
+                        widgetManager.saveOrderWidgets(orderWidgets)
+                    }
+                    
+                    // Fetch settings
+                    firebaseConfigManager.getSettings(merchantId) { settings ->
+                        widgetManager.saveSettings(settings)
+                        
+                        // If no widgets exist, initialize with defaults
+                        if (itemWidgets.isEmpty() && orderWidgets.isEmpty()) {
+                            val defaultItemWidgets = DefaultWidgetFactory.createItemLevelDefaults()
+                            val defaultOrderWidgets = DefaultWidgetFactory.createOrderLevelDefaults()
+                            val allDefaults = defaultItemWidgets + defaultOrderWidgets
+                            val defaultSettings = PopupSettings()
+                            widgetManager.saveItemWidgets(defaultItemWidgets)
+                            widgetManager.saveOrderWidgets(defaultOrderWidgets)
+                            firebaseConfigManager.initializeMerchant(merchantId, allDefaults, defaultSettings) { _ -> }
+                        }
                     }
                 }
             }

@@ -382,8 +382,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         val widgetManager = context?.let { WidgetManager.getInstance(it) }
         
         // Get enabled SINGLE_SELECT and MULTI_SELECT widgets
-        val selectWidgets = widgetManager?.getAllOrderLevelWidgets()
-            ?.filter { it.isEnabled && (it.type == WidgetType.SINGLE_SELECT || it.type == WidgetType.MULTI_SELECT) }
+        val selectWidgets = widgetManager?.getEnabledOrderWidgets()
+            ?.filter { it.type == WidgetType.SINGLE_SELECT || it.type == WidgetType.MULTI_SELECT }
             ?: emptyList()
         
         // Parse and get tags from order note
@@ -452,8 +452,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         val widgetManager = context?.let { WidgetManager.getInstance(it) } ?: return
         
         // Get enabled CALENDAR and TEXT_BOX widgets
-        val dynamicWidgets = widgetManager.getAllOrderLevelWidgets()
-            .filter { it.isEnabled && (it.type == WidgetType.CALENDAR || it.type == WidgetType.TEXT_BOX) }
+        val dynamicWidgets = widgetManager.getEnabledOrderWidgets()
+            .filter { it.type == WidgetType.CALENDAR || it.type == WidgetType.TEXT_BOX }
         
         if (orderNote.isNullOrBlank() || dynamicWidgets.isEmpty()) {
             container.visibility = View.GONE

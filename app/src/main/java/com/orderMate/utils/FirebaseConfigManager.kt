@@ -256,6 +256,29 @@ class FirebaseConfigManager private constructor() {
             .addOnFailureListener { callback(false) }
     }
     
+    /**
+     * Atomically replace ALL widgets with the provided list.
+     * This uses setValue() which completely replaces the widgets node,
+     * ensuring no stale widgets remain.
+     */
+    fun replaceAllWidgets(merchantId: String, widgets: List<WidgetConfig>, callback: (Boolean) -> Unit) {
+        val widgetsMap = mutableMapOf<String, Any>()
+        widgets.forEach { widget ->
+            widgetsMap[widget.id] = widget.toMap()
+        }
+        
+        db.getReference(FirebasePaths.widgets(merchantId))
+            .setValue(widgetsMap)
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
+    
     // ==================== Options ====================
     
     fun addOption(merchantId: String, widgetId: String, option: WidgetOption, callback: (Boolean) -> Unit) {
