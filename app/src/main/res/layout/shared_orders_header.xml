@@ -156,33 +156,24 @@
                 app:tint="@color/text_light"/>
         </FrameLayout>
 
-        <!-- Syncing Indicator -->
-        <LinearLayout
+        <!-- Syncing Indicator (blinking sync icon with bg/border) -->
+        <FrameLayout
             android:id="@+id/syncingContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginStart="20dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_header_button"
             android:visibility="gone"
             tools:visibility="visible">
 
-            <ProgressBar
-                android:id="@+id/syncProgress"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:indeterminateTint="@color/text_light"
-                style="?android:attr/progressBarStyleSmall"/>
-
-            <TextView
-                android:id="@+id/syncingText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Syncing..."
-                android:textColor="@color/text_muted"
-                android:textSize="13sp"/>
-        </LinearLayout>
+            <ImageView
+                android:id="@+id/syncingIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_sync"
+                app:tint="@color/accent_orange"/>
+        </FrameLayout>
 
     </LinearLayout>
 
