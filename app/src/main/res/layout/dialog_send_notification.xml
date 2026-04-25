@@ -90,13 +90,30 @@
                 android:textAllCaps="true"
                 android:letterSpacing="0.05" />
 
-            <Spinner
-                android:id="@+id/templateSpinner"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:background="@drawable/bg_modal_input"
-                android:paddingHorizontal="16dp"
-                android:popupBackground="@drawable/bg_dialog" />
+                android:background="@drawable/bg_modal_input">
+
+                <Spinner
+                    android:id="@+id/templateSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="40dp"
+                    android:popupBackground="@drawable/bg_dialog"
+                    android:spinnerMode="dropdown" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/ic_arrow_down"
+                    app:tint="@color/text_muted"
+                    android:importantForAccessibility="no" />
+            </FrameLayout>
         </LinearLayout>
 
         <!-- Customer Number/Email Section -->
