@@ -85,7 +85,7 @@ class ItemNoteDialogFragment : DialogFragment() {
             requestFeature(Window.FEATURE_NO_TITLE)
             setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         }
-        dialog.setCanceledOnTouchOutside(true)
+        dialog.setCanceledOnTouchOutside(false)
         return dialog
     }
 
