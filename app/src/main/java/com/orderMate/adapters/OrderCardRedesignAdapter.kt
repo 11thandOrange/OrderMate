@@ -137,7 +137,7 @@ class OrderCardRedesignAdapter(
             if (orderNote.isNullOrBlank()) return null
             
             // (#18) Use cached widgets only for parsing (never defaults, enabled only)
-            val cachedWidgets = WidgetManager.getInstance(context).getCachedOrderWidgets()
+            val cachedWidgets = WidgetManager.getInstance(binding.root.context).getCachedOrderWidgets()
             if (cachedWidgets.isNotEmpty()) {
                 val textWidgets = cachedWidgets.filter { 
                     it.type == com.orderMate.modals.WidgetType.TEXT_BOX
@@ -237,7 +237,7 @@ class OrderCardRedesignAdapter(
             val seenValues = mutableSetOf<String>()
             
             // Use cached widgets only for pill rendering (never defaults, enabled only)
-            val displayWidgets = WidgetManager.getInstance(context).getCachedOrderWidgets()
+            val displayWidgets = WidgetManager.getInstance(binding.root.context).getCachedOrderWidgets()
             
             // Include all 4 widget types, TEXT_BOX included with truncation
             val parsedTags = OrderNoteParser.extractTagsFromNote(orderNote, displayWidgets, NoteLevel.ORDER, includeTextBox = true)
@@ -388,7 +388,7 @@ class OrderCardRedesignAdapter(
             val notes = mutableListOf<NoteItem>()
             
             // Use cached widgets only for pill rendering (never defaults, enabled only)
-            val itemLevelWidgets = WidgetManager.getInstance(context).getCachedItemWidgets()
+            val itemLevelWidgets = WidgetManager.getInstance(binding.root.context).getCachedItemWidgets()
             
             order.lineItems?.forEach { lineItem ->
                 lineItem?.note?.let { note ->
