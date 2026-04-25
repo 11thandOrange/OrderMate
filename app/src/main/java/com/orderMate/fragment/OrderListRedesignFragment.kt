@@ -468,6 +468,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                     // Add date to filter state (supports multiple dates like HTML)
                     addDateToFilterState(dateTime)
                     
+                    // Sync filter state to shared ViewModel (so Calendar page sees it too)
+                    sharedFilterViewModel.setFilterState(currentFilterState)
+                    
                     // Apply filters and update pills
                     applyDialogFilters(currentFilterState)
                 }
