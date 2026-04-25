@@ -251,9 +251,9 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                             customer?.lastName ?: ""
                         ).trim()
                         
-                        // #52: Truncate to 10 characters with ellipsis
-                        val truncatedName = if (fullName.length > 10) {
-                            fullName.take(10) + "…"
+                        // #52: Truncate to 25 characters with ellipsis
+                        val truncatedName = if (fullName.length > 25) {
+                            fullName.take(25) + "…"
                         } else {
                             fullName
                         }
