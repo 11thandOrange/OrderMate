@@ -213,6 +213,8 @@ class ProfileSettingsFragment : Fragment() {
             settingsManager.setThemeColor(finalColor)
             saveToFirebase()
             applyColorToAppBackground(finalColor)
+            // Update nav profile button background with new theme color
+            activity?.findViewById<View>(R.id.navProfile)?.let { updateNavProfileBackground(it) }
             showToast("Theme color updated!")
             dialog.dismiss()
         }
