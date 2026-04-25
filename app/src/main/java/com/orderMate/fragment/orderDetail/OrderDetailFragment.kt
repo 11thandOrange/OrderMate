@@ -125,52 +125,24 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
     
     /**
-     * Set up Order Details Card max height and scroll indicator
-     * Customer Card: ~56dp fixed height
-     * Order History Card: ~257dp (header + 3 rows max)
-     * Max Order Details ScrollView height = Sidebar - Customer - History - margins - header
+     * Set up Order Details scroll indicator
+     * ConstraintLayout handles card positioning - Order Details fills remaining space
      */
     private fun setupOrderDetailsCardConstraints() {
-        val sidebar = binding.buttonMenu
         val scrollView = binding.orderDetailsScrollView
         val scrollIndicator = binding.orderDetailsScrollIndicator
         
-        // Wait for sidebar to be measured
-        sidebar.post {
-            val sidebarHeight = sidebar.height
-            if (sidebarHeight <= 0) return@post
-            
-            val density = resources.displayMetrics.density
-            
-            // Fixed heights based on design specs (in dp converted to px)
-            val customerCardHeight = (76 * density).toInt()  // ~56dp content + 20dp margin
-            val orderHistoryCardHeight = (257 * density).toInt()  // header + 3 history rows
-            val orderDetailsHeaderHeight = (65 * density).toInt()  // header with badges
-            val orderDetailsMargin = (20 * density).toInt()  // bottom margin
-            val scrollIndicatorHeight = (32 * density).toInt()  // chevron area
-            
-            // Calculate max height for ScrollView
-            val maxScrollViewHeight = sidebarHeight - customerCardHeight - orderHistoryCardHeight - 
-                orderDetailsHeaderHeight - orderDetailsMargin - scrollIndicatorHeight
-            
-            if (maxScrollViewHeight > 0) {
-                // Set max height on ScrollView
-                val layoutParams = scrollView.layoutParams
-                layoutParams.height = maxScrollViewHeight
-                scrollView.layoutParams = layoutParams
-                
-                // Update scroll indicator visibility
-                scrollView.post {
-                    val canScroll = scrollView.canScrollVertically(1)
-                    scrollIndicator.visibility = if (canScroll) View.VISIBLE else View.GONE
-                }
-                
-                // Set up scroll listener to show/hide indicator
-                scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
-                    val canScrollMore = scrollView.canScrollVertically(1)
-                    scrollIndicator.visibility = if (canScrollMore) View.VISIBLE else View.GONE
-                }
-            }
+        // Wait for layout to be measured
+        scrollView.post {
+            // Check if content is scrollable
+            val canScroll = scrollView.canScrollVertically(1)
+            scrollIndicator.visibility = if (canScroll) View.VISIBLE else View.GONE
+        }
+        
+        // Set up scroll listener to show/hide indicator
+        scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
+            val canScrollMore = scrollView.canScrollVertically(1)
+            scrollIndicator.visibility = if (canScrollMore) View.VISIBLE else View.GONE
         }
     }
 

@@ -402,19 +402,17 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Right Column: Order Details & History - matches HTML .order-detail-sidebar -->
-        <!-- width: 380px, gap: 20px -->
-        <LinearLayout
+        <!-- width: 380px, using ConstraintLayout to properly constrain card heights -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/buttonMenu"
             android:layout_width="380dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <!-- Order Details Card - clickable to open order-level popup -->
-            <!-- Max height calculated programmatically: sidebar height - customer card - order history card - margins -->
+            <!-- Order Details Card - fills remaining space, scrolls internally -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/orderDetailsCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_marginBottom="20dp"
                 android:clickable="true"
                 android:focusable="true"
@@ -423,7 +421,11 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/nav_border"
-                app:strokeWidth="1dp">
+                app:strokeWidth="1dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/customerCard">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -667,17 +669,20 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Customer Card - separate card with just the customer button, no header -->
+            <!-- Customer Card - fixed height, above Order History -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/customerCard"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 app:cardBackgroundColor="@color/glass_background"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/nav_border"
-                app:strokeWidth="1dp">
+                app:strokeWidth="1dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/orderHistoryCard">
 
                 <!-- Customer Row - clickable to open customer dialog -->
                 <LinearLayout
@@ -734,11 +739,11 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Order History Card - entire card clickable to open history popup -->
+            <!-- Order History Card - fixed height: header (56dp) + 2 rows (120dp) + spacing (20dp) = 196dp -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/orderHistoryCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="196dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
@@ -746,7 +751,10 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/nav_border"
-                app:strokeWidth="1dp">
+                app:strokeWidth="1dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -835,7 +843,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:visibility="gone" />
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
     <!-- Progress Overlay -->
