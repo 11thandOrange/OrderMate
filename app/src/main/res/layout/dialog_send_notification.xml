@@ -104,8 +104,9 @@
                     android:paddingStart="16dp"
                     android:paddingEnd="40dp"
                     android:spinnerMode="dropdown"
-                    android:dropDownWidth="match_parent"
-                    android:popupBackground="@drawable/bg_dialog" />
+                    android:dropDownWidth="wrap_content"
+                    android:dropDownVerticalOffset="4dp"
+                    android:popupBackground="@drawable/bg_modal_input" />
 
                 <ImageView
                     android:layout_width="24dp"
