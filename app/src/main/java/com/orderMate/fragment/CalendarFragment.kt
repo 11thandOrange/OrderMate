@@ -39,6 +39,8 @@ import com.orderMate.utils.exceptionHandlerWithReturn
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
+import com.orderMate.utils.showView
+import com.orderMate.utils.hideView
 import com.orderMate.modals.NoteLevel
 import com.orderMate.viewmodel.SharedFilterViewModel
 import java.text.SimpleDateFormat
@@ -121,6 +123,11 @@ class CalendarFragment : Fragment() {
     private var syncingContainer: View? = null
     private var isSyncing = false
     
+    // Search pill views
+    private var searchPillContainer: View? = null
+    private var searchPillText: TextView? = null
+    private var searchPillClose: View? = null
+    
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -172,6 +179,11 @@ class CalendarFragment : Fragment() {
         syncButton = view.findViewById(R.id.syncButton)
         syncingContainer = view.findViewById(R.id.syncingContainer)
         
+        // Search pill views
+        searchPillContainer = view.findViewById(R.id.searchPillContainer)
+        searchPillText = view.findViewById(R.id.searchPillText)
+        searchPillClose = view.findViewById(R.id.searchPillClose)
+        
         // Setup grid layout manager
         calendarGrid?.layoutManager = GridLayoutManager(requireContext(), 7)
     }
@@ -202,6 +214,8 @@ class CalendarFragment : Fragment() {
                         setSelection(query.length)
                     }
                 }
+                // Update search pill
+                updateSearchPill(query)
             }
         }
         
@@ -342,9 +356,32 @@ class CalendarFragment : Fragment() {
                 currentSearchQuery = text.toString().trim()
                 // Sync to shared ViewModel for cross-tab persistence
                 sharedFilterViewModel.setSearchQuery(currentSearchQuery)
+                // Update search pill immediately
+                updateSearchPill(currentSearchQuery)
                 searchOrders(currentSearchQuery)
             }
             handler.postDelayed(searchRunnable, Constants.debouncingTime)
+        }
+        
+        // Search pill close button - clears search
+        searchPillClose?.setOnClickListener {
+            searchInput?.text?.clear()
+            currentSearchQuery = ""
+            sharedFilterViewModel.setSearchQuery("")
+            updateSearchPill("")
+            searchOrders("")
+        }
+    }
+    
+    /**
+     * Update search pill visibility and text based on search query
+     */
+    private fun updateSearchPill(query: String) {
+        if (query.isNotBlank()) {
+            searchPillContainer?.showView()
+            searchPillText?.text = query
+        } else {
+            searchPillContainer?.hideView()
         }
     }
     

@@ -99,14 +99,8 @@ class SendNotificationDialog(
     }
 
     private fun preventKeyboardAutoOpen() {
-        // Clear focus from all input fields
-        binding.customerNumber.clearFocus()
-        binding.subject.clearFocus()
-        binding.etNotes.clearFocus()
-        
-        // Set focus to a non-editable view
-        binding.root.isFocusableInTouchMode = true
-        binding.root.requestFocus()
+        // Don't steal focus - just prevent auto-show of keyboard
+        // The input fields should remain focusable and clickable
     }
 
     private fun loadTemplates() {

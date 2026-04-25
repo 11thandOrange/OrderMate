@@ -174,8 +174,22 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                             setSelection(query.length)
                         }
                     }
+                    // Update search pill
+                    updateSearchPill(query)
                 }
             }
+        }
+    }
+    
+    /**
+     * Update search pill visibility and text based on search query
+     */
+    private fun updateSearchPill(query: String) {
+        if (query.isNotBlank()) {
+            binding.header.searchPillContainer.showView()
+            binding.header.searchPillText.text = query
+        } else {
+            binding.header.searchPillContainer.hideView()
         }
     }
 
@@ -281,9 +295,20 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 currentSearchQuery = text.toString().trim()
                 // Sync to shared ViewModel for cross-tab persistence
                 sharedFilterViewModel.setSearchQuery(currentSearchQuery)
+                // Update search pill immediately
+                updateSearchPill(currentSearchQuery)
                 searchOrders(currentSearchQuery)
             }
             handler.postDelayed(searchRunnable, Constants.debouncingTime)
+        }
+        
+        // Search pill close button - clears search
+        binding.header.searchPillClose.setOnClickListener {
+            binding.header.searchInput.text?.clear()
+            currentSearchQuery = ""
+            sharedFilterViewModel.setSearchQuery("")
+            updateSearchPill("")
+            searchOrders("")
         }
     }
 

@@ -1014,10 +1014,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 }
             }
             
-            // Add/Edit Order Note button (#93 requirement)
-            btnAddOrderNote.setOnClickListener {
-                openOrderNoteDialog()
-            }
+            // Note: Edit button removed - card click handles editing via orderDetailsCard.setOnClickListener
         }
     }
     

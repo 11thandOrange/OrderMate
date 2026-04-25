@@ -245,5 +245,6 @@
     <string name="status_changed">Status Changed</string>
     <string name="notification_sent">Notification Sent</string>
     <string name="view_details">View Details</string>
+    <string name="select_date">Select date</string>
 
 </resources>

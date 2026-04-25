@@ -150,51 +150,6 @@
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
 
-                    <!-- Coming Soon Toggle (disabled) - with container -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_toggle_option_container"
-                        android:padding="14dp"
-                        android:alpha="0.6"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Use OrderMate Register Instead Of Clover Register"
-                                android:textColor="@color/text_light"
-                                android:textSize="13sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:background="@drawable/bg_coming_soon_badge"
-                                android:text="🚀 Coming Soon"
-                                android:textColor="@color/orange_accent"
-                                android:textSize="10sp" />
-
-                        </LinearLayout>
-
-                        <Switch
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:clickable="false"
-                            android:enabled="false"
-                            android:thumb="@drawable/bg_toggle_thumb"
-                            android:track="@drawable/bg_toggle_track" />
-
-                    </LinearLayout>
-
                     <!-- Use OrderMate In Clover's Register Toggle - with container -->
                     <LinearLayout
                         android:layout_width="match_parent"

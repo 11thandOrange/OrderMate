@@ -186,16 +186,64 @@
 
     </LinearLayout>
 
+    <!-- Search Query Pill (shown when searching) -->
+    <LinearLayout
+        android:id="@+id/searchPillContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerTopRow">
+
+        <LinearLayout
+            android:id="@+id/searchPill"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="12dp"
+            android:background="@drawable/bg_filter_pill">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔍"
+                android:textSize="12sp"/>
+
+            <TextView
+                android:id="@+id/searchPillText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text=""
+                android:textColor="@color/text_light"
+                android:textSize="13sp"
+                android:maxWidth="150dp"
+                android:ellipsize="end"
+                android:maxLines="1"/>
+
+            <ImageView
+                android:id="@+id/searchPillClose"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_close"
+                app:tint="@color/text_muted"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+        </LinearLayout>
+    </LinearLayout>
+
     <!-- Filter Pills Row -->
     <HorizontalScrollView
         android:id="@+id/filterPillsScroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="8dp"
         android:scrollbars="none"
         android:visibility="gone"
         tools:visibility="visible"
-        app:layout_constraintTop_toBottomOf="@id/headerTopRow"
+        app:layout_constraintTop_toBottomOf="@id/searchPillContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

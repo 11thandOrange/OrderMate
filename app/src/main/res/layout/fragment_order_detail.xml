@@ -537,19 +537,7 @@
                             app:alignItems="center"
                             app:justifyContent="flex_start" />
                         
-                        <!-- Add/Edit Order Note Button -->
-                        <ImageView
-                            android:id="@+id/btnAddOrderNote"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:layout_marginStart="8dp"
-                            android:src="@drawable/ic_edit"
-                            android:padding="6dp"
-                            android:background="@drawable/bg_filter_option"
-                            app:tint="@color/order_dialog_accent"
-                            android:contentDescription="@string/add_note"
-                            android:clickable="true"
-                            android:focusable="true" />
+                        <!-- Edit button removed per user request - card click handles editing -->
                     </LinearLayout>
 
                     <View
