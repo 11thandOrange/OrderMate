@@ -10,10 +10,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.GridLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.orderMate.R
 import com.orderMate.databinding.DialogDatetimePickerBinding
 import java.text.SimpleDateFormat
@@ -114,6 +115,9 @@ class DateTimePickerDialog : DialogFragment() {
     }
 
     private fun setupCalendar() {
+        // Setup RecyclerView with GridLayoutManager (7 columns)
+        binding.calendarGrid.layoutManager = GridLayoutManager(requireContext(), 7)
+        
         updateMonthYearDisplay()
         renderCalendarGrid()
 
@@ -135,11 +139,27 @@ class DateTimePickerDialog : DialogFragment() {
     }
 
     private fun renderCalendarGrid() {
-        val grid = binding.calendarGrid
-        grid.removeAllViews()
+        val days = generateCalendarDays()
+        binding.calendarGrid.adapter = CalendarDayAdapter(days) { day ->
+            if (day.dayNumber > 0 && !day.isOtherMonth) {
+                calendar.set(Calendar.YEAR, displayCalendar.get(Calendar.YEAR))
+                calendar.set(Calendar.MONTH, displayCalendar.get(Calendar.MONTH))
+                calendar.set(Calendar.DAY_OF_MONTH, day.dayNumber)
+                renderCalendarGrid()
+            }
+        }
+    }
 
-        val context = requireContext()
-        val density = resources.displayMetrics.density
+    private fun generateCalendarDays(): List<CalendarDay> {
+        val days = mutableListOf<CalendarDay>()
+        
+        val today = Calendar.getInstance()
+        val selectedYear = calendar.get(Calendar.YEAR)
+        val selectedMonth = calendar.get(Calendar.MONTH)
+        val selectedDay = calendar.get(Calendar.DAY_OF_MONTH)
+        
+        val displayYear = displayCalendar.get(Calendar.YEAR)
+        val displayMonth = displayCalendar.get(Calendar.MONTH)
 
         // Get first day of month
         val monthCal = displayCalendar.clone() as Calendar
@@ -152,93 +172,100 @@ class DateTimePickerDialog : DialogFragment() {
         prevMonthCal.add(Calendar.MONTH, -1)
         val daysInPrevMonth = prevMonthCal.getActualMaximum(Calendar.DAY_OF_MONTH)
 
-        val today = Calendar.getInstance()
-        val selectedYear = calendar.get(Calendar.YEAR)
-        val selectedMonth = calendar.get(Calendar.MONTH)
-        val selectedDay = calendar.get(Calendar.DAY_OF_MONTH)
-
-        val displayYear = displayCalendar.get(Calendar.YEAR)
-        val displayMonth = displayCalendar.get(Calendar.MONTH)
-
-        // Total cells needed (6 rows max)
-        val totalCells = 42
-        var dayCounter = 1
-        var nextMonthDay = 1
-
-        for (i in 0 until totalCells) {
-            val dayView = TextView(context).apply {
-                layoutParams = GridLayout.LayoutParams().apply {
-                    width = 0
-                    height = (36 * density).toInt()
-                    columnSpec = GridLayout.spec(i % 7, 1f)
-                    rowSpec = GridLayout.spec(i / 7)
-                    setMargins((2 * density).toInt(), (2 * density).toInt(), (2 * density).toInt(), (2 * density).toInt())
-                }
-                gravity = Gravity.CENTER
-                textSize = 13f
-            }
-
-            when {
-                i < firstDayOfWeek -> {
-                    // Previous month
-                    val day = daysInPrevMonth - firstDayOfWeek + i + 1
-                    dayView.text = day.toString()
-                    dayView.setTextColor(ContextCompat.getColor(context, R.color.text_muted))
-                }
-                dayCounter <= daysInMonth -> {
-                    // Current month
-                    val day = dayCounter
-                    dayView.text = day.toString()
-                    
-                    val isSelected = displayYear == selectedYear && 
-                                     displayMonth == selectedMonth && 
-                                     day == selectedDay
-                    
-                    val isToday = displayYear == today.get(Calendar.YEAR) &&
-                                  displayMonth == today.get(Calendar.MONTH) &&
-                                  day == today.get(Calendar.DAY_OF_MONTH)
-
-                    when {
-                        isSelected -> {
-                            dayView.setTextColor(Color.WHITE)
-                            dayView.setBackgroundResource(R.drawable.bg_calendar_day_selected)
-                        }
-                        isToday -> {
-                            dayView.setTextColor(ContextCompat.getColor(context, R.color.orange_accent))
-                            dayView.background = createTodayBackground(density)
-                        }
-                        else -> {
-                            dayView.setTextColor(ContextCompat.getColor(context, R.color.text_light))
-                        }
-                    }
-
-                    dayView.setOnClickListener {
-                        calendar.set(Calendar.YEAR, displayYear)
-                        calendar.set(Calendar.MONTH, displayMonth)
-                        calendar.set(Calendar.DAY_OF_MONTH, day)
-                        renderCalendarGrid()
-                    }
-
-                    dayCounter++
-                }
-                else -> {
-                    // Next month
-                    dayView.text = nextMonthDay.toString()
-                    dayView.setTextColor(ContextCompat.getColor(context, R.color.text_muted))
-                    nextMonthDay++
-                }
-            }
-
-            grid.addView(dayView)
+        // Add previous month padding days
+        for (i in 0 until firstDayOfWeek) {
+            val day = daysInPrevMonth - firstDayOfWeek + i + 1
+            days.add(CalendarDay(day, isToday = false, isSelected = false, isOtherMonth = true))
         }
+
+        // Add current month days
+        for (day in 1..daysInMonth) {
+            val isToday = displayYear == today.get(Calendar.YEAR) &&
+                          displayMonth == today.get(Calendar.MONTH) &&
+                          day == today.get(Calendar.DAY_OF_MONTH)
+            
+            val isSelected = displayYear == selectedYear &&
+                             displayMonth == selectedMonth &&
+                             day == selectedDay
+
+            days.add(CalendarDay(day, isToday, isSelected, isOtherMonth = false))
+        }
+
+        // Add next month padding days to fill 6 rows (42 cells)
+        var nextMonthDay = 1
+        while (days.size < 42) {
+            days.add(CalendarDay(nextMonthDay++, isToday = false, isSelected = false, isOtherMonth = true))
+        }
+
+        return days
     }
 
-    private fun createTodayBackground(density: Float): GradientDrawable {
-        return GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            cornerRadius = 6 * density
-            setColor(Color.TRANSPARENT)
-            setStroke((1 * density).toInt(), ContextCompat.getColor(requireContext(), R.color.orange_accent))
+    // Data class for calendar day
+    data class CalendarDay(
+        val dayNumber: Int,
+        val isToday: Boolean,
+        val isSelected: Boolean,
+        val isOtherMonth: Boolean
+    )
+
+    // Adapter for calendar grid
+    inner class CalendarDayAdapter(
+        private val days: List<CalendarDay>,
+        private val onDayClick: (CalendarDay) -> Unit
+    ) : RecyclerView.Adapter<CalendarDayAdapter.ViewHolder>() {
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_datetime_picker_day, parent, false)
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.bind(days[position])
+        }
+
+        override fun getItemCount(): Int = days.size
+
+        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            private val dayText: TextView = itemView.findViewById(R.id.dayText)
+
+            fun bind(day: CalendarDay) {
+                val context = itemView.context
+                dayText.text = day.dayNumber.toString()
+
+                when {
+                    day.isSelected -> {
+                        dayText.setTextColor(Color.WHITE)
+                        dayText.setBackgroundResource(R.drawable.bg_calendar_day_selected)
+                    }
+                    day.isToday -> {
+                        dayText.setTextColor(ContextCompat.getColor(context, R.color.orange_accent))
+                        dayText.background = createTodayBackground()
+                    }
+                    day.isOtherMonth -> {
+                        dayText.setTextColor(ContextCompat.getColor(context, R.color.text_muted))
+                        dayText.setBackgroundResource(0)
+                    }
+                    else -> {
+                        dayText.setTextColor(ContextCompat.getColor(context, R.color.text_light))
+                        dayText.setBackgroundResource(0)
+                    }
+                }
+
+                itemView.setOnClickListener {
+                    onDayClick(day)
+                }
+            }
+
+            private fun createTodayBackground(): GradientDrawable {
+                val density = itemView.resources.displayMetrics.density
+                return GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = 6 * density
+                    setColor(Color.TRANSPARENT)
+                    setStroke((1 * density).toInt(), ContextCompat.getColor(itemView.context, R.color.orange_accent))
+                }
+            }
         }
     }
 
