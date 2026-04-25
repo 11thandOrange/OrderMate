@@ -21,8 +21,8 @@ class SharedFilterViewModel : ViewModel() {
     val searchQuery: LiveData<String> = _searchQuery
 
     // Dates parsed from search or filter (for calendar highlighting)
-    private val _searchedDates = MutableLiveData<List<Date>>(emptyList())
-    val searchedDates: LiveData<List<Date>> = _searchedDates
+    private val _highlightedDates = MutableLiveData<List<Date>>(emptyList())
+    val highlightedDates: LiveData<List<Date>> = _highlightedDates
     
     // Calendar view mode (day/week/month) - persists across navigation
     private val _calendarViewMode = MutableLiveData("month")
@@ -37,7 +37,7 @@ class SharedFilterViewModel : ViewModel() {
      */
     fun setFilterState(state: FilterDialogFragment.FilterState) {
         _filterState.value = state
-        updateSearchedDatesFromFilters()
+        updateHighlightedDatesFromFilters()
     }
 
     /**
@@ -48,10 +48,10 @@ class SharedFilterViewModel : ViewModel() {
     }
 
     /**
-     * Update searched dates (combines filter dates and parsed search dates)
+     * Update highlighted dates (combines filter dates and parsed search dates)
      */
-    fun setSearchedDates(dates: List<Date>) {
-        _searchedDates.value = dates
+    fun setHighlightedDates(dates: List<Date>) {
+        _highlightedDates.value = dates
     }
     
     /**
@@ -74,7 +74,7 @@ class SharedFilterViewModel : ViewModel() {
     fun resetAll() {
         _filterState.value = FilterDialogFragment.FilterState()
         _searchQuery.value = ""
-        _searchedDates.value = emptyList()
+        _highlightedDates.value = emptyList()
         // Note: We don't reset view mode on filter clear
     }
 
@@ -90,20 +90,20 @@ class SharedFilterViewModel : ViewModel() {
      * Check if dates are selected (disables month/week view)
      */
     fun hasSelectedDates(): Boolean {
-        return !_searchedDates.value.isNullOrEmpty()
+        return !_highlightedDates.value.isNullOrEmpty()
     }
 
     /**
-     * Update searched dates from current filter state
+     * Update highlighted dates from current filter state
      */
-    private fun updateSearchedDatesFromFilters() {
+    private fun updateHighlightedDatesFromFilters() {
         val filterDates = _filterState.value?.dateSelections?.values?.flatten() ?: emptyList()
         if (filterDates.isNotEmpty()) {
-            val currentSearchDates = _searchedDates.value ?: emptyList()
+            val currentSearchDates = _highlightedDates.value ?: emptyList()
             val combined = (filterDates + currentSearchDates).distinctBy { 
                 java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.getDefault()).format(it)
             }.sortedBy { it.time }
-            _searchedDates.value = combined
+            _highlightedDates.value = combined
         }
     }
 }

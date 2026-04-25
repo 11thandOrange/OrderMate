@@ -229,9 +229,9 @@ class CalendarFragment : Fragment() {
             }
         }
         
-        // Observe searched dates (affects view mode buttons)
-        sharedFilterViewModel.searchedDates.observe(viewLifecycleOwner) { dates ->
-            searchedDates = dates
+        // Observe highlighted dates (affects view mode buttons)
+        sharedFilterViewModel.highlightedDates.observe(viewLifecycleOwner) { dates ->
+            highlightedDates = dates
             updateViewModeButtonsState()
             // Don't render here - the filter application will handle rendering
         }
@@ -278,11 +278,11 @@ class CalendarFragment : Fragment() {
     
     /**
      * Update view mode buttons based on whether dates are selected
-     * Disables Month/Week when dates are searched/filtered
+     * Disables Month/Week when dates are highlighted/filtered
      * Disables Today/Next Fulfillment when individual date is selected
      */
     private fun updateViewModeButtonsState() {
-        val hasSelectedDates = searchedDates.isNotEmpty()
+        val hasSelectedDates = highlightedDates.isNotEmpty()
         val disabledAlpha = 0.4f
         val enabledAlpha = 1.0f
         
@@ -431,9 +431,9 @@ class CalendarFragment : Fragment() {
                     currentDate.time = date
                 }
                 
-                // Restore searched dates from shared state
-                val restoredSearchedDates = sharedFilterViewModel.searchedDates.value ?: emptyList()
-                searchedDates = restoredSearchedDates
+                // Restore highlighted dates from shared state
+                val restoredHighlightedDates = sharedFilterViewModel.highlightedDates.value ?: emptyList()
+                highlightedDates = restoredHighlightedDates
                 
                 // Restore view mode from shared state
                 sharedFilterViewModel.calendarViewMode.value?.let { mode ->
@@ -475,8 +475,8 @@ class CalendarFragment : Fragment() {
         
         filteredEvents = convertOrdersToEvents(filteredOrders)
         
-        // Update searchedDates from filter state
-        val filterDates = filters.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE] ?: emptyList()
+        // Update highlightedDates from filter state (all date filters, not just CLOVER_ORDER_DATE)
+        val filterDates = filters.dateSelections.values.flatten()
         val queryDates = if (currentSearchQuery.isNotEmpty()) {
             OrderSearchFilter.parseSearchDates(currentSearchQuery, currentDate.get(Calendar.YEAR))
         } else {
@@ -488,8 +488,8 @@ class CalendarFragment : Fragment() {
             .distinctBy { dateFormat.format(it) }
             .sortedBy { it.time }
         
-        searchedDates = combinedDates
-        sharedFilterViewModel.setSearchedDates(combinedDates)
+        highlightedDates = combinedDates
+        sharedFilterViewModel.setHighlightedDates(combinedDates)
         
         updateViewModeButtonsState()
         updateFilterPills(filters)
@@ -594,15 +594,15 @@ class CalendarFragment : Fragment() {
 
     // ==================== Search (matches HTML - includes date parsing) ====================
     
-    // Dates parsed from search query (matches HTML searchedDates)
-    private var searchedDates: List<Date> = emptyList()
+    // Dates parsed from search query (matches HTML highlightedDates)
+    private var highlightedDates: List<Date> = emptyList()
     
     private fun searchOrders(query: String?) {
         runOnBackgroundThread {
             val isFilterApplied = currentFilterState.hasActiveFilters()
             
             // Parse dates from search query (matches HTML parseSearchDates)
-            searchedDates = if (!query.isNullOrEmpty()) {
+            highlightedDates = if (!query.isNullOrEmpty()) {
                 OrderSearchFilter.parseSearchDates(query, currentDate.get(Calendar.YEAR))
             } else {
                 emptyList()
@@ -611,10 +611,10 @@ class CalendarFragment : Fragment() {
             // Also include dates from filter state (matches HTML behavior)
             val filterDates = currentFilterState.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE] ?: emptyList()
             if (filterDates.isNotEmpty()) {
-                val combined = (searchedDates + filterDates).distinctBy { 
+                val combined = (highlightedDates + filterDates).distinctBy { 
                     SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(it)
                 }.sortedBy { it.time }
-                searchedDates = combined
+                highlightedDates = combined
             }
 
             if (query.isNullOrEmpty()) {
@@ -656,7 +656,7 @@ class CalendarFragment : Fragment() {
      * Get dates to highlight/filter on calendar
      * Combines dates from search query and filter state (matches HTML)
      */
-    fun getSearchedDates(): List<Date> = searchedDates
+    fun getHighlightedDates(): List<Date> = highlightedDates
 
     // ==================== Date Picker (matches HTML - multiple dates with pills) ====================
     
@@ -873,7 +873,7 @@ class CalendarFragment : Fragment() {
         currentFilterState = FilterDialogFragment.FilterState()
         currentSearchQuery = ""
         selectedDateFilter = null
-        searchedDates = emptyList()
+        highlightedDates = emptyList()
         
         // Sync reset to shared ViewModel for cross-tab persistence
         sharedFilterViewModel.resetAll()
@@ -1054,33 +1054,33 @@ class CalendarFragment : Fragment() {
     // ==================== Calendar Rendering ====================
     
     fun renderCalendar() {
-        // Check if we have searched dates (matches HTML behavior)
-        // When dates are searched/filtered, show those specific dates
-        val hasSearchedDates = searchedDates.isNotEmpty()
+        // Check if we have highlighted dates (matches HTML behavior)
+        // When dates are highlighted/filtered, show those specific dates
+        val hasHighlightedDates = highlightedDates.isNotEmpty()
         
         // Update nav button visibility (matches HTML: hide when searching dates)
         val navPrev = view?.findViewById<View>(R.id.btnPrev)
         val navNext = view?.findViewById<View>(R.id.btnNext)
-        val navVisibility = if (hasSearchedDates) View.INVISIBLE else View.VISIBLE
+        val navVisibility = if (hasHighlightedDates) View.INVISIBLE else View.VISIBLE
         navPrev?.visibility = navVisibility
         navNext?.visibility = navVisibility
         
         when {
-            searchedDates.size > 1 -> {
-                // Multiple dates searched - show side-by-side view (matches HTML renderMultipleDaysView)
-                monthYearTitle?.text = "${searchedDates.size} Selected Dates"
-                renderSearchedDatesView()
+            highlightedDates.size > 1 -> {
+                // Multiple dates highlighted - show side-by-side view (matches HTML renderMultipleDaysView)
+                monthYearTitle?.text = "${highlightedDates.size} Selected Dates"
+                renderHighlightedDatesView()
             }
-            searchedDates.size == 1 -> {
-                // Single date searched - show day view for that date (matches HTML renderSingleSearchedDay)
-                val searchedDate = searchedDates.first()
-                currentDate.time = searchedDate
+            highlightedDates.size == 1 -> {
+                // Single date highlighted - show day view for that date (matches HTML renderSingleHighlightedDay)
+                val highlightedDate = highlightedDates.first()
+                currentDate.time = highlightedDate
                 val dateFormat = SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault())
-                monthYearTitle?.text = dateFormat.format(searchedDate)
+                monthYearTitle?.text = dateFormat.format(highlightedDate)
                 renderDayView()
             }
             else -> {
-                // No searched dates - normal view mode
+                // No highlighted dates - normal view mode
                 when (currentViewMode) {
                     "day" -> renderDayView()
                     "week" -> renderWeekView()
@@ -1091,10 +1091,10 @@ class CalendarFragment : Fragment() {
     }
     
     /**
-     * Render multiple searched dates side by side (matches HTML renderMultipleDaysView)
+     * Render multiple highlighted dates side by side (matches HTML renderMultipleDaysView)
      */
-    private fun renderSearchedDatesView() {
-        if (searchedDates.isEmpty()) {
+    private fun renderHighlightedDatesView() {
+        if (highlightedDates.isEmpty()) {
             renderMonthView()
             return
         }
@@ -1103,12 +1103,12 @@ class CalendarFragment : Fragment() {
         calendarGrid?.visibility = View.GONE
         weekdayHeaders?.visibility = View.GONE
         
-        // Render timeline with searched dates
-        renderTimelineViewForDates(searchedDates)
+        // Render timeline with highlighted dates
+        renderTimelineViewForDates(highlightedDates)
     }
     
     /**
-     * Render timeline view for specific dates (used for searched dates)
+     * Render timeline view for specific dates (used for highlighted dates)
      * Uses XML-defined views for proper layout (fixed header height)
      */
     private fun renderTimelineViewForDates(dates: List<Date>) {
@@ -1943,7 +1943,7 @@ class CalendarFragment : Fragment() {
         sharedFilterViewModel.setSelectedDate(currentDate.time)
         sharedFilterViewModel.setCalendarViewMode(currentViewMode)
         sharedFilterViewModel.setFilterState(currentFilterState)
-        sharedFilterViewModel.setSearchedDates(searchedDates)
+        sharedFilterViewModel.setHighlightedDates(highlightedDates)
     }
     
     private fun showNoUpcomingEventsMessage() {
