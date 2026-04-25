@@ -170,7 +170,9 @@ class SettingsFragment : Fragment() {
                     runOnMainThread {
                         if (isAdded) {
                             widgetManager.setMerchantId(mid)
-                            // Now that we have merchantId, load templates
+                            // Now that we have merchantId, reload widgets from Firebase (not cache)
+                            loadWidgetsFromFirebase()
+                            // Also load templates
                             loadTemplatesFromFirebase()
                         }
                     }
@@ -757,11 +759,12 @@ class SettingsFragment : Fragment() {
         }
         
         val widget = widgets[index]
-        android.util.Log.d("SettingsFragment", "deleteWidgetsSequentially: deleting ${widget.label} (${index + 1}/${widgets.size})")
+        android.util.Log.d("SettingsFragment", "deleteWidgetsSequentially: deleting ${widget.label} id=${widget.id} (${index + 1}/${widgets.size}), merchantId=${widgetManager.getMerchantId()}")
         
         widgetManager.deleteWidget(widget.id) { success ->
+            android.util.Log.d("SettingsFragment", "deleteWidgetsSequentially: delete ${widget.label} result=$success")
             if (!success) {
-                android.util.Log.e("SettingsFragment", "deleteWidgetsSequentially: failed to delete ${widget.label}")
+                android.util.Log.e("SettingsFragment", "deleteWidgetsSequentially: FAILED to delete ${widget.label} - merchantId may be null")
             }
             // Continue to next widget regardless of success/failure
             deleteWidgetsSequentially(widgets, index + 1, onComplete)
