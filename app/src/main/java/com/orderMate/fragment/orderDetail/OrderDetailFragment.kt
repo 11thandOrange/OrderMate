@@ -298,7 +298,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                     if (success) {
                         activity?.runOnUiThread {
                             // Refresh line item pills
-                            binding.itemRecycler.adapter?.notifyDataSetChanged()
+                            populateItemTags()
                             // Refresh order-level tags and dynamic rows
                             populateOrderTags()
                             populateDynamicWidgetRows()
@@ -327,8 +327,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     private fun setUpRecyclerView() {
         binding.apply {
             itemRecycler.layoutManager = LinearLayoutManager(requireContext())
-            val adapter = ItemAdapter(lineItems, this@OrderDetailFragment)
-            itemRecycler.adapter = adapter
+            populateItemTags()
             
             // #61: Setup scroll indicator for item list
             setupScrollIndicator()
@@ -341,6 +340,14 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             val refundAdapter = RefundAdapter(refundItems)
             refundRecycler.adapter = refundAdapter
         }
+    }
+    
+    /**
+     * Populate item tags by re-creating the ItemAdapter.
+     * Call this after widgets are loaded to render pills.
+     */
+    private fun populateItemTags() {
+        binding.itemRecycler.adapter = ItemAdapter(lineItems, this@OrderDetailFragment)
     }
     
     /**
