@@ -123,20 +123,30 @@ class SendNotificationDialog(
     }
 
     private fun loadTemplates() {
+        // First setup spinner with default option immediately so it's clickable
+        setupTemplateSpinner()
+        
         val app = requireContext().applicationContext as? MyApp ?: return
         val merchantId = app.getMerchantId() ?: return
         
         FirebaseConfigManager.getInstance().getTemplates(merchantId) { loadedTemplates ->
             templates = loadedTemplates
             runOnMainThread {
+                // Update spinner with loaded templates
                 setupTemplateSpinner()
             }
         }
     }
 
     private fun setupTemplateSpinner() {
-        val templateNames = mutableListOf(getString(R.string.select_template))
-        templateNames.addAll(templates.map { it.name })
+        if (!isAdded || context == null) return
+        
+        val templateNames = mutableListOf<String>()
+        templateNames.add(getString(R.string.select_template))
+        
+        if (templates.isNotEmpty()) {
+            templateNames.addAll(templates.map { it.name })
+        }
         
         val adapter = object : ArrayAdapter<String>(
             requireContext(),

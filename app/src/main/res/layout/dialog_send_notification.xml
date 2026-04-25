@@ -103,7 +103,9 @@
                     android:paddingStart="16dp"
                     android:paddingEnd="40dp"
                     android:popupBackground="@drawable/bg_dialog"
-                    android:spinnerMode="dropdown" />
+                    android:spinnerMode="dropdown"
+                    android:clickable="true"
+                    android:focusable="true" />
 
                 <ImageView
                     android:layout_width="24dp"
@@ -112,7 +114,9 @@
                     android:layout_marginEnd="12dp"
                     android:src="@drawable/ic_arrow_down"
                     app:tint="@color/text_muted"
-                    android:importantForAccessibility="no" />
+                    android:importantForAccessibility="no"
+                    android:clickable="false"
+                    android:focusable="false" />
             </FrameLayout>
         </LinearLayout>
 
