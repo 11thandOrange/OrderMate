@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details Card Preview - Pill Wrapping & Scroll</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1d23;
+            min-height: 100vh;
+            padding: 24px;
+            display: flex;
+            gap: 24px;
+        }
+
+        /* Left Column - Items (placeholder) */
+        .left-column {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .left-column h2 {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        .left-column .placeholder {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        /* Right Column - Sidebar */
+        .sidebar {
+            width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Card base styles */
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        /* Card Header */
+        .card-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            gap: 10px;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-icon svg {
+            width: 14px;
+            height: 14px;
+            fill: rgba(255, 255, 255, 0.9);
+        }
+
+        .card-title {
+            flex: 1;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Status badges */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-open {
+            background: #E53935;
+            color: white;
+        }
+
+        .badge-paid {
+            background: #FFC107;
+            color: #212121;
+        }
+
+        .chevron {
+            width: 20px;
+            height: 20px;
+            fill: rgba(255, 255, 255, 0.5);
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 16px;
+        }
+
+        /* Scrollable content area */
+        .card-content {
+            max-height: 280px;
+            overflow-y: auto;
+            padding: 12px 20px;
+        }
+
+        .card-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .card-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .card-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+
+        /* Info rows */
+        .info-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .info-row + .info-row {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-label {
+            flex: 1;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+        }
+
+        .info-value {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Tags section with FlexboxLayout simulation */
+        .tags-section {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 12px 0;
+        }
+
+        .tags-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        /* FlexboxLayout for wrapping pills */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 6px;
+        }
+
+        /* Pill styles */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .pill svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        /* Widget color variations */
+        .pill-event {
+            background: rgba(76, 175, 80, 0.15);
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            color: #4CAF50;
+        }
+        .pill-event svg { fill: #4CAF50; }
+
+        .pill-priority {
+            background: rgba(255, 159, 67, 0.15);
+            border: 1px solid rgba(255, 159, 67, 0.25);
+            color: #FF9F43;
+        }
+        .pill-priority svg { fill: #FF9F43; }
+
+        .pill-fragile {
+            background: rgba(233, 30, 99, 0.15);
+            border: 1px solid rgba(233, 30, 99, 0.25);
+            color: #E91E63;
+        }
+        .pill-fragile svg { fill: #E91E63; }
+
+        .pill-gift {
+            background: rgba(156, 39, 176, 0.15);
+            border: 1px solid rgba(156, 39, 176, 0.25);
+            color: #9C27B0;
+        }
+        .pill-gift svg { fill: #9C27B0; }
+
+        .pill-vip {
+            background: rgba(33, 150, 243, 0.15);
+            border: 1px solid rgba(33, 150, 243, 0.25);
+            color: #2196F3;
+        }
+        .pill-vip svg { fill: #2196F3; }
+
+        .pill-delivery {
+            background: rgba(0, 188, 212, 0.15);
+            border: 1px solid rgba(0, 188, 212, 0.25);
+            color: #00BCD4;
+        }
+        .pill-delivery svg { fill: #00BCD4; }
+
+        .pill-catering {
+            background: rgba(255, 87, 34, 0.15);
+            border: 1px solid rgba(255, 87, 34, 0.25);
+            color: #FF5722;
+        }
+        .pill-catering svg { fill: #FF5722; }
+
+        .pill-wedding {
+            background: rgba(121, 85, 72, 0.15);
+            border: 1px solid rgba(121, 85, 72, 0.25);
+            color: #8D6E63;
+        }
+        .pill-wedding svg { fill: #8D6E63; }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            display: flex;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .scroll-indicator svg {
+            width: 16px;
+            height: 16px;
+            fill: rgba(255, 255, 255, 0.5);
+            animation: bounce 1.5s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(3px); }
+        }
+
+        .scroll-indicator.hidden {
+            display: none;
+        }
+
+        /* Customer Card - Fixed height */
+        .customer-card {
+            padding: 16px 20px;
+        }
+
+        .customer-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .customer-avatar {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .customer-name {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .customer-chevron {
+            width: 12px;
+            height: 12px;
+            fill: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Order History Card */
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+        }
+
+        .history-item + .history-item {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: rgba(255, 255, 255, 0.5);
+        }
+
+        .history-content {
+            flex: 1;
+        }
+
+        .history-title {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .history-date {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        /* Demo controls */
+        .demo-controls {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 16px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .demo-controls button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #FF9F43;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .demo-controls button:hover {
+            background: #e68a2e;
+        }
+
+        .demo-controls label {
+            color: white;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Left Column (placeholder) -->
+    <div class="left-column">
+        <h2>Items (3)</h2>
+        <p class="placeholder">Items list placeholder...</p>
+    </div>
+
+    <!-- Right Column - Sidebar -->
+    <div class="sidebar">
+        <!-- Order Details Card -->
+        <div class="card" id="orderDetailsCard">
+            <!-- Fixed Header -->
+            <div class="card-header">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M9,13V19H7V13H9M15,15V19H17V15H15M11,11V19H13V11H11Z"/></svg>
+                </div>
+                <span class="card-title">Order Details</span>
+                <span class="badge badge-open">Open</span>
+                <span class="badge badge-paid">Paid</span>
+                <svg class="chevron" viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Scrollable Content -->
+            <div class="card-content" id="cardContent">
+                <!-- Order Date -->
+                <div class="info-row">
+                    <span class="info-label">Order Date</span>
+                    <span class="info-value">04/19/26</span>
+                </div>
+
+                <!-- Order Tags with FlexboxLayout wrapping - 8 pills -->
+                <div class="tags-section">
+                    <div class="tags-label">Order Tags</div>
+                    <div class="tags-container" id="tagsContainer">
+                        <span class="pill pill-event">
+                            <svg viewBox="0 0 24 24"><path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1"/></svg>
+                            Event
+                        </span>
+                        <span class="pill pill-priority">
+                            <svg viewBox="0 0 24 24"><path d="M17.63,5.84C17.27,5.33 16.67,5 16,5H8C7.33,5 6.73,5.33 6.37,5.84L2,12L6.37,18.16C6.73,18.67 7.33,19 8,19H16C16.67,19 17.27,18.67 17.63,18.16L22,12L17.63,5.84Z"/></svg>
+                            Priority
+                        </span>
+                        <span class="pill pill-fragile">
+                            <svg viewBox="0 0 24 24"><path d="M17.63,5.84C17.27,5.33 16.67,5 16,5H8C7.33,5 6.73,5.33 6.37,5.84L2,12L6.37,18.16C6.73,18.67 7.33,19 8,19H16C16.67,19 17.27,18.67 17.63,18.16L22,12L17.63,5.84Z"/></svg>
+                            Fragile
+                        </span>
+                        <span class="pill pill-gift">
+                            <svg viewBox="0 0 24 24"><path d="M17.63,5.84C17.27,5.33 16.67,5 16,5H8C7.33,5 6.73,5.33 6.37,5.84L2,12L6.37,18.16C6.73,18.67 7.33,19 8,19H16C16.67,19 17.27,18.67 17.63,18.16L22,12L17.63,5.84Z"/></svg>
+                            Gift
+                        </span>
+                        <span class="pill pill-vip">
+                            <svg viewBox="0 0 24 24"><path d="M17.63,5.84C17.27,5.33 16.67,5 16,5H8C7.33,5 6.73,5.33 6.37,5.84L2,12L6.37,18.16C6.73,18.67 7.33,19 8,19H16C16.67,19 17.27,18.67 17.63,18.16L22,12L17.63,5.84Z"/></svg>
+                            VIP
+                        </span>
+                        <span class="pill pill-delivery">
+                            <svg viewBox="0 0 24 24"><path d="M17.63,5.84C17.27,5.33 16.67,5 16,5H8C7.33,5 6.73,5.33 6.37,5.84L2,12L6.37,18.16C6.73,18.67 7.33,19 8,19H16C16.67,19 17.27,18.67 17.63,18.16L22,12L17.63,5.84Z"/></svg>
+                            Delivery
+                        </span>
+                        <span class="pill pill-catering">
+                            <svg viewBox="0 0 24 24"><path d="M17.63,5.84C17.27,5.33 16.67,5 16,5H8C7.33,5 6.73,5.33 6.37,5.84L2,12L6.37,18.16C6.73,18.67 7.33,19 8,19H16C16.67,19 17.27,18.67 17.63,18.16L22,12L17.63,5.84Z"/></svg>
+                            Catering
+                        </span>
+                        <span class="pill pill-wedding">
+                            <svg viewBox="0 0 24 24"><path d="M17.63,5.84C17.27,5.33 16.67,5 16,5H8C7.33,5 6.73,5.33 6.37,5.84L2,12L6.37,18.16C6.73,18.67 7.33,19 8,19H16C16.67,19 17.27,18.67 17.63,18.16L22,12L17.63,5.84Z"/></svg>
+                            Wedding
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Due Date (CALENDAR widget) -->
+                <div class="info-row">
+                    <span class="info-label">Due Date</span>
+                    <span class="info-value">May 2, 2026 7:29 AM</span>
+                </div>
+
+                <!-- Description (TEXT_BOX widget) -->
+                <div class="info-row">
+                    <span class="info-label">Description</span>
+                    <span class="info-value" style="max-width: 200px; text-align: right;">Custom 3-tier wedding cake with white fondant and pink roses</span>
+                </div>
+
+                <!-- Employee -->
+                <div class="info-row">
+                    <span class="info-label">Employee</span>
+                    <span class="info-value">John Smith</span>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="scroll-indicator hidden" id="scrollIndicator">
+                <svg viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+            </div>
+        </div>
+
+        <!-- Customer Card - Fixed Height -->
+        <div class="card">
+            <div class="customer-card">
+                <div class="customer-row">
+                    <span class="info-label" style="flex: 1;">Customer</span>
+                    <div class="customer-avatar">JS</div>
+                    <span class="customer-name">John Smith</span>
+                    <svg class="customer-chevron" viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order History Card - Max 3 rows -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z"/></svg>
+                </div>
+                <span class="card-title">Order History</span>
+                <svg class="chevron" viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
+            </div>
+            <div class="divider"></div>
+            <div style="padding: 8px 20px 12px;">
+                <div class="history-item">
+                    <div class="history-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,17V16H9V14H13V13H10A1,1 0 0,1 9,12V9A1,1 0 0,1 10,8H11V7H13V8H15V10H11V11H14A1,1 0 0,1 15,12V15A1,1 0 0,1 14,16H13V17H11Z"/></svg>
+                    </div>
+                    <div class="history-content">
+                        <div class="history-title">Payment Received</div>
+                        <div class="history-date">April 19, 2026 • 2:30 PM</div>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-icon">
+                        <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
+                    </div>
+                    <div class="history-content">
+                        <div class="history-title">Order Created</div>
+                        <div class="history-date">April 19, 2026 • 2:15 PM</div>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/></svg>
+                    </div>
+                    <div class="history-content">
+                        <div class="history-title">Customer Added</div>
+                        <div class="history-date">April 19, 2026 • 2:10 PM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Controls -->
+    <div class="demo-controls">
+        <label>Demo: Add/Remove Pills</label>
+        <button onclick="addMorePills()">Add More Pills</button>
+        <button onclick="resetPills()">Reset Pills</button>
+        <button onclick="addExtraRows()">Add Extra Rows</button>
+    </div>
+
+    <script>
+        const tagsContainer = document.getElementById('tagsContainer');
+        const cardContent = document.getElementById('cardContent');
+        const scrollIndicator = document.getElementById('scrollIndicator');
+
+        const extraPills = [
+            { class: 'pill-vip', label: 'VIP' },
+            { class: 'pill-delivery', label: 'Delivery' },
+            { class: 'pill-catering', label: 'Catering' },
+            { class: 'pill-wedding', label: 'Wedding' },
+            { class: 'pill-event', label: 'Birthday' },
+            { class: 'pill-priority', label: 'Rush' },
+            { class: 'pill-fragile', label: 'Handle with Care' },
+            { class: 'pill-gift', label: 'Gift Wrap' },
+        ];
+
+        let pillIndex = 0;
+
+        function addMorePills() {
+            if (pillIndex >= extraPills.length) pillIndex = 0;
+            const pill = extraPills[pillIndex++];
+            const pillEl = document.createElement('span');
+            pillEl.className = `pill ${pill.class}`;
+            pillEl.innerHTML = `
+                <svg viewBox="0 0 24 24"><path d="M17.63,5.84C17.27,5.33 16.67,5 16,5H8C7.33,5 6.73,5.33 6.37,5.84L2,12L6.37,18.16C6.73,18.67 7.33,19 8,19H16C16.67,19 17.27,18.67 17.63,18.16L22,12L17.63,5.84Z"/></svg>
+                ${pill.label}
+            `;
+            tagsContainer.appendChild(pillEl);
+            checkScroll();
+        }
+
+        function resetPills() {
+            tagsContainer.innerHTML = `
+                <span class="pill pill-event">
+                    <svg viewBox="0 0 24 24"><path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1"/></svg>
+                    Event
+                </span>
+                <span class="pill pill-priority">
+                    <svg viewBox="0 0 24 24"><path d="M17.63,5.84C17.27,5.33 16.67,5 16,5H8C7.33,5 6.73,5.33 6.37,5.84L2,12L6.37,18.16C6.73,18.67 7.33,19 8,19H16C16.67,19 17.27,18.67 17.63,18.16L22,12L17.63,5.84Z"/></svg>
+                    Priority
+                </span>
+                <span class="pill pill-fragile">
+                    <svg viewBox="0 0 24 24"><path d="M17.63,5.84C17.27,5.33 16.67,5 16,5H8C7.33,5 6.73,5.33 6.37,5.84L2,12L6.37,18.16C6.73,18.67 7.33,19 8,19H16C16.67,19 17.27,18.67 17.63,18.16L22,12L17.63,5.84Z"/></svg>
+                    Fragile
+                </span>
+                <span class="pill pill-gift">
+                    <svg viewBox="0 0 24 24"><path d="M17.63,5.84C17.27,5.33 16.67,5 16,5H8C7.33,5 6.73,5.33 6.37,5.84L2,12L6.37,18.16C6.73,18.67 7.33,19 8,19H16C16.67,19 17.27,18.67 17.63,18.16L22,12L17.63,5.84Z"/></svg>
+                    Gift
+                </span>
+            `;
+            // Remove extra rows
+            document.querySelectorAll('.extra-row').forEach(el => el.remove());
+            checkScroll();
+        }
+
+        function addExtraRows() {
+            const row = document.createElement('div');
+            row.className = 'info-row extra-row';
+            row.innerHTML = `
+                <span class="info-label">Extra Field ${Date.now() % 1000}</span>
+                <span class="info-value">Some Value</span>
+            `;
+            cardContent.appendChild(row);
+            checkScroll();
+        }
+
+        function checkScroll() {
+            const canScroll = cardContent.scrollHeight > cardContent.clientHeight;
+            const isAtBottom = cardContent.scrollTop + cardContent.clientHeight >= cardContent.scrollHeight - 5;
+            scrollIndicator.classList.toggle('hidden', !canScroll || isAtBottom);
+        }
+
+        cardContent.addEventListener('scroll', checkScroll);
+        window.addEventListener('resize', checkScroll);
+        checkScroll();
+    </script>
+</body>
+</html>

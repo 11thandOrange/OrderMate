@@ -65,6 +65,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import android.view.ViewTreeObserver
 
 
 class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdateListener,
@@ -118,9 +119,72 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         setDataOnScreenWithArgs()
         viewModel = ViewModelProvider(this)[OrderDetailViewModel::class.java]
         setUpObserver()
+        setupOrderDetailsCardConstraints()
         runOnBackgroundThread {
             appConnector = AppsConnector(requireContext(), myApp.getCloverAccount())
         }
+    }
+    
+    /**
+     * Set up Order Details Card max height and scroll indicator
+     * Max height = Sidebar height - Customer Card height - Order History Card height - margins
+     */
+    private fun setupOrderDetailsCardConstraints() {
+        val sidebar = binding.buttonMenu
+        val customerCard = binding.customerCard
+        val orderHistoryCard = binding.orderHistoryCard
+        val scrollView = binding.orderDetailsScrollView
+        val scrollIndicator = binding.orderDetailsScrollIndicator
+        val orderDetailsHeader = binding.orderDetailsHeader
+        
+        // Wait for layout to be measured
+        sidebar.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                sidebar.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                
+                val sidebarHeight = sidebar.height
+                val customerCardHeight = customerCard.height
+                val orderHistoryCardHeight = orderHistoryCard.height
+                val headerHeight = orderDetailsHeader.height
+                
+                // Margins: Order Details bottom (20dp) + Customer bottom (20dp) = 40dp
+                // Plus header divider (1dp) + scroll indicator area (32dp estimate)
+                val marginsInPx = (40 * resources.displayMetrics.density).toInt()
+                val headerDividerPx = (1 * resources.displayMetrics.density).toInt()
+                val scrollIndicatorPx = (32 * resources.displayMetrics.density).toInt()
+                
+                // Max height for scroll view content area
+                // = Sidebar - Customer - History - margins - header - divider - scroll indicator
+                val maxScrollViewHeight = sidebarHeight - customerCardHeight - orderHistoryCardHeight - 
+                    marginsInPx - headerHeight - headerDividerPx - scrollIndicatorPx
+                
+                if (maxScrollViewHeight > 0) {
+                    // Set max height on the NestedScrollView
+                    val layoutParams = scrollView.layoutParams
+                    layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                    scrollView.layoutParams = layoutParams
+                    
+                    // Use post to apply max height constraint
+                    scrollView.post {
+                        if (scrollView.height > maxScrollViewHeight) {
+                            val newParams = scrollView.layoutParams
+                            newParams.height = maxScrollViewHeight
+                            scrollView.layoutParams = newParams
+                        }
+                        
+                        // Check if content is scrollable
+                        val canScroll = scrollView.canScrollVertically(1)
+                        scrollIndicator.visibility = if (canScroll) View.VISIBLE else View.GONE
+                    }
+                    
+                    // Set up scroll listener to show/hide indicator
+                    scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
+                        val canScrollMore = scrollView.canScrollVertically(1)
+                        scrollIndicator.visibility = if (canScrollMore) View.VISIBLE else View.GONE
+                    }
+                }
+            }
+        })
     }
 
 

@@ -410,6 +410,7 @@
             android:orientation="vertical">
 
             <!-- Order Details Card - clickable to open order-level popup -->
+            <!-- Max height calculated programmatically: sidebar height - customer card - order history card - margins -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/orderDetailsCard"
                 android:layout_width="match_parent"
@@ -429,8 +430,9 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Card Header with Status Badges - matches HTML .detail-card-header -->
+                    <!-- Card Header with Status Badges - FIXED, does not scroll -->
                     <LinearLayout
+                        android:id="@+id/orderDetailsHeader"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
@@ -521,6 +523,14 @@
                         android:layout_height="1dp"
                         android:layout_marginHorizontal="16dp"
                         android:background="#1AFFFFFF" />
+                    
+                    <!-- Scrollable content area -->
+                    <androidx.core.widget.NestedScrollView
+                        android:id="@+id/orderDetailsScrollView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fillViewport="true"
+                        android:overScrollMode="never">
 
                     <!-- #51: Order Info Rows - reduced padding -->
                     <LinearLayout
@@ -569,24 +579,29 @@
                                 android:background="#0DFFFFFF" />
 
                             <!-- Order Tags - Shows SINGLE_SELECT + MULTI_SELECT order level widget pills -->
+                            <!-- Using vertical layout with label on top and FlexboxLayout for wrapping pills -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical"
+                                android:orientation="vertical"
                                 android:paddingVertical="12dp">
+                                
                                 <com.google.android.material.textview.MaterialTextView
-                                    android:layout_width="0dp"
+                                    android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
+                                    android:layout_marginBottom="8dp"
                                     android:text="@string/order_tags"
                                     android:textColor="@color/text_muted"
                                     android:textSize="13sp" />
-                                <LinearLayout
+                                
+                                <!-- FlexboxLayout for wrapping pills -->
+                                <com.google.android.flexbox.FlexboxLayout
                                     android:id="@+id/tagsContainer"
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal" />
+                                    app:flexWrap="wrap"
+                                    app:alignItems="center"
+                                    app:justifyContent="flex_start" />
                             </LinearLayout>
                         </LinearLayout>
                         
@@ -621,6 +636,26 @@
                                 android:textStyle="bold" />
                         </LinearLayout>
                         
+                    </LinearLayout>
+                    
+                    </androidx.core.widget.NestedScrollView>
+                    
+                    <!-- Scroll indicator - shown when content overflows -->
+                    <LinearLayout
+                        android:id="@+id/orderDetailsScrollIndicator"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:paddingVertical="8dp"
+                        android:visibility="gone">
+                        
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_chevron_down"
+                            app:tint="@color/text_muted"
+                            android:contentDescription="@string/scroll_for_more" />
                     </LinearLayout>
                     
                     <!-- Hidden description field for backward compatibility -->
