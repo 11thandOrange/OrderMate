@@ -757,6 +757,24 @@ class WidgetManager private constructor(private val context: Context) {
     
     fun getEnabledOrderWidgetCount(): Int = getOrderWidgetsFromCache().count { it.isEnabled }
     
+    // ==================== Cross-Level Convenience Methods ====================
+    
+    /**
+     * Get all filterable widgets (both levels, enabled, excluding TEXT_BOX).
+     * Used by filter dialogs that show widgets from both levels.
+     */
+    fun getFilterableWidgets(): List<WidgetConfig> {
+        return getFilterableItemWidgets() + getFilterableOrderWidgets()
+    }
+    
+    /**
+     * Get widget by ID from either level.
+     * Used when widget level is unknown.
+     */
+    fun getWidgetById(widgetId: String): WidgetConfig? {
+        return getItemWidgetById(widgetId) ?: getOrderWidgetById(widgetId)
+    }
+    
     /**
      * Force reload item widgets from Firebase
      */
