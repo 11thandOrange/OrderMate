@@ -135,17 +135,32 @@ class ItemAdapter(
             val container = binding.itemNotesContainer
             container.removeAllViews()
             
-            if (noteString.isNullOrEmpty() || noteString.trim().isEmpty()) return
+            android.util.Log.d("ItemPillDebug", "========== ITEM PILL DEBUG ==========")
+            android.util.Log.d("ItemPillDebug", "noteString: '$noteString'")
+            
+            if (noteString.isNullOrEmpty() || noteString.trim().isEmpty()) {
+                android.util.Log.d("ItemPillDebug", "EARLY RETURN: noteString is null/empty")
+                return
+            }
 
             val density = context.resources.displayMetrics.density
             
             // Use cached widgets only for pill rendering (never defaults)
             val itemLevelWidgets = WidgetManager.getInstance(context).getCachedItemWidgets()
             
+            android.util.Log.d("ItemPillDebug", "itemLevelWidgets count: ${itemLevelWidgets.size}")
+            itemLevelWidgets.forEach { widget ->
+                android.util.Log.d("ItemPillDebug", "  Widget: id=${widget.id}, label=${widget.label}, type=${widget.type}, level=${widget.level}, enabled=${widget.isEnabled}")
+            }
+            
             val parsedTags = OrderNoteParser.extractTagsFromNote(noteString, itemLevelWidgets, NoteLevel.ITEM, includeTextBox = true)
+            
+            android.util.Log.d("ItemPillDebug", "parsedTags count: ${parsedTags.size}")
             parsedTags.forEach { tag ->
+                android.util.Log.d("ItemPillDebug", "  Tag: label=${tag.label}, value=${tag.value}, type=${tag.type}, widgetType=${tag.widgetType}")
                 addPillView(context, container, tag.value, tag.widgetType, density)
             }
+            android.util.Log.d("ItemPillDebug", "======================================")
         }
         
         private fun addPillView(

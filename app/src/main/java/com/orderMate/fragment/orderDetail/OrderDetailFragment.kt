@@ -421,13 +421,22 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         val tagsSection = binding.tagsSection
         tagsContainer.removeAllViews()
         
+        android.util.Log.d("OrderPillDebug", "========== ORDER PILL DEBUG ==========")
+        
         val orderNote = orderArguments?.note
         val widgetManager = context?.let { WidgetManager.getInstance(it) }
+        
+        android.util.Log.d("OrderPillDebug", "orderNote: '$orderNote'")
         
         // Get cached widgets only for pill rendering (never defaults)
         val selectWidgets = widgetManager?.getCachedOrderWidgets()
             ?.filter { it.type == WidgetType.SINGLE_SELECT || it.type == WidgetType.MULTI_SELECT }
             ?: emptyList()
+        
+        android.util.Log.d("OrderPillDebug", "selectWidgets count: ${selectWidgets.size}")
+        selectWidgets.forEach { widget ->
+            android.util.Log.d("OrderPillDebug", "  Widget: id=${widget.id}, label=${widget.label}, type=${widget.type}, level=${widget.level}, enabled=${widget.isEnabled}")
+        }
         
         // Parse and get tags from order note
         val tags = if (orderNote.isNullOrBlank() || selectWidgets.isEmpty()) {
@@ -437,6 +446,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 orderNote, selectWidgets, NoteLevel.ORDER
             ).filter { it.type != com.orderMate.utils.OrderNoteParser.TagType.CALENDAR }
         }
+        
+        android.util.Log.d("OrderPillDebug", "tags count: ${tags.size}")
+        tags.forEach { tag ->
+            android.util.Log.d("OrderPillDebug", "  Tag: label=${tag.label}, value=${tag.value}, type=${tag.type}")
+        }
+        android.util.Log.d("OrderPillDebug", "======================================")
         
         if (tags.isEmpty()) {
             // Hide entire section (divider + row) when no tags

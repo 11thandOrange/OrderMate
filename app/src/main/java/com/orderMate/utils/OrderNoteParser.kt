@@ -38,24 +38,49 @@ object OrderNoteParser {
         widgets: List<WidgetConfig>,
         level: NoteLevel
     ): Map<WidgetConfig, String> {
-        if (note.isNullOrBlank()) return emptyMap()
+        android.util.Log.d("NoteParserDebug", "--- parseNotesByWidgetType ---")
+        android.util.Log.d("NoteParserDebug", "note: '$note'")
+        android.util.Log.d("NoteParserDebug", "level: $level")
+        android.util.Log.d("NoteParserDebug", "widgets count: ${widgets.size}")
+        
+        if (note.isNullOrBlank()) {
+            android.util.Log.d("NoteParserDebug", "RETURN EMPTY: note is null/blank")
+            return emptyMap()
+        }
         
         val filteredWidgets = widgets.filter { it.level == level && it.isEnabled }
-        if (filteredWidgets.isEmpty()) return emptyMap()
+        android.util.Log.d("NoteParserDebug", "filteredWidgets count (level=$level, enabled=true): ${filteredWidgets.size}")
+        filteredWidgets.forEach { w ->
+            android.util.Log.d("NoteParserDebug", "  Filtered widget: id=${w.id}, label=${w.label}, level=${w.level}")
+        }
+        
+        if (filteredWidgets.isEmpty()) {
+            android.util.Log.d("NoteParserDebug", "RETURN EMPTY: no widgets match level=$level and enabled=true")
+            return emptyMap()
+        }
         
         val result = mutableMapOf<WidgetConfig, String>()
         val parsedValues = parseNoteToMapWithIds(note)
         
+        android.util.Log.d("NoteParserDebug", "parsedValues from note:")
+        parsedValues.forEach { (key, value) ->
+            android.util.Log.d("NoteParserDebug", "  ParsedKey: widgetId=${key.widgetId}, label=${key.label} -> value=$value")
+        }
+        
         for (widget in filteredWidgets) {
-            val value = parsedValues.entries.find { (key, _) ->
+            val matchingEntry = parsedValues.entries.find { (key, _) ->
                 key.widgetId == widget.id
-            }?.value
+            }
+            android.util.Log.d("NoteParserDebug", "Matching widget.id=${widget.id} -> found=${matchingEntry != null}")
             
+            val value = matchingEntry?.value
             if (!value.isNullOrBlank()) {
                 result[widget] = value
+                android.util.Log.d("NoteParserDebug", "  MATCH! widget=${widget.label} -> value=$value")
             }
         }
         
+        android.util.Log.d("NoteParserDebug", "RESULT count: ${result.size}")
         return result
     }
     
@@ -75,11 +100,15 @@ object OrderNoteParser {
         val delimiter = if (note.contains("•")) "•" else "|"
         val parts = note.split(delimiter).map { it.trim() }
         
+        android.util.Log.d("NoteParserDebug", "parseNoteToMapWithIds: delimiter='$delimiter', parts=${parts.size}")
+        
         for (part in parts) {
             val colonIndex = part.indexOf(':')
             if (colonIndex > 0) {
                 val keyPart = part.substring(0, colonIndex).trim()
                 val value = part.substring(colonIndex + 1).trim()
+                
+                android.util.Log.d("NoteParserDebug", "  part: '$part' -> keyPart='$keyPart', value='$value'")
                 
                 if (keyPart.isNotBlank() && value.isNotBlank()) {
                     // Try to extract widget ID from new format: [widgetId]label
@@ -87,9 +116,11 @@ object OrderNoteParser {
                         val closeBracket = keyPart.indexOf(']')
                         val widgetId = keyPart.substring(1, closeBracket)
                         val label = keyPart.substring(closeBracket + 1)
+                        android.util.Log.d("NoteParserDebug", "    NEW FORMAT: widgetId=$widgetId, label=$label")
                         ParsedKey(widgetId, label)
                     } else {
                         // Old format: just label
+                        android.util.Log.d("NoteParserDebug", "    OLD FORMAT: label=$keyPart (no widgetId)")
                         ParsedKey(null, keyPart)
                     }
                     result[parsedKey] = value
