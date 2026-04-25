@@ -172,8 +172,15 @@ class SendNotificationDialog(
                 val view = super.getDropDownView(position, convertView, parent)
                 (view as? TextView)?.apply {
                     setTextColor(ContextCompat.getColor(context, R.color.text_light))
-                    setBackgroundColor(ContextCompat.getColor(context, R.color.glass_background))
-                    setPadding(32, 24, 32, 24)
+                    // Use same background as dialog container (#292D3E)
+                    setBackgroundColor(android.graphics.Color.parseColor("#292D3E"))
+                    // Match input box: 48dp height, 16dp horizontal padding
+                    val density = resources.displayMetrics.density
+                    val heightPx = (48 * density).toInt()
+                    val horizPadding = (16 * density).toInt()
+                    setPadding(horizPadding, 0, horizPadding, 0)
+                    height = heightPx
+                    gravity = android.view.Gravity.CENTER_VERTICAL
                     textSize = 14f
                 }
                 return view
