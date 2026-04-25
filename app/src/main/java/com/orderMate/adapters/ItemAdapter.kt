@@ -139,9 +139,8 @@ class ItemAdapter(
 
             val density = context.resources.displayMetrics.density
             
-            // Use widget-based parsing for ITEM-level widgets
-            val widgets = WidgetManager.getCachedWidgets()
-            val itemLevelWidgets = widgets.filter { it.level == NoteLevel.ITEM }
+            // Use cached widgets only for pill rendering (never defaults)
+            val itemLevelWidgets = WidgetManager.getInstance(context).getCachedItemWidgets()
             
             val parsedTags = OrderNoteParser.extractTagsFromNote(noteString, itemLevelWidgets, NoteLevel.ITEM, includeTextBox = true)
             parsedTags.forEach { tag ->

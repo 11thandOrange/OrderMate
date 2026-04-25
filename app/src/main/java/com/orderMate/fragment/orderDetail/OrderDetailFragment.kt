@@ -293,10 +293,16 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 // Render screen immediately, then reload widgets and refresh pills
                 setUpTheScreen()
                 
-                // Load widgets from Firebase and refresh adapter to render pills
-                WidgetManager.getInstance(requireContext()).reloadAll {
-                    activity?.runOnUiThread {
-                        binding.itemRecycler.adapter?.notifyDataSetChanged()
+                // Load widgets from Firebase and refresh all widget-dependent UI
+                WidgetManager.getInstance(requireContext()).reloadAll { success ->
+                    if (success) {
+                        activity?.runOnUiThread {
+                            // Refresh line item pills
+                            binding.itemRecycler.adapter?.notifyDataSetChanged()
+                            // Refresh order-level tags and dynamic rows
+                            populateOrderTags()
+                            populateDynamicWidgetRows()
+                        }
                     }
                 }
             }
@@ -411,8 +417,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         val orderNote = orderArguments?.note
         val widgetManager = context?.let { WidgetManager.getInstance(it) }
         
-        // Get enabled SINGLE_SELECT and MULTI_SELECT widgets
-        val selectWidgets = widgetManager?.getEnabledOrderWidgets()
+        // Get cached widgets only for pill rendering (never defaults)
+        val selectWidgets = widgetManager?.getCachedOrderWidgets()
             ?.filter { it.type == WidgetType.SINGLE_SELECT || it.type == WidgetType.MULTI_SELECT }
             ?: emptyList()
         
@@ -475,8 +481,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         val orderNote = orderArguments?.note
         val widgetManager = context?.let { WidgetManager.getInstance(it) } ?: return
         
-        // Get enabled CALENDAR and TEXT_BOX widgets
-        val dynamicWidgets = widgetManager.getEnabledOrderWidgets()
+        // Get cached widgets only for pill rendering (never defaults)
+        val dynamicWidgets = widgetManager.getCachedOrderWidgets()
             .filter { it.type == WidgetType.CALENDAR || it.type == WidgetType.TEXT_BOX }
         
         if (orderNote.isNullOrBlank() || dynamicWidgets.isEmpty()) {

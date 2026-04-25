@@ -136,11 +136,11 @@ class OrderCardRedesignAdapter(
             val orderNote = order.note
             if (orderNote.isNullOrBlank()) return null
             
-            // (#18) Use widget-based parsing for ORDER-level TEXT widgets
-            val widgets = WidgetManager.getCachedWidgets()
-            if (widgets.isNotEmpty()) {
-                val textWidgets = widgets.filter { 
-                    it.level == NoteLevel.ORDER && it.type == com.orderMate.modals.WidgetType.TEXT_BOX
+            // (#18) Use cached widgets only for parsing (never defaults, enabled only)
+            val cachedWidgets = WidgetManager.getInstance(context).getCachedOrderWidgets()
+            if (cachedWidgets.isNotEmpty()) {
+                val textWidgets = cachedWidgets.filter { 
+                    it.type == com.orderMate.modals.WidgetType.TEXT_BOX
                 }
                 for (widget in textWidgets) {
                     val label = widget.label
@@ -236,9 +236,8 @@ class OrderCardRedesignAdapter(
             val tags = mutableListOf<CustomTag>()
             val seenValues = mutableSetOf<String>()
             
-            // Use widget-based parsing for ORDER-level widgets (all 4 types)
-            val widgets = WidgetManager.getCachedWidgets()
-            val displayWidgets = widgets.filter { it.level == NoteLevel.ORDER }
+            // Use cached widgets only for pill rendering (never defaults, enabled only)
+            val displayWidgets = WidgetManager.getInstance(context).getCachedOrderWidgets()
             
             // Include all 4 widget types, TEXT_BOX included with truncation
             val parsedTags = OrderNoteParser.extractTagsFromNote(orderNote, displayWidgets, NoteLevel.ORDER, includeTextBox = true)
@@ -388,9 +387,8 @@ class OrderCardRedesignAdapter(
         private fun setupNotesPills(order: Order) {
             val notes = mutableListOf<NoteItem>()
             
-            // Use widget-based parsing for all ITEM-level widgets (all 4 types)
-            val widgets = WidgetManager.getCachedWidgets()
-            val itemLevelWidgets = widgets.filter { it.level == NoteLevel.ITEM }
+            // Use cached widgets only for pill rendering (never defaults, enabled only)
+            val itemLevelWidgets = WidgetManager.getInstance(context).getCachedItemWidgets()
             
             order.lineItems?.forEach { lineItem ->
                 lineItem?.note?.let { note ->

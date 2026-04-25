@@ -121,6 +121,26 @@ class WidgetManager private constructor(private val context: Context) {
         return getItemWidgetsFromCache() + getOrderWidgetsFromCache()
     }
     
+    // ==================== Cache-Only Methods (for pill rendering) ====================
+    // These methods return ONLY cached/stored widgets, never defaults.
+    // Use for rendering pills where we only want to show stored widget values.
+    
+    /**
+     * Get cached item-level widgets only (no defaults).
+     * For pill rendering - only show pills for stored widgets.
+     */
+    fun getCachedItemWidgets(): List<WidgetConfig> {
+        return getItemWidgetsFromCache().filter { it.isEnabled }
+    }
+    
+    /**
+     * Get cached order-level widgets only (no defaults).
+     * For pill rendering - only show pills for stored widgets.
+     */
+    fun getCachedOrderWidgets(): List<WidgetConfig> {
+        return getOrderWidgetsFromCache().filter { it.isEnabled }
+    }
+    
     /**
      * Get item-level widgets (all, including disabled) sorted by order.
      */

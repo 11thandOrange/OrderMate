@@ -500,10 +500,10 @@ class CalendarFragment : Fragment() {
      * Convert Clover orders to calendar events
      */
     private fun convertOrdersToEvents(orders: List<Order?>): List<ScheduledEvent> {
-        // Get widgets for widget-based parsing (#29, #30)
+        // Get all cached widgets for due date resolution (includes all levels)
         val allWidgets = WidgetManager.getCachedWidgets()
-        // Get ORDER level widgets only for order-level tag extraction
-        val orderLevelWidgets = allWidgets.filter { it.level == NoteLevel.ORDER && it.isEnabled }
+        // Get cached order widgets only for pill rendering (never defaults, enabled only)
+        val orderLevelWidgets = context?.let { WidgetManager.getInstance(it).getCachedOrderWidgets() } ?: emptyList()
         
         return orders.mapNotNull { order ->
             order ?: return@mapNotNull null
