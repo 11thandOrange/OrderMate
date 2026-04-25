@@ -172,10 +172,9 @@ class SendNotificationDialog(
                 val view = super.getDropDownView(position, convertView, parent)
                 (view as? TextView)?.apply {
                     setTextColor(ContextCompat.getColor(context, R.color.text_light))
-                    setBackgroundColor(ContextCompat.getColor(context, R.color.card_background))
-                    setPadding(48, 36, 48, 36)
+                    setBackgroundColor(ContextCompat.getColor(context, R.color.glass_background))
+                    setPadding(32, 24, 32, 24)
                     textSize = 14f
-                    minHeight = 48
                 }
                 return view
             }
