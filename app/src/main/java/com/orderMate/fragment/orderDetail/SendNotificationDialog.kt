@@ -129,10 +129,19 @@ class SendNotificationDialog(
         // Load templates on background thread (getMerchantId requires background thread)
         runOnBackgroundThread {
             try {
-                val app = requireContext().applicationContext as? MyApp ?: return@runOnBackgroundThread
-                val merchantId = app.getMerchantId() ?: return@runOnBackgroundThread
+                val app = requireContext().applicationContext as? MyApp ?: run {
+                    android.util.Log.e("SendNotificationDialog", "Failed to get MyApp")
+                    return@runOnBackgroundThread
+                }
+                val merchantId = app.getMerchantId() ?: run {
+                    android.util.Log.e("SendNotificationDialog", "Failed to get merchantId")
+                    return@runOnBackgroundThread
+                }
+                
+                android.util.Log.d("SendNotificationDialog", "Loading templates for merchant: $merchantId")
                 
                 FirebaseConfigManager.getInstance().getTemplates(merchantId) { loadedTemplates ->
+                    android.util.Log.d("SendNotificationDialog", "Loaded ${loadedTemplates.size} templates: ${loadedTemplates.map { it.name }}")
                     templates = loadedTemplates
                     runOnMainThread {
                         if (isAdded) {
@@ -141,6 +150,7 @@ class SendNotificationDialog(
                     }
                 }
             } catch (e: Exception) {
+                android.util.Log.e("SendNotificationDialog", "Error loading templates", e)
                 e.printStackTrace()
             }
         }
