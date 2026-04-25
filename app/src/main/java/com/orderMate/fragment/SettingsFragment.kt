@@ -170,9 +170,7 @@ class SettingsFragment : Fragment() {
                     runOnMainThread {
                         if (isAdded) {
                             widgetManager.setMerchantId(mid)
-                            // Now that we have merchantId, reload widgets from Firebase (not cache)
-                            loadWidgetsFromFirebase()
-                            // Also load templates
+                            // Now that we have merchantId, load templates
                             loadTemplatesFromFirebase()
                         }
                     }
