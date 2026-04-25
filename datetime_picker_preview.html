@@ -291,21 +291,21 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
-        /* Footer - nav_border */
+        /* Footer - nav_border, right-aligned buttons */
         .dialog-footer {
             display: flex;
-            gap: 16px;
+            justify-content: flex-end;
+            gap: 12px;
             padding: 16px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Buttons - 48dp height, 12dp corner radius */
+        /* Buttons - 44dp height, 12dp corner radius, wrap content */
         .btn {
-            flex: 1;
-            padding: 14px 20px;
-            height: 48px;
+            padding: 0 16px;
+            height: 44px;
             border-radius: 12px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -315,11 +315,11 @@
             justify-content: center;
         }
 
-        /* Cancel - glass_background, text_muted */
+        /* Cancel - glass_background, text_light */
         .btn-cancel {
             background: rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.8);
-            margin-right: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            padding: 0 16px;
         }
 
         .btn-cancel:hover {
@@ -330,7 +330,7 @@
         .btn-save {
             background: #FF9F43;
             color: #fff;
-            margin-left: 8px;
+            padding: 0 20px;
         }
 
         .btn-save:hover {
