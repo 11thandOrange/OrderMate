@@ -94,9 +94,7 @@
                 android:id="@+id/templateSpinnerContainer"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:background="@drawable/bg_modal_input"
-                android:clickable="true"
-                android:focusable="true">
+                android:background="@drawable/bg_modal_input">
 
                 <Spinner
                     android:id="@+id/templateSpinner"
@@ -105,8 +103,9 @@
                     android:background="@android:color/transparent"
                     android:paddingStart="16dp"
                     android:paddingEnd="40dp"
-                    android:spinnerMode="dialog"
-                    android:prompt="@string/select_template" />
+                    android:spinnerMode="dropdown"
+                    android:dropDownWidth="match_parent"
+                    android:popupBackground="@drawable/bg_dialog" />
 
                 <ImageView
                     android:layout_width="24dp"
