@@ -682,7 +682,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
                     val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
                     val widget = WidgetManager.getInstance(requireContext()).getWidgetById(widgetId ?: "") ?: continue
-                    val orderValues = extractWidgetValuesFromNotes(order.lineItems, widget.label)
+                    val orderValues = extractWidgetValuesFromNotes(order.lineItems, widget.id)
                     if (!selectedValues.any { it in orderValues }) return false
                 }
             }
@@ -708,7 +708,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
                     val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
                     val widget = WidgetManager.getInstance(requireContext()).getWidgetById(widgetId ?: "") ?: continue
-                    val orderDateValues = extractWidgetValuesFromNotes(order.lineItems, widget.label)
+                    val orderDateValues = extractWidgetValuesFromNotes(order.lineItems, widget.id)
                     
                     val matchesAny = dates.any { filterDate ->
                         val dateStr = java.text.SimpleDateFormat("M/d/yy", java.util.Locale.getDefault()).format(filterDate)
@@ -724,16 +724,22 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     
     /**
      * Extract widget values from line item notes
-     * Notes format: "Label: Value • Label2: Value2"
+     * Notes format: "[widgetId]Label: Value • [widgetId2]Label2: Value2"
      */
-    private fun extractWidgetValuesFromNotes(lineItems: MutableList<LineItem?>?, widgetLabel: String): Set<String> {
+    private fun extractWidgetValuesFromNotes(lineItems: MutableList<LineItem?>?, widgetId: String): Set<String> {
         val values = mutableSetOf<String>()
         lineItems?.forEach { item ->
             item?.note?.let { note ->
-                // Parse note format: "Label: Value • Label2: Value2"
-                val regex = "$widgetLabel:\\s*([^•]+)".toRegex(RegexOption.IGNORE_CASE)
-                regex.find(note)?.groupValues?.getOrNull(1)?.trim()?.let { 
-                    values.add(it) 
+                // Match by widget ID in format [widgetId]label:value
+                val pattern = "\\[$widgetId\\][^:]*:([^•|]+)".toRegex()
+                pattern.findAll(note).forEach { match ->
+                    val value = match.groupValues[1].trim()
+                    if (value.isNotEmpty()) {
+                        // Handle multi-select comma-separated values
+                        value.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { v ->
+                            values.add(v)
+                        }
+                    }
                 }
             }
         }

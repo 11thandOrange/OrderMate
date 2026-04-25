@@ -825,7 +825,7 @@ class CalendarFragment : Fragment() {
                 FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
                     val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
                     val widget = WidgetManager.getInstance(requireContext()).getWidgetById(widgetId ?: "") ?: continue
-                    val orderValues = extractWidgetValuesFromNotes(order.lineItems, widget.label)
+                    val orderValues = extractWidgetValuesFromNotes(order.lineItems, widget.id)
                     if (!selectedValues.any { it in orderValues }) return false
                 }
             }
@@ -850,16 +850,18 @@ class CalendarFragment : Fragment() {
         return true
     }
     
-    private fun extractWidgetValuesFromNotes(lineItems: List<com.clover.sdk.v3.order.LineItem>?, widgetLabel: String): Set<String> {
+    private fun extractWidgetValuesFromNotes(lineItems: List<com.clover.sdk.v3.order.LineItem>?, widgetId: String): Set<String> {
         val values = mutableSetOf<String>()
         lineItems?.forEach { lineItem ->
             val note = lineItem?.note ?: return@forEach
-            if (note.contains(widgetLabel, ignoreCase = true)) {
-                val parts = note.split("\n")
-                parts.forEach { part ->
-                    if (part.contains(widgetLabel, ignoreCase = true)) {
-                        val value = part.substringAfter(":").trim()
-                        if (value.isNotEmpty()) values.add(value)
+            // Match by widget ID in format [widgetId]label:value
+            val pattern = "\\[$widgetId\\][^:]*:([^•|]+)".toRegex()
+            pattern.findAll(note).forEach { match ->
+                val value = match.groupValues[1].trim()
+                if (value.isNotEmpty()) {
+                    // Handle multi-select comma-separated values
+                    value.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { v ->
+                        values.add(v)
                     }
                 }
             }

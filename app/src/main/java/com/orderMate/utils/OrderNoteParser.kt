@@ -30,7 +30,8 @@ object OrderNoteParser {
     )
     
     /**
-     * Parse a note string and match values to widgets by label.
+     * Parse a note string and match values to widgets by ID.
+     * Format: [widgetId]label:value
      */
     fun parseNotesByWidgetType(
         note: String?,
@@ -43,11 +44,11 @@ object OrderNoteParser {
         if (filteredWidgets.isEmpty()) return emptyMap()
         
         val result = mutableMapOf<WidgetConfig, String>()
-        val parsedValues = parseNoteToMap(note)
+        val parsedValues = parseNoteToMapWithIds(note)
         
         for (widget in filteredWidgets) {
-            val value = parsedValues.entries.find { (label, _) ->
-                label.equals(widget.label, ignoreCase = true)
+            val value = parsedValues.entries.find { (key, _) ->
+                key.widgetId == widget.id
             }?.value
             
             if (!value.isNullOrBlank()) {
@@ -59,27 +60,55 @@ object OrderNoteParser {
     }
     
     /**
-     * Parse a note string into a map of label -> value.
+     * Parsed key containing optional widget ID and label.
      */
-    fun parseNoteToMap(note: String?): Map<String, String> {
+    data class ParsedKey(val widgetId: String?, val label: String)
+    
+    /**
+     * Parse a note string into a map of ParsedKey -> value.
+     * Handles both new format [widgetId]label:value and old format label:value
+     */
+    private fun parseNoteToMapWithIds(note: String?): Map<ParsedKey, String> {
         if (note.isNullOrBlank()) return emptyMap()
         
-        val result = mutableMapOf<String, String>()
+        val result = mutableMapOf<ParsedKey, String>()
         val delimiter = if (note.contains("•")) "•" else "|"
         val parts = note.split(delimiter).map { it.trim() }
         
         for (part in parts) {
             val colonIndex = part.indexOf(':')
             if (colonIndex > 0) {
-                val label = part.substring(0, colonIndex).trim()
+                val keyPart = part.substring(0, colonIndex).trim()
                 val value = part.substring(colonIndex + 1).trim()
-                if (label.isNotBlank() && value.isNotBlank()) {
-                    result[label] = value
+                
+                if (keyPart.isNotBlank() && value.isNotBlank()) {
+                    // Try to extract widget ID from new format: [widgetId]label
+                    val parsedKey = if (keyPart.startsWith("[") && keyPart.contains("]")) {
+                        val closeBracket = keyPart.indexOf(']')
+                        val widgetId = keyPart.substring(1, closeBracket)
+                        val label = keyPart.substring(closeBracket + 1)
+                        ParsedKey(widgetId, label)
+                    } else {
+                        // Old format: just label
+                        ParsedKey(null, keyPart)
+                    }
+                    result[parsedKey] = value
                 }
             }
         }
         
         return result
+    }
+    
+    /**
+     * Parse a note string into a map of label -> value.
+     * Note: This strips widget IDs for backward compatibility.
+     */
+    fun parseNoteToMap(note: String?): Map<String, String> {
+        if (note.isNullOrBlank()) return emptyMap()
+        
+        val parsed = parseNoteToMapWithIds(note)
+        return parsed.map { (key, value) -> key.label to value }.toMap()
     }
     
     /**
