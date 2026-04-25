@@ -449,13 +449,6 @@ class CalendarFragment : Fragment() {
                     currentFilterState = sharedState
                     // applyFiltersSync handles pills and rendering
                     applyFiltersSync(sharedState)
-                } else if (restoredSearchedDates.isNotEmpty()) {
-                    // We have searched dates but no active filters - need to filter by those dates
-                    currentFilterState = currentFilterState.copy(
-                        dateSelections = mapOf(FilterCategoryBuilder.CLOVER_ORDER_DATE to restoredSearchedDates)
-                    )
-                    // applyFiltersSync handles pills and rendering
-                    applyFiltersSync(currentFilterState)
                 } else {
                     renderCalendar()
                 }
