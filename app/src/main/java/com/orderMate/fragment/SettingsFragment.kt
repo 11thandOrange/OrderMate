@@ -1042,7 +1042,7 @@ class SettingsFragment : Fragment() {
     
     private fun loadPopupSettingsFromFirebase() {
         // Load PopupSettings from WidgetManager (which loads from Firebase)
-        widgetManager.reload { success ->
+        widgetManager.reloadAll { success ->
             if (success) {
                 activity?.runOnUiThread {
                     val settings = widgetManager.getSettings()
