@@ -524,14 +524,13 @@
                         android:layout_marginHorizontal="16dp"
                         android:background="#1AFFFFFF" />
                     
-                    <!-- Scrollable content area - nestedScrollingEnabled=false prevents scroll propagation -->
+                    <!-- Scrollable content area -->
                     <androidx.core.widget.NestedScrollView
                         android:id="@+id/orderDetailsScrollView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fillViewport="true"
-                        android:overScrollMode="never"
-                        android:nestedScrollingEnabled="false">
+                        android:overScrollMode="never">
 
                     <!-- #51: Order Info Rows - reduced padding -->
                     <LinearLayout
