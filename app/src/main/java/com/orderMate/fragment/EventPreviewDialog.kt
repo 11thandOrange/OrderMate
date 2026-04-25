@@ -291,22 +291,31 @@ class EventPreviewDialog : DialogFragment() {
             
             private fun addWidgetPill(text: String, color: Int, iconRes: Int, density: Float) {
                 val context = itemView.context
-                val pill = TextView(context).apply {
-                    this.text = text
-                    setTextColor(color)
-                    textSize = 10f
-                    setPadding(dpToPx(8), dpToPx(2), dpToPx(8), dpToPx(2))
-                    // Use WidgetColorUtils for consistent pill styling
-                    background = WidgetColorUtils.createPillBackground(color, 8f, density)
-                    
-                    val lp = FlexboxLayout.LayoutParams(
-                        FlexboxLayout.LayoutParams.WRAP_CONTENT,
-                        FlexboxLayout.LayoutParams.WRAP_CONTENT
-                    )
-                    lp.setMargins(0, 0, dpToPx(4), dpToPx(4))
-                    layoutParams = lp
-                }
-                notesPillsContainer.addView(pill)
+                val inflater = LayoutInflater.from(context)
+                
+                // Inflate the same pill layout used everywhere
+                val pillView = inflater.inflate(R.layout.item_note_pill, notesPillsContainer, false) as android.widget.LinearLayout
+                
+                val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
+                val pillText = pillView.findViewById<TextView>(R.id.pillText)
+                
+                pillText.text = text
+                pillText.setTextColor(color)
+                
+                pillIcon.setImageResource(iconRes)
+                pillIcon.setColorFilter(color)
+                
+                // Use WidgetColorUtils for consistent pill styling
+                pillView.background = WidgetColorUtils.createPillBackground(color, 8f, density)
+                
+                val lp = FlexboxLayout.LayoutParams(
+                    FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                    FlexboxLayout.LayoutParams.WRAP_CONTENT
+                )
+                lp.setMargins(0, 0, dpToPx(4), dpToPx(4))
+                pillView.layoutParams = lp
+                
+                notesPillsContainer.addView(pillView)
             }
             
             private fun dpToPx(dp: Int): Int {
