@@ -586,11 +586,13 @@
 
                         <!-- Order Tags - Shows SINGLE_SELECT + MULTI_SELECT order level widget pills -->
                         <LinearLayout
+                            android:id="@+id/tagsRow"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
-                            android:paddingVertical="12dp">
+                            android:paddingVertical="12dp"
+                            android:visibility="gone">
                             <com.google.android.material.textview.MaterialTextView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
