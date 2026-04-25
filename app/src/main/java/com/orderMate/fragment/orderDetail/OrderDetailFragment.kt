@@ -405,33 +405,27 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         
         val density = resources.displayMetrics.density
         
-        tags.forEachIndexed { index, tag ->
-            // Use WidgetColorUtils for consistent colors
+        tags.forEach { tag ->
+            // Use WidgetColorUtils for consistent colors and icons (same as item-level)
             val tagColor = com.orderMate.utils.WidgetColorUtils.getColorForWidgetType(tag.widgetType)
+            val iconRes = com.orderMate.utils.WidgetColorUtils.getIconForWidgetType(tag.widgetType)
             
-            val tagView = TextView(requireContext()).apply {
-                text = tag.value
-                textSize = 11f
-                setTextColor(tagColor)
-                setPadding(
-                    (8 * density).toInt(),
-                    (4 * density).toInt(),
-                    (8 * density).toInt(),
-                    (4 * density).toInt()
-                )
-                
-                // Unified pill background: 15% opacity + 25% border
-                background = com.orderMate.utils.WidgetColorUtils.createPillBackground(tagColor, 10f, density)
-            }
-            tagsContainer.addView(tagView)
+            // Inflate the same pill layout used by item-level widgets
+            val pillView = layoutInflater.inflate(R.layout.item_note_pill, tagsContainer, false) as LinearLayout
             
-            // Add spacing between tags
-            if (index < tags.size - 1) {
-                val spacer = View(requireContext()).apply {
-                    layoutParams = LinearLayout.LayoutParams((4 * density).toInt(), 1)
-                }
-                tagsContainer.addView(spacer)
-            }
+            val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
+            val pillText = pillView.findViewById<TextView>(R.id.pillText)
+            
+            pillText.text = tag.value
+            pillText.setTextColor(tagColor)
+            
+            pillIcon.setImageResource(iconRes)
+            pillIcon.setColorFilter(tagColor)
+            
+            // Unified pill background: 15% opacity + 25% border
+            pillView.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(tagColor, 10f, density)
+            
+            tagsContainer.addView(pillView)
         }
     }
     
