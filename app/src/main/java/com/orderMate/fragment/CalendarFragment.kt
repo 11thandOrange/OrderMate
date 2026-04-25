@@ -325,35 +325,17 @@ class CalendarFragment : Fragment() {
     }
     
     private fun syncOrders() {
-        isSyncing = true
-        searchInput?.text?.clear()
-        
         // Show syncing indicator
         syncingContainer?.visibility = View.VISIBLE
         syncButton?.isEnabled = false
         syncButton?.alpha = 0.5f
         
-        runOnBackgroundThread {
-            try {
-                val orderConnector = (requireActivity().application as MyApp).getOrderConnector()
-                val orderData = orderConnector.getOrders(mutableListOf())
-                allOrders.clear()
-                orderData?.forEach { allOrders.add(it) }
-                allEvents = convertOrdersToEvents(allOrders)
-                filteredEvents = allEvents
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            
-            runOnMainThread {
-                isSyncing = false
-                syncingContainer?.visibility = View.GONE
-                syncButton?.isEnabled = true
-                syncButton?.alpha = 1.0f
-                
-                renderCalendar()
-                Toast.makeText(requireContext(), "Calendar synced", Toast.LENGTH_SHORT).show()
-            }
+        loadOrders {
+            // Hide syncing indicator after load completes
+            syncingContainer?.visibility = View.GONE
+            syncButton?.isEnabled = true
+            syncButton?.alpha = 1.0f
+            Toast.makeText(requireContext(), "Calendar synced", Toast.LENGTH_SHORT).show()
         }
     }
     
@@ -414,7 +396,7 @@ class CalendarFragment : Fragment() {
     /**
      * Load orders from Clover (same as List tab)
      */
-    private fun loadOrders() {
+    private fun loadOrders(onComplete: (() -> Unit)? = null) {
         ordersLoaded = false
         
         runOnBackgroundThread {
@@ -471,6 +453,8 @@ class CalendarFragment : Fragment() {
                 } else {
                     renderCalendar()
                 }
+                
+                onComplete?.invoke()
             }
         }
     }

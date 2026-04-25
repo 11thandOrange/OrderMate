@@ -320,7 +320,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     // ==================== Data Loading ====================
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun loadOrders() {
+    private fun loadOrders(onComplete: (() -> Unit)? = null) {
         showLoading(true)
         
         runOnBackgroundThread {
@@ -351,6 +351,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                     orderAdapter?.notifyDataSetChanged()
                     updateEmptyState()
                 }
+                
+                onComplete?.invoke()
             }
 
             // Update filter options
@@ -361,46 +363,17 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun syncOrders() {
-        isSyncing = true
-        binding.header.searchInput.text?.clear()
-        selectedDateFilter = null
-        
-        // Show syncing indicator (#15)
+        // Show syncing indicator
         binding.header.syncingContainer.showView()
         binding.header.syncButton.isEnabled = false
         binding.header.syncButton.alpha = 0.5f
-
-        runOnBackgroundThread {
-            try {
-                val orderData = myApp.getOrderConnector().getOrders(mutableListOf())
-                orderItems.clear()
-                allItemList.clear()
-                filterData.clear()
-                
-                orderData?.forEach {
-                    allItemList.add(it)
-                    orderItems.add(it)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            runOnMainThread {
-                isSyncing = false
-                binding.header.syncingContainer.hideView()
-                binding.header.syncButton.isEnabled = true
-                binding.header.syncButton.alpha = 1.0f
-                
-                updateResultsInfo()
-                notifyAdapter()
-                updateEmptyState()
-                
-                Toast.makeText(requireContext(), "Orders synced", Toast.LENGTH_SHORT).show()
-            }
-
-            CoroutineScope(Dispatchers.Default).launch {
-                updateFilterOptions()
-            }
+        
+        loadOrders {
+            // Hide syncing indicator after load completes
+            binding.header.syncingContainer.hideView()
+            binding.header.syncButton.isEnabled = true
+            binding.header.syncButton.alpha = 1.0f
+            Toast.makeText(requireContext(), "Orders synced", Toast.LENGTH_SHORT).show()
         }
     }
 
