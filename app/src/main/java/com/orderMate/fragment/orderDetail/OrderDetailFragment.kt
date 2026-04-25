@@ -941,9 +941,20 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             }
             
             // Order Details Card click - opens order-level notes popup
-            orderDetailsClickOverlay.setOnClickListener {
-                openOrderNoteDialog()
+            // Use GestureDetector to detect taps while allowing scroll
+            val gestureDetector = android.view.GestureDetector(requireContext(), 
+                object : android.view.GestureDetector.SimpleOnGestureListener() {
+                    override fun onSingleTapUp(e: android.view.MotionEvent): Boolean {
+                        openOrderNoteDialog()
+                        return true
+                    }
+                })
+            orderDetailsScrollView.setOnTouchListener { _, event ->
+                gestureDetector.onTouchEvent(event)
+                false // Return false to allow scroll to continue
             }
+            // Also handle clicks on header (which is outside ScrollView)
+            orderDetailsHeader.setOnClickListener { openOrderNoteDialog() }
             
             // Order History Card click - opens order history dialog
             orderHistoryCard.setOnClickListener {
