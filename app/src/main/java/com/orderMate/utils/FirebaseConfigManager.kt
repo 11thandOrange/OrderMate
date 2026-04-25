@@ -109,6 +109,42 @@ class FirebaseConfigManager private constructor() {
             }
     }
     
+    /**
+     * Get only ORDER level widgets (for order popup settings)
+     */
+    fun getOrderWidgets(merchantId: String, callback: (List<WidgetConfig>) -> Unit) {
+        db.getReference(FirebasePaths.widgets(merchantId))
+            .orderByChild("level")
+            .equalTo(NoteLevel.ORDER.name)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val widgets = snapshot.children.mapNotNull { parseWidget(it) }
+                callback(widgets.sortedBy { it.order })
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(emptyList())
+            }
+    }
+    
+    /**
+     * Get only ITEM level widgets (for item popup settings)
+     */
+    fun getItemWidgets(merchantId: String, callback: (List<WidgetConfig>) -> Unit) {
+        db.getReference(FirebasePaths.widgets(merchantId))
+            .orderByChild("level")
+            .equalTo(NoteLevel.ITEM.name)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val widgets = snapshot.children.mapNotNull { parseWidget(it) }
+                callback(widgets.sortedBy { it.order })
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(emptyList())
+            }
+    }
+    
     private fun parseWidget(snapshot: DataSnapshot): WidgetConfig? {
         val id = snapshot.key ?: return null
         val typeStr = snapshot.child("type").getValue(String::class.java)
@@ -158,6 +194,11 @@ class FirebaseConfigManager private constructor() {
     }
     
     fun saveWidget(merchantId: String, widget: WidgetConfig, callback: (Boolean) -> Unit) {
+        // Ensure level is never null - default to ITEM for backward compatibility
+        if (widget.level == null) {
+            widget.level = NoteLevel.ITEM
+        }
+        
         db.getReference(FirebasePaths.widget(merchantId, widget.id))
             .setValue(widget.toMap())
             .addOnSuccessListener {

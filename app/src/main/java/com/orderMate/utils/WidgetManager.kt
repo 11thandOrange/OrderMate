@@ -60,6 +60,11 @@ class WidgetManager private constructor(private val context: Context) {
         this.merchantId = merchantId
     }
     
+    /**
+     * Get merchant ID for direct Firebase queries.
+     */
+    fun getMerchantId(): String? = merchantId
+    
     // ==================== Read from Cache (synchronous) ====================
     
     /**
@@ -259,6 +264,13 @@ class WidgetManager private constructor(private val context: Context) {
     
     fun updateWidget(widget: WidgetConfig, callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
+        
+        // Fix: Preserve original level from cache to prevent accidental level changes
+        val originalWidget = getWidgetById(widget.id)
+        if (originalWidget != null && widget.level != originalWidget.level) {
+            widget.level = originalWidget.level
+        }
+        
         firebase.saveWidget(mid, widget) { success ->
             if (success) {
                 val widgets = getWidgets().toMutableList()

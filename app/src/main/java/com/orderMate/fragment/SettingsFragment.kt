@@ -398,7 +398,7 @@ class SettingsFragment : Fragment() {
         }
         
         itemLevelWidgetAdapter = FirebaseWidgetEditorAdapter(
-            onWidgetUpdate = { widget -> saveWidgetToFirebase(widget) },
+            onWidgetUpdate = { widget -> saveItemWidget(widget) },
             onWidgetDelete = { widget -> showDeleteWidgetDialog(widget, NoteLevel.ITEM) }
         )
         
@@ -468,7 +468,7 @@ class SettingsFragment : Fragment() {
         }
         
         orderLevelWidgetAdapter = FirebaseWidgetEditorAdapter(
-            onWidgetUpdate = { widget -> saveWidgetToFirebase(widget) },
+            onWidgetUpdate = { widget -> saveOrderWidget(widget) },
             onWidgetDelete = { widget -> showDeleteWidgetDialog(widget, NoteLevel.ORDER) }
         )
         
@@ -521,15 +521,61 @@ class SettingsFragment : Fragment() {
     // ==================== Shared Widget Methods ====================
     
     private fun loadWidgetsFromFirebase() {
-        // Read directly from cache (MainActivityRedesign already populated it)
-        val itemWidgets = widgetManager.getAllItemLevelWidgets()
-        itemLevelWidgetAdapter?.setWidgets(itemWidgets.toMutableList())
-
-        val orderWidgets = widgetManager.getAllOrderLevelWidgets()
-        orderLevelWidgetAdapter?.setWidgets(orderWidgets.toMutableList())
+        val merchantId = widgetManager.getMerchantId()
+        if (merchantId == null) {
+            // Fallback to cache if merchantId not available
+            val itemWidgets = widgetManager.getAllItemLevelWidgets()
+            itemLevelWidgetAdapter?.setWidgets(itemWidgets.toMutableList())
+            val orderWidgets = widgetManager.getAllOrderLevelWidgets()
+            orderLevelWidgetAdapter?.setWidgets(orderWidgets.toMutableList())
+            return
+        }
+        
+        val firebase = FirebaseConfigManager.getInstance()
+        
+        // Use direct Firebase queries to ensure level separation
+        firebase.getItemWidgets(merchantId) { itemWidgets ->
+            activity?.runOnUiThread {
+                itemLevelWidgetAdapter?.setWidgets(itemWidgets.toMutableList())
+            }
+        }
+        
+        firebase.getOrderWidgets(merchantId) { orderWidgets ->
+            activity?.runOnUiThread {
+                orderLevelWidgetAdapter?.setWidgets(orderWidgets.toMutableList())
+            }
+        }
     }
     
     private fun saveWidgetToFirebase(widget: WidgetConfig) {
+        widgetManager.updateWidget(widget) { success ->
+            if (!success) {
+                activity?.runOnUiThread {
+                    Toast.makeText(context, "Failed to save widget", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    
+    /**
+     * Save item-level widget with enforced level
+     */
+    private fun saveItemWidget(widget: WidgetConfig) {
+        widget.level = NoteLevel.ITEM  // Enforce level
+        widgetManager.updateWidget(widget) { success ->
+            if (!success) {
+                activity?.runOnUiThread {
+                    Toast.makeText(context, "Failed to save widget", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    
+    /**
+     * Save order-level widget with enforced level
+     */
+    private fun saveOrderWidget(widget: WidgetConfig) {
+        widget.level = NoteLevel.ORDER  // Enforce level
         widgetManager.updateWidget(widget) { success ->
             if (!success) {
                 activity?.runOnUiThread {
