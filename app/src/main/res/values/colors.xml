@@ -149,4 +149,12 @@
     <!-- Order note dialog accent -->
     <color name="order_dialog_accent">#9B59B6</color>
     <color name="item_dialog_accent">#27AE60</color>
+    
+    <!-- DateTime picker colors -->
+    <color name="calendar_blue">#64B5F6</color>
+    <color name="calendar_blue_bg">#2664B5F6</color>
+    <color name="input_background">#1A000000</color>
+    <color name="text_tertiary">#99000000</color>
+    <color name="calendar_day_selected">#64B5F6</color>
+    <color name="calendar_day_today_border">#8064B5F6</color>
 </resources>

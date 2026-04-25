@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DateTime Picker Preview - OrderMate</title>
+    <style>
+        /* Android color mappings (matching order/item note dialogs):
+           bg_dialog: #CC292D3E (dark purple/blue glassmorphism)
+           orange_accent: #FF9F43 (gold highlight)
+           text_light: #E6FFFFFF (90% white)
+           text_muted: #99FFFFFF (60% white)
+           glass_background: #26FFFFFF (15% white)
+           nav_border: #1AFFFFFF (10% white)
+        */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Dialog - bg_dialog #CC292D3E with 1dp border #1AFFFFFF */
+        .dialog {
+            position: relative;
+            background: rgba(41, 45, 62, 0.8);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Header */
+        .dialog-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dialog-title {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .dialog-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .dialog-body {
+            padding: 16px;
+        }
+
+        /* Side by side layout */
+        .picker-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .date-section {
+            flex: 1;
+            margin-right: 12px;
+        }
+
+        .time-section {
+            width: 120px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Section Labels - text_muted, 11sp, bold, uppercase */
+        .section-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        /* Calendar Container - glass_background #26FFFFFF, 12dp corner radius */
+        .calendar-container {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .calendar-nav-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            padding: 6px;
+        }
+
+        .calendar-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Month text - text_light, 14sp, bold */
+        .calendar-month {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            margin-top: 4px;
+        }
+
+        /* Day headers - text_muted, 10sp */
+        .calendar-day-header {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 10px;
+            text-align: center;
+            padding: 6px 0;
+            font-weight: 500;
+        }
+
+        /* Calendar days - 36dp height, 6dp corner radius, 13sp */
+        .calendar-day {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 2px;
+        }
+
+        .calendar-day:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Other month - text_muted */
+        .calendar-day.other-month {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Today - orange_accent border */
+        .calendar-day.today {
+            border: 1px solid rgba(255, 159, 67, 0.5);
+            color: #FF9F43;
+        }
+
+        /* Selected - orange_accent background */
+        .calendar-day.selected {
+            background: #FF9F43;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* Time Container - same as calendar, glass_background */
+        .time-container {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .time-picker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .time-scroll {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Arrow buttons - 32x24dp, text_muted */
+        .time-scroll-btn {
+            width: 32px;
+            height: 24px;
+            border-radius: 6px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .time-scroll-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .time-display {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin: 4px 0;
+        }
+
+        /* Time value - 28sp, bold, text_light */
+        .time-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.9);
+            width: 40px;
+            text-align: center;
+        }
+
+        /* Separator - 24sp, text_muted */
+        .time-separator {
+            font-size: 24px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            margin: 0 2px;
+        }
+
+        /* AM/PM buttons - 12sp, bold, 12dp horizontal, 6dp vertical padding */
+        .time-period {
+            display: flex;
+            gap: 4px;
+            margin-top: 12px;
+        }
+
+        .time-period-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        /* Selected - orange_accent bg, white text */
+        .time-period-btn.active {
+            background: #FF9F43;
+            color: #fff;
+        }
+
+        /* Unselected - glass_background */
+        .time-period-btn:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .time-period-btn:not(.active):hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Footer - nav_border */
+        .dialog-footer {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Buttons - 48dp height, 12dp corner radius */
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            height: 48px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Cancel - glass_background, text_muted */
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.8);
+            margin-right: 8px;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Save - orange_accent, white text */
+        .btn-save {
+            background: #FF9F43;
+            color: #fff;
+            margin-left: 8px;
+        }
+
+        .btn-save:hover {
+            background: #e68a2e;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    
+    <div class="dialog">
+        <!-- Header with card_background -->
+        <div class="dialog-header">
+            <div class="dialog-title">Select Date & Time</div>
+            <div class="dialog-subtitle">Due Date</div>
+        </div>
+        
+        <div class="dialog-body">
+            <div class="picker-row">
+                <!-- Date Section -->
+                <div class="date-section">
+                    <div class="section-label">DATE</div>
+                    <div class="calendar-container">
+                        <div class="calendar-nav">
+                            <button class="calendar-nav-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M15.41,16.59L10.83,12l4.58-4.59L14,6l-6,6l6,6L15.41,16.59z"/>
+                                </svg>
+                            </button>
+                            <span class="calendar-month">April 2026</span>
+                            <button class="calendar-nav-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M8.59,16.59L13.17,12L8.59,7.41L10,6l6,6l-6,6L8.59,16.59z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Day Headers -->
+                        <div class="calendar-grid" style="margin-bottom: 0;">
+                            <div class="calendar-day-header">Su</div>
+                            <div class="calendar-day-header">Mo</div>
+                            <div class="calendar-day-header">Tu</div>
+                            <div class="calendar-day-header">We</div>
+                            <div class="calendar-day-header">Th</div>
+                            <div class="calendar-day-header">Fr</div>
+                            <div class="calendar-day-header">Sa</div>
+                        </div>
+                        
+                        <!-- Calendar Grid -->
+                        <div class="calendar-grid">
+                            <div class="calendar-day other-month">29</div>
+                            <div class="calendar-day other-month">30</div>
+                            <div class="calendar-day other-month">31</div>
+                            <div class="calendar-day">1</div>
+                            <div class="calendar-day">2</div>
+                            <div class="calendar-day">3</div>
+                            <div class="calendar-day">4</div>
+                            
+                            <div class="calendar-day">5</div>
+                            <div class="calendar-day">6</div>
+                            <div class="calendar-day">7</div>
+                            <div class="calendar-day">8</div>
+                            <div class="calendar-day">9</div>
+                            <div class="calendar-day">10</div>
+                            <div class="calendar-day">11</div>
+                            
+                            <div class="calendar-day">12</div>
+                            <div class="calendar-day">13</div>
+                            <div class="calendar-day">14</div>
+                            <div class="calendar-day">15</div>
+                            <div class="calendar-day">16</div>
+                            <div class="calendar-day">17</div>
+                            <div class="calendar-day">18</div>
+                            
+                            <div class="calendar-day">19</div>
+                            <div class="calendar-day">20</div>
+                            <div class="calendar-day">21</div>
+                            <div class="calendar-day">22</div>
+                            <div class="calendar-day">23</div>
+                            <div class="calendar-day">24</div>
+                            <div class="calendar-day selected">25</div>
+                            
+                            <div class="calendar-day">26</div>
+                            <div class="calendar-day">27</div>
+                            <div class="calendar-day">28</div>
+                            <div class="calendar-day">29</div>
+                            <div class="calendar-day">30</div>
+                            <div class="calendar-day other-month">1</div>
+                            <div class="calendar-day other-month">2</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Time Section (120dp width) -->
+                <div class="time-section">
+                    <div class="section-label">TIME</div>
+                    <div class="time-container">
+                        <div class="time-picker">
+                            <div class="time-scroll">
+                                <!-- Up arrow -->
+                                <button class="time-scroll-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M7.41,15.41L12,10.83l4.59,4.58L18,14l-6,-6l-6,6z"/>
+                                    </svg>
+                                </button>
+                                
+                                <!-- Time display: HH:MM -->
+                                <div class="time-display">
+                                    <div class="time-value">02</div>
+                                    <div class="time-separator">:</div>
+                                    <div class="time-value">30</div>
+                                </div>
+                                
+                                <!-- Down arrow -->
+                                <button class="time-scroll-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M7.41,8.59L12,13.17l4.59,-4.58L18,10l-6,6l-6,-6z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <!-- AM/PM Toggle -->
+                            <div class="time-period">
+                                <button class="time-period-btn">AM</button>
+                                <button class="time-period-btn active">PM</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer with divider -->
+        <div class="dialog-footer">
+            <button class="btn btn-cancel">Cancel</button>
+            <button class="btn btn-save">Save</button>
+        </div>
+    </div>
+
+    <script>
+        // Interactive demo
+        document.querySelectorAll('.calendar-day:not(.other-month):not(.calendar-day-header)').forEach(day => {
+            day.addEventListener('click', function() {
+                document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        document.querySelectorAll('.time-period-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.time-period-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

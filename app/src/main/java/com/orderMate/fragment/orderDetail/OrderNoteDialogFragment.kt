@@ -1,8 +1,6 @@
 package com.orderMate.fragment.orderDetail
 
-import android.app.DatePickerDialog
 import android.app.Dialog
-import android.app.TimePickerDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -200,7 +198,7 @@ class OrderNoteDialogFragment : DialogFragment() {
 
         val dateInput = sectionView.findViewById<TextInputEditText>(R.id.dateInput)
         dateSelections[widget.id]?.let { dateInput.setText(it) }
-        dateInput.setOnClickListener { showDatePicker(widget.id, dateInput) }
+        dateInput.setOnClickListener { showDateTimePicker(widget.id, widget.label, dateInput) }
 
         noteSectionsContainer?.addView(sectionView)
     }
@@ -275,58 +273,32 @@ class OrderNoteDialogFragment : DialogFragment() {
     }
 
     /**
-     * Show date and time picker dialog (date first, then time)
+     * Show combined date and time picker dialog
      */
-    private fun showDatePicker(widgetId: String, dateInput: TextInputEditText) {
-        val calendar = Calendar.getInstance()
-
-        // If there's an existing datetime, parse it
+    private fun showDateTimePicker(widgetId: String, widgetLabel: String, dateInput: TextInputEditText) {
+        // Parse existing datetime if present
+        var initialDate: java.util.Date? = null
         dateSelections[widgetId]?.let { existing ->
             try {
-                dateTimeFormat.parse(existing)?.let { calendar.time = it }
+                initialDate = dateTimeFormat.parse(existing)
             } catch (e: Exception) {
                 try {
-                    dateFormat.parse(existing)?.let { calendar.time = it }
+                    initialDate = dateFormat.parse(existing)
                 } catch (e2: Exception) { /* ignore */ }
             }
         }
 
-        DatePickerDialog(
-            requireContext(),
-            R.style.Theme_OrderMate_DatePicker,
-            { _, year, month, day ->
-                calendar.set(Calendar.YEAR, year)
-                calendar.set(Calendar.MONTH, month)
-                calendar.set(Calendar.DAY_OF_MONTH, day)
-                
-                // After date selection, show time picker
-                showTimePicker(widgetId, dateInput, calendar)
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
-    }
-    
-    /**
-     * Show time picker dialog after date selection
-     */
-    private fun showTimePicker(widgetId: String, dateInput: TextInputEditText, calendar: Calendar) {
-        TimePickerDialog(
-            requireContext(),
-            R.style.Theme_OrderMate_DatePicker,
-            { _, hourOfDay, minute ->
-                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                calendar.set(Calendar.MINUTE, minute)
-                
-                val formattedDateTime = dateTimeFormat.format(calendar.time)
-                dateSelections[widgetId] = formattedDateTime
-                dateInput.setText(formattedDateTime)
-            },
-            calendar.get(Calendar.HOUR_OF_DAY),
-            calendar.get(Calendar.MINUTE),
-            false // 12-hour format
-        ).show()
+        com.orderMate.fragment.DateTimePickerDialog.newInstance(
+            widgetLabel = widgetLabel,
+            initialDateTime = initialDate
+        ).apply {
+            setListener(object : com.orderMate.fragment.DateTimePickerDialog.OnDateTimeSelectedListener {
+                override fun onDateTimeSelected(dateTime: java.util.Date, formattedDateTime: String) {
+                    dateSelections[widgetId] = formattedDateTime
+                    dateInput.setText(formattedDateTime)
+                }
+            })
+        }.show(parentFragmentManager, com.orderMate.fragment.DateTimePickerDialog.TAG)
     }
 
     private fun createChip(label: String, value: String, isSelected: Boolean, widgetColor: Int): TextView {
