@@ -1,7 +1,6 @@
 package com.orderMate.fragment
 
 import android.annotation.SuppressLint
-import android.app.DatePickerDialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -456,29 +455,24 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     // ==================== Date Filter ====================
 
     private fun showDatePicker() {
-        val calendar = Calendar.getInstance()
         // Use last selected date or current date
         val existingDates = currentFilterState.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE]
-        existingDates?.lastOrNull()?.let { calendar.time = it }
+        val initialDate = existingDates?.lastOrNull()
 
-        DatePickerDialog(
-            requireContext(),
-            R.style.Theme_OrderMate_DatePicker,
-            { _, year, month, day ->
-                calendar.set(year, month, day, 0, 0, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                val selectedDate = calendar.time
-                
-                // Add date to filter state (supports multiple dates like HTML)
-                addDateToFilterState(selectedDate)
-                
-                // Apply filters and update pills
-                applyDialogFilters(currentFilterState)
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        DateTimePickerDialog.newInstance(
+            widgetLabel = "Select Date",
+            initialDateTime = initialDate
+        ).apply {
+            setListener(object : DateTimePickerDialog.OnDateTimeSelectedListener {
+                override fun onDateTimeSelected(dateTime: java.util.Date, formattedDateTime: String) {
+                    // Add date to filter state (supports multiple dates like HTML)
+                    addDateToFilterState(dateTime)
+                    
+                    // Apply filters and update pills
+                    applyDialogFilters(currentFilterState)
+                }
+            })
+        }.show(childFragmentManager, "dateTimePicker")
     }
 
     // ==================== Separate Date Pills (#12) ====================

@@ -1,6 +1,5 @@
 package com.orderMate.fragment
 
-import android.app.DatePickerDialog
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -309,33 +308,28 @@ class FilterDialogFragment : DialogFragment() {
         dateInput: com.google.android.material.textfield.TextInputEditText,
         dateChips: FlexboxLayout
     ) {
-        val calendar = Calendar.getInstance()
+        DateTimePickerDialog.newInstance(
+            widgetLabel = "Select Date",
+            initialDateTime = null
+        ).apply {
+            setListener(object : DateTimePickerDialog.OnDateTimeSelectedListener {
+                override fun onDateTimeSelected(dateTime: Date, formattedDateTime: String) {
+                    // Initialize date list for this category if not exists
+                    if (!dateSelections.containsKey(categoryId)) {
+                        dateSelections[categoryId] = mutableListOf()
+                    }
+                    val dates = dateSelections[categoryId]!!
 
-        DatePickerDialog(
-            requireContext(),
-            R.style.Theme_OrderMate_DatePicker,
-            { _, year, month, day ->
-                calendar.set(year, month, day)
-                val date = calendar.time
-
-                // Initialize date list for this category if not exists
-                if (!dateSelections.containsKey(categoryId)) {
-                    dateSelections[categoryId] = mutableListOf()
+                    if (!dates.any { isSameDay(it, dateTime) }) {
+                        dates.add(dateTime)
+                        dateInput.setText(dateFormat.format(dateTime))
+                    }
+                    
+                    updateDateChipsForCategory(categoryId, dateChips, dateInput)
+                    applyFiltersImmediately()
                 }
-                val dates = dateSelections[categoryId]!!
-
-                if (!dates.any { isSameDay(it, date) }) {
-                    dates.add(date)
-                    dateInput.setText(dateFormat.format(date))
-                }
-                
-                updateDateChipsForCategory(categoryId, dateChips, dateInput)
-                applyFiltersImmediately()
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
+            })
+        }.show(childFragmentManager, "dateTimePicker")
     }
 
     private fun isSameDay(d1: Date, d2: Date): Boolean {

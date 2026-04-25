@@ -1,6 +1,5 @@
 package com.orderMate.fragment
 
-import android.app.DatePickerDialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -679,36 +678,32 @@ class CalendarFragment : Fragment() {
     // ==================== Date Picker (matches HTML - multiple dates with pills) ====================
     
     private fun showDatePicker() {
-        val calendar = Calendar.getInstance()
         // Use last selected date or current date
         val existingDates = currentFilterState.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE]
-        existingDates?.lastOrNull()?.let { calendar.time = it }
+        val initialDate = existingDates?.lastOrNull()
 
-        DatePickerDialog(
-            requireContext(),
-            R.style.Theme_OrderMate_Dialog,
-            { _, year, month, day ->
-                calendar.set(year, month, day, 0, 0, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                val selectedDate = calendar.time
-                
-                // Add date to filter state (supports multiple dates like HTML)
-                addDateToFilterState(selectedDate)
-                
-                // Navigate calendar to this date and persist
-                currentDate.set(year, month, day)
-                sharedFilterViewModel.setSelectedDate(currentDate.time)
-                
-                // Sync filter state to shared ViewModel
-                sharedFilterViewModel.setFilterState(currentFilterState)
-                
-                // Apply filters and update pills
-                applyDialogFilters(currentFilterState)
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        DateTimePickerDialog.newInstance(
+            widgetLabel = "Select Date",
+            initialDateTime = initialDate
+        ).apply {
+            setListener(object : DateTimePickerDialog.OnDateTimeSelectedListener {
+                override fun onDateTimeSelected(dateTime: java.util.Date, formattedDateTime: String) {
+                    // Add date to filter state (supports multiple dates like HTML)
+                    addDateToFilterState(dateTime)
+                    
+                    // Navigate calendar to this date and persist
+                    val cal = Calendar.getInstance().apply { time = dateTime }
+                    currentDate.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
+                    sharedFilterViewModel.setSelectedDate(currentDate.time)
+                    
+                    // Sync filter state to shared ViewModel
+                    sharedFilterViewModel.setFilterState(currentFilterState)
+                    
+                    // Apply filters and update pills
+                    applyDialogFilters(currentFilterState)
+                }
+            })
+        }.show(childFragmentManager, "dateTimePicker")
     }
     
     /**
