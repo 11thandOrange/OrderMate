@@ -711,64 +711,93 @@ class SettingsFragment : Fragment() {
     
     /**
      * Reset widgets for a given level to defaults
+     * Fetches fresh data from Firebase, deletes all widgets of this level, then adds defaults
      */
     private fun resetWidgetsToDefaults(level: NoteLevel) {
+        val merchantId = widgetManager.getMerchantId() ?: return
+        val firebase = FirebaseConfigManager.getInstance()
+        
         val defaultWidgets = if (level == NoteLevel.ITEM) {
             DefaultWidgetFactory.createItemLevelDefaults()
         } else {
             DefaultWidgetFactory.createOrderLevelDefaults()
         }
         
-        // Delete existing widgets of this level
-        val existingWidgets = if (level == NoteLevel.ITEM) {
-            widgetManager.getAllItemLevelWidgets()
-        } else {
-            widgetManager.getAllOrderLevelWidgets()
-        }
-        
-        // Remove existing widgets first
-        var deleteCount = existingWidgets.size
-        if (deleteCount == 0) {
-            // No existing widgets, just add defaults
-            saveDefaultWidgets(defaultWidgets, level)
-            return
-        }
-        
-        existingWidgets.forEach { widget ->
-            widgetManager.deleteWidget(widget.id) { success ->
-                deleteCount--
-                if (deleteCount == 0) {
-                    // All deletions complete, now add defaults
-                    activity?.runOnUiThread {
-                        saveDefaultWidgets(defaultWidgets, level)
-                    }
+        // Fetch fresh widget list from Firebase (not cache) to ensure we delete all
+        firebase.getWidgets(merchantId) { allWidgets ->
+            val existingWidgets = allWidgets.filter { it.level == level }
+            
+            android.util.Log.d("SettingsFragment", "resetWidgetsToDefaults: found ${existingWidgets.size} existing ${level.name} widgets to delete")
+            
+            if (existingWidgets.isEmpty()) {
+                // No existing widgets, just add defaults
+                activity?.runOnUiThread {
+                    saveDefaultWidgets(defaultWidgets, level)
+                }
+                return@getWidgets
+            }
+            
+            // Delete all existing widgets of this level sequentially
+            deleteWidgetsSequentially(existingWidgets, 0) {
+                android.util.Log.d("SettingsFragment", "resetWidgetsToDefaults: all deletions complete, adding ${defaultWidgets.size} defaults")
+                activity?.runOnUiThread {
+                    saveDefaultWidgets(defaultWidgets, level)
                 }
             }
         }
     }
     
     /**
-     * Save default widgets to Firebase and update UI
+     * Delete widgets one by one to avoid race conditions
+     */
+    private fun deleteWidgetsSequentially(widgets: List<WidgetConfig>, index: Int, onComplete: () -> Unit) {
+        if (index >= widgets.size) {
+            onComplete()
+            return
+        }
+        
+        val widget = widgets[index]
+        android.util.Log.d("SettingsFragment", "deleteWidgetsSequentially: deleting ${widget.label} (${index + 1}/${widgets.size})")
+        
+        widgetManager.deleteWidget(widget.id) { success ->
+            if (!success) {
+                android.util.Log.e("SettingsFragment", "deleteWidgetsSequentially: failed to delete ${widget.label}")
+            }
+            // Continue to next widget regardless of success/failure
+            deleteWidgetsSequentially(widgets, index + 1, onComplete)
+        }
+    }
+    
+    /**
+     * Save default widgets to Firebase sequentially and update UI
      */
     private fun saveDefaultWidgets(widgets: List<WidgetConfig>, level: NoteLevel) {
-        var saveCount = widgets.size
-        widgets.forEach { widget ->
-            widgetManager.addWidget(widget) { success ->
-                saveCount--
-                if (saveCount == 0) {
-                    // All saves complete, refresh UI
-                    activity?.runOnUiThread {
-                        if (level == NoteLevel.ITEM) {
-                            val updatedWidgets = widgetManager.getAllItemLevelWidgets()
-                            itemLevelWidgetAdapter?.setWidgets(updatedWidgets.toMutableList())
-                        } else {
-                            val updatedWidgets = widgetManager.getAllOrderLevelWidgets()
-                            orderLevelWidgetAdapter?.setWidgets(updatedWidgets.toMutableList())
-                        }
-                        Toast.makeText(context, "Widgets reset to defaults", Toast.LENGTH_SHORT).show()
-                    }
-                }
+        saveWidgetsSequentially(widgets, level, 0) {
+            android.util.Log.d("SettingsFragment", "saveDefaultWidgets: all ${widgets.size} widgets saved")
+            // Refresh from Firebase to get accurate state
+            loadWidgetsFromFirebase()
+            Toast.makeText(context, "Widgets reset to defaults", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    /**
+     * Save widgets one by one to avoid race conditions
+     */
+    private fun saveWidgetsSequentially(widgets: List<WidgetConfig>, level: NoteLevel, index: Int, onComplete: () -> Unit) {
+        if (index >= widgets.size) {
+            onComplete()
+            return
+        }
+        
+        val widget = widgets[index]
+        android.util.Log.d("SettingsFragment", "saveWidgetsSequentially: saving ${widget.label} (${index + 1}/${widgets.size})")
+        
+        widgetManager.addWidget(widget) { success ->
+            if (!success) {
+                android.util.Log.e("SettingsFragment", "saveWidgetsSequentially: failed to save ${widget.label}")
             }
+            // Continue to next widget regardless of success/failure
+            saveWidgetsSequentially(widgets, level, index + 1, onComplete)
         }
     }
 
