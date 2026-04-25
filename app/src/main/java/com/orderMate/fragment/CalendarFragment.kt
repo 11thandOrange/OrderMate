@@ -147,6 +147,17 @@ class CalendarFragment : Fragment() {
         setupActionButtons()
         observeSharedState()
         loadOrders()
+        
+        // Sync widgets from Firebase and refresh calendar to ensure pills display on first load
+        WidgetManager.getInstance(requireContext()).reloadAll {
+            activity?.runOnUiThread {
+                if (allOrders.isNotEmpty()) {
+                    allEvents = convertOrdersToEvents(allOrders)
+                    filteredEvents = convertOrdersToEvents(filteredOrders)
+                    updateCalendarView()
+                }
+            }
+        }
     }
     
     private fun initViews(view: View) {

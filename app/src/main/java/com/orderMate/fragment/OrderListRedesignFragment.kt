@@ -138,6 +138,11 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         setupClickListeners()
         setupSearchListener()
         observeSharedState()
+        
+        // Sync widgets from Firebase and refresh adapter to ensure pills display on first load
+        WidgetManager.getInstance(requireContext()).reloadAll {
+            activity?.runOnUiThread { orderAdapter?.notifyDataSetChanged() }
+        }
     }
     
     /**
