@@ -83,30 +83,45 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom buttons -->
+    <!-- Footer border -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="24dp"
+        android:background="@color/nav_border" />
+
+    <!-- Footer - styled same as customer dialog -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="end"
-        android:layout_marginTop="24dp">
+        android:paddingVertical="16dp"
+        android:gravity="end">
 
+        <!-- Cancel button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cancel"
-            android:textColor="@color/text_muted"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_marginEnd="8dp"/>
+            android:layout_height="44dp"
+            android:layout_marginEnd="12dp"
+            android:backgroundTint="@color/glass_background"
+            android:text="@string/cancel"
+            android:textColor="@color/text_light"
+            android:textSize="14sp"
+            android:paddingHorizontal="16dp"
+            app:cornerRadius="12dp" />
 
+        <!-- Save button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSave"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Save"
-            android:backgroundTint="@color/accent_orange"
-            android:textColor="@color/white"/>
+            android:layout_height="44dp"
+            android:backgroundTint="@color/orange_accent"
+            android:text="@string/save"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:paddingHorizontal="20dp"
+            app:cornerRadius="12dp" />
 
     </LinearLayout>
 
