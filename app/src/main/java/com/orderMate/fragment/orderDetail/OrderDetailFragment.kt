@@ -290,10 +290,13 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                         }
                     }
                 }
-                // Load widgets from Firebase before rendering pills
+                // Render screen immediately, then reload widgets and refresh pills
+                setUpTheScreen()
+                
+                // Load widgets from Firebase and refresh adapter to render pills
                 WidgetManager.getInstance(requireContext()).reloadAll {
                     activity?.runOnUiThread {
-                        setUpTheScreen()
+                        binding.itemRecycler.adapter?.notifyDataSetChanged()
                     }
                 }
             }
