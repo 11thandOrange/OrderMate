@@ -141,7 +141,17 @@ class DateTimePickerDialog : DialogFragment() {
     private fun renderCalendarGrid() {
         val days = generateCalendarDays()
         binding.calendarGrid.adapter = CalendarDayAdapter(days) { day ->
-            if (day.dayNumber > 0 && !day.isOtherMonth) {
+            if (day.dayNumber > 0) {
+                if (day.isOtherMonth) {
+                    // Clicking on other month day - navigate to that month and select
+                    if (day.isPreviousMonth) {
+                        displayCalendar.add(Calendar.MONTH, -1)
+                    } else {
+                        displayCalendar.add(Calendar.MONTH, 1)
+                    }
+                    updateMonthYearDisplay()
+                }
+                // Set selected date
                 calendar.set(Calendar.YEAR, displayCalendar.get(Calendar.YEAR))
                 calendar.set(Calendar.MONTH, displayCalendar.get(Calendar.MONTH))
                 calendar.set(Calendar.DAY_OF_MONTH, day.dayNumber)
@@ -175,7 +185,7 @@ class DateTimePickerDialog : DialogFragment() {
         // Add previous month padding days
         for (i in 0 until firstDayOfWeek) {
             val day = daysInPrevMonth - firstDayOfWeek + i + 1
-            days.add(CalendarDay(day, isToday = false, isSelected = false, isOtherMonth = true))
+            days.add(CalendarDay(day, isToday = false, isSelected = false, isOtherMonth = true, isPreviousMonth = true))
         }
 
         // Add current month days
@@ -188,13 +198,13 @@ class DateTimePickerDialog : DialogFragment() {
                              displayMonth == selectedMonth &&
                              day == selectedDay
 
-            days.add(CalendarDay(day, isToday, isSelected, isOtherMonth = false))
+            days.add(CalendarDay(day, isToday, isSelected, isOtherMonth = false, isPreviousMonth = false))
         }
 
         // Add next month padding days to fill 6 rows (42 cells)
         var nextMonthDay = 1
         while (days.size < 42) {
-            days.add(CalendarDay(nextMonthDay++, isToday = false, isSelected = false, isOtherMonth = true))
+            days.add(CalendarDay(nextMonthDay++, isToday = false, isSelected = false, isOtherMonth = true, isPreviousMonth = false))
         }
 
         return days
@@ -205,7 +215,8 @@ class DateTimePickerDialog : DialogFragment() {
         val dayNumber: Int,
         val isToday: Boolean,
         val isSelected: Boolean,
-        val isOtherMonth: Boolean
+        val isOtherMonth: Boolean,
+        val isPreviousMonth: Boolean  // true = previous month, false = next month (only relevant if isOtherMonth)
     )
 
     // Adapter for calendar grid
