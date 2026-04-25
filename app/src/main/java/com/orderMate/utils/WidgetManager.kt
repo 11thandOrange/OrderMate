@@ -167,12 +167,17 @@ class WidgetManager private constructor(private val context: Context) {
     
     /**
      * Get item-level widgets (all, including disabled) sorted by order.
+     * If cache is empty, creates defaults AND saves them to cache to ensure stable IDs.
      */
     fun getItemWidgets(): List<WidgetConfig> {
         val cached = getItemWidgetsFromCache()
         val result = if (cached.isEmpty()) {
-            android.util.Log.d("WidgetGetDebug", "getItemWidgets: CACHE EMPTY - creating new defaults!")
-            DefaultWidgetFactory.createItemLevelDefaults()
+            android.util.Log.d("WidgetGetDebug", "getItemWidgets: CACHE EMPTY - creating new defaults and SAVING to cache!")
+            val defaults = DefaultWidgetFactory.createItemLevelDefaults()
+            // CRITICAL FIX: Save defaults to cache immediately so IDs remain stable
+            // Without this, each call creates NEW UUIDs, breaking note parsing!
+            saveItemWidgetsToCache(defaults)
+            defaults
         } else {
             android.util.Log.d("WidgetGetDebug", "getItemWidgets: returning ${cached.size} cached widgets")
             cached
@@ -182,12 +187,17 @@ class WidgetManager private constructor(private val context: Context) {
     
     /**
      * Get order-level widgets (all, including disabled) sorted by order.
+     * If cache is empty, creates defaults AND saves them to cache to ensure stable IDs.
      */
     fun getOrderWidgets(): List<WidgetConfig> {
         val cached = getOrderWidgetsFromCache()
         val result = if (cached.isEmpty()) {
-            android.util.Log.d("WidgetGetDebug", "getOrderWidgets: CACHE EMPTY - creating new defaults!")
-            DefaultWidgetFactory.createOrderLevelDefaults()
+            android.util.Log.d("WidgetGetDebug", "getOrderWidgets: CACHE EMPTY - creating new defaults and SAVING to cache!")
+            val defaults = DefaultWidgetFactory.createOrderLevelDefaults()
+            // CRITICAL FIX: Save defaults to cache immediately so IDs remain stable
+            // Without this, each call creates NEW UUIDs, breaking note parsing!
+            saveOrderWidgetsToCache(defaults)
+            defaults
         } else {
             android.util.Log.d("WidgetGetDebug", "getOrderWidgets: returning ${cached.size} cached widgets")
             cached
