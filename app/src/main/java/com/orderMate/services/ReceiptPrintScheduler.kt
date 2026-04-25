@@ -10,7 +10,7 @@ import com.clover.sdk.util.CloverAccount
 import com.clover.sdk.v1.printer.Category
 import com.clover.sdk.v1.printer.job.StaticOrderPrintJob
 import com.clover.sdk.v3.order.OrderConnector
-import com.clover.sdk.v3.printers.PrinterConnector
+import com.clover.sdk.v1.printer.PrinterConnector
 import com.orderMate.utils.SettingsManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -185,7 +185,7 @@ class ReceiptPrintReceiver : BroadcastReceiver() {
             
             // Create and execute print job
             val printJob = StaticOrderPrintJob.Builder()
-                .orderId(orderId)
+                .order(orderId)
                 .build(context)
             
             printJob.print(context, cloverAccount)

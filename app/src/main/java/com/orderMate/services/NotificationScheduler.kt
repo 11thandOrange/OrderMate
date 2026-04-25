@@ -189,7 +189,7 @@ class OrderNotificationReceiver : BroadcastReceiver() {
             val merchantConnector = MerchantConnector(context, cloverAccount, null)
             merchantConnector.connect()
             val merchant = merchantConnector.merchant
-            val merchantEmail = merchant?.owner?.email
+            val merchantEmail = merchant?.supportEmail
             val merchantName = merchant?.name ?: "OrderMate"
             merchantConnector.disconnect()
             
@@ -310,7 +310,7 @@ class OrderNotificationReceiver : BroadcastReceiver() {
             val emailData = ShareMessageJson(body, receiver, reference, meta)
             
             // 5. Send via Bird API
-            val repository = CloverRepository()
+            val repository = CloverRepository.getInstance(context)
             repository.sendEmail(emailData)
             
         } catch (e: Exception) {
