@@ -192,6 +192,13 @@ class SettingsFragment : Fragment() {
         // Show general panel by default
         switchToTab("general")
     }
+    
+    override fun onResume() {
+        super.onResume()
+        // Refresh widget lists when returning to this fragment
+        // This prevents stale data after switching tabs in the main activity
+        loadWidgetsFromFirebase()
+    }
 
     private fun initViews(view: View) {
         // Sub-tabs
@@ -412,7 +419,8 @@ class SettingsFragment : Fragment() {
                 val fromPos = viewHolder.adapterPosition
                 val toPos = target.adapterPosition
                 itemLevelWidgetAdapter?.moveWidget(fromPos, toPos)
-                widgetManager.reorderWidgets(fromPos, toPos) { success ->
+                // Use level-specific reorder to prevent index mismatch with order-level widgets
+                widgetManager.reorderWidgetsForLevel(NoteLevel.ITEM, fromPos, toPos) { success ->
                     if (!success) {
                         activity?.runOnUiThread {
                             Toast.makeText(context, "Failed to save order", Toast.LENGTH_SHORT).show()
@@ -470,7 +478,7 @@ class SettingsFragment : Fragment() {
         }
         
         // Setup drag-and-drop for order level widgets
-        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+        val orderTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
         ) {
             override fun onMove(
@@ -481,7 +489,8 @@ class SettingsFragment : Fragment() {
                 val fromPos = viewHolder.adapterPosition
                 val toPos = target.adapterPosition
                 orderLevelWidgetAdapter?.moveWidget(fromPos, toPos)
-                widgetManager.reorderWidgets(fromPos, toPos) { success ->
+                // Use level-specific reorder to prevent index mismatch with item-level widgets
+                widgetManager.reorderWidgetsForLevel(NoteLevel.ORDER, fromPos, toPos) { success ->
                     if (!success) {
                         activity?.runOnUiThread {
                             Toast.makeText(context, "Failed to save order", Toast.LENGTH_SHORT).show()
@@ -494,8 +503,8 @@ class SettingsFragment : Fragment() {
             override fun isLongPressDragEnabled() = false
         })
         
-        itemTouchHelper.attachToRecyclerView(orderLevelWidgetRecyclerView)
-        orderLevelWidgetAdapter?.setDragHelper(itemTouchHelper)
+        orderTouchHelper.attachToRecyclerView(orderLevelWidgetRecyclerView)
+        orderLevelWidgetAdapter?.setDragHelper(orderTouchHelper)
         
         btnAddOrderLevelWidget?.setOnClickListener {
             showAddWidgetDialog(NoteLevel.ORDER)

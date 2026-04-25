@@ -332,6 +332,36 @@ class WidgetManager private constructor(private val context: Context) {
         firebase.saveWidgetsBatch(mid, widgets, callback)
     }
     
+    /**
+     * Reorder widgets within a specific level only.
+     * This prevents index mismatches when reordering in level-specific adapters.
+     */
+    fun reorderWidgetsForLevel(level: NoteLevel, fromIndex: Int, toIndex: Int, callback: (Boolean) -> Unit) {
+        val mid = merchantId ?: return callback(false)
+        
+        // Get widgets for this level only
+        val levelWidgets = getWidgets().filter { it.level == level }.sortedBy { it.order }.toMutableList()
+        
+        if (fromIndex < 0 || toIndex < 0 || fromIndex >= levelWidgets.size || toIndex >= levelWidgets.size) {
+            callback(false)
+            return
+        }
+        
+        // Reorder within level
+        val widget = levelWidgets.removeAt(fromIndex)
+        levelWidgets.add(toIndex, widget)
+        
+        // Update order values for the level
+        levelWidgets.forEachIndexed { index, w -> w.order = index }
+        
+        // Merge back with other level's widgets
+        val otherLevelWidgets = getWidgets().filter { it.level != level }
+        val allWidgets = (levelWidgets + otherLevelWidgets).toMutableList()
+        
+        saveWidgetsToCache(allWidgets)
+        firebase.saveWidgetsBatch(mid, allWidgets, callback)
+    }
+    
     // ==================== Option CRUD ====================
     
     fun addOption(widgetId: String, label: String, value: String = label, callback: (WidgetOption?) -> Unit) {
