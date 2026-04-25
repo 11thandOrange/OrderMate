@@ -62,6 +62,15 @@ class SendNotificationDialog(
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NO_FRAME, R.style.Theme_OrderMate_Dialog)
     }
+    
+    override fun onStart() {
+        super.onStart()
+        // Ensure dialog window can receive focus for input
+        dialog?.window?.apply {
+            clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
+            clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -93,14 +102,24 @@ class SendNotificationDialog(
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
             setDimAmount(0.6f)
-            // Prevent keyboard from auto-opening
-            setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
+            // Use SOFT_INPUT_ADJUST_RESIZE to allow keyboard while keeping focus
+            // SOFT_INPUT_STATE_UNCHANGED prevents auto-open but allows input
+            setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or 
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED
+            )
+            // Ensure dialog can receive input focus
+            clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
+            clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
         }
     }
 
     private fun preventKeyboardAutoOpen() {
-        // Don't steal focus - just prevent auto-show of keyboard
-        // The input fields should remain focusable and clickable
+        // Clear focus from input fields initially to prevent auto-show
+        // But don't make them unfocusable - user can still tap to focus
+        binding.customerNumber.clearFocus()
+        binding.subject.clearFocus()
+        binding.etNotes.clearFocus()
     }
 
     private fun loadTemplates() {
