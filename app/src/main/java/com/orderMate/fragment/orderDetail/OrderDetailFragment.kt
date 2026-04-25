@@ -371,9 +371,11 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
      * #46: Populate custom order tags in the tags container
      * Uses enabled SINGLE_SELECT and MULTI_SELECT widgets from order level
      * Styled like pills on order details list row using WidgetColorUtils
+     * Hides entire section (including divider) when no tags exist
      */
     private fun populateOrderTags() {
         val tagsContainer = binding.tagsContainer
+        val tagsSection = binding.tagsSection
         tagsContainer.removeAllViews()
         
         val orderNote = orderArguments?.note
@@ -394,15 +396,13 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         }
         
         if (tags.isEmpty()) {
-            // Add a dash or placeholder
-            val placeholder = TextView(requireContext()).apply {
-                text = "—"
-                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_muted))
-                textSize = 14f
-            }
-            tagsContainer.addView(placeholder)
+            // Hide entire section (divider + row) when no tags
+            tagsSection.visibility = View.GONE
             return
         }
+        
+        // Show section when there are tags
+        tagsSection.visibility = View.VISIBLE
         
         val density = resources.displayMetrics.density
         

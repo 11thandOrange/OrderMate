@@ -579,30 +579,39 @@
                                 android:textStyle="bold" />
                         </LinearLayout>
                         
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#0DFFFFFF" />
-
-                        <!-- Order Tags - Shows SINGLE_SELECT + MULTI_SELECT order level widget pills -->
+                        <!-- Order Tags Section - includes divider, hidden when no tags -->
                         <LinearLayout
+                            android:id="@+id/tagsSection"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:paddingVertical="12dp">
-                            <com.google.android.material.textview.MaterialTextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/order_tags"
-                                android:textColor="@color/text_muted"
-                                android:textSize="13sp" />
+                            android:orientation="vertical"
+                            android:visibility="gone">
+                            
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#0DFFFFFF" />
+
+                            <!-- Order Tags - Shows SINGLE_SELECT + MULTI_SELECT order level widget pills -->
                             <LinearLayout
-                                android:id="@+id/tagsContainer"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal" />
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:paddingVertical="12dp">
+                                <com.google.android.material.textview.MaterialTextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/order_tags"
+                                    android:textColor="@color/text_muted"
+                                    android:textSize="13sp" />
+                                <LinearLayout
+                                    android:id="@+id/tagsContainer"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal" />
+                            </LinearLayout>
                         </LinearLayout>
                         
                         <!-- Task 21: Dynamic Widget Rows Container - renders CALENDAR and TEXT_BOX widgets -->
