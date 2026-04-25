@@ -1691,6 +1691,9 @@ class FirebaseWidgetEditorAdapter(
 
         @SuppressLint("ClickableViewAccessibility")
         fun bind(widget: WidgetConfig) {
+            // Remove old watcher BEFORE setText to prevent triggering save
+            labelWatcher?.let { inputWidgetLabel.removeTextChangedListener(it) }
+            
             widgetTitle.text = widget.label
             widgetType.text = widget.type.displayName
             widgetToggle.isChecked = widget.isEnabled
@@ -1738,8 +1741,7 @@ class FirebaseWidgetEditorAdapter(
                 scheduleSave(widget)
             }
 
-            // Label change - remove old watcher to prevent duplicates on rebind
-            labelWatcher?.let { inputWidgetLabel.removeTextChangedListener(it) }
+            // Label change - add new watcher (old one removed at start of bind)
             labelWatcher = object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
                     widget.label = s?.toString() ?: ""
