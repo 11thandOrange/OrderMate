@@ -523,6 +523,7 @@ class SettingsFragment : Fragment() {
     private fun loadWidgetsFromFirebase() {
         val merchantId = widgetManager.getMerchantId()
         if (merchantId == null) {
+            android.util.Log.d("SettingsFragment", "loadWidgetsFromFirebase: merchantId is null, using cache")
             // Fallback to cache if merchantId not available
             val itemWidgets = widgetManager.getAllItemLevelWidgets()
             itemLevelWidgetAdapter?.setWidgets(itemWidgets.toMutableList())
@@ -536,6 +537,11 @@ class SettingsFragment : Fragment() {
         // Fetch ALL widgets first, then filter by level
         // This ensures widgets without level field are handled correctly
         firebase.getWidgets(merchantId) { allWidgets ->
+            android.util.Log.d("SettingsFragment", "loadWidgetsFromFirebase: fetched ${allWidgets.size} widgets from Firebase")
+            allWidgets.forEach { w ->
+                android.util.Log.d("SettingsFragment", "  Widget: ${w.label}, level=${w.level}, id=${w.id}")
+            }
+            
             activity?.runOnUiThread {
                 // Update cache with latest from Firebase
                 widgetManager.saveToCache(allWidgets, widgetManager.getSettings())
@@ -543,6 +549,8 @@ class SettingsFragment : Fragment() {
                 // Filter by level for each adapter
                 val itemWidgets = allWidgets.filter { it.level == NoteLevel.ITEM }.sortedBy { it.order }
                 val orderWidgets = allWidgets.filter { it.level == NoteLevel.ORDER }.sortedBy { it.order }
+                
+                android.util.Log.d("SettingsFragment", "loadWidgetsFromFirebase: itemWidgets=${itemWidgets.size}, orderWidgets=${orderWidgets.size}")
                 
                 itemLevelWidgetAdapter?.setWidgets(itemWidgets.toMutableList())
                 orderLevelWidgetAdapter?.setWidgets(orderWidgets.toMutableList())
@@ -564,8 +572,10 @@ class SettingsFragment : Fragment() {
      * Save item-level widget with enforced level
      */
     private fun saveItemWidget(widget: WidgetConfig) {
+        android.util.Log.d("SettingsFragment", "saveItemWidget: ${widget.label}, current level=${widget.level}")
         widget.level = NoteLevel.ITEM  // Enforce level
         widgetManager.updateWidget(widget) { success ->
+            android.util.Log.d("SettingsFragment", "saveItemWidget result: success=$success, level=${widget.level}")
             if (!success) {
                 activity?.runOnUiThread {
                     Toast.makeText(context, "Failed to save widget", Toast.LENGTH_SHORT).show()
@@ -578,8 +588,10 @@ class SettingsFragment : Fragment() {
      * Save order-level widget with enforced level
      */
     private fun saveOrderWidget(widget: WidgetConfig) {
+        android.util.Log.d("SettingsFragment", "saveOrderWidget: ${widget.label}, current level=${widget.level}")
         widget.level = NoteLevel.ORDER  // Enforce level
         widgetManager.updateWidget(widget) { success ->
+            android.util.Log.d("SettingsFragment", "saveOrderWidget result: success=$success, level=${widget.level}")
             if (!success) {
                 activity?.runOnUiThread {
                     Toast.makeText(context, "Failed to save widget", Toast.LENGTH_SHORT).show()
