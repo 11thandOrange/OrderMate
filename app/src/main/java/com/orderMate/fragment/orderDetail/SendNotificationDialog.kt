@@ -175,21 +175,40 @@ class SendNotificationDialog(
                     val density = resources.displayMetrics.density
                     val heightPx = (48 * density).toInt()
                     val horizPadding = (16 * density).toInt()
-                    val dividerHeight = (1 * density).toInt()
+                    val cornerRadius = 10 * density
                     
-                    // Add divider line at bottom (except last item)
+                    val isFirstItem = position == 0
                     val isLastItem = position == count - 1
-                    val bgDrawable = android.graphics.drawable.LayerDrawable(arrayOf(
-                        android.graphics.drawable.ColorDrawable(android.graphics.Color.parseColor("#292D3E")),
-                        android.graphics.drawable.InsetDrawable(
-                            android.graphics.drawable.ColorDrawable(android.graphics.Color.parseColor("#1AFFFFFF")),
-                            0, heightPx - dividerHeight, 0, 0
+                    
+                    // Create background with rounded corners for first/last items
+                    val bgShape = android.graphics.drawable.GradientDrawable()
+                    bgShape.setColor(android.graphics.Color.parseColor("#292D3E"))
+                    
+                    when {
+                        count == 1 -> bgShape.cornerRadii = floatArrayOf(
+                            cornerRadius, cornerRadius, cornerRadius, cornerRadius,
+                            cornerRadius, cornerRadius, cornerRadius, cornerRadius
                         )
-                    ))
-                    background = if (isLastItem) {
-                        android.graphics.drawable.ColorDrawable(android.graphics.Color.parseColor("#292D3E"))
+                        isFirstItem -> bgShape.cornerRadii = floatArrayOf(
+                            cornerRadius, cornerRadius, cornerRadius, cornerRadius,
+                            0f, 0f, 0f, 0f
+                        )
+                        isLastItem -> bgShape.cornerRadii = floatArrayOf(
+                            0f, 0f, 0f, 0f,
+                            cornerRadius, cornerRadius, cornerRadius, cornerRadius
+                        )
+                        else -> bgShape.cornerRadii = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
+                    }
+                    
+                    // Add divider at bottom (except last item)
+                    if (!isLastItem) {
+                        val dividerDrawable = android.graphics.drawable.GradientDrawable()
+                        dividerDrawable.setColor(android.graphics.Color.parseColor("#33FFFFFF"))
+                        val layerDrawable = android.graphics.drawable.LayerDrawable(arrayOf(bgShape, dividerDrawable))
+                        layerDrawable.setLayerInset(1, 0, heightPx - (1 * density).toInt(), 0, 0)
+                        background = layerDrawable
                     } else {
-                        bgDrawable
+                        background = bgShape
                     }
                     
                     setPadding(horizPadding, 0, horizPadding, 0)
@@ -202,6 +221,11 @@ class SendNotificationDialog(
         }
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.templateSpinner.adapter = adapter
+        
+        // Set dropdown width to match the container width
+        binding.templateSpinnerContainer.post {
+            binding.templateSpinner.dropDownWidth = binding.templateSpinnerContainer.width
+        }
         
         // Make container click also trigger spinner
         binding.templateSpinnerContainer.setOnClickListener {
