@@ -516,31 +516,6 @@
                             android:contentDescription="@string/view_details" />
                     </LinearLayout>
 
-                    <!-- Order-level Notes Section (#93 requirement) -->
-                    <!-- Hidden when no pills to display -->
-                    <LinearLayout
-                        android:id="@+id/orderNotesSection"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="20dp"
-                        android:paddingVertical="12dp"
-                        android:visibility="gone">
-                        
-                        <!-- Order Notes Pills Container -->
-                        <com.google.android.flexbox.FlexboxLayout
-                            android:id="@+id/orderNotesPillsContainer"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            app:flexWrap="wrap"
-                            app:alignItems="center"
-                            app:justifyContent="flex_start" />
-                        
-                        <!-- Edit button removed per user request - card click handles editing -->
-                    </LinearLayout>
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"

@@ -362,7 +362,6 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         showThePaymentData()
         showTheDiscountAndTaxData()
         populateHistoryCard()
-        setupOrderNotesPills()
         populateOrderTags()           // SINGLE_SELECT + MULTI_SELECT widgets
         populateDynamicWidgetRows()   // CALENDAR + TEXT_BOX widgets
     }
@@ -521,72 +520,6 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             rowLayout.addView(valueView)
             container.addView(rowLayout)
         }
-    }
-    
-    /**
-     * Setup order-level notes pills display (#93)
-     * QA spec: Header pills show SINGLE_SELECT and MULTI_SELECT only.
-     * TEXT_BOX and CALENDAR are shown in dedicated rows (handled elsewhere).
-     * Section is hidden when there are no pills to display.
-     */
-    private fun setupOrderNotesPills() {
-        val orderNote = orderArguments?.note
-        val container = binding.orderNotesPillsContainer
-        val section = binding.orderNotesSection
-        
-        container.removeAllViews()
-        
-        if (orderNote.isNullOrBlank()) {
-            // No notes, hide section entirely
-            section.visibility = View.GONE
-            return
-        }
-        
-        // Use widget-based parsing for ORDER-level widgets
-        val widgets = com.orderMate.utils.WidgetManager.getCachedWidgets()
-        val orderLevelWidgets = widgets.filter { it.level == NoteLevel.ORDER }
-        val density = resources.displayMetrics.density
-        
-        // QA spec: Header pills = SINGLE_SELECT + MULTI_SELECT only
-        // TEXT_BOX and CALENDAR get their own dedicated rows
-        val parsedTags = com.orderMate.utils.OrderNoteParser.extractTagsFromNote(orderNote, orderLevelWidgets, NoteLevel.ORDER, includeTextBox = false)
-        val pillTags = parsedTags.filter { 
-            it.widgetType == WidgetType.SINGLE_SELECT || it.widgetType == WidgetType.MULTI_SELECT 
-        }
-        
-        if (pillTags.isEmpty()) {
-            // No pills to display, hide section entirely
-            section.visibility = View.GONE
-            return
-        }
-        
-        // Show section with pills
-        section.visibility = View.VISIBLE
-        pillTags.forEach { tag ->
-            addNotePill(container, tag.value, tag.widgetType, density)
-        }
-    }
-    
-    private fun addNotePill(container: com.google.android.flexbox.FlexboxLayout, text: String, widgetType: WidgetType, density: Float) {
-        val pillView = layoutInflater.inflate(R.layout.item_note_pill, container, false) as LinearLayout
-        
-        val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-        val pillText = pillView.findViewById<TextView>(R.id.pillText)
-        
-        val pillColor = com.orderMate.utils.WidgetColorUtils.getColorForWidgetType(widgetType)
-        
-        pillText.text = text
-        pillText.maxLines = 1
-        pillText.setTextColor(pillColor)
-        
-        val iconRes = com.orderMate.utils.WidgetColorUtils.getIconForWidgetType(widgetType)
-        pillIcon.setImageResource(iconRes)
-        pillIcon.setColorFilter(pillColor)
-        
-        // Unified pill background: 15% opacity + 25% border
-        pillView.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(pillColor, 10f, density)
-        
-        container.addView(pillView)
     }
     
     /**
