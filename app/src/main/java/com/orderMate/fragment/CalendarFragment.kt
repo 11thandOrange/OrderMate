@@ -825,7 +825,11 @@ class CalendarFragment : Fragment() {
                 FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
                     val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
                     val widget = WidgetManager.getInstance(requireContext()).getWidgetById(widgetId ?: "") ?: continue
-                    val orderValues = extractWidgetValuesFromNotes(order.lineItems, widget.id)
+                    val orderValues = if (widget.level == NoteLevel.ORDER) {
+                        extractWidgetValuesFromOrderNote(order.note, widget.id)
+                    } else {
+                        extractWidgetValuesFromNotes(order.lineItems, widget.id)
+                    }
                     if (!selectedValues.any { it in orderValues }) return false
                 }
             }
@@ -854,15 +858,26 @@ class CalendarFragment : Fragment() {
         val values = mutableSetOf<String>()
         lineItems?.forEach { lineItem ->
             val note = lineItem?.note ?: return@forEach
-            // Match by widget ID in format [widgetId]label:value
-            val pattern = "\\[$widgetId\\][^:]*:([^•|]+)".toRegex()
-            pattern.findAll(note).forEach { match ->
-                val value = match.groupValues[1].trim()
-                if (value.isNotEmpty()) {
-                    // Handle multi-select comma-separated values
-                    value.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { v ->
-                        values.add(v)
-                    }
+            values.addAll(extractWidgetValuesFromString(note, widgetId))
+        }
+        return values
+    }
+    
+    private fun extractWidgetValuesFromOrderNote(orderNote: String?, widgetId: String): Set<String> {
+        if (orderNote.isNullOrBlank()) return emptySet()
+        return extractWidgetValuesFromString(orderNote, widgetId)
+    }
+    
+    private fun extractWidgetValuesFromString(note: String, widgetId: String): Set<String> {
+        val values = mutableSetOf<String>()
+        // Match by widget ID in format [widgetId]label:value
+        val pattern = "\\[$widgetId\\][^:]*:([^•|]+)".toRegex()
+        pattern.findAll(note).forEach { match ->
+            val value = match.groupValues[1].trim()
+            if (value.isNotEmpty()) {
+                // Handle multi-select comma-separated values
+                value.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { v ->
+                    values.add(v)
                 }
             }
         }

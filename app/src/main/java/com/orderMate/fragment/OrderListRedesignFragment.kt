@@ -25,6 +25,7 @@ import com.orderMate.databinding.FragmentOrderListRedesignBinding
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FilterCategories
 import com.orderMate.utils.FilterCategoryBuilder
+import com.orderMate.modals.NoteLevel
 import com.orderMate.utils.ModalDialogCategories
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.OrderSearchFilter
@@ -682,7 +683,11 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
                     val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
                     val widget = WidgetManager.getInstance(requireContext()).getWidgetById(widgetId ?: "") ?: continue
-                    val orderValues = extractWidgetValuesFromNotes(order.lineItems, widget.id)
+                    val orderValues = if (widget.level == NoteLevel.ORDER) {
+                        extractWidgetValuesFromOrderNote(order.note, widget.id)
+                    } else {
+                        extractWidgetValuesFromNotes(order.lineItems, widget.id)
+                    }
                     if (!selectedValues.any { it in orderValues }) return false
                 }
             }
@@ -708,7 +713,11 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
                     val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
                     val widget = WidgetManager.getInstance(requireContext()).getWidgetById(widgetId ?: "") ?: continue
-                    val orderDateValues = extractWidgetValuesFromNotes(order.lineItems, widget.id)
+                    val orderDateValues = if (widget.level == NoteLevel.ORDER) {
+                        extractWidgetValuesFromOrderNote(order.note, widget.id)
+                    } else {
+                        extractWidgetValuesFromNotes(order.lineItems, widget.id)
+                    }
                     
                     val matchesAny = dates.any { filterDate ->
                         val dateStr = java.text.SimpleDateFormat("M/d/yy", java.util.Locale.getDefault()).format(filterDate)
@@ -730,16 +739,27 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         val values = mutableSetOf<String>()
         lineItems?.forEach { item ->
             item?.note?.let { note ->
-                // Match by widget ID in format [widgetId]label:value
-                val pattern = "\\[$widgetId\\][^:]*:([^•|]+)".toRegex()
-                pattern.findAll(note).forEach { match ->
-                    val value = match.groupValues[1].trim()
-                    if (value.isNotEmpty()) {
-                        // Handle multi-select comma-separated values
-                        value.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { v ->
-                            values.add(v)
-                        }
-                    }
+                values.addAll(extractWidgetValuesFromString(note, widgetId))
+            }
+        }
+        return values
+    }
+    
+    private fun extractWidgetValuesFromOrderNote(orderNote: String?, widgetId: String): Set<String> {
+        if (orderNote.isNullOrBlank()) return emptySet()
+        return extractWidgetValuesFromString(orderNote, widgetId)
+    }
+    
+    private fun extractWidgetValuesFromString(note: String, widgetId: String): Set<String> {
+        val values = mutableSetOf<String>()
+        // Match by widget ID in format [widgetId]label:value
+        val pattern = "\\[$widgetId\\][^:]*:([^•|]+)".toRegex()
+        pattern.findAll(note).forEach { match ->
+            val value = match.groupValues[1].trim()
+            if (value.isNotEmpty()) {
+                // Handle multi-select comma-separated values
+                value.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { v ->
+                    values.add(v)
                 }
             }
         }

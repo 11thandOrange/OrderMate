@@ -333,10 +333,14 @@ object FilterCategoryBuilder {
     
     /**
      * Extract widget ID from filter category ID
+     * Category ID format: widget_{widgetId}_item or widget_{widgetId}_order
      */
     fun getWidgetId(categoryId: String): String? {
         return if (isWidgetFilter(categoryId)) {
-            categoryId.removePrefix(WIDGET_PREFIX)
+            categoryId
+                .removePrefix(WIDGET_PREFIX)
+                .removeSuffix("_item")
+                .removeSuffix("_order")
         } else {
             null
         }
