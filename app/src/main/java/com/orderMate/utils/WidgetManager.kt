@@ -146,11 +146,14 @@ class WidgetManager private constructor(private val context: Context) {
      */
     fun getItemWidgets(): List<WidgetConfig> {
         val cached = getItemWidgetsFromCache()
-        return if (cached.isEmpty()) {
+        val result = if (cached.isEmpty()) {
+            android.util.Log.d("WidgetGetDebug", "getItemWidgets: CACHE EMPTY - creating new defaults!")
             DefaultWidgetFactory.createItemLevelDefaults()
         } else {
+            android.util.Log.d("WidgetGetDebug", "getItemWidgets: returning ${cached.size} cached widgets")
             cached
         }
+        return result
     }
     
     /**
@@ -158,18 +161,26 @@ class WidgetManager private constructor(private val context: Context) {
      */
     fun getOrderWidgets(): List<WidgetConfig> {
         val cached = getOrderWidgetsFromCache()
-        return if (cached.isEmpty()) {
+        val result = if (cached.isEmpty()) {
+            android.util.Log.d("WidgetGetDebug", "getOrderWidgets: CACHE EMPTY - creating new defaults!")
             DefaultWidgetFactory.createOrderLevelDefaults()
         } else {
+            android.util.Log.d("WidgetGetDebug", "getOrderWidgets: returning ${cached.size} cached widgets")
             cached
         }
+        return result
     }
     
     /**
      * Get enabled item-level widgets sorted by order.
      */
     fun getEnabledItemWidgets(): List<WidgetConfig> {
-        return getItemWidgets().filter { it.isEnabled }
+        val widgets = getItemWidgets().filter { it.isEnabled }
+        android.util.Log.d("WidgetGetDebug", "getEnabledItemWidgets: returning ${widgets.size} enabled widgets")
+        widgets.forEach { w ->
+            android.util.Log.d("WidgetGetDebug", "  Widget: id=${w.id}, label=${w.label}")
+        }
+        return widgets
     }
     
     /**
@@ -366,9 +377,19 @@ class WidgetManager private constructor(private val context: Context) {
         val defaults = DefaultWidgetFactory.createItemLevelDefaults()
         val currentOrderWidgets = getOrderWidgetsFromCache()
         
+        android.util.Log.d("WidgetResetDebug", "========== RESET ITEM WIDGETS ==========")
+        android.util.Log.d("WidgetResetDebug", "merchantId: $mid")
+        android.util.Log.d("WidgetResetDebug", "NEW defaults being created:")
+        defaults.forEach { w ->
+            android.util.Log.d("WidgetResetDebug", "  Widget: id=${w.id}, label=${w.label}, type=${w.type}, level=${w.level}")
+        }
+        android.util.Log.d("WidgetResetDebug", "=========================================")
+        
         firebase.replaceAllWidgets(mid, defaults + currentOrderWidgets) { success ->
+            android.util.Log.d("WidgetResetDebug", "Firebase replaceAllWidgets success: $success")
             if (success) {
                 saveItemWidgetsToCache(defaults)
+                android.util.Log.d("WidgetResetDebug", "Saved to cache")
             }
             callback(success)
         }

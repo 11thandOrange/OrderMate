@@ -1121,6 +1121,11 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         ).apply {
             setListener(object : ItemNoteDialogFragment.ItemNoteListener {
                 override fun onNoteSaved(itemId: String?, note: String) {
+                    android.util.Log.d("ItemNoteReceivedDebug", "========== NOTE RECEIVED FROM DIALOG ==========")
+                    android.util.Log.d("ItemNoteReceivedDebug", "itemId: $itemId")
+                    android.util.Log.d("ItemNoteReceivedDebug", "note received: '$note'")
+                    android.util.Log.d("ItemNoteReceivedDebug", "================================================")
+                    
                     // Update the line item note in UI
                     updateNoteInTheLineItemOfOrder(itemId, note, orderPosition)
                     
@@ -1130,15 +1135,19 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                             val orderId = orderArguments?.id ?: return@exceptionHandler
                             val allLineItems = orderArguments?.lineItems ?: return@exceptionHandler
                             
+                            android.util.Log.d("ItemNoteReceivedDebug", "Saving to Clover - orderId: $orderId")
+                            
                             // Update note for matching line items
                             allLineItems.forEach { lineItem ->
                                 if (lineItem?.item?.id == itemId) {
+                                    android.util.Log.d("ItemNoteReceivedDebug", "Setting note on lineItem: ${lineItem.id}")
                                     lineItem.note = note
                                 }
                             }
                             
                             // Save to Clover
                             myApp.getOrderConnector().updateLineItems(orderId, allLineItems)
+                            android.util.Log.d("ItemNoteReceivedDebug", "Saved to Clover!")
                         }
                     }
                 }
@@ -1155,6 +1164,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     * When user update the note for the item the callback come here
     * */
     override fun updateLineItem(id: String?, list: String?, position: Int) {
+        android.util.Log.d("ItemNoteUpdateDebug", "updateLineItem called - id: $id, list: '$list'")
         if (list == null) return
         updateNoteInTheLineItemOfOrder(id, list, position)
     }
@@ -1164,10 +1174,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
     private fun updateNoteInTheLineItemOfOrder(id: String?, list: String, position: Int) {
+        android.util.Log.d("ItemNoteUpdateDebug", "updateNoteInTheLineItemOfOrder - id: $id, note: '$list'")
         runOnBackgroundThread(Dispatchers.Default) {
             // update the order in the order detail screen
             for (i in lineItems) {
                 if (i?.order?.item?.id == id) {
+                    android.util.Log.d("ItemNoteUpdateDebug", "Setting note on lineItems[].order.note")
                     i?.order?.note = list
                 }
             }
@@ -1178,6 +1190,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             // each quantity of line item has same note
             for (i in orderArguments?.lineItems ?: emptyList()) {
                 if (i?.item?.id == id) {
+                    android.util.Log.d("ItemNoteUpdateDebug", "Setting note on orderArguments.lineItems[].note")
                     i?.note = list
                 }
             }

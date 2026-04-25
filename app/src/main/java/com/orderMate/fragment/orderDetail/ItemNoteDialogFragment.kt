@@ -118,6 +118,15 @@ class ItemNoteDialogFragment : DialogFragment() {
         // Read item-level widgets only (enabled widgets)
         widgets = WidgetManager.getInstance(requireContext()).getEnabledItemWidgets()
         
+        android.util.Log.d("ItemNoteDialogDebug", "========== ITEM NOTE DIALOG OPENED ==========")
+        android.util.Log.d("ItemNoteDialogDebug", "lineItemId: $lineItemId")
+        android.util.Log.d("ItemNoteDialogDebug", "existingNote: '$existingNote'")
+        android.util.Log.d("ItemNoteDialogDebug", "widgets loaded count: ${widgets.size}")
+        widgets.forEach { w ->
+            android.util.Log.d("ItemNoteDialogDebug", "  Widget: id=${w.id}, label=${w.label}, type=${w.type}, level=${w.level}")
+        }
+        android.util.Log.d("ItemNoteDialogDebug", "==============================================")
+        
         setupHeader()
         setupButtons()
         // Task 10: Parse existing note BEFORE building UI so selections are pre-populated
@@ -149,6 +158,14 @@ class ItemNoteDialogFragment : DialogFragment() {
 
         binding.btnSave.setOnClickListener {
             val note = buildNoteString()
+            android.util.Log.d("ItemNoteSaveDebug", "========== ITEM NOTE SAVE ==========")
+            android.util.Log.d("ItemNoteSaveDebug", "lineItemId: $lineItemId")
+            android.util.Log.d("ItemNoteSaveDebug", "note being saved: '$note'")
+            android.util.Log.d("ItemNoteSaveDebug", "widgets used for building:")
+            widgets.filter { it.isEnabled }.forEach { w ->
+                android.util.Log.d("ItemNoteSaveDebug", "  Widget: id=${w.id}, label=${w.label}, type=${w.type}")
+            }
+            android.util.Log.d("ItemNoteSaveDebug", "=====================================")
             listener?.onNoteSaved(lineItemId, note)
             dismiss()
         }
