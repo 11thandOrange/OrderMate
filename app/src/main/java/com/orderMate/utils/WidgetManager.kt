@@ -167,32 +167,38 @@ class WidgetManager private constructor(private val context: Context) {
     
     /**
      * Get item-level widgets (all, including disabled) sorted by order.
+     * Returns cached widgets or empty list if cache not yet populated.
+     * 
+     * IMPORTANT: Does NOT create defaults - that should only happen via
+     * explicit user action (reset widgets) or new merchant initialization.
+     * Callers should ensure reloadAll() has completed before expecting data.
      */
     fun getItemWidgets(): List<WidgetConfig> {
         val cached = getItemWidgetsFromCache()
-        val result = if (cached.isEmpty()) {
-            android.util.Log.d("WidgetGetDebug", "getItemWidgets: CACHE EMPTY - creating new defaults!")
-            DefaultWidgetFactory.createItemLevelDefaults()
+        if (cached.isEmpty()) {
+            android.util.Log.w("WidgetGetDebug", "getItemWidgets: CACHE EMPTY - returning empty list (Firebase sync may be pending)")
         } else {
             android.util.Log.d("WidgetGetDebug", "getItemWidgets: returning ${cached.size} cached widgets")
-            cached
         }
-        return result
+        return cached
     }
     
     /**
      * Get order-level widgets (all, including disabled) sorted by order.
+     * Returns cached widgets or empty list if cache not yet populated.
+     * 
+     * IMPORTANT: Does NOT create defaults - that should only happen via
+     * explicit user action (reset widgets) or new merchant initialization.
+     * Callers should ensure reloadAll() has completed before expecting data.
      */
     fun getOrderWidgets(): List<WidgetConfig> {
         val cached = getOrderWidgetsFromCache()
-        val result = if (cached.isEmpty()) {
-            android.util.Log.d("WidgetGetDebug", "getOrderWidgets: CACHE EMPTY - creating new defaults!")
-            DefaultWidgetFactory.createOrderLevelDefaults()
+        if (cached.isEmpty()) {
+            android.util.Log.w("WidgetGetDebug", "getOrderWidgets: CACHE EMPTY - returning empty list (Firebase sync may be pending)")
         } else {
             android.util.Log.d("WidgetGetDebug", "getOrderWidgets: returning ${cached.size} cached widgets")
-            cached
         }
-        return result
+        return cached
     }
     
     /**
