@@ -86,8 +86,15 @@ class LineItemAddedReceiver : BroadcastReceiver() {
                 true
             )
         ) {
+            Log.d("DrawerState", "ORDER_SAVED or PAYMENT_PROCESSED received")
             prefManager?.saveString(Constants.isOrderSaved, Constants.isTrue)
             OrderDetailFragment.orderIdForReopen = null
+            Log.d("DrawerState", "Cleared orderIdForReopen, drawer will use new active order")
+            // Refresh the drawer to show the new order that starts after save/pay
+            if (FloatingWidgetService.isShowing) {
+                Log.d("DrawerState", "Refreshing drawer after save/pay")
+                FloatingWidgetService.instance?.getTheOrderData()
+            }
             return
         }
         // Task 14: Check V2 settings for OrderMate in Clover Register
