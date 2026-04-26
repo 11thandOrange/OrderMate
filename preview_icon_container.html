@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Widget Icon Container Preview</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 40px;
+            margin: 0;
+        }
+        h1 {
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #888;
+            font-size: 18px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+        .comparison {
+            display: flex;
+            gap: 60px;
+            margin-top: 30px;
+        }
+        .column {
+            flex: 1;
+        }
+        .column h3 {
+            color: #aaa;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+        
+        /* Widget Card */
+        .widget-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        /* BEFORE: Icon without dark container */
+        .icon-container-before {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* AFTER: Icon with dark container */
+        .icon-bg-container {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(41, 45, 62, 0.8); /* #CC292D3E */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-container-after {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Widget type colors (20% opacity) */
+        .calendar { background: rgba(25, 118, 210, 0.2); }
+        .calendar .icon { color: #1976D2; }
+        
+        .single-select { background: rgba(123, 31, 162, 0.2); }
+        .single-select .icon { color: #7B1FA2; }
+        
+        .multi-select { background: rgba(56, 142, 60, 0.2); }
+        .multi-select .icon { color: #388E3C; }
+        
+        .text-box { background: rgba(245, 124, 0, 0.2); }
+        .text-box .icon { color: #F57C00; }
+        
+        .icon {
+            font-size: 20px;
+        }
+        
+        /* Widget info */
+        .widget-info {
+            flex: 1;
+        }
+        .widget-title {
+            font-size: 14px;
+            color: #fff;
+        }
+        .widget-type {
+            font-size: 11px;
+            color: #888;
+        }
+        
+        /* Toggle */
+        .toggle {
+            width: 44px;
+            height: 24px;
+            background: #4CAF50;
+            border-radius: 12px;
+            position: relative;
+        }
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            right: 2px;
+        }
+        
+        /* Code section */
+        .code-section {
+            margin-top: 60px;
+            background: #0d0d1a;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .code-section h3 {
+            color: #888;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        pre {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        code {
+            color: #e0e0e0;
+        }
+        .highlight-new {
+            background: rgba(76, 175, 80, 0.2);
+            display: block;
+        }
+        .highlight-old {
+            background: rgba(244, 67, 54, 0.1);
+            display: block;
+        }
+        .comment { color: #6a9955; }
+        .tag { color: #569cd6; }
+        .attr { color: #9cdcfe; }
+        .value { color: #ce9178; }
+    </style>
+</head>
+<body>
+    <h1>Filter Widget Icon Container Change</h1>
+    <p style="color: #888;">Adding dark background container behind widget icons (matches pill styling)</p>
+    
+    <div class="comparison">
+        <div class="column">
+            <h3>❌ Before (Current)</h3>
+            
+            <div class="widget-card">
+                <div class="icon-container-before calendar">
+                    <span class="icon">📅</span>
+                </div>
+                <div class="widget-info">
+                    <div class="widget-title">Due Date/Time</div>
+                    <div class="widget-type">Calendar</div>
+                </div>
+                <div class="toggle"></div>
+            </div>
+            
+            <div class="widget-card">
+                <div class="icon-container-before single-select">
+                    <span class="icon">📋</span>
+                </div>
+                <div class="widget-info">
+                    <div class="widget-title">Priority</div>
+                    <div class="widget-type">Single Select</div>
+                </div>
+                <div class="toggle"></div>
+            </div>
+            
+            <div class="widget-card">
+                <div class="icon-container-before multi-select">
+                    <span class="icon">☑️</span>
+                </div>
+                <div class="widget-info">
+                    <div class="widget-title">Tags</div>
+                    <div class="widget-type">Multi Select</div>
+                </div>
+                <div class="toggle"></div>
+            </div>
+            
+            <div class="widget-card">
+                <div class="icon-container-before text-box">
+                    <span class="icon">✏️</span>
+                </div>
+                <div class="widget-info">
+                    <div class="widget-title">Notes</div>
+                    <div class="widget-type">Text Box</div>
+                </div>
+                <div class="toggle"></div>
+            </div>
+        </div>
+        
+        <div class="column">
+            <h3>✅ After (With Dark Container)</h3>
+            
+            <div class="widget-card">
+                <div class="icon-bg-container">
+                    <div class="icon-container-after calendar">
+                        <span class="icon">📅</span>
+                    </div>
+                </div>
+                <div class="widget-info">
+                    <div class="widget-title">Due Date/Time</div>
+                    <div class="widget-type">Calendar</div>
+                </div>
+                <div class="toggle"></div>
+            </div>
+            
+            <div class="widget-card">
+                <div class="icon-bg-container">
+                    <div class="icon-container-after single-select">
+                        <span class="icon">📋</span>
+                    </div>
+                </div>
+                <div class="widget-info">
+                    <div class="widget-title">Priority</div>
+                    <div class="widget-type">Single Select</div>
+                </div>
+                <div class="toggle"></div>
+            </div>
+            
+            <div class="widget-card">
+                <div class="icon-bg-container">
+                    <div class="icon-container-after multi-select">
+                        <span class="icon">☑️</span>
+                    </div>
+                </div>
+                <div class="widget-info">
+                    <div class="widget-title">Tags</div>
+                    <div class="widget-type">Multi Select</div>
+                </div>
+                <div class="toggle"></div>
+            </div>
+            
+            <div class="widget-card">
+                <div class="icon-bg-container">
+                    <div class="icon-container-after text-box">
+                        <span class="icon">✏️</span>
+                    </div>
+                </div>
+                <div class="widget-info">
+                    <div class="widget-title">Notes</div>
+                    <div class="widget-type">Text Box</div>
+                </div>
+                <div class="toggle"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="code-section">
+        <h3>Code Changes</h3>
+        
+        <h4 style="color: #fff; margin-top: 20px;">1. item_filter_widget.xml (Modified)</h4>
+        <pre><code><span class="comment">&lt;!-- Widget Icon with dark background container (matches pill styling) --&gt;</span>
+<span class="highlight-new"><span class="tag">&lt;FrameLayout</span>
+    <span class="attr">android:id</span>=<span class="value">"@+id/filterWidgetIconBgContainer"</span>
+    <span class="attr">android:layout_width</span>=<span class="value">"40dp"</span>
+    <span class="attr">android:layout_height</span>=<span class="value">"40dp"</span>
+    <span class="attr">android:background</span>=<span class="value">"@drawable/bg_icon_dark_container"</span><span class="tag">&gt;</span></span>
+
+    <span class="tag">&lt;FrameLayout</span>
+        <span class="attr">android:id</span>=<span class="value">"@+id/filterWidgetIconContainer"</span>
+        <span class="attr">android:layout_width</span>=<span class="value">"36dp"</span>
+        <span class="attr">android:layout_height</span>=<span class="value">"36dp"</span>
+<span class="highlight-new">        <span class="attr">android:layout_gravity</span>=<span class="value">"center"</span></span>
+        <span class="attr">android:background</span>=<span class="value">"@drawable/bg_widget_icon_calendar"</span><span class="tag">&gt;</span>
+
+        <span class="tag">&lt;ImageView</span>
+            <span class="attr">android:id</span>=<span class="value">"@+id/filterWidgetIcon"</span>
+            ... <span class="tag">/&gt;</span>
+
+    <span class="tag">&lt;/FrameLayout&gt;</span>
+
+<span class="highlight-new"><span class="tag">&lt;/FrameLayout&gt;</span></span></code></pre>
+
+        <h4 style="color: #fff; margin-top: 30px;">2. bg_icon_dark_container.xml (New File)</h4>
+        <pre><code><span class="tag">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="comment">&lt;!-- Dark container background for widget icons (matches pill container styling) --&gt;</span>
+<span class="tag">&lt;shape</span> <span class="attr">xmlns:android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span>
+    <span class="attr">android:shape</span>=<span class="value">"rectangle"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;solid</span> <span class="attr">android:color</span>=<span class="value">"#CC292D3E"</span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;corners</span> <span class="attr">android:radius</span>=<span class="value">"10dp"</span> <span class="tag">/&gt;</span>
+<span class="tag">&lt;/shape&gt;</span></code></pre>
+    </div>
+    
+    <div style="margin-top: 40px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+        <h4 style="margin: 0 0 10px 0;">Color Reference</h4>
+        <p style="color: #888; margin: 0;">
+            Dark Container: <code style="background: #292D3E; padding: 2px 8px; border-radius: 4px;">#CC292D3E</code> (80% opacity of #292D3E)
+            <br><br>
+            Same as <code>COLOR_PILL_CONTAINER</code> in WidgetColorUtils.kt
+        </p>
+    </div>
+</body>
+</html>
