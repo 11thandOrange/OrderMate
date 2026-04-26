@@ -182,8 +182,8 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         val screenWidth = realMetrics.widthPixels
         val screenHeight = realMetrics.heightPixels
         
-        // Clover register left panel width: 24.5%
-        val drawerWidth = (screenWidth * 0.245).toInt()
+        // Clover register left panel width: 23.5%
+        val drawerWidth = (screenWidth * 0.235).toInt()
         
         // Top offset: approximately 11% of screen height (status bar + Register header) - already flush
         val topOffset = (screenHeight * 0.11).toInt()
