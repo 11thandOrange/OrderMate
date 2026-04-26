@@ -76,6 +76,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         var currencyName: String = ""
         var isPaymentBtnClicked = false
         var isReOpenBtnClicked = false
+        @Volatile
         var orderIdForReopen: String? = null
     }
 

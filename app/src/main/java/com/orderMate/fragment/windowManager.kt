@@ -71,7 +71,12 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     private var isPermanentMode: Boolean = false
     
     // Flag to prevent duplicate data fetching
+    @Volatile
     private var isFetchingData = false
+    
+    // Flag to track if a refresh was requested while fetching (prevents race conditions)
+    @Volatile
+    private var pendingRefresh = false
     
     // Flag to track when popup is open (prevents drawer close in permanent mode)
     private var isPopupOpen = false
@@ -106,6 +111,19 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             registerReceiver(popupClosedReceiver, IntentFilter(ACTION_POPUP_CLOSED))
         }
         
+        // Register OnOrderChangedListener once to handle any order changes
+        // This ensures drawer stays up-to-date with real-time order modifications
+        try {
+            MyApp.getInstance().getOrderConnector().addOnOrderChangedListener { orderId, _ ->
+                Log.d("DrawerState", "OnOrderChangedListener triggered for order: $orderId")
+                if (isShowing) {
+                    getTheOrderData()
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("DrawerState", "Failed to register OnOrderChangedListener: ${e.message}")
+        }
+        
         // Check if we're in permanent mode from settings
         isPermanentMode = settingsManager.getUseOrderMateRegisterInstead()
         
@@ -132,11 +150,6 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
 
         setupClickListener()
         setUpTouchListener()
-
-
-        // this is to handle the case when the dialog is open and user has added some items
-        //some time it backfires by not providing the callback at correct time
-
     }
     
     /**
@@ -606,9 +619,14 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     }
 
     fun getTheOrderData() {
-        // Prevent duplicate fetches
-        if (isFetchingData) return
+        // If already fetching, mark that a refresh is pending and return
+        if (isFetchingData) {
+            Log.d("DrawerState", "getTheOrderData() called but fetch in progress, marking pendingRefresh")
+            pendingRefresh = true
+            return
+        }
         isFetchingData = true
+        pendingRefresh = false  // Clear any pending flag since we're starting a fresh fetch
         
         Log.d("DrawerState", "getTheOrderData() called")
         Log.d("DrawerState", "Expected order (orderIdForReopen): ${OrderDetailFragment.orderIdForReopen}")
@@ -622,6 +640,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                 if (data?.isEmpty() == true) {
                     Log.d("DrawerState", "No orders available from getOrders()")
                     isFetchingData = false
+                    checkPendingRefresh()
                     return@launch
                 }
                 
@@ -652,11 +671,25 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                 CoroutineScope(Dispatchers.Main).launch {
                     setupRecyclerView(result, orderToDisplay)
                     isFetchingData = false
+                    checkPendingRefresh()
                 }
             } catch (e: Exception) {
                 Log.e("DrawerState", "Error in getTheOrderData: ${e.message}")
                 isFetchingData = false
+                checkPendingRefresh()
             }
+        }
+    }
+    
+    /**
+     * Check if a refresh was requested while we were fetching.
+     * If so, trigger another fetch to get the latest data.
+     */
+    private fun checkPendingRefresh() {
+        if (pendingRefresh) {
+            Log.d("DrawerState", "Pending refresh detected, fetching latest data")
+            pendingRefresh = false
+            getTheOrderData()
         }
     }
 

@@ -67,13 +67,8 @@ class LineItemAddedReceiver : BroadcastReceiver() {
             return
         }
 
-
-        MyApp.getInstance().getOrderConnector().addOnOrderChangedListener { _, _ ->
-            if (FloatingWidgetService.isShowing) {
-                FloatingWidgetService.instance?.getTheOrderData()
-            }
-        }
-
+        // Note: OnOrderChangedListener is registered once in FloatingWidgetService.onCreate()
+        // to avoid duplicate listener registration on every broadcast
 
         // is this the required intent if yes then perform the next operation else not
         if (!isRequiredIntent(p1)) {
@@ -173,7 +168,13 @@ class LineItemAddedReceiver : BroadcastReceiver() {
             }
 
             ACTION_LINE_ITEM_DELETED -> {
-                Constants.notImplementedLog
+                Log.d("DrawerState", "ACTION_LINE_ITEM_DELETED received")
+                prefManager?.saveString(Constants.isOrderSaved, Constants.isFalse)
+                // Refresh the drawer to reflect the deleted item
+                if (FloatingWidgetService.isShowing) {
+                    Log.d("DrawerState", "Refreshing drawer after item deleted")
+                    FloatingWidgetService.instance?.getTheOrderData()
+                }
             }
         }
     }
