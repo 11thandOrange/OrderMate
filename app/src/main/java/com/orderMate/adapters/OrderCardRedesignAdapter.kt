@@ -101,10 +101,10 @@ class OrderCardRedesignAdapter(
             setupNotesPills(order)
 
             // Left Status Indicator (green for paid, red for unpaid)
-            val paymentState = order.paymentState?.name ?: "NOT_PAID"
+            val paymentState = order.paymentState?.name ?: "OPEN"
             val indicatorColor = when (paymentState) {
                 "PAID" -> ContextCompat.getColor(context, R.color.paid_status_color)
-                "NOT_PAID" -> ContextCompat.getColor(context, R.color.unpaid_status_color)
+                "OPEN" -> ContextCompat.getColor(context, R.color.unpaid_status_color)
                 "PARTIALLY_PAID" -> ContextCompat.getColor(context, R.color.orange_accent)
                 "REFUNDED" -> ContextCompat.getColor(context, R.color.orange_accent)
                 else -> ContextCompat.getColor(context, R.color.paid_status_color)
@@ -292,7 +292,7 @@ class OrderCardRedesignAdapter(
         }
 
         private fun setupPaymentStatusBadge(order: Order) {
-            val paymentState = order.paymentState?.name ?: "NOT_PAID"
+            val paymentState = order.paymentState?.name ?: "OPEN"
             val displayText = formatPaymentState(paymentState)
             val density = binding.root.context.resources.displayMetrics.density
             

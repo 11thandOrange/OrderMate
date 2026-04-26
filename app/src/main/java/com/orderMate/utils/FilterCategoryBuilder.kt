@@ -67,7 +67,7 @@ object FilterCategoryBuilder {
     const val WIDGET_PREFIX = "widget_"
     
     // Clover enum values (from Clover SDK)
-    private val CLOVER_PAYMENT_STATUS_VALUES = listOf("PAID", "NOT_PAID", "PARTIALLY_PAID", "REFUNDED", "PARTIALLY_REFUNDED", "OPEN")
+    private val CLOVER_PAYMENT_STATUS_VALUES = listOf("OPEN", "PAID", "PARTIALLY_PAID", "REFUNDED", "PARTIALLY_REFUNDED", "CREDITED")
     private val CLOVER_ORDER_STATUS_VALUES = listOf("open", "locked")
     private val CLOVER_PAYMENT_TYPE_VALUES = listOf("Cash", "Credit Card", "Debit Card", "Check", "Gift Card", "External Gift Card", "Other")
     
@@ -288,12 +288,12 @@ object FilterCategoryBuilder {
      */
     private fun formatPaymentStatus(status: String): String {
         return when (status.uppercase()) {
+            "OPEN" -> "Unpaid"
             "PAID" -> "Paid"
-            "NOT_PAID" -> "Unpaid"
             "PARTIALLY_PAID" -> "Partial"
             "REFUNDED" -> "Refunded"
             "PARTIALLY_REFUNDED" -> "Partial Refund"
-            "OPEN" -> "Open"
+            "CREDITED" -> "Credited"
             else -> status.lowercase()
                 .replace("_", " ")
                 .split(" ")

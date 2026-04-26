@@ -112,7 +112,7 @@ class OrderCardAdapter(
 
         private fun setupPaymentInfo(order: Order, context: Context) {
             // Payment Status Badge
-            val paymentState = order.paymentState?.name?.uppercase() ?: Constants.OPEN
+            val paymentState = order.paymentState?.name?.uppercase() ?: "OPEN"
             
             val (statusText, bgRes, textColorRes) = when (paymentState) {
                 Constants.PAID -> Triple(
@@ -218,7 +218,7 @@ class OrderCardAdapter(
         }
 
         private fun setupStatusIndicator(order: Order) {
-            val paymentState = order.paymentState?.name?.uppercase() ?: ""
+            val paymentState = order.paymentState?.name?.uppercase() ?: "OPEN"
             val colorRes = when (paymentState) {
                 Constants.PAID -> R.color.paid_status_color
                 Constants.REFUNDED, Constants.PARTIALLY_REFUNDED -> R.color.other_order_payment_status

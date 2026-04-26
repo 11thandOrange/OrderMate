@@ -106,25 +106,25 @@ fun getCustomerContactDetails(customer: Customer?): Pair<String, String> {
 /**
  * Formats Clover payment state to human-readable text.
  * 
- * Mapping:
- * - OPEN → Open
+ * Mapping (Clover SDK PaymentState enum):
+ * - OPEN → Unpaid
  * - PAID → Paid
- * - NOT_PAID → Unpaid
  * - PARTIALLY_PAID → Partially Paid
  * - PARTIALLY_REFUNDED → Partially Refunded
  * - REFUNDED → Refunded
- * - LOCKED → Closed
+ * - CREDITED → Credited
+ * - LOCKED → Closed (order state, not payment state)
  */
 fun formatPaymentState(state: String?): String {
-    if (state.isNullOrEmpty()) return "Open"
+    if (state.isNullOrEmpty()) return "Unpaid"
     
     return when (state.uppercase()) {
-        "OPEN" -> "Open"
+        "OPEN" -> "Unpaid"
         "PAID" -> "Paid"
-        "NOT_PAID" -> "Unpaid"
         "PARTIALLY_PAID" -> "Partially Paid"
         "PARTIALLY_REFUNDED" -> "Partially Refunded"
         "REFUNDED" -> "Refunded"
+        "CREDITED" -> "Credited"
         "LOCKED" -> "Closed"
         else -> state.replace("_", " ")
             .lowercase()

@@ -144,12 +144,13 @@ object OrderSearchFilter {
     }
 
     private fun matchesPaymentStatus(order: Order, value: String): Boolean {
-        val state = order.paymentState?.name?.uppercase() ?: ""
+        val state = order.paymentState?.name?.uppercase() ?: "OPEN"
         return when (value.lowercase()) {
             "paid" -> state == "PAID"
-            "unpaid" -> state == "OPEN" || state.isEmpty()
+            "unpaid" -> state == "OPEN"
             "refunded" -> state == "REFUNDED" || state == "PARTIALLY_REFUNDED"
             "partial" -> state == "PARTIALLY_PAID"
+            "credited" -> state == "CREDITED"
             else -> true
         }
     }

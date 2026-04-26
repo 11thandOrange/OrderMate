@@ -666,7 +666,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             when {
                 // Clover filters
                 categoryId == FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> {
-                    val orderPayment = order.paymentState?.name ?: "NOT_PAID"
+                    val orderPayment = order.paymentState?.name ?: "OPEN"
                     android.util.Log.d("FILTER_DEBUG", "PAYMENT_STATUS: orderId=${order.id?.takeLast(6)}, orderPayment='$orderPayment', selectedValues=$selectedValues, match=${selectedValues.contains(orderPayment)}")
                     if (!selectedValues.contains(orderPayment)) return false
                 }
