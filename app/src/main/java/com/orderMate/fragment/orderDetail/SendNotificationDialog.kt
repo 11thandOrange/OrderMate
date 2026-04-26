@@ -31,6 +31,7 @@ import com.orderMate.modals.ShareMessageJson
 import com.orderMate.modals.ShareSmsModal
 import com.orderMate.modals.SmsBody
 import com.orderMate.modals.Text
+import com.orderMate.services.TemplateProcessor
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FirebaseConfigManager
 import com.orderMate.utils.NotificationTemplate
@@ -40,6 +41,10 @@ import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
 import com.orderMate.utils.showView
 import com.orderMate.utils.MyApp
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class SendNotificationDialog(
     private val order: Order?,
@@ -54,10 +59,50 @@ class SendNotificationDialog(
     private var customerEmailArray: MutableList<String?> = mutableListOf()
     private var customerPhoneArray: MutableList<String?> = mutableListOf()
     private var templates: List<NotificationTemplate> = emptyList()
+    private var merchantName: String = ""
 
     @Synchronized
     fun tabChanged() {
         isSmsEnabled = !isSmsEnabled
+    }
+    
+    /**
+     * Process template content by replacing {{placeholders}} with actual order data
+     */
+    private fun processTemplateContent(template: String): String {
+        val customerName = order?.customers?.firstOrNull()?.let { customer ->
+            listOfNotNull(customer.firstName, customer.lastName)
+                .filter { it.isNotBlank() }
+                .joinToString(" ")
+        } ?: ""
+        
+        val orderTotal = order?.total?.let { total ->
+            NumberFormat.getCurrencyInstance(Locale.US).format(total / 100.0)
+        } ?: ""
+        
+        val dueDate = order?.createdTime?.let { timestamp ->
+            SimpleDateFormat("MMMM d, yyyy", Locale.US).format(Date(timestamp))
+        } ?: ""
+        
+        val dueTime = order?.createdTime?.let { timestamp ->
+            SimpleDateFormat("h:mm a", Locale.US).format(Date(timestamp))
+        } ?: ""
+        
+        val itemCount = order?.lineItems?.size ?: 0
+        
+        val orderNotes = order?.note ?: ""
+        
+        return TemplateProcessor.processForOrder(
+            template = template,
+            merchantName = merchantName,
+            orderId = order?.id ?: "",
+            customerName = customerName,
+            orderTotal = orderTotal,
+            dueDate = dueDate,
+            dueTime = dueTime,
+            itemCount = itemCount,
+            orderNotes = orderNotes
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -135,6 +180,11 @@ class SendNotificationDialog(
             try {
                 val app = requireContext().applicationContext as? MyApp ?: return@runOnBackgroundThread
                 val merchantId = app.getMerchantId() ?: return@runOnBackgroundThread
+                
+                // Load merchant name for template processing
+                app.getMerchantConnector()?.merchant?.name?.let { name ->
+                    merchantName = name
+                }
                 
                 FirebaseConfigManager.getInstance().getTemplates(merchantId) { loadedTemplates ->
                     templates = loadedTemplates
@@ -246,11 +296,13 @@ class SendNotificationDialog(
             override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (position > 0 && position <= templates.size) {
                     val selectedTemplate = templates[position - 1]
-                    // #63: Auto-fill content
-                    binding.etNotes.setText(selectedTemplate.content)
-                    // #64: Auto-fill subject for email (use template subject, not name)
+                    // #63: Auto-fill content with processed template (replace {{placeholders}})
+                    val processedContent = processTemplateContent(selectedTemplate.content)
+                    binding.etNotes.setText(processedContent)
+                    // #64: Auto-fill subject for email (also process placeholders)
                     if (!isSmsEnabled && selectedTemplate.subject.isNotBlank()) {
-                        binding.subject.setText(selectedTemplate.subject)
+                        val processedSubject = processTemplateContent(selectedTemplate.subject)
+                        binding.subject.setText(processedSubject)
                     }
                 }
             }
