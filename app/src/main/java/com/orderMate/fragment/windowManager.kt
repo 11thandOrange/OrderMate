@@ -86,6 +86,8 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             windowManager.addView(binding?.root, setTheWindowParamsForPermanentOverlay())
             binding?.orderMateButton?.hideView()
             binding?.permanentModeBackground?.showView()  // Show opaque dark background
+            // Use no-rounded-corners background for permanent mode
+            binding?.container?.setBackgroundResource(R.drawable.bg_drawer_permanent)
             binding?.container?.showView()
             binding?.transparentContainer?.visibility = View.GONE  // No dimming overlay needed
             getTheOrderData()
@@ -107,8 +109,8 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     /**
      * WindowManager params for permanent overlay mode.
      * Positions the drawer over Clover register item list (left panel):
-     * - Below "Current Order" header (~56dp from top)
-     * - Above "Save/Pay" footer (~120dp from bottom)
+     * - Below "Current Order" header + status bar (~100dp from top)
+     * - Above "Save/Pay" footer (~140dp from bottom)
      * - Covers the full width of the left panel (~350dp on most devices)
      */
     private fun setTheWindowParamsForPermanentOverlay(): WindowManager.LayoutParams {
@@ -120,10 +122,10 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         val drawerWidth = (350 * density).toInt()
         
         // Height calculation:
-        // - Top offset: ~56dp for "Current Order" header
-        // - Bottom offset: ~120dp for subtotal/tax/total + Save/Pay buttons
-        val topOffset = (56 * density).toInt()
-        val bottomOffset = (120 * density).toInt()
+        // - Top offset: ~100dp for status bar + "Current Order" header row
+        // - Bottom offset: ~140dp for subtotal/tax/total + Save/Pay buttons
+        val topOffset = (100 * density).toInt()
+        val bottomOffset = (140 * density).toInt()
         val screenHeight = displayMetrics.heightPixels
         val drawerHeight = screenHeight - topOffset - bottomOffset
         
@@ -445,6 +447,8 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                 )
                 // Show opaque background and drawer, no transparent dimming
                 binding?.permanentModeBackground?.showView()
+                // Use no-rounded-corners background for permanent mode
+                binding?.container?.setBackgroundResource(R.drawable.bg_drawer_permanent)
                 binding?.container?.showView()
                 binding?.transparentContainer?.visibility = View.GONE
             } else {
@@ -456,8 +460,9 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                         WindowManager.LayoutParams.MATCH_PARENT
                     )
                 )
-                // Show drawer and overlay
+                // Show drawer and overlay with rounded corners
                 binding?.permanentModeBackground?.hideView()
+                binding?.container?.setBackgroundResource(R.drawable.bg_drawer_glass)
                 binding?.container?.showView()
                 binding?.transparentContainer?.showView()
             }
