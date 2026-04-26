@@ -145,6 +145,17 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             scrollIndicator.visibility = if (canScrollMore) View.VISIBLE else View.GONE
         }
     }
+    
+    /**
+     * Update order details scroll indicator visibility after content changes
+     * Called after populateOrderTags() and populateDynamicWidgetRows() to recheck scrollability
+     */
+    private fun updateOrderDetailsScrollIndicator() {
+        binding.orderDetailsScrollView.post {
+            val canScroll = binding.orderDetailsScrollView.canScrollVertically(1)
+            binding.orderDetailsScrollIndicator.visibility = if (canScroll) View.VISIBLE else View.GONE
+        }
+    }
 
 
     private fun setUpObserver() {
@@ -408,6 +419,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         populateHistoryCard()
         populateOrderTags()           // SINGLE_SELECT + MULTI_SELECT widgets
         populateDynamicWidgetRows()   // CALENDAR + TEXT_BOX widgets
+        updateOrderDetailsScrollIndicator() // Update scroll indicator after content changes
     }
     
     /**
