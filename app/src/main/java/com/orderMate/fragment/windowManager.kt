@@ -11,6 +11,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -88,6 +89,11 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             binding?.permanentModeBackground?.showView()  // Show opaque dark background
             // Use no-rounded-corners background for permanent mode
             binding?.container?.setBackgroundResource(R.drawable.bg_drawer_permanent)
+            // Set container to fill the window in permanent mode
+            binding?.container?.layoutParams = binding?.container?.layoutParams?.apply {
+                width = ViewGroup.LayoutParams.MATCH_PARENT
+                height = ViewGroup.LayoutParams.MATCH_PARENT
+            }
             binding?.container?.showView()
             binding?.transparentContainer?.visibility = View.GONE  // No dimming overlay needed
             getTheOrderData()
@@ -467,6 +473,11 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                 binding?.permanentModeBackground?.showView()
                 // Use no-rounded-corners background for permanent mode
                 binding?.container?.setBackgroundResource(R.drawable.bg_drawer_permanent)
+                // Set container to fill the window in permanent mode
+                binding?.container?.layoutParams = binding?.container?.layoutParams?.apply {
+                    width = ViewGroup.LayoutParams.MATCH_PARENT
+                    height = ViewGroup.LayoutParams.MATCH_PARENT
+                }
                 binding?.container?.showView()
                 binding?.transparentContainer?.visibility = View.GONE
             } else {
