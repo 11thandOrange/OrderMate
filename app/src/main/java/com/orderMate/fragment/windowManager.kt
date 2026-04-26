@@ -188,8 +188,8 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         // Top offset: approximately 11% of screen height (status bar + Register header) - already flush
         val topOffset = (screenHeight * 0.11).toInt()
         
-        // Bottom offset: 12% (flush with Save/Pay footer)
-        val bottomOffset = (screenHeight * 0.12).toInt()
+        // Bottom offset: 15% (flush with Save/Pay footer)
+        val bottomOffset = (screenHeight * 0.15).toInt()
         
         val drawerHeight = screenHeight - topOffset - bottomOffset
         
