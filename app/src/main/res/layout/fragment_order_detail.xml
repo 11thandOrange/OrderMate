@@ -440,50 +440,48 @@
                         android:paddingHorizontal="20dp"
                         android:paddingVertical="16dp">
 
-                        <!-- Inner FlexboxLayout: icon + title + pills (wraps when needed) -->
+                        <!-- Icon with background - matches HTML .detail-card-title i -->
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/bg_card_title_icon">
+                            
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_receipt"
+                                app:tint="@color/text_light"
+                                android:contentDescription="@string/order_details" />
+                        </FrameLayout>
+
+                        <!-- Title - fixed width, won't shrink -->
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:text="@string/order_details"
+                            android:textColor="@color/text_light"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <!-- Pills FlexboxLayout - wraps and aligns right -->
                         <com.google.android.flexbox.FlexboxLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             app:flexWrap="wrap"
+                            app:justifyContent="flex_end"
                             app:alignItems="center"
-                            app:alignContent="flex_start">
+                            app:alignContent="center">
 
-                            <!-- Icon with background - matches HTML .detail-card-title i -->
-                            <FrameLayout
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:layout_marginEnd="10dp"
-                                android:background="@drawable/bg_card_title_icon"
-                                app:layout_flexShrink="0">
-                                
-                                <ImageView
-                                    android:layout_width="14dp"
-                                    android:layout_height="14dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_receipt"
-                                    app:tint="@color/text_light"
-                                    android:contentDescription="@string/order_details" />
-                            </FrameLayout>
-
-                            <!-- Title - fixed width, won't shrink, pushes pills right -->
-                            <com.google.android.material.textview.MaterialTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="10dp"
-                                android:text="@string/order_details"
-                                android:textColor="@color/text_light"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                app:layout_flexShrink="0"
-                                app:layout_flexGrow="1" />
-
-                            <!-- Status badges - will wrap to next row if needed -->
+                            <!-- Status badges - will wrap to next row if needed, aligned right -->
                             <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/orderPlacedStatusValue"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginEnd="6dp"
+                                android:layout_marginStart="6dp"
                                 android:layout_marginTop="4dp"
                                 android:layout_marginBottom="4dp"
                                 android:background="@drawable/badge_background_order_status"
@@ -500,7 +498,7 @@
                                 android:id="@+id/paymentStatusBadge"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginEnd="6dp"
+                                android:layout_marginStart="6dp"
                                 android:layout_marginTop="4dp"
                                 android:layout_marginBottom="4dp"
                                 android:background="@drawable/badge_background_payment_status"
@@ -517,6 +515,7 @@
                                 android:id="@+id/paymentTypeBadge"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
                                 android:layout_marginTop="4dp"
                                 android:layout_marginBottom="4dp"
                                 android:background="@drawable/badge_background_payment_type"

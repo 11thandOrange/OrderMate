@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details Header - Pill Wrapping Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        h2 {
+            margin: 30px 0 15px;
+            font-size: 18px;
+            color: #FF9F43;
+        }
+
+        .description {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .demo-container {
+            max-width: 380px;
+            margin-bottom: 40px;
+        }
+
+        .demo-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Card styling to match Android */
+        .card {
+            background: rgba(255,255,255,0.15);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        /* CURRENT BROKEN LAYOUT */
+        .header-broken {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 16px 20px;
+            gap: 10px;
+        }
+
+        .header-broken .title {
+            flex: 1;
+            min-width: 0; /* This causes title to shrink */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* FIXED LAYOUT - FlexboxLayout with wrap */
+        .header-fixed {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            align-content: flex-start;
+            padding: 16px 20px;
+            gap: 8px;
+            row-gap: 10px;
+        }
+
+        .header-fixed .icon-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .header-fixed .title {
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .header-fixed .pills-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            justify-content: flex-end;
+        }
+
+        .header-fixed .chevron {
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        /* FIXED: Two-part layout - left side wraps, chevron stays fixed right */
+        .header-flexbox {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px 20px;
+            gap: 8px;
+        }
+
+        .header-flexbox .header-content {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            flex: 1;
+            gap: 8px;
+            row-gap: 10px;
+        }
+
+        .header-flexbox .icon {
+            flex-shrink: 0;
+        }
+
+        .header-flexbox .title {
+            flex-shrink: 0;
+            margin-right: auto; /* Pushes pills to the right */
+        }
+
+        .header-flexbox .pill {
+            flex-shrink: 0;
+        }
+
+        .header-flexbox .chevron {
+            flex-shrink: 0;
+            align-self: center;
+        }
+
+        /* Common styles */
+        .icon {
+            width: 32dp;
+            height: 32px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .icon svg {
+            width: 14px;
+            height: 14px;
+            fill: rgba(255,255,255,0.9);
+        }
+
+        .title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .pill {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .pill-red {
+            background: #ea5455;
+            color: #fff;
+        }
+
+        .pill-yellow {
+            background: #ffc107;
+            color: #212121;
+        }
+
+        .pill-gray {
+            background: rgba(255,255,255,0.3);
+            color: #fff;
+        }
+
+        .pill-blue {
+            background: #3498db;
+            color: #fff;
+        }
+
+        .pill-green {
+            background: #28c76f;
+            color: #fff;
+        }
+
+        .chevron {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chevron svg {
+            width: 16px;
+            height: 16px;
+            fill: rgba(255,255,255,0.5);
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            margin: 0 16px;
+        }
+
+        .content-placeholder {
+            padding: 20px;
+            color: rgba(255,255,255,0.4);
+            font-size: 12px;
+        }
+
+        /* Controls */
+        .controls {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+        }
+
+        .controls label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .controls select, .controls input {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .controls button {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            background: #FF9F43;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 8px;
+            margin-top: 10px;
+        }
+
+        .controls button:hover {
+            background: #e8912e;
+        }
+
+        .side-by-side {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .comparison {
+            flex: 1;
+            min-width: 380px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .badge-broken {
+            background: #ea5455;
+        }
+
+        .badge-fixed {
+            background: #28c76f;
+        }
+    </style>
+</head>
+<body>
+    <h1>Order Details Header - Pill Wrapping Demo</h1>
+    <p class="description">
+        Demonstrates how the "Order Details" header should handle multiple status pills.<br>
+        The title should remain fixed width, and pills should wrap to the next row when space is limited.
+    </p>
+
+    <div class="controls">
+        <label>Add/Remove Pills to see wrapping behavior:</label>
+        <button onclick="setPills(2)">2 Pills (Normal)</button>
+        <button onclick="setPills(3)">3 Pills</button>
+        <button onclick="setPills(4)">4 Pills</button>
+        <button onclick="setPills(5)">5 Pills (Many)</button>
+        <button onclick="setPills(6)">6 Pills (Overflow)</button>
+    </div>
+
+    <div class="side-by-side">
+        <!-- BROKEN LAYOUT -->
+        <div class="comparison">
+            <h2>❌ Current (Broken) <span class="badge badge-broken">BUG</span></h2>
+            <p class="description">Title shrinks when pills are added. Pills can't wrap.</p>
+            
+            <div class="demo-container">
+                <div class="demo-label">LinearLayout (horizontal, no wrap)</div>
+                <div class="card">
+                    <div class="header-broken" id="header-broken">
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm3-4H7v-2h8v2zm0-4H7V7h8v2z"/></svg>
+                        </div>
+                        <span class="title">Order Details</span>
+                        <span class="pill pill-red">OPEN</span>
+                        <span class="pill pill-yellow">UNPAID</span>
+                        <div class="chevron">
+                            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="content-placeholder">Card content...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FIXED LAYOUT -->
+        <div class="comparison">
+            <h2>✅ Fixed (FlexboxLayout) <span class="badge badge-fixed">SOLUTION</span></h2>
+            <p class="description">Title stays fixed. Pills wrap to next row when needed.</p>
+            
+            <div class="demo-container">
+                <div class="demo-label">FlexboxLayout (flexWrap="wrap")</div>
+                <div class="card">
+                    <div class="header-flexbox" id="header-fixed">
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm3-4H7v-2h8v2zm0-4H7V7h8v2z"/></svg>
+                        </div>
+                        <span class="title">Order Details</span>
+                        <span class="pill pill-red">OPEN</span>
+                        <span class="pill pill-yellow">UNPAID</span>
+                        <div class="chevron">
+                            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="content-placeholder">Card content...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>📱 Android XML Implementation</h2>
+    <div class="demo-container" style="max-width: 900px;">
+        <pre style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; overflow-x: auto; font-size: 12px; line-height: 1.5;">
+&lt;!-- Outer LinearLayout: keeps chevron fixed on right --&gt;
+&lt;LinearLayout
+    android:id="@+id/orderDetailsHeader"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="16dp"&gt;
+
+    &lt;!-- Inner FlexboxLayout: icon + title + pills (wraps) --&gt;
+    &lt;com.google.android.flexbox.FlexboxLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        app:flexWrap="wrap"
+        app:alignItems="center"
+        app:alignContent="flex_start"&gt;
+
+        &lt;!-- Icon - fixed, won't shrink --&gt;
+        &lt;FrameLayout
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="10dp"
+            app:layout_flexShrink="0"
+            ... /&gt;
+
+        &lt;!-- Title - fixed width, won't shrink, pushes pills right --&gt;
+        &lt;TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:text="Order Details"
+            app:layout_flexShrink="0"
+            app:layout_flexGrow="1"
+            ... /&gt;
+
+        &lt;!-- Status Pills - will wrap to next row if needed --&gt;
+        &lt;TextView android:id="@+id/orderPlacedStatusValue"
+            android:layout_marginEnd="6dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            app:layout_flexShrink="0"
+            ... /&gt;
+
+        &lt;TextView android:id="@+id/paymentStatusBadge"
+            android:layout_marginEnd="6dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            app:layout_flexShrink="0"
+            ... /&gt;
+
+        &lt;TextView android:id="@+id/paymentTypeBadge"
+            android:layout_marginEnd="6dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            app:layout_flexShrink="0"
+            ... /&gt;
+
+    &lt;/com.google.android.flexbox.FlexboxLayout&gt;
+
+    &lt;!-- Chevron - OUTSIDE FlexboxLayout, stays fixed on right --&gt;
+    &lt;ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        ... /&gt;
+
+&lt;/LinearLayout&gt;
+        </pre>
+    </div>
+
+    <script>
+        const pillConfigs = [
+            { text: 'OPEN', class: 'pill-red' },
+            { text: 'UNPAID', class: 'pill-yellow' },
+            { text: 'CASH', class: 'pill-gray' },
+            { text: 'DELIVERY', class: 'pill-blue' },
+            { text: 'RUSH', class: 'pill-green' },
+            { text: 'VIP', class: 'pill-red' },
+        ];
+
+        function setPills(count) {
+            // Update broken header
+            const brokenHeader = document.getElementById('header-broken');
+            const fixedHeader = document.getElementById('header-fixed');
+            
+            // Clear and rebuild broken header
+            brokenHeader.innerHTML = `
+                <div class="icon">
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm3-4H7v-2h8v2zm0-4H7V7h8v2z"/></svg>
+                </div>
+                <span class="title">Order Details</span>
+                ${pillConfigs.slice(0, count).map(p => `<span class="pill ${p.class}">${p.text}</span>`).join('')}
+                <div class="chevron">
+                    <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                </div>
+            `;
+
+            // Clear and rebuild fixed header - with wrapper for content
+            fixedHeader.innerHTML = `
+                <div class="header-content">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm3-4H7v-2h8v2zm0-4H7V7h8v2z"/></svg>
+                    </div>
+                    <span class="title">Order Details</span>
+                    ${pillConfigs.slice(0, count).map(p => `<span class="pill ${p.class}">${p.text}</span>`).join('')}
+                </div>
+                <div class="chevron">
+                    <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                </div>
+            `;
+        }
+
+        // Initialize with 6 pills to show wrapping
+        setPills(6);
+    </script>
+</body>
+</html>
