@@ -1070,8 +1070,8 @@ class SettingsFragment : Fragment() {
         inputNotificationDays?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val value = s?.toString()?.toIntOrNull()
-                if (value != null && (value < 0 || value > 24)) {
-                    inputNotificationDays?.error = "Must be 0-24"
+                if (value != null && (value < 0 || value > 30)) {
+                    inputNotificationDays?.error = "Must be 0-30"
                     return
                 }
                 inputNotificationDays?.error = null
@@ -1105,8 +1105,8 @@ class SettingsFragment : Fragment() {
         inputReceiptDays?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val value = s?.toString()?.toIntOrNull()
-                if (value != null && (value < 0 || value > 24)) {
-                    inputReceiptDays?.error = "Must be 0-24"
+                if (value != null && (value < 0 || value > 30)) {
+                    inputReceiptDays?.error = "Must be 0-30"
                     return
                 }
                 inputReceiptDays?.error = null
@@ -1209,12 +1209,16 @@ class SettingsFragment : Fragment() {
         merchantId?.let { mid ->
             firebase.getAdvancedSettings(mid) { settings ->
                 activity?.runOnUiThread {
-                    // Update local settings manager
+                    // Update local settings manager - sync all settings from Firebase
                     settingsManager.setNotificationDays(settings.notificationDays)
                     settingsManager.setNotificationMinutes(settings.notificationMinutes)
                     settingsManager.setReceiptDays(settings.receiptDays)
                     settingsManager.setReceiptMinutes(settings.receiptMinutes)
                     settingsManager.setUseOrderMateRegister(settings.useOrderMateInRegister)
+                    settingsManager.setScheduledNotificationsEnabled(settings.scheduledNotificationsEnabled)
+                    settingsManager.setScheduledReceiptEnabled(settings.scheduledReceiptEnabled)
+                    settingsManager.setPrintNotesOnCustomerReceipts(settings.printNotesOnCustomerReceipts)
+                    settingsManager.setPrintNotesOnOrderReceipts(settings.printNotesOnOrderReceipts)
                     
                     // Update UI - toggles
                     switchScheduledNotifications?.isChecked = settings.scheduledNotificationsEnabled

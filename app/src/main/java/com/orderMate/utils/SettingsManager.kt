@@ -166,7 +166,7 @@ class SettingsManager(private val context: Context) {
     }
 
     fun setNotificationMinutes(minutes: Int) {
-        prefs.edit { putInt(KEY_NOTIFICATION_MINUTES, minutes.coerceIn(0, 999)) }
+        prefs.edit { putInt(KEY_NOTIFICATION_MINUTES, minutes.coerceIn(0, 60)) }
     }
 
     fun getReceiptDays(): Int {
@@ -182,7 +182,25 @@ class SettingsManager(private val context: Context) {
     }
 
     fun setReceiptMinutes(minutes: Int) {
-        prefs.edit { putInt(KEY_RECEIPT_MINUTES, minutes.coerceIn(0, 999)) }
+        prefs.edit { putInt(KEY_RECEIPT_MINUTES, minutes.coerceIn(0, 60)) }
+    }
+
+    // ==================== Scheduled Task Settings ====================
+
+    fun getScheduledNotificationsEnabled(): Boolean {
+        return prefs.getBoolean(KEY_SCHEDULED_NOTIFICATIONS_ENABLED, false)
+    }
+
+    fun setScheduledNotificationsEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean(KEY_SCHEDULED_NOTIFICATIONS_ENABLED, enabled) }
+    }
+
+    fun getScheduledReceiptEnabled(): Boolean {
+        return prefs.getBoolean(KEY_SCHEDULED_RECEIPT_ENABLED, false)
+    }
+
+    fun setScheduledReceiptEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean(KEY_SCHEDULED_RECEIPT_ENABLED, enabled) }
     }
 
     // ==================== Receipt Print Settings ====================
@@ -412,6 +430,10 @@ class SettingsManager(private val context: Context) {
         private const val KEY_SHOW_FILTER_ORDER_STATUS = "show_filter_order_status"
         private const val KEY_SHOW_FILTER_PAYMENT_TYPE = "show_filter_payment_type"
         private const val KEY_SHOW_FILTER_EMPLOYEE = "show_filter_employee"
+        
+        // Scheduled Task Settings Keys
+        private const val KEY_SCHEDULED_NOTIFICATIONS_ENABLED = "scheduled_notifications_enabled"
+        private const val KEY_SCHEDULED_RECEIPT_ENABLED = "scheduled_receipt_enabled"
         
         // Receipt Print Settings Keys
         private const val KEY_PRINT_NOTES_CUSTOMER = "print_notes_customer"
