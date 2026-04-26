@@ -120,6 +120,19 @@ class LineItemAddedReceiver : BroadcastReceiver() {
                     OrderDetailFragment.orderIdForReopen = null
                     prefManager?.saveString(Constants.isOrderSaved, Constants.isTrue)
                 }
+                
+                (p1.action.equals(ACTION_ACTIVE_REGISTER_ORDER)) -> {
+                    // When the active order changes in Register, update drawer to show that order
+                    val activeOrderId = p1.getStringExtra(EXTRA_CLOVER_ORDER_ID)
+                    if (activeOrderId != null) {
+                        OrderDetailFragment.orderIdForReopen = activeOrderId
+                        prefManager?.saveString(Constants.isOrderSaved, Constants.isFalse)
+                        // Refresh the drawer with the new active order
+                        if (FloatingWidgetService.isShowing) {
+                            FloatingWidgetService.instance?.getTheOrderData()
+                        }
+                    }
+                }
 
                 else -> {
                     Constants.notImplementedLog

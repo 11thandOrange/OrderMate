@@ -45,7 +45,7 @@
                 <action android:name="com.clover.intent.action.ITEM_SELECT" />
                 <action android:name="com.clover.intent.action.ORDER_SAVED" />
                 <action android:name="com.clover.intent.action.ORDER_CREATED" />
-                <action android:name=" clover.intent.action.ACTIVE_REGISTER_ORDER"/>
+                <action android:name="clover.intent.action.ACTIVE_REGISTER_ORDER"/>
                 <action android:name="com.clover.intent.action.PAYMENT_PROCESSED" />
             </intent-filter>
         </receiver>
