@@ -204,6 +204,9 @@ class OrderNoteDialogFragment : DialogFragment() {
     }
 
     private fun addTextBoxSection(widget: WidgetConfig) {
+        android.util.Log.d("TextBoxDebug", "OrderNote addTextBoxSection: id=${widget.id}, label=${widget.label}")
+        android.util.Log.d("TextBoxDebug", "  textInputViews BEFORE: ${textInputViews.keys}")
+        
         val sectionView = LayoutInflater.from(requireContext())
             .inflate(R.layout.note_section_textbox, noteSectionsContainer, false)
 
@@ -214,6 +217,8 @@ class OrderNoteDialogFragment : DialogFragment() {
         val textInput = sectionView.findViewById<TextInputEditText>(R.id.textInput)
         textSelections[widget.id]?.let { textInput.setText(it) }
         textInputViews[widget.id] = textInput
+        
+        android.util.Log.d("TextBoxDebug", "  textInputViews AFTER: ${textInputViews.keys}")
 
         noteSectionsContainer?.addView(sectionView)
     }
@@ -357,9 +362,16 @@ class OrderNoteDialogFragment : DialogFragment() {
                     }
                 }
                 WidgetType.TEXT_BOX -> {
+                    android.util.Log.d("TextBoxDebug", "OrderNote buildNoteString TEXT_BOX: id=${widget.id}, label=${widget.label}")
+                    android.util.Log.d("TextBoxDebug", "  textInputViews.keys: ${textInputViews.keys}")
+                    android.util.Log.d("TextBoxDebug", "  textInputViews[${widget.id}]: ${textInputViews[widget.id]}")
                     val value = textInputViews[widget.id]?.text?.toString()?.trim()
+                    android.util.Log.d("TextBoxDebug", "  value retrieved: '$value'")
                     if (!value.isNullOrEmpty()) {
                         parts.add("[${widget.id}]${widget.label}:$value")
+                        android.util.Log.d("TextBoxDebug", "  ADDED to parts")
+                    } else {
+                        android.util.Log.d("TextBoxDebug", "  SKIPPED - value is null or empty")
                     }
                 }
             }
