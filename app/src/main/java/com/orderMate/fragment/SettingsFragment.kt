@@ -1279,53 +1279,43 @@ class SettingsFragment : Fragment() {
         }
         filterEmptyState?.visibility = View.GONE
         
-        // Setup Item Level RecyclerView with adapter
+        // Setup Item Level RecyclerView with adapter - recreate each time for proper sizing
         if (hasItemWidgets) {
             filterItemLevelRecyclerView?.visibility = View.VISIBLE
-            if (filterItemLevelAdapter == null) {
-                filterItemLevelAdapter = FilterWidgetAdapter { widget ->
-                    widgetManager.updateItemWidget(widget) { success ->
-                        if (!success) {
-                            activity?.runOnUiThread {
-                                Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
-                            }
+            filterItemLevelAdapter = FilterWidgetAdapter { widget ->
+                widgetManager.updateItemWidget(widget) { success ->
+                    if (!success) {
+                        activity?.runOnUiThread {
+                            Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
-                filterItemLevelRecyclerView?.apply {
-                    layoutManager = LinearLayoutManager(requireContext())
-                    adapter = filterItemLevelAdapter
-                    setHasFixedSize(false)
-                }
             }
             filterItemLevelAdapter?.setWidgets(itemLevelWidgets.toMutableList())
+            filterItemLevelRecyclerView?.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = filterItemLevelAdapter
+            }
         } else {
             filterItemLevelRecyclerView?.visibility = View.GONE
         }
         
-        // Setup Order Level RecyclerView with adapter
+        // Setup Order Level RecyclerView with adapter - recreate each time for proper sizing
         if (hasOrderWidgets) {
             filterOrderLevelRecyclerView?.visibility = View.VISIBLE
-            if (filterOrderLevelAdapter == null) {
-                filterOrderLevelAdapter = FilterWidgetAdapter { widget ->
-                    widgetManager.updateOrderWidget(widget) { success ->
-                        if (!success) {
-                            activity?.runOnUiThread {
-                                Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
-                            }
+            filterOrderLevelAdapter = FilterWidgetAdapter { widget ->
+                widgetManager.updateOrderWidget(widget) { success ->
+                    if (!success) {
+                        activity?.runOnUiThread {
+                            Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
-                filterOrderLevelRecyclerView?.apply {
-                    layoutManager = LinearLayoutManager(requireContext())
-                    adapter = filterOrderLevelAdapter
-                    setHasFixedSize(false)
-                }
             }
             filterOrderLevelAdapter?.setWidgets(orderLevelWidgets.toMutableList())
-            // Force re-measure after data change
-            filterOrderLevelRecyclerView?.post {
-                filterOrderLevelRecyclerView?.requestLayout()
+            filterOrderLevelRecyclerView?.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = filterOrderLevelAdapter
             }
         } else {
             filterOrderLevelRecyclerView?.visibility = View.GONE
