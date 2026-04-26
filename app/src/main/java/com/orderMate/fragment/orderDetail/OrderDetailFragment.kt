@@ -931,22 +931,47 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                     getString(R.string.delete_order),
                     getString(R.string.cancel)
                 ) {
+                    android.util.Log.d("DELETE_ORDER", "=== Delete order started ===")
+                    android.util.Log.d("DELETE_ORDER", "OrderDetailFragment isAdded: $isAdded")
+                    android.util.Log.d("DELETE_ORDER", "OrderDetailFragment activity: $activity")
+                    
                     runOnBackgroundThread {
-                        if (deleteTheOrder()) {
+                        android.util.Log.d("DELETE_ORDER", "Calling deleteTheOrder()...")
+                        val deleteSuccess = deleteTheOrder()
+                        android.util.Log.d("DELETE_ORDER", "deleteTheOrder() result: $deleteSuccess")
+                        
+                        if (deleteSuccess) {
                             runOnMainThread {
+                                android.util.Log.d("DELETE_ORDER", "Navigating up...")
+                                android.util.Log.d("DELETE_ORDER", "isAdded: $isAdded, activity: $activity, view: $view")
                                 // #44: Safe navigation - verify fragment is still attached before navigating
                                 try {
                                     if (isAdded && activity != null && view != null) {
                                         findNavController().navigateUp()
+                                        android.util.Log.d("DELETE_ORDER", "Navigation successful")
+                                    } else {
+                                        android.util.Log.w("DELETE_ORDER", "Fragment not attached, skipping navigation")
                                     }
                                 } catch (e: Exception) {
-                                    // Navigation failed - fragment may be destroyed, ignore
+                                    android.util.Log.e("DELETE_ORDER", "Navigation failed: ${e.message}", e)
                                 }
                             }
                             // Update the dashboard after the order is deleted
+                            android.util.Log.d("DELETE_ORDER", "Scheduling OrderHistoryFragment refresh in 1s...")
                             Handler(Looper.getMainLooper()).postDelayed({
-                                exceptionHandler {
-                                    OrderHistoryFragment.getInstance().getTheOrderData(true)
+                                android.util.Log.d("DELETE_ORDER", "=== OrderHistoryFragment refresh callback ===")
+                                try {
+                                    val historyFragment = OrderHistoryFragment.getInstance()
+                                    android.util.Log.d("DELETE_ORDER", "OrderHistoryFragment instance: $historyFragment")
+                                    android.util.Log.d("DELETE_ORDER", "OrderHistoryFragment isAdded: ${historyFragment.isAdded}")
+                                    android.util.Log.d("DELETE_ORDER", "OrderHistoryFragment activity: ${historyFragment.activity}")
+                                    android.util.Log.d("DELETE_ORDER", "OrderHistoryFragment view: ${historyFragment.view}")
+                                    android.util.Log.d("DELETE_ORDER", "Calling getTheOrderData(true)...")
+                                    historyFragment.getTheOrderData(true)
+                                    android.util.Log.d("DELETE_ORDER", "getTheOrderData() completed")
+                                } catch (e: Exception) {
+                                    android.util.Log.e("DELETE_ORDER", "OrderHistoryFragment refresh CRASHED: ${e.message}", e)
+                                    e.printStackTrace()
                                 }
                             }, 1000)
                         }
