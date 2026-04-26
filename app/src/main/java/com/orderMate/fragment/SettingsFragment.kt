@@ -2191,22 +2191,29 @@ class FilterWidgetAdapter(
     private val expandedIds = mutableSetOf<String>()
 
     fun setWidgets(newWidgets: MutableList<WidgetConfig>) {
+        android.util.Log.d("FilterAdapterDebug", "setWidgets called with ${newWidgets.size} widgets")
         widgets.clear()
         widgets.addAll(newWidgets)
+        android.util.Log.d("FilterAdapterDebug", "After addAll, widgets.size = ${widgets.size}")
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        android.util.Log.d("FilterAdapterDebug", "onCreateViewHolder called")
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_filter_widget, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        android.util.Log.d("FilterAdapterDebug", "onBindViewHolder position=$position, widget=${widgets[position].label}")
         holder.bind(widgets[position])
     }
 
-    override fun getItemCount() = widgets.size
+    override fun getItemCount(): Int {
+        android.util.Log.d("FilterAdapterDebug", "getItemCount called, returning ${widgets.size}")
+        return widgets.size
+    }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val widgetIconContainer: View = itemView.findViewById(R.id.filterWidgetIconContainer)
