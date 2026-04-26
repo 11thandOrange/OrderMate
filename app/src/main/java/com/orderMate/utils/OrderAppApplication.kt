@@ -52,6 +52,20 @@ class MyApp : Application() {
         instance = this
         FirebaseApp.initializeApp(applicationContext)
         storeIntoPreference()
+        // Connect CustomerConnector early so it's ready when needed
+        initializeCustomerConnector()
+    }
+    
+    /**
+     * Initialize CustomerConnector early in app startup.
+     * This ensures the connection is established before any customer operations are attempted.
+     */
+    private fun initializeCustomerConnector() {
+        try {
+            getCustomerConnector()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 
