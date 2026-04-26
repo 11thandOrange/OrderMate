@@ -972,7 +972,8 @@ class SettingsFragment : Fragment() {
                         // Create default template if none exist
                         val defaultTemplate = NotificationTemplate.create(
                             name = "Order Ready",
-                            content = "Your order from {{merchant_name}} is ready for pickup!"
+                            content = "Your order from {{merchant_name}} is ready for pickup!",
+                            subject = "Hello, {{customer_name}}! Your Order Is Ready 🔥"
                         )
                         saveTemplateToFirebase(defaultTemplate)
                         templateAdapter?.setTemplates(listOf(defaultTemplate))

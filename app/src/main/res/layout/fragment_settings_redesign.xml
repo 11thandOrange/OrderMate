@@ -1273,10 +1273,19 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:layout_marginBottom="16dp"
                         android:text="Create text templates for notification popups. Used for email or SMS. Available in notification popup dropdown."
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="16dp"
+                        android:text="Available data: {{merchant_name}}, {{order_id}}, {{customer_name}}, {{order_total}}, {{due_date}}, {{due_time}}, {{item_count}}, {{order_notes}}"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace" />
 
                     <!-- Template List -->
                     <androidx.recyclerview.widget.RecyclerView
