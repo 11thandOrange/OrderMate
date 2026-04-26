@@ -430,9 +430,8 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                     }
                 }
             } else {
-                if (OrderDetailFragment.isReOpenBtnClicked) {
-                    getTheOrderData()
-                }
+                // Always refresh the order data when data exists
+                getTheOrderData()
             }
         }
 
