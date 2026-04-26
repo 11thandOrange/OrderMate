@@ -386,7 +386,6 @@ class OrderCardRedesignAdapter(
 
         private fun setupNotesPills(order: Order) {
             val notes = mutableListOf<NoteItem>()
-            val seenValues = mutableSetOf<String>()  // Deduplicate pills across line items
             
             // Use cached widgets only for pill rendering (never defaults, enabled only)
             val itemLevelWidgets = WidgetManager.getInstance(binding.root.context).getCachedItemWidgets()
@@ -396,18 +395,13 @@ class OrderCardRedesignAdapter(
                     if (note.isNotBlank()) {
                         val parsedTags = OrderNoteParser.extractTagsFromNote(note, itemLevelWidgets, NoteLevel.ITEM, includeTextBox = true)
                         parsedTags.forEach { tag ->
-                            // Deduplicate by label:value combination (same as getCustomTags for order-level)
-                            val uniqueKey = "${tag.label.lowercase()}:${tag.value}"
-                            if (!seenValues.contains(uniqueKey)) {
-                                seenValues.add(uniqueKey)
-                                // Truncate TEXT_BOX values for list page item pills
-                                val displayValue = if (tag.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX && tag.value.length > 20) {
-                                    tag.value.take(20) + "..."
-                                } else {
-                                    tag.value
-                                }
-                                notes.add(NoteItem(tag.label.lowercase(), displayValue, tag.widgetType))
+                            // Truncate TEXT_BOX values for list page item pills
+                            val displayValue = if (tag.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX && tag.value.length > 20) {
+                                tag.value.take(20) + "..."
+                            } else {
+                                tag.value
                             }
+                            notes.add(NoteItem(tag.label.lowercase(), displayValue, tag.widgetType))
                         }
                     }
                 }
