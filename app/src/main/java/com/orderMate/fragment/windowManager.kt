@@ -64,6 +64,9 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     
     // Flag for permanent overlay mode (Use OrderMate Register Instead)
     private var isPermanentMode: Boolean = false
+    
+    // Flag to prevent duplicate data fetching
+    private var isFetchingData = false
 
     private val prefManager: PreferenceManager by lazy {
         PreferenceManager.getInstance(applicationContext)
@@ -569,33 +572,42 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     }
 
     fun getTheOrderData() {
+        // Prevent duplicate fetches
+        if (isFetchingData) return
+        isFetchingData = true
+        
         binding?.progressLayout?.showView()
         CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val data =
+                    MyApp.getInstance().getOrderConnector().getOrders(mutableListOf())
+                lineItems.clear()
+                if (data?.isEmpty() == true) {
+                    isFetchingData = false
+                    return@launch
+                }
+                val requiredData = if (OrderDetailFragment.orderIdForReopen != null) {
+                    MyApp.getInstance().getOrderConnector()
+                        .getOrder(OrderDetailFragment.orderIdForReopen)
+                } else null
 
-            val data =
-                MyApp.getInstance().getOrderConnector().getOrders(mutableListOf())
-            lineItems.clear()
-            if (data?.isEmpty() == true) {
-                return@launch
-            }
-            val requiredData = if (OrderDetailFragment.orderIdForReopen != null) {
-                MyApp.getInstance().getOrderConnector()
-                    .getOrder(OrderDetailFragment.orderIdForReopen)
-            } else null
 
-
-            updateOrder(requiredData ?: data?.get(0))
-            val result = (requiredData ?: data?.get(0))?.lineItems?.let {
-                countElementsByUniqueKeys(
-                    binding?.root?.context,
-                    it
-                )
-            }
-            result?.forEach {
-                lineItems.add(it)
-            }
-            CoroutineScope(Dispatchers.Main).launch {
-                setupRecyclerView(result, requiredData ?: data?.get(0)  )
+                updateOrder(requiredData ?: data?.get(0))
+                val result = (requiredData ?: data?.get(0))?.lineItems?.let {
+                    countElementsByUniqueKeys(
+                        binding?.root?.context,
+                        it
+                    )
+                }
+                result?.forEach {
+                    lineItems.add(it)
+                }
+                CoroutineScope(Dispatchers.Main).launch {
+                    setupRecyclerView(result, requiredData ?: data?.get(0))
+                    isFetchingData = false
+                }
+            } catch (e: Exception) {
+                isFetchingData = false
             }
         }
     }
