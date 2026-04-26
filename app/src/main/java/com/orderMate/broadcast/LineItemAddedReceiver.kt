@@ -123,10 +123,21 @@ class LineItemAddedReceiver : BroadcastReceiver() {
                 
                 (p1.action.equals(ACTION_ACTIVE_REGISTER_ORDER)) -> {
                     // When the active order changes in Register, update drawer to show that order
-                    val activeOrderId = p1.getStringExtra(EXTRA_CLOVER_ORDER_ID)
                     val previousOrderId = OrderDetailFragment.orderIdForReopen
                     Log.d("DrawerState", "ACTION_ACTIVE_REGISTER_ORDER received")
                     Log.d("DrawerState", "Previous orderIdForReopen: $previousOrderId")
+                    
+                    // Log all intent extras to debug what's available
+                    Log.d("DrawerState", "Intent data URI: ${p1.data}")
+                    p1.extras?.keySet()?.forEach { key ->
+                        Log.d("DrawerState", "Intent extra: $key = ${p1.extras?.get(key)}")
+                    }
+                    
+                    // Try different ways to get the order ID
+                    val activeOrderId = p1.getStringExtra(EXTRA_CLOVER_ORDER_ID)
+                        ?: p1.getStringExtra("com.clover.intent.extra.ORDER_ID")
+                        ?: p1.data?.lastPathSegment
+                    
                     Log.d("DrawerState", "New active order from Register: $activeOrderId")
                     if (activeOrderId != null) {
                         OrderDetailFragment.orderIdForReopen = activeOrderId
