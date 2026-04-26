@@ -204,6 +204,7 @@ class SettingsFragment : Fragment() {
         super.onResume()
         // Refresh widget lists when returning to this fragment
         // This prevents stale data after switching tabs in the main activity
+        android.util.Log.d("WidgetDragDebug", "onResume: calling loadAllWidgetsFromFirebase()")
         loadAllWidgetsFromFirebase()
     }
 
@@ -443,6 +444,9 @@ class SettingsFragment : Fragment() {
         val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
         ) {
+            private var dragFrom = -1
+            private var dragTo = -1
+            
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -450,17 +454,31 @@ class SettingsFragment : Fragment() {
             ): Boolean {
                 val fromPos = viewHolder.adapterPosition
                 val toPos = target.adapterPosition
+                android.util.Log.d("WidgetDragDebug", "ITEM onMove: fromPos=$fromPos, toPos=$toPos, dragFrom=$dragFrom")
+                
+                // Track the original position
+                if (dragFrom == -1) dragFrom = fromPos
+                dragTo = toPos
+                
+                // Update UI immediately
                 itemLevelWidgetAdapter?.moveWidget(fromPos, toPos)
-                // Use level-specific reorder
-                widgetManager.reorderItemWidgets(fromPos, toPos) { success ->
-                    if (!success) {
-                        activity?.runOnUiThread {
-                            Toast.makeText(context, "Failed to save order", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
                 return true
             }
+            
+            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+                super.clearView(recyclerView, viewHolder)
+                android.util.Log.d("WidgetDragDebug", "ITEM clearView: dragFrom=$dragFrom, dragTo=$dragTo")
+                // Save to Firebase only when drag is complete
+                if (dragFrom != -1 && dragFrom != dragTo) {
+                    android.util.Log.d("WidgetDragDebug", "ITEM clearView: calling saveItemWidgetOrder()")
+                    saveItemWidgetOrder()
+                } else {
+                    android.util.Log.d("WidgetDragDebug", "ITEM clearView: SKIPPED save (no change or dragFrom=-1)")
+                }
+                dragFrom = -1
+                dragTo = -1
+            }
+            
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
             override fun isLongPressDragEnabled() = false
         })
@@ -513,6 +531,9 @@ class SettingsFragment : Fragment() {
         val orderTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
         ) {
+            private var dragFrom = -1
+            private var dragTo = -1
+            
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -520,17 +541,31 @@ class SettingsFragment : Fragment() {
             ): Boolean {
                 val fromPos = viewHolder.adapterPosition
                 val toPos = target.adapterPosition
+                android.util.Log.d("WidgetDragDebug", "ORDER onMove: fromPos=$fromPos, toPos=$toPos, dragFrom=$dragFrom")
+                
+                // Track the original position
+                if (dragFrom == -1) dragFrom = fromPos
+                dragTo = toPos
+                
+                // Update UI immediately
                 orderLevelWidgetAdapter?.moveWidget(fromPos, toPos)
-                // Use level-specific reorder
-                widgetManager.reorderOrderWidgets(fromPos, toPos) { success ->
-                    if (!success) {
-                        activity?.runOnUiThread {
-                            Toast.makeText(context, "Failed to save order", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
                 return true
             }
+            
+            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+                super.clearView(recyclerView, viewHolder)
+                android.util.Log.d("WidgetDragDebug", "ORDER clearView: dragFrom=$dragFrom, dragTo=$dragTo")
+                // Save to Firebase only when drag is complete
+                if (dragFrom != -1 && dragFrom != dragTo) {
+                    android.util.Log.d("WidgetDragDebug", "ORDER clearView: calling saveOrderWidgetOrder()")
+                    saveOrderWidgetOrder()
+                } else {
+                    android.util.Log.d("WidgetDragDebug", "ORDER clearView: SKIPPED save (no change or dragFrom=-1)")
+                }
+                dragFrom = -1
+                dragTo = -1
+            }
+            
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
             override fun isLongPressDragEnabled() = false
         })
@@ -639,6 +674,60 @@ class SettingsFragment : Fragment() {
             if (!success) {
                 activity?.runOnUiThread {
                     Toast.makeText(context, "Failed to save widget", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    
+    /**
+     * Save item-level widget order after drag-and-drop.
+     * Gets current order from adapter and saves all widgets with updated order field.
+     */
+    private fun saveItemWidgetOrder() {
+        val widgets = itemLevelWidgetAdapter?.getWidgets()?.toMutableList()
+        if (widgets == null) {
+            android.util.Log.e("WidgetDragDebug", "saveItemWidgetOrder: widgets is NULL!")
+            return
+        }
+        android.util.Log.d("WidgetDragDebug", "saveItemWidgetOrder: saving ${widgets.size} widgets")
+        // Update order field based on current position
+        widgets.forEachIndexed { index, widget -> 
+            android.util.Log.d("WidgetDragDebug", "  ITEM[$index]: ${widget.label} (id=${widget.id})")
+            widget.order = index 
+        }
+        
+        widgetManager.updateItemWidgets(widgets) { success ->
+            android.util.Log.d("WidgetDragDebug", "saveItemWidgetOrder: Firebase callback success=$success")
+            if (!success) {
+                activity?.runOnUiThread {
+                    Toast.makeText(context, "Failed to save widget order", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    
+    /**
+     * Save order-level widget order after drag-and-drop.
+     * Gets current order from adapter and saves all widgets with updated order field.
+     */
+    private fun saveOrderWidgetOrder() {
+        val widgets = orderLevelWidgetAdapter?.getWidgets()?.toMutableList()
+        if (widgets == null) {
+            android.util.Log.e("WidgetDragDebug", "saveOrderWidgetOrder: widgets is NULL!")
+            return
+        }
+        android.util.Log.d("WidgetDragDebug", "saveOrderWidgetOrder: saving ${widgets.size} widgets")
+        // Update order field based on current position
+        widgets.forEachIndexed { index, widget -> 
+            android.util.Log.d("WidgetDragDebug", "  ORDER[$index]: ${widget.label} (id=${widget.id})")
+            widget.order = index 
+        }
+        
+        widgetManager.updateOrderWidgets(widgets) { success ->
+            android.util.Log.d("WidgetDragDebug", "saveOrderWidgetOrder: Firebase callback success=$success")
+            if (!success) {
+                activity?.runOnUiThread {
+                    Toast.makeText(context, "Failed to save widget order", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -1699,6 +1788,10 @@ class FirebaseWidgetEditorAdapter(
         Collections.swap(widgets, from, to)
         notifyItemMoved(from, to)
     }
+    
+    fun getWidgets(): List<WidgetConfig> {
+        return widgets.toList()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -1828,7 +1921,9 @@ class FirebaseWidgetEditorAdapter(
 
             // Drag handle
             dragHandle.setOnTouchListener { _, event ->
+                android.util.Log.d("WidgetDragDebug", "dragHandle touched: action=${event.actionMasked}")
                 if (event.actionMasked == android.view.MotionEvent.ACTION_DOWN) {
+                    android.util.Log.d("WidgetDragDebug", "dragHandle ACTION_DOWN: calling startDrag, itemTouchHelper=$itemTouchHelper")
                     itemTouchHelper?.startDrag(this)
                 }
                 false
