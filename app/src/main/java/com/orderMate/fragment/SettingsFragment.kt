@@ -1287,7 +1287,7 @@ class SettingsFragment : Fragment() {
         }
         filterEmptyState?.visibility = View.GONE
         
-        // Setup Item Level RecyclerView with adapter - recreate each time for proper sizing
+        // Setup Item Level RecyclerView with adapter
         if (hasItemWidgets) {
             filterItemLevelRecyclerView?.visibility = View.VISIBLE
             filterItemLevelAdapter = FilterWidgetAdapter { widget ->
@@ -1299,6 +1299,7 @@ class SettingsFragment : Fragment() {
                     }
                 }
             }
+            filterItemLevelAdapter?.setAdapterName("ITEM")
             filterItemLevelAdapter?.setWidgets(itemLevelWidgets.toMutableList())
             filterItemLevelRecyclerView?.apply {
                 layoutManager = LinearLayoutManager(requireContext())
@@ -1308,7 +1309,7 @@ class SettingsFragment : Fragment() {
             filterItemLevelRecyclerView?.visibility = View.GONE
         }
         
-        // Setup Order Level RecyclerView with adapter - recreate each time for proper sizing
+        // Setup Order Level RecyclerView with adapter
         if (hasOrderWidgets) {
             filterOrderLevelRecyclerView?.visibility = View.VISIBLE
             filterOrderLevelAdapter = FilterWidgetAdapter { widget ->
@@ -1320,6 +1321,7 @@ class SettingsFragment : Fragment() {
                     }
                 }
             }
+            filterOrderLevelAdapter?.setAdapterName("ORDER")
             filterOrderLevelAdapter?.setWidgets(orderLevelWidgets.toMutableList())
             filterOrderLevelRecyclerView?.apply {
                 layoutManager = LinearLayoutManager(requireContext())
@@ -2190,28 +2192,34 @@ class FilterWidgetAdapter(
     private val widgets = mutableListOf<WidgetConfig>()
     private val expandedIds = mutableSetOf<String>()
 
+    private var adapterName = "unknown"
+    
+    fun setAdapterName(name: String) {
+        adapterName = name
+    }
+    
     fun setWidgets(newWidgets: MutableList<WidgetConfig>) {
-        android.util.Log.d("FilterAdapterDebug", "setWidgets called with ${newWidgets.size} widgets")
+        android.util.Log.d("FilterAdapterDebug", "[$adapterName] setWidgets called with ${newWidgets.size} widgets")
         widgets.clear()
         widgets.addAll(newWidgets)
-        android.util.Log.d("FilterAdapterDebug", "After addAll, widgets.size = ${widgets.size}")
+        android.util.Log.d("FilterAdapterDebug", "[$adapterName] After addAll, widgets.size = ${widgets.size}")
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        android.util.Log.d("FilterAdapterDebug", "onCreateViewHolder called")
+        android.util.Log.d("FilterAdapterDebug", "[$adapterName] onCreateViewHolder called")
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_filter_widget, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        android.util.Log.d("FilterAdapterDebug", "onBindViewHolder position=$position, widget=${widgets[position].label}")
+        android.util.Log.d("FilterAdapterDebug", "[$adapterName] onBindViewHolder position=$position, widget=${widgets[position].label}")
         holder.bind(widgets[position])
     }
 
     override fun getItemCount(): Int {
-        android.util.Log.d("FilterAdapterDebug", "getItemCount called, returning ${widgets.size}")
+        android.util.Log.d("FilterAdapterDebug", "[$adapterName] getItemCount called, returning ${widgets.size}")
         return widgets.size
     }
 
