@@ -97,17 +97,16 @@ class SendNotificationDialog(
     private fun setupDialog() {
         dialog?.window?.apply {
             setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            // Set max height to allow room for keyboard
+            val displayMetrics = resources.displayMetrics
+            val maxHeight = (displayMetrics.heightPixels * 0.85).toInt()
             setLayout(
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT
+                maxHeight
             )
             setDimAmount(0.6f)
-            // Use SOFT_INPUT_ADJUST_RESIZE to allow keyboard while keeping focus
-            // SOFT_INPUT_STATE_UNCHANGED prevents auto-open but allows input
-            setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or 
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED
-            )
+            // SOFT_INPUT_ADJUST_RESIZE allows dialog to resize when keyboard appears
+            setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
             // Ensure dialog can receive input focus
             clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
             clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
