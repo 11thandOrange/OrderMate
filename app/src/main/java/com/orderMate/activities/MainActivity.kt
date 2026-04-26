@@ -102,14 +102,9 @@ class MainActivity : AppCompatActivity() {
     private fun applyThemeGradient() {
         val themeColor = profileSettingsManager.getThemeColor()
         val baseColor = Color.parseColor(themeColor)
-        val lighterColor = lightenColor(baseColor, 0.3f)
         
-        val gradientDrawable = GradientDrawable(
-            GradientDrawable.Orientation.TL_BR,
-            intArrayOf(baseColor, lighterColor)
-        )
-        
-        rootLayout?.background = gradientDrawable
+        // Apply solid color (no gradient)
+        rootLayout?.setBackgroundColor(baseColor)
     }
     
     /**
@@ -136,25 +131,12 @@ class MainActivity : AppCompatActivity() {
     private fun applyThemeToNavProfile() {
         val themeColor = profileSettingsManager.getThemeColor()
         val baseColor = Color.parseColor(themeColor)
-        val lighterColor = lightenColor(baseColor, 0.3f)
         
-        val gradientDrawable = GradientDrawable(
-            GradientDrawable.Orientation.TL_BR,
-            intArrayOf(baseColor, lighterColor)
-        )
-        gradientDrawable.cornerRadius = 22f * resources.displayMetrics.density
+        val drawable = GradientDrawable()
+        drawable.setColor(baseColor)
+        drawable.cornerRadius = 22f * resources.displayMetrics.density
         
-        navProfile?.background = gradientDrawable
-    }
-    
-    /**
-     * Lighten a color by percentage
-     */
-    private fun lightenColor(color: Int, percent: Float): Int {
-        val r = minOf(255, (Color.red(color) + 255 * percent).toInt())
-        val g = minOf(255, (Color.green(color) + 255 * percent).toInt())
-        val b = minOf(255, (Color.blue(color) + 255 * percent).toInt())
-        return Color.rgb(r, g, b)
+        navProfile?.background = drawable
     }
     
     /**
