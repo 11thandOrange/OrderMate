@@ -386,6 +386,9 @@ class OrderCardRedesignAdapter(
 
         private fun setupNotesPills(order: Order) {
             val notes = mutableListOf<NoteItem>()
+            // Deduplicate: Legacy behavior saves same note to all line items of same product,
+            // so we only show one pill per unique label:value combination
+            val seenPills = mutableSetOf<String>()
             
             // Use cached widgets only for pill rendering (never defaults, enabled only)
             val itemLevelWidgets = WidgetManager.getInstance(binding.root.context).getCachedItemWidgets()
@@ -395,13 +398,17 @@ class OrderCardRedesignAdapter(
                     if (note.isNotBlank()) {
                         val parsedTags = OrderNoteParser.extractTagsFromNote(note, itemLevelWidgets, NoteLevel.ITEM, includeTextBox = true)
                         parsedTags.forEach { tag ->
-                            // Truncate TEXT_BOX values for list page item pills
-                            val displayValue = if (tag.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX && tag.value.length > 20) {
-                                tag.value.take(20) + "..."
-                            } else {
-                                tag.value
+                            val pillKey = "${tag.label.lowercase()}:${tag.value}"
+                            if (pillKey !in seenPills) {
+                                seenPills.add(pillKey)
+                                // Truncate TEXT_BOX values for list page item pills
+                                val displayValue = if (tag.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX && tag.value.length > 20) {
+                                    tag.value.take(20) + "..."
+                                } else {
+                                    tag.value
+                                }
+                                notes.add(NoteItem(tag.label.lowercase(), displayValue, tag.widgetType))
                             }
-                            notes.add(NoteItem(tag.label.lowercase(), displayValue, tag.widgetType))
                         }
                     }
                 }

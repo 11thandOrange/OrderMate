@@ -1150,11 +1150,11 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                             val orderId = orderArguments?.id ?: return@exceptionHandler
                             val allLineItems = orderArguments?.lineItems ?: return@exceptionHandler
                             
-                            android.util.Log.d("ItemNoteReceivedDebug", "Saving to Clover - orderId: $orderId, lineItemId: $itemId")
+                            android.util.Log.d("ItemNoteReceivedDebug", "Saving to Clover - orderId: $orderId")
                             
-                            // Update note for the specific line item (by lineItem.id, NOT item.id)
+                            // Update note for matching line items
                             allLineItems.forEach { lineItem ->
-                                if (lineItem?.id == itemId) {
+                                if (lineItem?.item?.id == itemId) {
                                     android.util.Log.d("ItemNoteReceivedDebug", "Setting note on lineItem: ${lineItem.id}")
                                     lineItem.note = note
                                 }
@@ -1189,20 +1189,23 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
     private fun updateNoteInTheLineItemOfOrder(id: String?, list: String, position: Int) {
-        android.util.Log.d("ItemNoteUpdateDebug", "updateNoteInTheLineItemOfOrder - lineItemId: $id, note: '$list'")
+        android.util.Log.d("ItemNoteUpdateDebug", "updateNoteInTheLineItemOfOrder - id: $id, note: '$list'")
         runOnBackgroundThread(Dispatchers.Default) {
-            // update the order in the order detail screen (by lineItem.id, NOT item.id)
+            // update the order in the order detail screen
             for (i in lineItems) {
-                if (i?.order?.id == id) {
-                    android.util.Log.d("ItemNoteUpdateDebug", "Setting note on lineItems[].order.note for lineItem.id=$id")
+                if (i?.order?.item?.id == id) {
+                    android.util.Log.d("ItemNoteUpdateDebug", "Setting note on lineItems[].order.note")
                     i?.order?.note = list
                 }
             }
 
-            // update the order in the order history screen (by lineItem.id, NOT item.id)
+
+            // update the order in the order history screen
+            // update all item quantity if the order so that
+            // each quantity of line item has same note
             for (i in orderArguments?.lineItems ?: emptyList()) {
-                if (i?.id == id) {
-                    android.util.Log.d("ItemNoteUpdateDebug", "Setting note on orderArguments.lineItems[].note for lineItem.id=$id")
+                if (i?.item?.id == id) {
+                    android.util.Log.d("ItemNoteUpdateDebug", "Setting note on orderArguments.lineItems[].note")
                     i?.note = list
                 }
             }
