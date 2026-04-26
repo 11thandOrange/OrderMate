@@ -291,14 +291,17 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
 
 
                 exceptionHandler({
-                        binding.orderPlacedEmployeeValue.text =
-                            employee?.jsonObject?.get(Constants.name)?.toString()
+                        val employeeName = employee?.jsonObject?.get(Constants.name)?.toString()
+                        binding.orderPlacedEmployeeValue.text = employeeName
+                        binding.employeeValue.text = employeeName ?: getString(R.string.dash)
                 })
                 {
                     CoroutineScope(Dispatchers.IO).launch {
                         val value = MyApp.getInstance().getEmployeeName(employee?.id)
                         CoroutineScope(Dispatchers.Main).launch {
                             binding.orderPlacedEmployeeValue.text = value
+                                ?: getString(R.string.dash)
+                            binding.employeeValue.text = value
                                 ?: getString(R.string.dash)
                         }
                     }
