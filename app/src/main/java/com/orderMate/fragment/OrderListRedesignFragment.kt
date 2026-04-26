@@ -608,20 +608,44 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun applyDialogFilters(filters: FilterDialogFragment.FilterState) {
+        android.util.Log.d("FILTER_DEBUG", "=== applyDialogFilters START ===")
+        android.util.Log.d("FILTER_DEBUG", "currentSearchQuery: '$currentSearchQuery'")
+        android.util.Log.d("FILTER_DEBUG", "filters.selections: ${filters.selections}")
+        android.util.Log.d("FILTER_DEBUG", "filters.dateSelections: ${filters.dateSelections}")
+        android.util.Log.d("FILTER_DEBUG", "allItemList.size: ${allItemList.size}")
+        
         runOnBackgroundThread {
             orderItems.clear()
             filterData.clear()
 
+            var filterMatchCount = 0
+            var searchMatchCount = 0
+            var bothMatchCount = 0
+
             allItemList.forEach { order ->
-                if (orderMatchesFilters(order, filters)) {
-                    // Also apply search query if present
-                    if (currentSearchQuery.isEmpty() || OrderSearchFilter.matchesSearch(order, currentSearchQuery)) {
-                        orderItems.add(order)
-                    }
+                val filterMatch = orderMatchesFilters(order, filters)
+                val searchMatch = currentSearchQuery.isEmpty() || OrderSearchFilter.matchesSearch(order, currentSearchQuery)
+                
+                if (filterMatch) filterMatchCount++
+                if (searchMatch) searchMatchCount++
+                
+                if (filterMatch && searchMatch) {
+                    bothMatchCount++
+                    orderItems.add(order)
+                }
+                
+                if (filterMatch) {
                     // filterData stores filter-only results (without search) for search to work on
                     filterData.add(order)
                 }
             }
+            
+            android.util.Log.d("FILTER_DEBUG", "filterMatchCount: $filterMatchCount")
+            android.util.Log.d("FILTER_DEBUG", "searchMatchCount: $searchMatchCount")
+            android.util.Log.d("FILTER_DEBUG", "bothMatchCount: $bothMatchCount")
+            android.util.Log.d("FILTER_DEBUG", "orderItems.size: ${orderItems.size}")
+            android.util.Log.d("FILTER_DEBUG", "filterData.size: ${filterData.size}")
+            android.util.Log.d("FILTER_DEBUG", "=== applyDialogFilters END ===")
 
             runOnMainThread {
                 updateResultsInfo()
