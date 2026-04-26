@@ -172,7 +172,7 @@ class SettingsManager(private val context: Context) {
     // ==================== Receipt Print Settings ====================
 
     fun getPrintNotesOnCustomerReceipts(): Boolean {
-        return prefs.getBoolean(KEY_PRINT_NOTES_CUSTOMER, true)
+        return prefs.getBoolean(KEY_PRINT_NOTES_CUSTOMER, false)
     }
 
     fun setPrintNotesOnCustomerReceipts(enabled: Boolean) {
