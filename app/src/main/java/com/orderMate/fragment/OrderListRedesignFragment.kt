@@ -349,6 +349,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 if (sharedState != null && sharedState.hasActiveFilters()) {
                     currentFilterState = sharedState
                     applyDialogFilters(sharedState)
+                } else if (currentSearchQuery.isNotEmpty()) {
+                    // No dialog filters but search is active - apply search filter
+                    searchOrders(currentSearchQuery)
                 } else {
                     updateResultsInfo()
                     orderAdapter?.notifyDataSetChanged()
