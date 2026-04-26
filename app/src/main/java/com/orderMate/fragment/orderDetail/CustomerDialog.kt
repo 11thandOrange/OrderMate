@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
@@ -65,7 +66,17 @@ class CustomerDialog(
             val screenWidth = displayMetrics.widthPixels
             val maxWidthPx = (420 * displayMetrics.density).toInt()
             val targetWidth = minOf((screenWidth * 0.9).toInt(), maxWidthPx)
-            window.setLayout(targetWidth, ViewGroup.LayoutParams.WRAP_CONTENT)
+            val maxHeightPx = (displayMetrics.heightPixels * 0.85).toInt()
+            
+            window.setLayout(targetWidth, WindowManager.LayoutParams.WRAP_CONTENT)
+            window.attributes = window.attributes.apply {
+                height = minOf(height, maxHeightPx)
+            }
+            // Ensure dialog can receive input focus for keyboard
+            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
+            window.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+            // Set soft input mode to resize when keyboard appears
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         }
     }
 
