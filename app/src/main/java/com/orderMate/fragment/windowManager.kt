@@ -111,22 +111,40 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
      * Positions the drawer over Clover register item list (left panel):
      * - Top aligned with bottom border of "Register (DEV)" header
      * - Bottom aligned with top of Subtotal/Tax/Total footer section
-     * - Covers the full width of the left panel (~350dp on most devices)
+     * - Covers the full width of the left panel
+     * 
+     * Uses percentage-based positioning to work across different Clover devices:
+     * - Flex: 720x1280 @ 320dpi (xhdpi)
+     * - Mini: 1280x800 @ 213dpi (tvdpi)
+     * - Station 2018: 1920x1080 @ 213dpi (tvdpi)
+     * - Station: 1366x768 @ 160dpi (mdpi)
      */
     private fun setTheWindowParamsForPermanentOverlay(): WindowManager.LayoutParams {
-        val displayMetrics = resources.displayMetrics
-        val density = displayMetrics.density
+        // Get real screen dimensions including nav bar
+        val realMetrics = android.util.DisplayMetrics()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val windowMetrics = windowManager.currentWindowMetrics
+            val bounds = windowMetrics.bounds
+            realMetrics.widthPixels = bounds.width()
+            realMetrics.heightPixels = bounds.height()
+            realMetrics.density = resources.displayMetrics.density
+        } else {
+            @Suppress("DEPRECATION")
+            windowManager.defaultDisplay.getRealMetrics(realMetrics)
+        }
         
-        // Clover register left panel dimensions (approximate)
-        // Width: ~350dp for item list panel
-        val drawerWidth = (350 * density).toInt()
+        val screenWidth = realMetrics.widthPixels
+        val screenHeight = realMetrics.heightPixels
         
-        // Height calculation:
-        // - Top offset: ~76dp for status bar (~24dp) + Register header (~52dp)
-        // - Bottom offset: ~182dp for Subtotal/Tax/Total (~70dp) + Save/Pay buttons (~62dp) + nav bar (~50dp)
-        val topOffset = (76 * density).toInt()
-        val bottomOffset = (182 * density).toInt()
-        val screenHeight = displayMetrics.heightPixels
+        // Clover register left panel width: approximately 45% of screen width
+        val drawerWidth = (screenWidth * 0.45).toInt()
+        
+        // Top offset: approximately 7% of screen height (status bar + Register header)
+        val topOffset = (screenHeight * 0.07).toInt()
+        
+        // Bottom offset: approximately 18% of screen height (Subtotal/Tax/Total + Save/Pay + nav bar)
+        val bottomOffset = (screenHeight * 0.18).toInt()
+        
         val drawerHeight = screenHeight - topOffset - bottomOffset
         
         val permanentParams = WindowManager.LayoutParams(
