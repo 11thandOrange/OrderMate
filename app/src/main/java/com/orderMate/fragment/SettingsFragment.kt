@@ -1336,35 +1336,25 @@ class SettingsFragment : Fragment() {
         val widgetIconContainer: View = itemView.findViewById(R.id.filterWidgetIconContainer)
         val widgetIcon: ImageView = itemView.findViewById(R.id.filterWidgetIcon)
         val widgetTitle: TextView = itemView.findViewById(R.id.filterWidgetTitle)
-        val widgetType: TextView = itemView.findViewById(R.id.filterWidgetType)
+        val widgetTypeView: TextView = itemView.findViewById(R.id.filterWidgetType)
         val widgetToggle: Switch = itemView.findViewById(R.id.filterWidgetToggle)
         val expandChevron: ImageView = itemView.findViewById(R.id.filterExpandChevron)
-        val widgetHeader: View = itemView.findViewById(R.id.filterWidgetHeader)
         val widgetBody: View = itemView.findViewById(R.id.filterWidgetBody)
-        
-        // Set icon based on widget type
-        val iconRes = when (widget.type) {
-            WidgetType.SINGLE_SELECT -> R.drawable.ic_widget_single_select
-            WidgetType.MULTI_SELECT -> R.drawable.ic_widget_multi_select
-            WidgetType.CALENDAR -> R.drawable.ic_widget_calendar
-            else -> R.drawable.ic_widget_single_select
-        }
-        widgetIcon.setImageResource(iconRes)
-        
-        // Set icon container color
-        val colorRes = when (widget.type) {
-            WidgetType.SINGLE_SELECT -> R.color.widget_single_select_bg
-            WidgetType.MULTI_SELECT -> R.color.widget_multi_select_bg
-            WidgetType.CALENDAR -> R.color.widget_calendar_bg
-            else -> R.color.widget_single_select_bg
-        }
-        widgetIconContainer.backgroundTintList = android.content.res.ColorStateList.valueOf(
-            ContextCompat.getColor(requireContext(), colorRes)
-        )
         
         // Set title and type
         widgetTitle.text = widget.label
-        widgetType.text = widget.type.name.replace("_", " ")
+        widgetTypeView.text = widget.type.displayName
+        
+        // Set icon and colors based on type - matches FilterWidgetAdapter pattern
+        val (iconRes, bgRes, tintColor) = when (widget.type) {
+            com.orderMate.modals.WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, WidgetColorUtils.COLOR_CALENDAR)
+            com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
+            com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
+            com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
+        }
+        widgetIcon.setImageResource(iconRes)
+        widgetIcon.setColorFilter(tintColor)
+        widgetIconContainer.setBackgroundResource(bgRes)
         
         // Set toggle state
         widgetToggle.isChecked = widget.showInFilter
@@ -1373,7 +1363,7 @@ class SettingsFragment : Fragment() {
             onUpdate(widget)
         }
         
-        // Hide expand chevron and body for now (simplified version)
+        // Hide expand chevron and body (simplified version without expand/collapse)
         expandChevron.visibility = View.GONE
         widgetBody.visibility = View.GONE
     }
