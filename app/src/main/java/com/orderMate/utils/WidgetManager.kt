@@ -282,17 +282,59 @@ class WidgetManager private constructor(private val context: Context) {
     // ==================== Save to Cache ====================
     
     /**
-     * Save item widgets to cache.
+     * Save item widgets to local cache only (no Firebase sync).
+     * 
+     * Use this ONLY when loading widgets from Firebase to populate local cache.
+     * For creating/updating widgets, use updateItemWidgets() or updateItemWidget() instead.
      */
     fun saveItemWidgets(widgets: List<WidgetConfig>) {
         saveItemWidgetsToCache(widgets)
     }
     
     /**
-     * Save order widgets to cache.
+     * Save order widgets to local cache only (no Firebase sync).
+     * 
+     * Use this ONLY when loading widgets from Firebase to populate local cache.
+     * For creating/updating widgets, use updateOrderWidgets() or updateOrderWidget() instead.
      */
     fun saveOrderWidgets(widgets: List<WidgetConfig>) {
         saveOrderWidgetsToCache(widgets)
+    }
+    
+    /**
+     * Update multiple item widgets with Firebase sync.
+     * Saves to Firebase first, then updates cache on success.
+     */
+    fun updateItemWidgets(widgets: List<WidgetConfig>, callback: (Boolean) -> Unit) {
+        val mid = merchantId ?: return callback(false)
+        
+        // Ensure all widgets have ITEM level
+        widgets.forEach { it.level = NoteLevel.ITEM }
+        
+        firebase.saveWidgetsBatch(mid, widgets) { success ->
+            if (success) {
+                saveItemWidgetsToCache(widgets)
+            }
+            callback(success)
+        }
+    }
+    
+    /**
+     * Update multiple order widgets with Firebase sync.
+     * Saves to Firebase first, then updates cache on success.
+     */
+    fun updateOrderWidgets(widgets: List<WidgetConfig>, callback: (Boolean) -> Unit) {
+        val mid = merchantId ?: return callback(false)
+        
+        // Ensure all widgets have ORDER level
+        widgets.forEach { it.level = NoteLevel.ORDER }
+        
+        firebase.saveWidgetsBatch(mid, widgets) { success ->
+            if (success) {
+                saveOrderWidgetsToCache(widgets)
+            }
+            callback(success)
+        }
     }
     
     /**
@@ -400,12 +442,12 @@ class WidgetManager private constructor(private val context: Context) {
     
     /**
      * Reset item-level widgets to defaults.
-     * Atomically replaces all item widgets with default set.
+     * Atomically replaces only item widgets with default set, leaving order widgets untouched.
+     * Uses level-specific replace to eliminate race conditions.
      */
     fun resetItemWidgetsToDefaults(callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
         val defaults = DefaultWidgetFactory.createItemLevelDefaults()
-        val currentOrderWidgets = getOrderWidgetsFromCache()
         
         android.util.Log.d("WidgetResetDebug", "========== RESET ITEM WIDGETS ==========")
         android.util.Log.d("WidgetResetDebug", "merchantId: $mid")
@@ -415,8 +457,9 @@ class WidgetManager private constructor(private val context: Context) {
         }
         android.util.Log.d("WidgetResetDebug", "=========================================")
         
-        firebase.replaceAllWidgets(mid, defaults + currentOrderWidgets) { success ->
-            android.util.Log.d("WidgetResetDebug", "Firebase replaceAllWidgets success: $success")
+        // Use level-specific replace - no need to read/merge order widgets
+        firebase.replaceItemWidgets(mid, defaults) { success ->
+            android.util.Log.d("WidgetResetDebug", "Firebase replaceItemWidgets success: $success")
             if (success) {
                 saveItemWidgetsToCache(defaults)
                 android.util.Log.d("WidgetResetDebug", "Saved to cache")
@@ -547,14 +590,15 @@ class WidgetManager private constructor(private val context: Context) {
     
     /**
      * Reset order-level widgets to defaults.
-     * Atomically replaces all order widgets with default set.
+     * Atomically replaces only order widgets with default set, leaving item widgets untouched.
+     * Uses level-specific replace to eliminate race conditions.
      */
     fun resetOrderWidgetsToDefaults(callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
         val defaults = DefaultWidgetFactory.createOrderLevelDefaults()
-        val currentItemWidgets = getItemWidgetsFromCache()
         
-        firebase.replaceAllWidgets(mid, currentItemWidgets + defaults) { success ->
+        // Use level-specific replace - no need to read/merge item widgets
+        firebase.replaceOrderWidgets(mid, defaults) { success ->
             if (success) {
                 saveOrderWidgetsToCache(defaults)
             }

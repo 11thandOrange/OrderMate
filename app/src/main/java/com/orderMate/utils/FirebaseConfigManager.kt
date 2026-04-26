@@ -272,7 +272,11 @@ class FirebaseConfigManager private constructor() {
      * Atomically replace ALL widgets with the provided list.
      * This uses setValue() which completely replaces the widgets node,
      * ensuring no stale widgets remain.
+     * 
+     * @deprecated Use replaceItemWidgets() or replaceOrderWidgets() for level-specific operations
+     * to avoid race conditions when resetting one level while the other is being modified.
      */
+    @Deprecated("Use replaceItemWidgets() or replaceOrderWidgets() for level-specific operations")
     fun replaceAllWidgets(merchantId: String, widgets: List<WidgetConfig>, callback: (Boolean) -> Unit) {
         val widgetsMap = mutableMapOf<String, Any>()
         widgets.forEach { widget ->
@@ -288,6 +292,88 @@ class FirebaseConfigManager private constructor() {
             .addOnFailureListener {
                 it.printStackTrace()
                 callback(false)
+            }
+    }
+    
+    /**
+     * Replace only ITEM-level widgets, leaving ORDER widgets untouched.
+     * Uses Firebase query to delete existing ITEM widgets, then adds new ones atomically.
+     * This eliminates race conditions when resetting item widgets while order widgets are being modified.
+     */
+    fun replaceItemWidgets(merchantId: String, itemWidgets: List<WidgetConfig>, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.widgets(merchantId))
+            .orderByChild("level")
+            .equalTo(NoteLevel.ITEM.name)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val updates = mutableMapOf<String, Any?>()
+                
+                // Delete all existing ITEM widgets
+                snapshot.children.forEach { child ->
+                    updates["${FirebasePaths.widgets(merchantId)}/${child.key}"] = null
+                }
+                
+                // Add new ITEM widgets
+                itemWidgets.forEach { widget ->
+                    val widgetPath = "${FirebasePaths.widgets(merchantId)}/${widget.id}"
+                    updates[widgetPath] = widget.toMap()
+                }
+                
+                // Atomic update
+                db.reference.updateChildren(updates)
+                    .addOnSuccessListener {
+                        updateTimestamp(merchantId)
+                        callback(true)
+                    }
+                    .addOnFailureListener { 
+                        it.printStackTrace()
+                        callback(false) 
+                    }
+            }
+            .addOnFailureListener { 
+                it.printStackTrace()
+                callback(false) 
+            }
+    }
+    
+    /**
+     * Replace only ORDER-level widgets, leaving ITEM widgets untouched.
+     * Uses Firebase query to delete existing ORDER widgets, then adds new ones atomically.
+     * This eliminates race conditions when resetting order widgets while item widgets are being modified.
+     */
+    fun replaceOrderWidgets(merchantId: String, orderWidgets: List<WidgetConfig>, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.widgets(merchantId))
+            .orderByChild("level")
+            .equalTo(NoteLevel.ORDER.name)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val updates = mutableMapOf<String, Any?>()
+                
+                // Delete all existing ORDER widgets
+                snapshot.children.forEach { child ->
+                    updates["${FirebasePaths.widgets(merchantId)}/${child.key}"] = null
+                }
+                
+                // Add new ORDER widgets
+                orderWidgets.forEach { widget ->
+                    val widgetPath = "${FirebasePaths.widgets(merchantId)}/${widget.id}"
+                    updates[widgetPath] = widget.toMap()
+                }
+                
+                // Atomic update
+                db.reference.updateChildren(updates)
+                    .addOnSuccessListener {
+                        updateTimestamp(merchantId)
+                        callback(true)
+                    }
+                    .addOnFailureListener { 
+                        it.printStackTrace()
+                        callback(false) 
+                    }
+            }
+            .addOnFailureListener { 
+                it.printStackTrace()
+                callback(false) 
             }
     }
     
