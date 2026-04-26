@@ -26,29 +26,20 @@
         android:orientation="horizontal"
         android:padding="12dp">
 
-        <!-- Widget Icon with dark background container (matches pill styling) -->
+        <!-- Widget Icon -->
         <FrameLayout
-            android:id="@+id/filterWidgetIconBgContainer"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/bg_icon_dark_container">
+            android:id="@+id/filterWidgetIconContainer"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_widget_icon_calendar">
 
-            <FrameLayout
-                android:id="@+id/filterWidgetIconContainer"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+            <ImageView
+                android:id="@+id/filterWidgetIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:background="@drawable/bg_widget_icon_calendar">
-
-                <ImageView
-                    android:id="@+id/filterWidgetIcon"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_calendar"
-                    app:tint="#3B82F6" />
-
-            </FrameLayout>
+                android:src="@drawable/ic_calendar"
+                app:tint="#3B82F6" />
 
         </FrameLayout>
 
