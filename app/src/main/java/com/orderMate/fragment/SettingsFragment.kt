@@ -202,10 +202,18 @@ class SettingsFragment : Fragment() {
     
     override fun onResume() {
         super.onResume()
-        // Refresh widget lists when returning to this fragment
-        // This prevents stale data after switching tabs in the main activity
-        android.util.Log.d("WidgetDragDebug", "onResume: calling loadAllWidgetsFromFirebase()")
-        loadAllWidgetsFromFirebase()
+        // Load from local cache (not Firebase) to preserve recent changes
+        // Firebase sync happens in onViewCreated for initial load
+        android.util.Log.d("WidgetDragDebug", "onResume: loading from cache")
+        loadWidgetsFromCache()
+    }
+    
+    private fun loadWidgetsFromCache() {
+        val itemWidgets = widgetManager.getItemWidgets()
+        val orderWidgets = widgetManager.getOrderWidgets()
+        android.util.Log.d("WidgetDragDebug", "loadWidgetsFromCache: ${itemWidgets.size} item, ${orderWidgets.size} order widgets")
+        itemLevelWidgetAdapter?.setWidgets(itemWidgets.toMutableList())
+        orderLevelWidgetAdapter?.setWidgets(orderWidgets.toMutableList())
     }
 
     private fun initViews(view: View) {
