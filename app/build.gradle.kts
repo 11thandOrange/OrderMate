@@ -22,16 +22,27 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("${rootProject.projectDir}/Cert")
+            storePassword = "123456"
+            keyAlias = "Cert"
+            keyPassword = "123456"
+            enableV1Signing = true
+            enableV2Signing = false
+        }
+    }
+    
     buildTypes {
         release {
             isMinifyEnabled = false
             multiDexEnabled = true
+            signingConfig = signingConfigs.getByName("release")
             
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            
         }
         debug {
             multiDexEnabled = true
