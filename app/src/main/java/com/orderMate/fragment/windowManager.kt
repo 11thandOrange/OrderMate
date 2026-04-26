@@ -109,8 +109,8 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     /**
      * WindowManager params for permanent overlay mode.
      * Positions the drawer over Clover register item list (left panel):
-     * - Below "Current Order" header + status bar (~100dp from top)
-     * - Above "Save/Pay" footer (~140dp from bottom)
+     * - Top aligned with bottom border of "Register (DEV)" header
+     * - Bottom aligned with top of Subtotal/Tax/Total footer section
      * - Covers the full width of the left panel (~350dp on most devices)
      */
     private fun setTheWindowParamsForPermanentOverlay(): WindowManager.LayoutParams {
@@ -122,10 +122,10 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         val drawerWidth = (350 * density).toInt()
         
         // Height calculation:
-        // - Top offset: ~100dp for status bar + "Current Order" header row
-        // - Bottom offset: ~140dp for subtotal/tax/total + Save/Pay buttons
-        val topOffset = (100 * density).toInt()
-        val bottomOffset = (140 * density).toInt()
+        // - Top offset: ~82dp for status bar (~24dp) + Register header (~58dp)
+        // - Bottom offset: ~200dp for Subtotal/Tax/Total (~80dp) + Save/Pay buttons (~70dp) + nav bar (~50dp)
+        val topOffset = (82 * density).toInt()
+        val bottomOffset = (200 * density).toInt()
         val screenHeight = displayMetrics.heightPixels
         val drawerHeight = screenHeight - topOffset - bottomOffset
         
