@@ -18,33 +18,28 @@
         android:fontFamily="sans-serif-medium" />
 
     <!-- Text Input -->
-    <com.google.android.material.textfield.TextInputLayout
+    <LinearLayout
         android:id="@+id/textInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:boxBackgroundMode="outline"
-        app:boxBackgroundColor="@color/input_bg"
-        app:boxStrokeColor="@color/input_border"
-        app:boxStrokeWidth="1dp"
-        app:boxCornerRadiusTopStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:hintEnabled="false"
-        app:counterEnabled="true"
-        app:counterMaxLength="500">
+        android:orientation="vertical"
+        android:background="@drawable/bg_note_input"
+        android:padding="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@null"
             android:textColor="@color/text_light"
+            android:textColorHint="@color/text_muted"
             android:textSize="14sp"
             android:minLines="2"
             android:maxLines="5"
+            android:maxLength="500"
             android:gravity="top"
             android:inputType="textMultiLine|textCapSentences" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
 
 </LinearLayout>
