@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.IBinder
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -29,6 +30,7 @@ import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.OrderNoteParser
 import com.orderMate.utils.PreferenceManager
+import com.orderMate.utils.SettingsManager
 import com.orderMate.utils.WidgetColorUtils
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.countElementsByUniqueKeys
@@ -46,6 +48,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         var isShowing: Boolean = false
         var lastOrder: Order? = null
         var instance: FloatingWidgetService? = null
+        const val EXTRA_PERMANENT_MODE = "permanent_mode"
     }
 
     private lateinit var windowManager: WindowManager
@@ -57,9 +60,16 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     
     // Flag to prevent immediate close when opening drawer
     private var isDrawerOpening = false
+    
+    // Flag for permanent overlay mode (Use OrderMate Register Instead)
+    private var isPermanentMode: Boolean = false
 
     private val prefManager: PreferenceManager by lazy {
         PreferenceManager.getInstance(applicationContext)
+    }
+    
+    private val settingsManager: SettingsManager by lazy {
+        SettingsManager(applicationContext)
     }
 
     override fun onCreate() {
@@ -67,7 +77,21 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         instance = this
         isShowing = true
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        windowManager.addView(binding?.root, setTheWindowParams())
+        
+        // Check if we're in permanent mode from settings
+        isPermanentMode = settingsManager.getUseOrderMateRegisterInstead()
+        
+        if (isPermanentMode) {
+            // Permanent mode: start with drawer expanded, positioned over Clover register item list
+            windowManager.addView(binding?.root, setTheWindowParamsForPermanentOverlay())
+            binding?.orderMateButton?.hideView()
+            binding?.container?.showView()
+            binding?.transparentContainer?.visibility = View.GONE  // No dimming in permanent mode
+            getTheOrderData()
+        } else {
+            // Normal mode: show floating button
+            windowManager.addView(binding?.root, setTheWindowParams())
+        }
 
         setupClickListener()
         setUpTouchListener()
@@ -76,6 +100,33 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         // this is to handle the case when the dialog is open and user has added some items
         //some time it backfires by not providing the callback at correct time
 
+    }
+    
+    /**
+     * WindowManager params for permanent overlay mode.
+     * Positions the drawer on the right side to cover Clover register item list.
+     */
+    private fun setTheWindowParamsForPermanentOverlay(): WindowManager.LayoutParams {
+        val displayMetrics = resources.displayMetrics
+        // Drawer width matches existing drawer (340dp converted to pixels)
+        val drawerWidth = (340 * displayMetrics.density).toInt()
+        val screenHeight = displayMetrics.heightPixels
+        
+        val permanentParams = WindowManager.LayoutParams(
+            drawerWidth,
+            screenHeight,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+            else
+                WindowManager.LayoutParams.TYPE_PHONE,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+            PixelFormat.TRANSLUCENT
+        )
+        permanentParams.gravity = Gravity.END or Gravity.TOP
+        permanentParams.x = 0
+        permanentParams.y = 0
+        return permanentParams
     }
 
 
@@ -370,17 +421,28 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             }
             setupMinWidth(500)
 
-            windowManager.updateViewLayout(
-                binding?.root,
-                setTheWindowParams(
-                    WindowManager.LayoutParams.MATCH_PARENT,
-                    WindowManager.LayoutParams.MATCH_PARENT
+            if (isPermanentMode) {
+                // In permanent mode, expand to full right-side overlay
+                windowManager.updateViewLayout(
+                    binding?.root,
+                    setTheWindowParamsForPermanentOverlay()
                 )
-            )
-
-            // Show drawer and overlay
-            binding?.container?.showView()
-            binding?.transparentContainer?.showView()
+                // No transparent container dimming in permanent mode
+                binding?.container?.showView()
+                binding?.transparentContainer?.visibility = View.GONE
+            } else {
+                // Normal mode: expand to full screen with dimming
+                windowManager.updateViewLayout(
+                    binding?.root,
+                    setTheWindowParams(
+                        WindowManager.LayoutParams.MATCH_PARENT,
+                        WindowManager.LayoutParams.MATCH_PARENT
+                    )
+                )
+                // Show drawer and overlay
+                binding?.container?.showView()
+                binding?.transparentContainer?.showView()
+            }
             
             // Reset flag after a short delay to allow layout to settle
             binding?.root?.postDelayed({
@@ -416,15 +478,31 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     private fun closeHandler() {
         setupMinWidth(0)
         binding?.orderMateButton?.showView()
-        windowManager.updateViewLayout(
-            binding?.root,
-            setTheWindowParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                MyApp.latestAxis?.first,
-                MyApp.latestAxis?.second
+        
+        if (isPermanentMode) {
+            // In permanent mode, collapse to button but position at right edge for easy re-access
+            val displayMetrics = resources.displayMetrics
+            windowManager.updateViewLayout(
+                binding?.root,
+                setTheWindowParams(
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    displayMetrics.widthPixels - 100,
+                    displayMetrics.heightPixels / 2
+                )
             )
-        )
+        } else {
+            // Normal mode: restore to last known position
+            windowManager.updateViewLayout(
+                binding?.root,
+                setTheWindowParams(
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    MyApp.latestAxis?.first,
+                    MyApp.latestAxis?.second
+                )
+            )
+        }
         binding?.container?.hideView()
         binding?.transparentContainer?.hideView()
     }

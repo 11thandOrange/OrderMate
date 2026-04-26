@@ -76,6 +76,7 @@ class SettingsFragment : Fragment() {
     
     // General Panel
     private var switchUseInCloverRegister: Switch? = null
+    private var switchUseOrderMateInstead: Switch? = null
     private var switchItemNotesEnabledGeneral: Switch? = null
     private var switchOrderNotesEnabledGeneral: Switch? = null
     
@@ -225,6 +226,7 @@ class SettingsFragment : Fragment() {
         
         // General Panel
         switchUseInCloverRegister = view.findViewById(R.id.switchUseInCloverRegister)
+        switchUseOrderMateInstead = view.findViewById(R.id.switchUseOrderMateInstead)
         switchItemNotesEnabledGeneral = view.findViewById(R.id.switchItemNotesEnabledGeneral)
         switchOrderNotesEnabledGeneral = view.findViewById(R.id.switchOrderNotesEnabledGeneral)
         
@@ -337,9 +339,15 @@ class SettingsFragment : Fragment() {
     // ==================== General Panel ====================
     
     private fun setupGeneralPanel() {
+        // "Use OrderMate In Clover's Register" toggle (shows floating button)
         switchUseInCloverRegister?.setOnCheckedChangeListener { _, isChecked ->
-            // Save to local settings
+            // Save to local settings (mutual exclusion handled in SettingsManager)
             settingsManager.setUseOrderMateRegister(isChecked)
+            
+            // Mutual exclusion: disable "Instead" toggle if this is enabled
+            if (isChecked) {
+                switchUseOrderMateInstead?.isChecked = false
+            }
             
             // Save to Firebase V2 PopupSettings
             widgetManager.setShowOMButtonInRegister(isChecked) { success ->
@@ -348,6 +356,17 @@ class SettingsFragment : Fragment() {
                         Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
                     }
                 }
+            }
+        }
+        
+        // "Use OrderMate Register Instead Of Clover Register" toggle (permanent overlay)
+        switchUseOrderMateInstead?.setOnCheckedChangeListener { _, isChecked ->
+            // Save to local settings (mutual exclusion handled in SettingsManager)
+            settingsManager.setUseOrderMateRegisterInstead(isChecked)
+            
+            // Mutual exclusion: disable regular toggle if this is enabled
+            if (isChecked) {
+                switchUseInCloverRegister?.isChecked = false
             }
         }
         
@@ -1049,6 +1068,7 @@ class SettingsFragment : Fragment() {
     private fun loadSettings() {
         // Load from local SettingsManager first (fast)
         switchUseInCloverRegister?.isChecked = settingsManager.getUseOrderMateRegister()
+        switchUseOrderMateInstead?.isChecked = settingsManager.getUseOrderMateRegisterInstead()
         inputNotificationDays?.setText(settingsManager.getNotificationDays().toString())
         inputNotificationMinutes?.setText(settingsManager.getNotificationMinutes().toString())
         inputReceiptDays?.setText(settingsManager.getReceiptDays().toString())
@@ -1356,6 +1376,7 @@ class SettingsFragment : Fragment() {
         panelNotification = null
         panelAdvanced = null
         switchUseInCloverRegister = null
+        switchUseOrderMateInstead = null
         switchItemNotesEnabledGeneral = null
         switchOrderNotesEnabledGeneral = null
         filterItemLevelHeader = null

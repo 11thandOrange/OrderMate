@@ -32,6 +32,22 @@ class SettingsManager(private val context: Context) {
 
     fun setUseOrderMateRegister(enabled: Boolean) {
         prefs.edit { putBoolean(KEY_USE_ORDERMATE_REGISTER, enabled) }
+        // Mutual exclusion: if enabling this, disable "Instead" mode
+        if (enabled) {
+            prefs.edit { putBoolean(KEY_USE_ORDERMATE_REGISTER_INSTEAD, false) }
+        }
+    }
+
+    fun getUseOrderMateRegisterInstead(): Boolean {
+        return prefs.getBoolean(KEY_USE_ORDERMATE_REGISTER_INSTEAD, false)
+    }
+
+    fun setUseOrderMateRegisterInstead(enabled: Boolean) {
+        prefs.edit { putBoolean(KEY_USE_ORDERMATE_REGISTER_INSTEAD, enabled) }
+        // Mutual exclusion: if enabling this, disable regular mode
+        if (enabled) {
+            prefs.edit { putBoolean(KEY_USE_ORDERMATE_REGISTER, false) }
+        }
     }
 
     fun getUseBothRegisters(): Boolean {
@@ -346,6 +362,7 @@ class SettingsManager(private val context: Context) {
     fun resetToDefaults() {
         prefs.edit {
             putBoolean(KEY_USE_ORDERMATE_REGISTER, true)
+            putBoolean(KEY_USE_ORDERMATE_REGISTER_INSTEAD, false)
             putBoolean(KEY_USE_BOTH_REGISTERS, false)
             remove(KEY_WIDGETS)
             putInt(KEY_NOTIFICATION_DAYS, DEFAULT_NOTIFICATION_DAYS)
@@ -370,6 +387,7 @@ class SettingsManager(private val context: Context) {
 
         // Keys
         private const val KEY_USE_ORDERMATE_REGISTER = "use_ordermate_register"
+        private const val KEY_USE_ORDERMATE_REGISTER_INSTEAD = "use_ordermate_register_instead"
         private const val KEY_USE_BOTH_REGISTERS = "use_both_registers"
         private const val KEY_WIDGETS = "popup_widgets"
         private const val KEY_NOTIFICATION_DAYS = "notification_days"

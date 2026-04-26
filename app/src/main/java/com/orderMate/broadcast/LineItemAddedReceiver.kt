@@ -95,10 +95,14 @@ class LineItemAddedReceiver : BroadcastReceiver() {
         val settingsManager = p0?.let { SettingsManager(it) }
         val isOrderMateRegisterEnabled = settingsManager?.getUseOrderMateRegister() ?: 
             prefManager?.getBoolean(Constants.isMenuBasketOptionEnabled) ?: false
+        val isOrderMateRegisterInstead = settingsManager?.getUseOrderMateRegisterInstead() ?: false
         
-        // this is basically the option is enabled and the widget is not currently visible to the user
-        if (isOrderMateRegisterEnabled) {
+        // Either mode triggers the service (floating button OR permanent overlay)
+        if (isOrderMateRegisterEnabled || isOrderMateRegisterInstead) {
             val intent = Intent(p0, FloatingWidgetService::class.java)
+            // Pass mode to service so it knows whether to show permanent overlay
+            intent.putExtra(FloatingWidgetService.EXTRA_PERMANENT_MODE, isOrderMateRegisterInstead)
+            
             when {
                 (p1.action.equals(ACTION_V1_ORDER_BUILD_START)) -> {
                     if(FloatingWidgetService.isShowing){
