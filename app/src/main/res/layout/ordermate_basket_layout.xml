@@ -108,7 +108,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_close"
-                app:tint="@color/text_muted"
+                app:tint="@color/text_light"
                 android:contentDescription="Close drawer"/>
 
             <!-- Order Title -->
