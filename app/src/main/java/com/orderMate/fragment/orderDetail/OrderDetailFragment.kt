@@ -1196,8 +1196,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
 
     private fun updateNoteInTheLineItemOfOrder(id: String?, list: String, position: Int) {
         android.util.Log.d("ItemNoteUpdateDebug", "updateNoteInTheLineItemOfOrder - id: $id, note: '$list', position: $position")
-        try {
-            runOnBackgroundThread(Dispatchers.Default) {
+        runOnBackgroundThread(Dispatchers.Default) {
+            try {
                 // update the order in the order detail screen
                 for (i in lineItems) {
                     if (i?.order?.item?.id == id) {
@@ -1205,7 +1205,6 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                         i?.order?.note = list
                     }
                 }
-
 
                 // update all item quantity if the order so that
                 // each quantity of line item has same note
@@ -1217,14 +1216,19 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 }
                 // Signal refresh when navigating back (list will reload with updated data)
                 sharedFilterViewModel.triggerRefresh()
+                android.util.Log.d("ItemNoteUpdateDebug", "Background update complete")
+            } catch (e: Exception) {
+                android.util.Log.e("ItemNoteUpdateDebug", "CRASH in background thread: ${e.message}", e)
             }
-            runOnMainThread {
+        }
+        runOnMainThread {
+            try {
                 android.util.Log.d("ItemNoteUpdateDebug", "notifyItemChanged - position: $position, adapter: ${binding.itemRecycler.adapter}")
                 binding.itemRecycler.adapter?.notifyItemChanged(position)
                 android.util.Log.d("ItemNoteUpdateDebug", "notifyItemChanged COMPLETE")
+            } catch (e: Exception) {
+                android.util.Log.e("ItemNoteUpdateDebug", "CRASH in main thread notifyItemChanged: ${e.message}", e)
             }
-        } catch (e: Exception) {
-            android.util.Log.e("ItemNoteUpdateDebug", "CRASH in updateNoteInTheLineItemOfOrder: ${e.message}", e)
         }
     }
 

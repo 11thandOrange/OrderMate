@@ -157,17 +157,24 @@ class ItemNoteDialogFragment : DialogFragment() {
         }
 
         binding.btnSave.setOnClickListener {
-            val note = buildNoteString()
-            android.util.Log.d("ItemNoteSaveDebug", "========== ITEM NOTE SAVE ==========")
-            android.util.Log.d("ItemNoteSaveDebug", "lineItemId: $lineItemId")
-            android.util.Log.d("ItemNoteSaveDebug", "note being saved: '$note'")
-            android.util.Log.d("ItemNoteSaveDebug", "widgets used for building:")
-            widgets.filter { it.isEnabled }.forEach { w ->
-                android.util.Log.d("ItemNoteSaveDebug", "  Widget: id=${w.id}, label=${w.label}, type=${w.type}")
+            try {
+                val note = buildNoteString()
+                android.util.Log.d("ItemNoteSaveDebug", "========== ITEM NOTE SAVE ==========")
+                android.util.Log.d("ItemNoteSaveDebug", "lineItemId: $lineItemId")
+                android.util.Log.d("ItemNoteSaveDebug", "note being saved: '$note'")
+                android.util.Log.d("ItemNoteSaveDebug", "widgets used for building:")
+                widgets.filter { it.isEnabled }.forEach { w ->
+                    android.util.Log.d("ItemNoteSaveDebug", "  Widget: id=${w.id}, label=${w.label}, type=${w.type}")
+                }
+                android.util.Log.d("ItemNoteSaveDebug", "=====================================")
+                android.util.Log.d("ItemNoteSaveDebug", "Calling listener?.onNoteSaved...")
+                listener?.onNoteSaved(lineItemId, note)
+                android.util.Log.d("ItemNoteSaveDebug", "onNoteSaved returned, calling dismiss()...")
+                dismiss()
+                android.util.Log.d("ItemNoteSaveDebug", "dismiss() completed")
+            } catch (e: Exception) {
+                android.util.Log.e("ItemNoteSaveDebug", "CRASH in btnSave onClick: ${e.message}", e)
             }
-            android.util.Log.d("ItemNoteSaveDebug", "=====================================")
-            listener?.onNoteSaved(lineItemId, note)
-            dismiss()
         }
     }
 
