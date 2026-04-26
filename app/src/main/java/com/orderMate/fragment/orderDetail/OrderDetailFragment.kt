@@ -977,6 +977,9 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             }
             
             // Order Details Card click - opens order-level notes popup
+            // Set click listener on the entire card to ensure full clickability
+            orderDetailsCard.setOnClickListener { openOrderNoteDialog() }
+            
             // Use GestureDetector to detect taps while allowing scroll
             val gestureDetector = android.view.GestureDetector(requireContext(), 
                 object : android.view.GestureDetector.SimpleOnGestureListener() {
