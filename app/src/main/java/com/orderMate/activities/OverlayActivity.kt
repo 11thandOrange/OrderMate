@@ -32,6 +32,11 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
         const val OVERLAY_MODE_ITEM_NOTE = "item_note"
         const val OVERLAY_MODE_ORDER_NOTE = "order_note"
         const val EXTRA_OVERLAY_MODE = "overlay_mode"
+        
+        // Static flag to track if popup is active (for FloatingWidgetService to check)
+        @Volatile
+        var isActive: Boolean = false
+            private set
     }
 
     private val binding: ActivityOverlayBinding by lazy {
@@ -45,6 +50,7 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        isActive = true
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(binding.root)
         parseIntentData()
@@ -178,6 +184,7 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
     
     override fun onDestroy() {
         super.onDestroy()
+        isActive = false
         // Notify FloatingWidgetService that popup is closed
         sendBroadcast(Intent(FloatingWidgetService.ACTION_POPUP_CLOSED))
     }

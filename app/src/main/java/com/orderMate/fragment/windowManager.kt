@@ -559,7 +559,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
 
     private fun closeHandler() {
         // In permanent mode, don't close drawer when popup is open
-        if (isPermanentMode && isPopupOpen) {
+        if (isPermanentMode && (isPopupOpen || OverlayActivity.isActive)) {
             return
         }
         
