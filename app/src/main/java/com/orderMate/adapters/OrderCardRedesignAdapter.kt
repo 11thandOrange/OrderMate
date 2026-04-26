@@ -390,11 +390,21 @@ class OrderCardRedesignAdapter(
             // Use cached widgets only for pill rendering (never defaults, enabled only)
             val itemLevelWidgets = WidgetManager.getInstance(binding.root.context).getCachedItemWidgets()
             
+            android.util.Log.d("PillDebug", "=== setupNotesPills for order ${order.id} ===")
+            android.util.Log.d("PillDebug", "itemLevelWidgets count: ${itemLevelWidgets.size}")
+            itemLevelWidgets.forEach { w ->
+                android.util.Log.d("PillDebug", "  Widget: id=${w.id}, label=${w.label}, level=${w.level}, enabled=${w.isEnabled}")
+            }
+            android.util.Log.d("PillDebug", "lineItems count: ${order.lineItems?.size ?: 0}")
+            
             order.lineItems?.forEach { lineItem ->
                 lineItem?.note?.let { note ->
                     if (note.isNotBlank()) {
+                        android.util.Log.d("PillDebug", "LineItem note: '$note'")
                         val parsedTags = OrderNoteParser.extractTagsFromNote(note, itemLevelWidgets, NoteLevel.ITEM, includeTextBox = true)
+                        android.util.Log.d("PillDebug", "  parsedTags count: ${parsedTags.size}")
                         parsedTags.forEach { tag ->
+                            android.util.Log.d("PillDebug", "    Tag: label=${tag.label}, value=${tag.value}, type=${tag.widgetType}")
                             // Truncate TEXT_BOX values for list page item pills
                             val displayValue = if (tag.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX && tag.value.length > 20) {
                                 tag.value.take(20) + "..."
@@ -406,6 +416,8 @@ class OrderCardRedesignAdapter(
                     }
                 }
             }
+            
+            android.util.Log.d("PillDebug", "Total notes to render: ${notes.size}")
 
             val container = binding.notesChipsContainer
             
