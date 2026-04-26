@@ -1198,7 +1198,6 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             }
 
 
-            // update the order in the order history screen
             // update all item quantity if the order so that
             // each quantity of line item has same note
             for (i in orderArguments?.lineItems ?: emptyList()) {
@@ -1207,7 +1206,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                     i?.note = list
                 }
             }
-            OrderHistoryFragment.getInstance().updateTheOrder(orderArguments)
+            // Signal refresh when navigating back (list will reload with updated data)
+            sharedFilterViewModel.triggerRefresh()
         }
         runOnMainThread {
             binding.itemRecycler.adapter?.notifyItemChanged(position)
