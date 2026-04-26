@@ -1323,6 +1323,10 @@ class SettingsFragment : Fragment() {
                 }
             }
             filterOrderLevelAdapter?.setWidgets(orderLevelWidgets.toMutableList())
+            // Force re-measure after data change
+            filterOrderLevelRecyclerView?.post {
+                filterOrderLevelRecyclerView?.requestLayout()
+            }
         } else {
             filterOrderLevelRecyclerView?.visibility = View.GONE
         }
