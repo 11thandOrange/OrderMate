@@ -1,6 +1,7 @@
 package com.orderMate.utils
 
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.LayerDrawable
 import com.orderMate.R
 import com.orderMate.modals.WidgetType
 
@@ -24,11 +25,15 @@ import com.orderMate.modals.WidgetType
  *    - Order Date: Blue (#64B5F6)
  * 
  * PILL STYLING:
- *    - Background: 15% opacity
+ *    - Dark container background (#CC292D3E) - same as filter modal
+ *    - Colored overlay: 15% opacity on top
  *    - Border: 25% opacity, 1dp stroke
  *    - Text: Full color (100%)
  */
 object WidgetColorUtils {
+    
+    // Dark container background color (matches filter modal bg_dialog.xml)
+    const val COLOR_PILL_CONTAINER = 0xCC292D3E.toInt()
     
     // Widget type colors (full opacity)
     const val COLOR_CALENDAR = 0xFF64B5F6.toInt()      // Blue
@@ -108,16 +113,33 @@ object WidgetColorUtils {
     }
     
     /**
-     * Create a unified pill background drawable with 15% opacity bg + 25% border
+     * Create a unified pill background drawable with dark container + colored overlay
      * This is the SINGLE source of truth for all pill styling across the app
+     * 
+     * Layers (bottom to top):
+     * 1. Dark container (#CC292D3E) - matches filter modal background
+     * 2. Colored overlay (15% opacity of pill color)
+     * 3. Border (25% opacity of pill color)
      */
-    fun createPillBackground(color: Int, cornerRadiusDp: Float, density: Float): GradientDrawable {
-        return GradientDrawable().apply {
+    fun createPillBackground(color: Int, cornerRadiusDp: Float, density: Float): LayerDrawable {
+        val cornerRadius = cornerRadiusDp * density
+        
+        // Bottom layer: dark container background
+        val containerDrawable = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
-            cornerRadius = cornerRadiusDp * density
+            this.cornerRadius = cornerRadius
+            setColor(COLOR_PILL_CONTAINER)
+        }
+        
+        // Top layer: colored overlay with border
+        val colorOverlayDrawable = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            this.cornerRadius = cornerRadius
             setColor(getBackgroundColor(color))
             setStroke((1 * density).toInt(), getBorderColor(color))
         }
+        
+        return LayerDrawable(arrayOf(containerDrawable, colorOverlayDrawable))
     }
     
     /**
