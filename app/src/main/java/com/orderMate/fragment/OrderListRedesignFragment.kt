@@ -861,10 +861,12 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     
     private fun formatPaymentStatus(status: String): String {
         return when (status.uppercase()) {
+            "OPEN" -> "Unpaid"
             "PAID" -> "Paid"
-            "NOT_PAID" -> "Unpaid"
             "PARTIALLY_PAID" -> "Partial"
             "REFUNDED" -> "Refunded"
+            "PARTIALLY_REFUNDED" -> "Partial Refund"
+            "CREDITED" -> "Credited"
             else -> status.replaceFirstChar { it.uppercase() }
         }
     }
