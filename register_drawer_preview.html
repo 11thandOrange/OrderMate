@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrderMate Register Drawer Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+        }
+
+        .device-frame {
+            width: 720px;
+            height: 1280px;
+            background: #000;
+            margin: 20px auto;
+            position: relative;
+            border: 2px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 24px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Clover Register Header */
+        .register-header {
+            height: 64px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+            border-bottom: 4px solid #4CAF50;
+        }
+
+        .hamburger-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            cursor: pointer;
+        }
+
+        .hamburger-icon span {
+            width: 100%;
+            height: 3px;
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .register-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #4CAF50 50%, #fff 50%);
+            border: 2px solid #4CAF50;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .register-title {
+            font-size: 20px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* Main Content Area - Split View */
+        .main-content {
+            display: flex;
+            height: calc(100% - 24px - 64px - 80px); /* status + header + footer (just Save/Pay container) */
+            position: relative;
+        }
+
+        /* Left Panel - Clover Item List (where OrderMate drawer overlays) */
+        .clover-left-panel {
+            width: 50%;
+            background: #2d2d44;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .clover-order-header {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .clover-order-title {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .clover-item-list {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .clover-item {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .clover-subtotal-section {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #888;
+            font-size: 14px;
+        }
+
+        .subtotal-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        /* Right Panel - Clover Menu Grid */
+        .clover-right-panel {
+            width: 50%;
+            background: #3d3d5c;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            align-content: start;
+        }
+
+        .menu-item {
+            aspect-ratio: 1;
+            background: #5a5a7a;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 12px;
+            text-align: center;
+            padding: 8px;
+        }
+
+        /* Footer - Save/Pay Buttons Container ONLY (not including totals) */
+        .register-footer {
+            height: 80px;
+            background: #2d2d44;
+            display: flex;
+            padding: 16px;
+            gap: 16px;
+            border-top: 2px solid #4a4a6a; /* Visible border - drawer should align to top of this */
+        }
+
+        .footer-btn {
+            flex: 1;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-save {
+            background: rgba(200, 230, 200, 0.3);
+            color: rgba(200, 230, 200, 0.6);
+        }
+
+        .btn-pay {
+            background: rgba(200, 230, 200, 0.3);
+            color: rgba(200, 230, 200, 0.6);
+        }
+
+        /* ============================================
+           OrderMate Drawer Overlay
+           ============================================ */
+        
+        /* Current (Buggy) positioning - showing the issues */
+        .ordermate-drawer-current {
+            position: absolute;
+            top: 0; /* Top is flush - correct */
+            left: 0;
+            width: calc(50% - 8px); /* Too narrow - not flush with right edge */
+            height: calc(100% - 20px); /* Too short - not flush with footer top border */
+            background: #1A1A2E;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            /* Issues visualized */
+            border-right: 4px solid #ff6b6b; /* Shows gap on right */
+            border-bottom: 4px solid #ff6b6b; /* Shows gap on bottom */
+        }
+
+        /* Correct positioning */
+        .ordermate-drawer-correct {
+            position: absolute;
+            top: 0; /* Top is flush - correct */
+            left: 0;
+            width: 50%; /* Flush with right edge of Clover left panel */
+            height: 100%; /* Flush with top border of footer */
+            background: #1A1A2E;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            /* Flush edges - no gaps */
+            border-right: 2px solid #4CAF50; /* Green = correct alignment */
+            border-bottom: 2px solid #4CAF50; /* Green = correct alignment */
+        }
+
+        /* Drawer Header */
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .close-btn {
+            width: 24px;
+            height: 24px;
+            color: #888;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .drawer-title {
+            flex: 1;
+            margin-left: 12px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .order-notes-btn {
+            background: #E8A855;
+            color: #1A1A2E;
+            padding: 10px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        /* Detail Rows */
+        .detail-section {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 4px 0;
+            margin-bottom: 16px;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .detail-content {
+            margin-left: 12px;
+        }
+
+        .detail-label {
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Line Items */
+        .line-items-header {
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .line-items-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* Toggle Controls */
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #333;
+            padding: 20px;
+            border-radius: 12px;
+            z-index: 1000;
+            color: #fff;
+        }
+
+        .controls h3 {
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: #E8A855;
+        }
+
+        .control-row {
+            margin-bottom: 12px;
+        }
+
+        .control-row label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .control-row input[type="radio"] {
+            accent-color: #E8A855;
+        }
+
+        /* Alignment Guides */
+        .alignment-guide {
+            position: absolute;
+            background: #4CAF50;
+            z-index: 200;
+            opacity: 0.8;
+        }
+
+        .guide-right {
+            width: 2px;
+            right: 50%;
+            top: 0;
+            height: 100%;
+            display: none;
+        }
+
+        .guide-bottom {
+            height: 2px;
+            left: 0;
+            bottom: 0;
+            width: 50%;
+            display: none;
+        }
+
+        .show-guides .guide-right,
+        .show-guides .guide-bottom {
+            display: block;
+        }
+
+        /* Issue Annotations */
+        .issue-marker {
+            position: absolute;
+            background: #ff6b6b;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            z-index: 300;
+            white-space: nowrap;
+        }
+
+        .issue-right {
+            right: calc(50% + 10px);
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .issue-bottom {
+            left: 25%;
+            bottom: 30px;
+            transform: translateX(-50%);
+        }
+
+        /* Measurements */
+        .measurement {
+            position: absolute;
+            color: #4CAF50;
+            font-size: 10px;
+            font-family: monospace;
+            z-index: 250;
+        }
+
+        .device-frame.correct-mode .ordermate-drawer-current {
+            display: none;
+        }
+
+        .device-frame.current-mode .ordermate-drawer-correct {
+            display: none;
+        }
+
+        .device-frame.correct-mode .issue-marker {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h3>Register Drawer Preview</h3>
+        <div class="control-row">
+            <label>
+                <input type="radio" name="mode" value="current" checked onchange="toggleMode(this.value)">
+                Current (with issues)
+            </label>
+        </div>
+        <div class="control-row">
+            <label>
+                <input type="radio" name="mode" value="correct" onchange="toggleMode(this.value)">
+                Correct (flush edges)
+            </label>
+        </div>
+        <div class="control-row">
+            <label>
+                <input type="checkbox" onchange="toggleGuides(this.checked)">
+                Show alignment guides
+            </label>
+        </div>
+        <hr style="margin: 16px 0; border-color: #555;">
+        <div style="font-size: 11px; color: #888; line-height: 1.5;">
+            <strong>Issues to fix:</strong><br>
+            ✓ Top edge is flush (correct)<br>
+            ✗ Right edge not flush with Clover panel<br>
+            ✗ Bottom edge not flush with Save/Pay footer
+        </div>
+    </div>
+
+    <div class="device-frame current-mode" id="deviceFrame">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>3:00</span>
+            <div class="status-icons">
+                <span>⚠</span>
+                <span>📶</span>
+                <span>🔋</span>
+            </div>
+        </div>
+
+        <!-- Clover Register Header -->
+        <div class="register-header">
+            <div class="hamburger-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="register-logo">📋</div>
+            <span class="register-title">Register (DEV)</span>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel - Clover's Item List (hidden by OrderMate) -->
+            <div class="clover-left-panel">
+                <div class="clover-order-header">
+                    <div class="clover-order-title">Current Order</div>
+                </div>
+                <div class="clover-item-list">
+                    <div class="clover-item">Burger - $12.99</div>
+                    <div class="clover-item">Fries - $4.99</div>
+                    <div class="clover-item">Drink - $2.99</div>
+                </div>
+                <div class="clover-subtotal-section">
+                    <div class="subtotal-row">
+                        <span>Subtotal</span>
+                        <span>$20.97</span>
+                    </div>
+                    <div class="subtotal-row">
+                        <span>Tax</span>
+                        <span>$1.68</span>
+                    </div>
+                    <div class="subtotal-row" style="color: #fff; font-weight: 500;">
+                        <span>Total</span>
+                        <span>$22.65</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Menu Grid -->
+            <div class="clover-right-panel">
+                <div class="menu-item">Burgers</div>
+                <div class="menu-item">Sides</div>
+                <div class="menu-item">Drinks</div>
+                <div class="menu-item">Desserts</div>
+                <div class="menu-item">Specials</div>
+                <div class="menu-item">Combos</div>
+            </div>
+
+            <!-- Alignment Guides -->
+            <div class="alignment-guide guide-right"></div>
+            <div class="alignment-guide guide-bottom"></div>
+
+            <!-- Issue Markers (shown in current mode) -->
+            <div class="issue-marker issue-right">← Gap: Right edge not flush</div>
+            <div class="issue-marker issue-bottom">↑ Gap: Bottom not flush with footer</div>
+
+            <!-- OrderMate Drawer - CURRENT (with issues) -->
+            <div class="ordermate-drawer-current">
+                <div class="drawer-header">
+                    <span class="close-btn">✕</span>
+                    <span class="drawer-title">Order #G152</span>
+                    <div class="order-notes-btn">
+                        <span>✏</span>
+                        <span>Order Notes</span>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-row">
+                        <div class="detail-icon">👤</div>
+                        <div class="detail-content">
+                            <div class="detail-label">Customer</div>
+                            <div class="detail-value">-</div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon">$</div>
+                        <div class="detail-content">
+                            <div class="detail-label">Total</div>
+                            <div class="detail-value">$0.00</div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon">👍</div>
+                        <div class="detail-content">
+                            <div class="detail-label">Items</div>
+                            <div class="detail-value">0 items</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="line-items-header">LINE ITEMS</div>
+                <div class="line-items-list">
+                    <!-- Empty state or items would go here -->
+                </div>
+            </div>
+
+            <!-- OrderMate Drawer - CORRECT (flush edges) -->
+            <div class="ordermate-drawer-correct">
+                <div class="drawer-header">
+                    <span class="close-btn">✕</span>
+                    <span class="drawer-title">Order #G152</span>
+                    <div class="order-notes-btn">
+                        <span>✏</span>
+                        <span>Order Notes</span>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-row">
+                        <div class="detail-icon">👤</div>
+                        <div class="detail-content">
+                            <div class="detail-label">Customer</div>
+                            <div class="detail-value">-</div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon">$</div>
+                        <div class="detail-content">
+                            <div class="detail-label">Total</div>
+                            <div class="detail-value">$0.00</div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon">👍</div>
+                        <div class="detail-content">
+                            <div class="detail-label">Items</div>
+                            <div class="detail-value">0 items</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="line-items-header">LINE ITEMS</div>
+                <div class="line-items-list">
+                    <!-- Empty state or items would go here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer with Save/Pay buttons -->
+        <div class="register-footer">
+            <button class="footer-btn btn-save">Save</button>
+            <button class="footer-btn btn-pay">Pay</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleMode(mode) {
+            const frame = document.getElementById('deviceFrame');
+            frame.className = 'device-frame ' + mode + '-mode';
+        }
+
+        function toggleGuides(show) {
+            const frame = document.getElementById('deviceFrame');
+            if (show) {
+                frame.classList.add('show-guides');
+            } else {
+                frame.classList.remove('show-guides');
+            }
+        }
+    </script>
+</body>
+</html>
