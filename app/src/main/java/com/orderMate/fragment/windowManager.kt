@@ -3,7 +3,10 @@ package com.orderMate.fragment
 
 import android.annotation.SuppressLint
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.IBinder
@@ -50,6 +53,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         var lastOrder: Order? = null
         var instance: FloatingWidgetService? = null
         const val EXTRA_PERMANENT_MODE = "permanent_mode"
+        const val ACTION_POPUP_CLOSED = "com.orderMate.ACTION_POPUP_CLOSED"
     }
 
     private lateinit var windowManager: WindowManager
@@ -67,6 +71,18 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     
     // Flag to prevent duplicate data fetching
     private var isFetchingData = false
+    
+    // Flag to track when popup is open (prevents drawer close in permanent mode)
+    private var isPopupOpen = false
+    
+    // Broadcast receiver to listen for popup closed events
+    private val popupClosedReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == ACTION_POPUP_CLOSED) {
+                isPopupOpen = false
+            }
+        }
+    }
 
     private val prefManager: PreferenceManager by lazy {
         PreferenceManager.getInstance(applicationContext)
@@ -81,6 +97,13 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         instance = this
         isShowing = true
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+        
+        // Register broadcast receiver for popup closed events
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(popupClosedReceiver, IntentFilter(ACTION_POPUP_CLOSED), RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(popupClosedReceiver, IntentFilter(ACTION_POPUP_CLOSED))
+        }
         
         // Check if we're in permanent mode from settings
         isPermanentMode = settingsManager.getUseOrderMateRegisterInstead()
@@ -519,6 +542,11 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         binding?.btnEditOrderNotes?.setOnClickListener {
             // Check if order-level notes are enabled
             if (WidgetManager.getInstance(applicationContext).isOrderNotesEnabled()) {
+                // In permanent mode, set flag to prevent drawer from closing
+                if (isPermanentMode) {
+                    isPopupOpen = true
+                }
+                
                 val data = Intent(applicationContext, OverlayActivity::class.java)
                 data.putExtra(Constants.overlayIntentExtraOrder, lastOrder?.id)
                 data.putExtra(OverlayActivity.EXTRA_OVERLAY_MODE, OverlayActivity.OVERLAY_MODE_ORDER_NOTE)
@@ -530,6 +558,11 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
 
 
     private fun closeHandler() {
+        // In permanent mode, don't close drawer when popup is open
+        if (isPermanentMode && isPopupOpen) {
+            return
+        }
+        
         setupMinWidth(0)
         binding?.orderMateButton?.showView()
         
@@ -643,6 +676,11 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        try {
+            unregisterReceiver(popupClosedReceiver)
+        } catch (e: Exception) {
+            // Receiver may not be registered
+        }
         if (binding != null) windowManager.removeView(binding?.root)
         isShowing = false
     }
@@ -655,6 +693,11 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         // Check if item-level notes are enabled
         if (!WidgetManager.getInstance(applicationContext).isItemNotesEnabled()) {
             return // Item notes disabled, don't show popup
+        }
+        
+        // In permanent mode, set flag to prevent drawer from closing
+        if (isPermanentMode) {
+            isPopupOpen = true
         }
         
         val data = Intent(applicationContext, OverlayActivity::class.java)

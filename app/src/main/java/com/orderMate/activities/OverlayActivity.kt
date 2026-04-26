@@ -1,9 +1,11 @@
 package com.orderMate.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
+import com.orderMate.fragment.FloatingWidgetService
 import com.clover.sdk.v3.order.Order
 import com.orderMate.communicators.ILineItemUpdateListener
 import com.orderMate.databinding.ActivityOverlayBinding
@@ -172,5 +174,11 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
 
     override fun updateLineItem(id: String?, list: String?, position: Int) {
         Constants.notImplementedLog
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        // Notify FloatingWidgetService that popup is closed
+        sendBroadcast(Intent(FloatingWidgetService.ACTION_POPUP_CLOSED))
     }
 }
