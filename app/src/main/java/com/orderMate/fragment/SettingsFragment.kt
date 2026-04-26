@@ -1324,7 +1324,10 @@ class SettingsFragment : Fragment() {
             filterOrderLevelAdapter?.setAdapterName("ORDER")
             filterOrderLevelAdapter?.setWidgets(orderLevelWidgets.toMutableList())
             filterOrderLevelRecyclerView?.apply {
-                layoutManager = LinearLayoutManager(requireContext())
+                // Use custom LayoutManager that doesn't limit items based on visible area
+                layoutManager = object : LinearLayoutManager(requireContext()) {
+                    override fun canScrollVertically() = false
+                }
                 adapter = filterOrderLevelAdapter
             }
         } else {
