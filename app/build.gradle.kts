@@ -17,8 +17,8 @@ android {
         minSdk = 17   // for clover apps we need to setup the minimum support sdk to 17
         //noinspection ExpiredTargetSdkVersion
         targetSdk = 25  // for clover app this is the max target version it supports.
-        versionCode = 31
-        versionName = "1.0.3"
+        versionCode = 32
+        versionName = "1.0.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
