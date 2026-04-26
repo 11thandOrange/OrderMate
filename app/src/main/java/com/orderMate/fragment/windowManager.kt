@@ -543,6 +543,8 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         binding?.cancelButton?.setOnClickListener {
             closeHandler()
         }
+        // Set X button to white for register drawer
+        binding?.cancelButton?.setColorFilter(ContextCompat.getColor(this, R.color.text_light))
 
         binding?.transparentContainer?.setOnClickListener {
             // Ignore clicks if drawer is still opening (prevents accidental close)
