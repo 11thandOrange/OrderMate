@@ -39,8 +39,7 @@ object WidgetColorUtils {
     const val COLOR_CALENDAR = 0xFF64B5F6.toInt()      // Blue
     const val COLOR_SINGLE_SELECT = 0xFFCE93D8.toInt() // Purple
     const val COLOR_MULTI_SELECT = 0xFF81C784.toInt()  // Green
-    const val COLOR_TEXT_BOX = 0xFF212121.toInt()      // Black (for description pills)
-    const val COLOR_TEXT_BOX_TEXT = 0xFF9E9E9E.toInt() // Light grey text for description pills
+    const val COLOR_TEXT_BOX = 0xFFA1887F.toInt()      // Brown
     
     // Clover filter colors
     const val COLOR_PAYMENT_STATUS = 0xFFFFB74D.toInt()  // Yellow
@@ -58,17 +57,6 @@ object WidgetColorUtils {
             WidgetType.SINGLE_SELECT -> COLOR_SINGLE_SELECT
             WidgetType.MULTI_SELECT -> COLOR_MULTI_SELECT
             WidgetType.TEXT_BOX -> COLOR_TEXT_BOX
-        }
-    }
-    
-    /**
-     * Get text color for a widget type pill
-     * TEXT_BOX uses light grey text, others use the widget color
-     */
-    fun getTextColorForWidgetType(type: WidgetType): Int {
-        return when (type) {
-            WidgetType.TEXT_BOX -> COLOR_TEXT_BOX_TEXT // Light grey for description
-            else -> getColorForWidgetType(type)
         }
     }
     
