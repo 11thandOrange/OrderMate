@@ -1,5 +1,6 @@
 package com.orderMate.fragment.orderDetail
 
+import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.TextView
@@ -62,13 +64,33 @@ class SendNotificationDialog(
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NO_FRAME, R.style.Theme_OrderMate_Dialog)
     }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.apply {
+            requestFeature(Window.FEATURE_NO_TITLE)
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        }
+        dialog.setCanceledOnTouchOutside(false)
+        return dialog
+    }
     
     override fun onStart() {
         super.onStart()
-        // Ensure dialog window can receive focus for input
-        dialog?.window?.apply {
-            clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
-            clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+        dialog?.window?.let { window ->
+            val displayMetrics = resources.displayMetrics
+            val screenWidth = displayMetrics.widthPixels
+            val maxWidthPx = (520 * displayMetrics.density).toInt()
+            val targetWidth = minOf((screenWidth * 0.9).toInt(), maxWidthPx)
+            val maxHeightPx = (displayMetrics.heightPixels * 0.85).toInt()
+
+            window.setLayout(targetWidth, WindowManager.LayoutParams.WRAP_CONTENT)
+            window.attributes = window.attributes.apply {
+                height = minOf(height, maxHeightPx)
+            }
+            // Ensure dialog can receive input focus
+            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
+            window.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
         }
     }
 
@@ -95,22 +117,7 @@ class SendNotificationDialog(
     }
 
     private fun setupDialog() {
-        dialog?.window?.apply {
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            // Set max height to allow room for keyboard
-            val displayMetrics = resources.displayMetrics
-            val maxHeight = (displayMetrics.heightPixels * 0.85).toInt()
-            setLayout(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                maxHeight
-            )
-            setDimAmount(0.6f)
-            // SOFT_INPUT_ADJUST_RESIZE allows dialog to resize when keyboard appears
-            setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-            // Ensure dialog can receive input focus
-            clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
-            clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
-        }
+        dialog?.window?.setDimAmount(0.6f)
     }
 
     private fun preventKeyboardAutoOpen() {
