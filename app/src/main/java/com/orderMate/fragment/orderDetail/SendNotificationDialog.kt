@@ -347,6 +347,15 @@ class SendNotificationDialog(
 
             sendButton.setOnClickListener {
                 hideKeyboard(binding.root)
+                
+                // Process any remaining {{placeholders}} before sending
+                val processedContent = processTemplateContent(binding.etNotes.text.toString())
+                binding.etNotes.setText(processedContent)
+                if (!isSmsEnabled) {
+                    val processedSubject = processTemplateContent(binding.subject.text.toString())
+                    binding.subject.setText(processedSubject)
+                }
+                
                 val validate = validateTheData()
                 if (validate.second) {
                     Snackbar.make(binding.root, validate.first, BaseTransientBottomBar.LENGTH_SHORT)
