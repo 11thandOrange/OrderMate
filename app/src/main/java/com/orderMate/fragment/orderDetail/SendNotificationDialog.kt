@@ -300,7 +300,8 @@ class SendNotificationDialog(
                     val processedContent = processTemplateContent(selectedTemplate.content)
                     binding.etNotes.setText(processedContent)
                     // #64: Auto-fill subject for email (also process placeholders)
-                    if (!isSmsEnabled && selectedTemplate.subject.isNotBlank()) {
+                    // Always fill subject so it's ready when switching to email tab
+                    if (selectedTemplate.subject.isNotBlank()) {
                         val processedSubject = processTemplateContent(selectedTemplate.subject)
                         binding.subject.setText(processedSubject)
                     }
