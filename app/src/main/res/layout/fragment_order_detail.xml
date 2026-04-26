@@ -430,6 +430,7 @@
                     android:orientation="vertical">
 
                     <!-- Card Header with Status Badges - FIXED, does not scroll -->
+                    <!-- Outer LinearLayout keeps chevron fixed on right -->
                     <LinearLayout
                         android:id="@+id/orderDetailsHeader"
                         android:layout_width="match_parent"
@@ -439,75 +440,99 @@
                         android:paddingHorizontal="20dp"
                         android:paddingVertical="16dp">
 
-                        <!-- Icon with background - matches HTML .detail-card-title i -->
-                        <FrameLayout
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:background="@drawable/bg_card_title_icon">
-                            
-                            <ImageView
-                                android:layout_width="14dp"
-                                android:layout_height="14dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_receipt"
-                                app:tint="@color/text_light"
-                                android:contentDescription="@string/order_details" />
-                        </FrameLayout>
-
-                        <com.google.android.material.textview.MaterialTextView
+                        <!-- Inner FlexboxLayout: icon + title + pills (wraps when needed) -->
+                        <com.google.android.flexbox.FlexboxLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginStart="10dp"
-                            android:text="@string/order_details"
-                            android:textColor="@color/text_light"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
+                            app:flexWrap="wrap"
+                            app:alignItems="center"
+                            app:alignContent="flex_start">
 
-                        <!-- Status badges - Clover filters: Order Status (red), Payment Status (yellow), Payment Type (grey) -->
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/orderPlacedStatusValue"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="6dp"
-                            android:background="@drawable/badge_background_order_status"
-                            android:paddingHorizontal="10dp"
-                            android:paddingVertical="4dp"
-                            android:text="@string/open"
-                            android:textColor="#FFFFFF"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:textAllCaps="true" />
+                            <!-- Icon with background - matches HTML .detail-card-title i -->
+                            <FrameLayout
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_marginEnd="10dp"
+                                android:background="@drawable/bg_card_title_icon"
+                                app:layout_flexShrink="0">
+                                
+                                <ImageView
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_receipt"
+                                    app:tint="@color/text_light"
+                                    android:contentDescription="@string/order_details" />
+                            </FrameLayout>
 
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/paymentStatusBadge"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="6dp"
-                            android:background="@drawable/badge_background_payment_status"
-                            android:paddingHorizontal="10dp"
-                            android:paddingVertical="4dp"
-                            android:text="@string/paid"
-                            android:textColor="#212121"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:textAllCaps="true" />
+                            <!-- Title - fixed width, won't shrink, pushes pills right -->
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="10dp"
+                                android:text="@string/order_details"
+                                android:textColor="@color/text_light"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:layout_flexShrink="0"
+                                app:layout_flexGrow="1" />
 
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/paymentTypeBadge"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/badge_background_payment_type"
-                            android:paddingHorizontal="10dp"
-                            android:paddingVertical="4dp"
-                            android:text="CASH"
-                            android:textColor="#FFFFFF"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:textAllCaps="true"
-                            android:visibility="gone" />
+                            <!-- Status badges - will wrap to next row if needed -->
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/orderPlacedStatusValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="6dp"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginBottom="4dp"
+                                android:background="@drawable/badge_background_order_status"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="4dp"
+                                android:text="@string/open"
+                                android:textColor="#FFFFFF"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:textAllCaps="true"
+                                app:layout_flexShrink="0" />
 
-                        <!-- Task 12: Right-facing carrot to indicate clickable -->
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/paymentStatusBadge"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="6dp"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginBottom="4dp"
+                                android:background="@drawable/badge_background_payment_status"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="4dp"
+                                android:text="@string/paid"
+                                android:textColor="#212121"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:textAllCaps="true"
+                                app:layout_flexShrink="0" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/paymentTypeBadge"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginBottom="4dp"
+                                android:background="@drawable/badge_background_payment_type"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="4dp"
+                                android:text="CASH"
+                                android:textColor="#FFFFFF"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:textAllCaps="true"
+                                android:visibility="gone"
+                                app:layout_flexShrink="0" />
+
+                        </com.google.android.flexbox.FlexboxLayout>
+
+                        <!-- Chevron - OUTSIDE FlexboxLayout, stays fixed on right -->
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
