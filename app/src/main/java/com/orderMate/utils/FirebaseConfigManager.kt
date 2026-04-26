@@ -548,7 +548,9 @@ class FirebaseConfigManager private constructor() {
                     notificationMinutes = snapshot.child("notificationMinutes").getValue(Int::class.java) ?: 0,
                     scheduledReceiptEnabled = snapshot.child("scheduledReceiptEnabled").getValue(Boolean::class.java) ?: false,
                     receiptDays = snapshot.child("receiptDays").getValue(Int::class.java) ?: 0,
-                    receiptMinutes = snapshot.child("receiptMinutes").getValue(Int::class.java) ?: 60
+                    receiptMinutes = snapshot.child("receiptMinutes").getValue(Int::class.java) ?: 60,
+                    printNotesOnCustomerReceipts = snapshot.child("printNotesOnCustomerReceipts").getValue(Boolean::class.java) ?: false,
+                    printNotesOnOrderReceipts = snapshot.child("printNotesOnOrderReceipts").getValue(Boolean::class.java) ?: true
                 )
                 callback(settings)
             }
@@ -565,7 +567,9 @@ class FirebaseConfigManager private constructor() {
             "notificationMinutes" to settings.notificationMinutes,
             "scheduledReceiptEnabled" to settings.scheduledReceiptEnabled,
             "receiptDays" to settings.receiptDays,
-            "receiptMinutes" to settings.receiptMinutes
+            "receiptMinutes" to settings.receiptMinutes,
+            "printNotesOnCustomerReceipts" to settings.printNotesOnCustomerReceipts,
+            "printNotesOnOrderReceipts" to settings.printNotesOnOrderReceipts
         )
         db.getReference(FirebasePaths.settings(merchantId))
             .updateChildren(updates)
