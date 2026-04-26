@@ -1137,34 +1137,39 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         ).apply {
             setListener(object : ItemNoteDialogFragment.ItemNoteListener {
                 override fun onNoteSaved(itemId: String?, note: String) {
-                    android.util.Log.d("ItemNoteReceivedDebug", "========== NOTE RECEIVED FROM DIALOG ==========")
-                    android.util.Log.d("ItemNoteReceivedDebug", "itemId: $itemId")
-                    android.util.Log.d("ItemNoteReceivedDebug", "note received: '$note'")
-                    android.util.Log.d("ItemNoteReceivedDebug", "================================================")
-                    
-                    // Update the line item note in UI
-                    updateNoteInTheLineItemOfOrder(itemId, note, orderPosition)
-                    
-                    // Save to Clover via OrderConnector
-                    runOnBackgroundThread {
-                        exceptionHandler {
-                            val orderId = orderArguments?.id ?: return@exceptionHandler
-                            val allLineItems = orderArguments?.lineItems ?: return@exceptionHandler
-                            
-                            android.util.Log.d("ItemNoteReceivedDebug", "Saving to Clover - orderId: $orderId")
-                            
-                            // Update note for matching line items
-                            allLineItems.forEach { lineItem ->
-                                if (lineItem?.item?.id == itemId) {
-                                    android.util.Log.d("ItemNoteReceivedDebug", "Setting note on lineItem: ${lineItem.id}")
-                                    lineItem.note = note
+                    try {
+                        android.util.Log.d("ItemNoteReceivedDebug", "========== NOTE RECEIVED FROM DIALOG ==========")
+                        android.util.Log.d("ItemNoteReceivedDebug", "itemId: $itemId")
+                        android.util.Log.d("ItemNoteReceivedDebug", "note received: '$note'")
+                        android.util.Log.d("ItemNoteReceivedDebug", "orderPosition: $orderPosition")
+                        android.util.Log.d("ItemNoteReceivedDebug", "================================================")
+                        
+                        // Update the line item note in UI
+                        updateNoteInTheLineItemOfOrder(itemId, note, orderPosition)
+                        
+                        // Save to Clover via OrderConnector
+                        runOnBackgroundThread {
+                            exceptionHandler {
+                                val orderId = orderArguments?.id ?: return@exceptionHandler
+                                val allLineItems = orderArguments?.lineItems ?: return@exceptionHandler
+                                
+                                android.util.Log.d("ItemNoteReceivedDebug", "Saving to Clover - orderId: $orderId")
+                                
+                                // Update note for matching line items
+                                allLineItems.forEach { lineItem ->
+                                    if (lineItem?.item?.id == itemId) {
+                                        android.util.Log.d("ItemNoteReceivedDebug", "Setting note on lineItem: ${lineItem.id}")
+                                        lineItem.note = note
+                                    }
                                 }
+                                
+                                // Save to Clover
+                                myApp.getOrderConnector().updateLineItems(orderId, allLineItems)
+                                android.util.Log.d("ItemNoteReceivedDebug", "Saved to Clover!")
                             }
-                            
-                            // Save to Clover
-                            myApp.getOrderConnector().updateLineItems(orderId, allLineItems)
-                            android.util.Log.d("ItemNoteReceivedDebug", "Saved to Clover!")
                         }
+                    } catch (e: Exception) {
+                        android.util.Log.e("ItemNoteReceivedDebug", "CRASH in onNoteSaved: ${e.message}", e)
                     }
                 }
                 
@@ -1190,30 +1195,36 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
     private fun updateNoteInTheLineItemOfOrder(id: String?, list: String, position: Int) {
-        android.util.Log.d("ItemNoteUpdateDebug", "updateNoteInTheLineItemOfOrder - id: $id, note: '$list'")
-        runOnBackgroundThread(Dispatchers.Default) {
-            // update the order in the order detail screen
-            for (i in lineItems) {
-                if (i?.order?.item?.id == id) {
-                    android.util.Log.d("ItemNoteUpdateDebug", "Setting note on lineItems[].order.note")
-                    i?.order?.note = list
+        android.util.Log.d("ItemNoteUpdateDebug", "updateNoteInTheLineItemOfOrder - id: $id, note: '$list', position: $position")
+        try {
+            runOnBackgroundThread(Dispatchers.Default) {
+                // update the order in the order detail screen
+                for (i in lineItems) {
+                    if (i?.order?.item?.id == id) {
+                        android.util.Log.d("ItemNoteUpdateDebug", "Setting note on lineItems[].order.note")
+                        i?.order?.note = list
+                    }
                 }
-            }
 
 
-            // update all item quantity if the order so that
-            // each quantity of line item has same note
-            for (i in orderArguments?.lineItems ?: emptyList()) {
-                if (i?.item?.id == id) {
-                    android.util.Log.d("ItemNoteUpdateDebug", "Setting note on orderArguments.lineItems[].note")
-                    i?.note = list
+                // update all item quantity if the order so that
+                // each quantity of line item has same note
+                for (i in orderArguments?.lineItems ?: emptyList()) {
+                    if (i?.item?.id == id) {
+                        android.util.Log.d("ItemNoteUpdateDebug", "Setting note on orderArguments.lineItems[].note")
+                        i?.note = list
+                    }
                 }
+                // Signal refresh when navigating back (list will reload with updated data)
+                sharedFilterViewModel.triggerRefresh()
             }
-            // Signal refresh when navigating back (list will reload with updated data)
-            sharedFilterViewModel.triggerRefresh()
-        }
-        runOnMainThread {
-            binding.itemRecycler.adapter?.notifyItemChanged(position)
+            runOnMainThread {
+                android.util.Log.d("ItemNoteUpdateDebug", "notifyItemChanged - position: $position, adapter: ${binding.itemRecycler.adapter}")
+                binding.itemRecycler.adapter?.notifyItemChanged(position)
+                android.util.Log.d("ItemNoteUpdateDebug", "notifyItemChanged COMPLETE")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("ItemNoteUpdateDebug", "CRASH in updateNoteInTheLineItemOfOrder: ${e.message}", e)
         }
     }
 
