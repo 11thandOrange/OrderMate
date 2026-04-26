@@ -182,7 +182,7 @@ class SendNotificationDialog(
                 val merchantId = app.getMerchantId() ?: return@runOnBackgroundThread
                 
                 // Load merchant name for template processing
-                app.getMerchantConnector()?.merchant?.name?.let { name ->
+                app.getMerchantName()?.let { name ->
                     merchantName = name
                 }
                 

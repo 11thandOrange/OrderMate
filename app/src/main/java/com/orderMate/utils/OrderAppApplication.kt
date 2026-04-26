@@ -181,6 +181,16 @@ class MyApp : Application() {
             null
         }
     }
+    
+    fun getMerchantName(): String? {
+        return try {
+            val data = getMerchantConnector().merchant
+            data.name
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 
     fun orderTax(order: Order?): Long {
         return OrderCalc(order).tax
