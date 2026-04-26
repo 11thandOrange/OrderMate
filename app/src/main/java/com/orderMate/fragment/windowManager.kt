@@ -10,6 +10,7 @@ import android.content.IntentFilter
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -609,6 +610,9 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         if (isFetchingData) return
         isFetchingData = true
         
+        Log.d("DrawerState", "getTheOrderData() called")
+        Log.d("DrawerState", "Expected order (orderIdForReopen): ${OrderDetailFragment.orderIdForReopen}")
+        
         binding?.progressLayout?.showView()
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -616,17 +620,27 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                     MyApp.getInstance().getOrderConnector().getOrders(mutableListOf())
                 lineItems.clear()
                 if (data?.isEmpty() == true) {
+                    Log.d("DrawerState", "No orders available from getOrders()")
                     isFetchingData = false
                     return@launch
                 }
+                
+                Log.d("DrawerState", "First order from getOrders(): ${data?.get(0)?.id}")
+                
                 val requiredData = if (OrderDetailFragment.orderIdForReopen != null) {
+                    Log.d("DrawerState", "Fetching specific order: ${OrderDetailFragment.orderIdForReopen}")
                     MyApp.getInstance().getOrderConnector()
                         .getOrder(OrderDetailFragment.orderIdForReopen)
-                } else null
+                } else {
+                    Log.d("DrawerState", "orderIdForReopen is null, will use first order")
+                    null
+                }
 
-
-                updateOrder(requiredData ?: data?.get(0))
-                val result = (requiredData ?: data?.get(0))?.lineItems?.let {
+                val orderToDisplay = requiredData ?: data?.get(0)
+                Log.d("DrawerState", "Actual order being displayed: ${orderToDisplay?.id}")
+                
+                updateOrder(orderToDisplay)
+                val result = orderToDisplay?.lineItems?.let {
                     countElementsByUniqueKeys(
                         binding?.root?.context,
                         it
@@ -636,10 +650,11 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                     lineItems.add(it)
                 }
                 CoroutineScope(Dispatchers.Main).launch {
-                    setupRecyclerView(result, requiredData ?: data?.get(0))
+                    setupRecyclerView(result, orderToDisplay)
                     isFetchingData = false
                 }
             } catch (e: Exception) {
+                Log.e("DrawerState", "Error in getTheOrderData: ${e.message}")
                 isFetchingData = false
             }
         }
