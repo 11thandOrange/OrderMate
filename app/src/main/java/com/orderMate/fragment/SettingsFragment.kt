@@ -1309,30 +1309,73 @@ class SettingsFragment : Fragment() {
             filterItemLevelRecyclerView?.visibility = View.GONE
         }
         
-        // Setup Order Level RecyclerView with adapter
+        // Setup Order Level - use LinearLayout with dynamic views instead of RecyclerView
+        filterOrderLevelRecyclerView?.visibility = View.GONE  // Hide RecyclerView
         if (hasOrderWidgets) {
-            filterOrderLevelRecyclerView?.visibility = View.VISIBLE
-            filterOrderLevelAdapter = FilterWidgetAdapter { widget ->
-                widgetManager.updateOrderWidget(widget) { success ->
-                    if (!success) {
-                        activity?.runOnUiThread {
-                            Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
+            filterOrderLevelWidgetsContainer?.visibility = View.VISIBLE
+            filterOrderLevelWidgetsContainer?.removeAllViews()
+            orderLevelWidgets.forEach { widget ->
+                val itemView = layoutInflater.inflate(R.layout.item_filter_widget, filterOrderLevelWidgetsContainer, false)
+                bindFilterWidgetView(itemView, widget) { updatedWidget ->
+                    widgetManager.updateOrderWidget(updatedWidget) { success ->
+                        if (!success) {
+                            activity?.runOnUiThread {
+                                Toast.makeText(context, "Failed to save setting", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 }
-            }
-            filterOrderLevelAdapter?.setAdapterName("ORDER")
-            filterOrderLevelAdapter?.setWidgets(orderLevelWidgets.toMutableList())
-            filterOrderLevelRecyclerView?.apply {
-                // Use custom LayoutManager that doesn't limit items based on visible area
-                layoutManager = object : LinearLayoutManager(requireContext()) {
-                    override fun canScrollVertically() = false
-                }
-                adapter = filterOrderLevelAdapter
+                filterOrderLevelWidgetsContainer?.addView(itemView)
             }
         } else {
-            filterOrderLevelRecyclerView?.visibility = View.GONE
+            filterOrderLevelWidgetsContainer?.visibility = View.GONE
         }
+    }
+    
+    private fun bindFilterWidgetView(itemView: View, widget: WidgetConfig, onUpdate: (WidgetConfig) -> Unit) {
+        val widgetIconContainer: View = itemView.findViewById(R.id.filterWidgetIconContainer)
+        val widgetIcon: ImageView = itemView.findViewById(R.id.filterWidgetIcon)
+        val widgetTitle: TextView = itemView.findViewById(R.id.filterWidgetTitle)
+        val widgetType: TextView = itemView.findViewById(R.id.filterWidgetType)
+        val widgetToggle: Switch = itemView.findViewById(R.id.filterWidgetToggle)
+        val expandChevron: ImageView = itemView.findViewById(R.id.filterExpandChevron)
+        val widgetHeader: View = itemView.findViewById(R.id.filterWidgetHeader)
+        val widgetBody: View = itemView.findViewById(R.id.filterWidgetBody)
+        
+        // Set icon based on widget type
+        val iconRes = when (widget.type) {
+            WidgetType.SINGLE_SELECT -> R.drawable.ic_widget_single_select
+            WidgetType.MULTI_SELECT -> R.drawable.ic_widget_multi_select
+            WidgetType.CALENDAR -> R.drawable.ic_widget_calendar
+            else -> R.drawable.ic_widget_single_select
+        }
+        widgetIcon.setImageResource(iconRes)
+        
+        // Set icon container color
+        val colorRes = when (widget.type) {
+            WidgetType.SINGLE_SELECT -> R.color.widget_single_select_bg
+            WidgetType.MULTI_SELECT -> R.color.widget_multi_select_bg
+            WidgetType.CALENDAR -> R.color.widget_calendar_bg
+            else -> R.color.widget_single_select_bg
+        }
+        widgetIconContainer.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            ContextCompat.getColor(requireContext(), colorRes)
+        )
+        
+        // Set title and type
+        widgetTitle.text = widget.label
+        widgetType.text = widget.type.name.replace("_", " ")
+        
+        // Set toggle state
+        widgetToggle.isChecked = widget.showInFilter
+        widgetToggle.setOnCheckedChangeListener { _, isChecked ->
+            widget.showInFilter = isChecked
+            onUpdate(widget)
+        }
+        
+        // Hide expand chevron and body for now (simplified version)
+        expandChevron.visibility = View.GONE
+        widgetBody.visibility = View.GONE
     }
     
     /**
