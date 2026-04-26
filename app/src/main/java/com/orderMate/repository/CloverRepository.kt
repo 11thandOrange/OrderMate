@@ -262,18 +262,27 @@ class CloverRepository private constructor(private val context: Context) {
                 false
             ) ?: return@withContext null
             
-            // Add phone number if provided
+            // Add phone number if provided (with retry on failure)
             if (!phone.isNullOrBlank()) {
-                customerConnector.addPhoneNumber(createdV1Customer.id, phone)
+                var phoneResult = customerConnector.addPhoneNumber(createdV1Customer.id, phone)
+                if (phoneResult == null) {
+                    // Retry once
+                    phoneResult = customerConnector.addPhoneNumber(createdV1Customer.id, phone)
+                }
             }
             
-            // Add email if provided
+            // Add email if provided (with retry on failure)
             if (!email.isNullOrBlank()) {
-                customerConnector.addEmailAddress(createdV1Customer.id, email)
+                var emailResult = customerConnector.addEmailAddress(createdV1Customer.id, email)
+                if (emailResult == null) {
+                    // Retry once
+                    emailResult = customerConnector.addEmailAddress(createdV1Customer.id, email)
+                }
             }
             
-            // Convert to v3 Customer for return
-            convertV1ToV3Customer(createdV1Customer)
+            // Re-fetch customer to get complete data with phone/email
+            val completeCustomer = customerConnector.getCustomer(createdV1Customer.id)
+            convertV1ToV3Customer(completeCustomer ?: createdV1Customer)
         } catch (e: Exception) {
             e.printStackTrace()
             // Fallback to in-memory customer if Clover save fails
