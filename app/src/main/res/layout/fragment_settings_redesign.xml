@@ -1500,19 +1500,19 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- Section Header -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Receipt Settings"
                         android:textColor="@color/text_light"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="16dp"
                         android:text="Control where order notes appear on printed receipts"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
@@ -1521,31 +1521,18 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:background="@drawable/bg_toggle_option_container"
+                        android:padding="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                        <LinearLayout
+                        <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Print notes on customer receipts"
-                                android:textColor="@color/text_light"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="Include order notes on receipts given to customers"
-                                android:textColor="@color/text_muted"
-                                android:textSize="11sp" />
-                        </LinearLayout>
+                            android:text="Print Notes On Customer Receipts"
+                            android:textColor="@color/text_light"
+                            android:textSize="13sp" />
 
                         <Switch
                             android:id="@+id/switchPrintNotesCustomer"
@@ -1560,31 +1547,19 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_toggle_option_container"
+                        android:padding="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                        <LinearLayout
+                        <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Print notes on order receipts"
-                                android:textColor="@color/text_light"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="Include order notes on kitchen/order tickets"
-                                android:textColor="@color/text_muted"
-                                android:textSize="11sp" />
-                        </LinearLayout>
+                            android:text="Print Notes On Order Receipts"
+                            android:textColor="@color/text_light"
+                            android:textSize="13sp" />
 
                         <Switch
                             android:id="@+id/switchPrintNotesOrder"
