@@ -255,11 +255,10 @@ class CloverRepository private constructor(private val context: Context) {
         try {
             val customerConnector = myApp.getCustomerConnector() ?: return@withContext null
             
-            // Create customer in Clover (marketingAllowed = false by default)
-            val createdV1Customer = customerConnector.createCustomer(
+            // Create customer in Clover
+            val createdV1Customer = customerConnector.newCustomer(
                 firstName ?: "",
-                lastName ?: "",
-                false
+                lastName ?: ""
             ) ?: return@withContext null
             
             // Add phone number if provided (with retry on failure)
