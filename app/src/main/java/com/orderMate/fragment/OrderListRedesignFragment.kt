@@ -614,7 +614,11 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
             allItemList.forEach { order ->
                 if (orderMatchesFilters(order, filters)) {
-                    orderItems.add(order)
+                    // Also apply search query if present
+                    if (currentSearchQuery.isEmpty() || OrderSearchFilter.matchesSearch(order, currentSearchQuery)) {
+                        orderItems.add(order)
+                    }
+                    // filterData stores filter-only results (without search) for search to work on
                     filterData.add(order)
                 }
             }
