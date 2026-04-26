@@ -187,6 +187,14 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 }
             }
         }
+        
+        // Observe refresh trigger (e.g., after order deletion)
+        sharedFilterViewModel.refreshTrigger.observe(viewLifecycleOwner) { _ ->
+            // Refresh order list when triggered
+            if (allItemList.isNotEmpty() || orderItems.isNotEmpty()) {
+                loadOrders()
+            }
+        }
     }
     
     /**

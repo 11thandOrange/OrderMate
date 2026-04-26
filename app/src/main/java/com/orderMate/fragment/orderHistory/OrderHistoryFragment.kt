@@ -626,20 +626,10 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
 
     @SuppressLint("NotifyDataSetChanged")
     fun getTheOrderData(isFromOrderDetail : Boolean = false) {
-        android.util.Log.d("DELETE_ORDER", "=== getTheOrderData() START ===")
-        android.util.Log.d("DELETE_ORDER", "isFromOrderDetail: $isFromOrderDetail")
-        android.util.Log.d("DELETE_ORDER", "this.isAdded: $isAdded")
-        android.util.Log.d("DELETE_ORDER", "this.activity: $activity")
-        android.util.Log.d("DELETE_ORDER", "this.context: $context")
-        android.util.Log.d("DELETE_ORDER", "this.view: $view")
-        
         runOnBackgroundThread {
-            android.util.Log.d("DELETE_ORDER", "Background thread started")
             getTheEmployeeDataForAdminRole()
             try {
-                android.util.Log.d("DELETE_ORDER", "Fetching orders from Clover...")
                 val orderData = myApp.getOrderConnector().getOrders(mutableListOf())
-                android.util.Log.d("DELETE_ORDER", "Orders fetched: ${orderData?.size ?: 0}")
                 orderItems.clear()
                 allItemList.clear()
                 orderData?.forEach {
@@ -647,17 +637,12 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
                     orderItems.add(it)
                 }
             } catch (e: Exception) {
-                android.util.Log.e("DELETE_ORDER", "Error fetching orders: ${e.message}", e)
                 e.printStackTrace()
                 debugSnackBar(getString(R.string.there_is_issue_with_your_account))
             }
             runOnMainThread {
-                android.util.Log.d("DELETE_ORDER", "Main thread - updating UI")
-                android.util.Log.d("DELETE_ORDER", "isAdded before binding access: $isAdded")
-                android.util.Log.d("DELETE_ORDER", "view before binding access: $view")
                 binding.orderRecycler.adapter?.notifyDataSetChanged()
                 binding.syncingText.hideView()
-                android.util.Log.d("DELETE_ORDER", "UI update complete")
             }
             CoroutineScope(Dispatchers.Default).launch {
                 runOnMainThread {
@@ -665,7 +650,6 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
                         binding.progressLayoutNoData.hideView()
                     }
                     updateTheFilterData()
-                    android.util.Log.d("DELETE_ORDER", "=== getTheOrderData() END ===")
                 }
 
             }

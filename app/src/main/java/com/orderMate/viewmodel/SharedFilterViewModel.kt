@@ -31,6 +31,10 @@ class SharedFilterViewModel : ViewModel() {
     // Selected calendar date - persists across navigation
     private val _selectedDate = MutableLiveData<Date?>(null)
     val selectedDate: LiveData<Date?> = _selectedDate
+    
+    // Refresh trigger - incremented to signal list fragments to refresh
+    private val _refreshTrigger = MutableLiveData(0)
+    val refreshTrigger: LiveData<Int> = _refreshTrigger
 
     /**
      * Update the filter state
@@ -76,6 +80,13 @@ class SharedFilterViewModel : ViewModel() {
         _searchQuery.value = ""
         _highlightedDates.value = emptyList()
         // Note: We don't reset view mode on filter clear
+    }
+    
+    /**
+     * Trigger a refresh of the order list (e.g., after deleting an order)
+     */
+    fun triggerRefresh() {
+        _refreshTrigger.value = (_refreshTrigger.value ?: 0) + 1
     }
 
     /**
