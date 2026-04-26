@@ -21,6 +21,7 @@ import com.orderMate.utils.WidgetColorUtils
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatPaymentState
+import com.orderMate.utils.formatOrderState
 import com.orderMate.utils.toDoubleFloatPoint
 
 /**
@@ -279,8 +280,8 @@ class OrderCardRedesignAdapter(
         }
 
         private fun setupOrderStatusBadge(order: Order) {
-            val state = order.state?.toString() ?: "OPEN"
-            val displayText = formatPaymentState(state)
+            val state = order.state
+            val displayText = formatOrderState(state)
             val density = binding.root.context.resources.displayMetrics.density
             
             // Use WidgetColorUtils for consistent colors - ORDER_STATUS = Red

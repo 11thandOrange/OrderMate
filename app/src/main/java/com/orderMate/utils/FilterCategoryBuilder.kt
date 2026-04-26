@@ -162,7 +162,7 @@ object FilterCategoryBuilder {
         val options = CLOVER_PAYMENT_STATUS_VALUES.map { status ->
             FilterOption(
                 id = status.lowercase(),
-                label = formatPaymentStatus(status),
+                label = formatPaymentState(status),
                 value = status
             )
         }
@@ -183,7 +183,7 @@ object FilterCategoryBuilder {
         val options = CLOVER_ORDER_STATUS_VALUES.map { status ->
             FilterOption(
                 id = status.lowercase(),
-                label = formatOrderStatus(status),
+                label = formatOrderState(status),
                 value = status
             )
         }
@@ -282,38 +282,6 @@ object FilterCategoryBuilder {
     }
     
     // ==================== Formatters ====================
-    
-    /**
-     * Format Clover payment status for display
-     */
-    private fun formatPaymentStatus(status: String): String {
-        return when (status.uppercase()) {
-            "OPEN" -> "Unpaid"
-            "PAID" -> "Paid"
-            "PARTIALLY_PAID" -> "Partial"
-            "REFUNDED" -> "Refunded"
-            "PARTIALLY_REFUNDED" -> "Partial Refund"
-            "CREDITED" -> "Credited"
-            else -> status.lowercase()
-                .replace("_", " ")
-                .split(" ")
-                .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
-        }
-    }
-    
-    /**
-     * Format Clover order status for display
-     */
-    private fun formatOrderStatus(status: String): String {
-        return when (status.lowercase()) {
-            "open" -> "Open"
-            "locked" -> "Closed"
-            else -> status.lowercase()
-                .replace("_", " ")
-                .split(" ")
-                .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
-        }
-    }
     
     // ==================== Helpers ====================
     

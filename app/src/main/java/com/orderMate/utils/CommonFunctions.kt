@@ -104,31 +104,46 @@ fun getCustomerContactDetails(customer: Customer?): Pair<String, String> {
 }
 
 /**
- * Formats Clover payment state to human-readable text.
+ * Formats Clover payment state to display text (UPPERCASE).
+ * Single source of truth for payment status formatting.
  * 
  * Mapping (Clover SDK PaymentState enum):
- * - OPEN → Unpaid
- * - PAID → Paid
- * - PARTIALLY_PAID → Partially Paid
- * - PARTIALLY_REFUNDED → Partially Refunded
- * - REFUNDED → Refunded
- * - CREDITED → Credited
- * - LOCKED → Closed (order state, not payment state)
+ * - OPEN → UNPAID
+ * - PAID → PAID
+ * - PARTIALLY_PAID → PARTIALLY PAID
+ * - PARTIALLY_REFUNDED → PARTIALLY REFUNDED
+ * - REFUNDED → REFUNDED
+ * - CREDITED → CREDITED
  */
 fun formatPaymentState(state: String?): String {
-    if (state.isNullOrEmpty()) return "Unpaid"
+    if (state.isNullOrEmpty()) return "UNPAID"
     
     return when (state.uppercase()) {
-        "OPEN" -> "Unpaid"
-        "PAID" -> "Paid"
-        "PARTIALLY_PAID" -> "Partially Paid"
-        "PARTIALLY_REFUNDED" -> "Partially Refunded"
-        "REFUNDED" -> "Refunded"
-        "CREDITED" -> "Credited"
-        "LOCKED" -> "Closed"
-        else -> state.replace("_", " ")
-            .lowercase()
-            .replaceFirstChar { it.uppercase() }
+        "OPEN" -> "UNPAID"
+        "PAID" -> "PAID"
+        "PARTIALLY_PAID" -> "PARTIALLY PAID"
+        "PARTIALLY_REFUNDED" -> "PARTIALLY REFUNDED"
+        "REFUNDED" -> "REFUNDED"
+        "CREDITED" -> "CREDITED"
+        else -> state.replace("_", " ").uppercase()
+    }
+}
+
+/**
+ * Formats Clover order state to display text (UPPERCASE).
+ * Single source of truth for order status formatting.
+ * 
+ * Mapping:
+ * - open → OPEN
+ * - locked → CLOSED
+ */
+fun formatOrderState(state: String?): String {
+    if (state.isNullOrEmpty()) return "OPEN"
+    
+    return when (state.lowercase()) {
+        "open" -> "OPEN"
+        "locked" -> "CLOSED"
+        else -> state.uppercase()
     }
 }
 

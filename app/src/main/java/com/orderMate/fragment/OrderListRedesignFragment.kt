@@ -42,6 +42,8 @@ import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
 import com.orderMate.utils.SettingsManager
 import com.orderMate.utils.showView
+import com.orderMate.utils.formatPaymentState
+import com.orderMate.utils.formatOrderState
 import com.orderMate.viewmodel.SharedFilterViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -790,8 +792,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             values.forEach { value ->
                 hasPills = true
                 val displayValue = when (categoryId) {
-                    FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> formatPaymentStatus(value)
-                    FilterCategoryBuilder.CLOVER_ORDER_STATUS -> formatOrderStatus(value)
+                    FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> formatPaymentState(value)
+                    FilterCategoryBuilder.CLOVER_ORDER_STATUS -> formatOrderState(value)
                     else -> value
                 }
                 val pill = createFilterPillWithClose(displayValue) {
@@ -859,26 +861,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         applyDialogFilters(currentFilterState)
     }
     
-    private fun formatPaymentStatus(status: String): String {
-        return when (status.uppercase()) {
-            "OPEN" -> "Unpaid"
-            "PAID" -> "Paid"
-            "PARTIALLY_PAID" -> "Partial"
-            "REFUNDED" -> "Refunded"
-            "PARTIALLY_REFUNDED" -> "Partial Refund"
-            "CREDITED" -> "Credited"
-            else -> status.replaceFirstChar { it.uppercase() }
-        }
-    }
-    
-    private fun formatOrderStatus(status: String): String {
-        return when (status.lowercase()) {
-            "open" -> "Open"
-            "locked" -> "Closed"
-            else -> status.replaceFirstChar { it.uppercase() }
-        }
-    }
-
     private fun createFilterPillWithClose(text: String, onClose: () -> Unit): View {
         return android.widget.LinearLayout(requireContext()).apply {
             orientation = android.widget.LinearLayout.HORIZONTAL

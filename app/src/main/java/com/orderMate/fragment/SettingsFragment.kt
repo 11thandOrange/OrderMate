@@ -1286,11 +1286,11 @@ class SettingsFragment : Fragment() {
      */
     private fun populateCloverFilterOptions() {
         // Payment Status options (Yellow) - display names for Clover PaymentState enum
-        val paymentStatusValues = listOf("Unpaid", "Paid", "Partial", "Refunded", "Partial Refund", "Credited")
+        val paymentStatusValues = listOf("UNPAID", "PAID", "PARTIALLY PAID", "REFUNDED", "PARTIALLY REFUNDED", "CREDITED")
         populateOptionsContainer(paymentStatusOptions, paymentStatusValues, WidgetColorUtils.COLOR_PAYMENT_STATUS)
         
         // Order Status options (Red)
-        val orderStatusValues = listOf("Open", "Closed")
+        val orderStatusValues = listOf("OPEN", "CLOSED")
         populateOptionsContainer(orderStatusOptions, orderStatusValues, WidgetColorUtils.COLOR_ORDER_STATUS)
         
         // Payment Type options (Grey)

@@ -44,6 +44,7 @@ import com.orderMate.utils.debugSnackBar
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatMillisToDateTime
 import com.orderMate.utils.formatPaymentState
+import com.orderMate.utils.formatOrderState
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.getThePaymentState
 import com.orderMate.utils.hideView
@@ -223,17 +224,16 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 val density = resources.displayMetrics.density
                 
                 // Order Status badge (Red)
-                val orderState = orderArguments?.state?.uppercase() ?: "OPEN"
-                val isOrderOpen = orderState == "OPEN"
-                binding.orderPlacedStatusValue.text = if (isOrderOpen) "OPEN" else "CLOSED"
+                val orderState = orderArguments?.state
+                binding.orderPlacedStatusValue.text = formatOrderState(orderState)
                 binding.orderPlacedStatusValue.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
                     com.orderMate.utils.WidgetColorUtils.COLOR_ORDER_STATUS, 20f, density
                 )
                 binding.orderPlacedStatusValue.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_ORDER_STATUS)
                 
                 // Payment Status badge (Yellow)
-                val paymentState = orderArguments?.paymentState?.name ?: "NOT_PAID"
-                binding.paymentStatusBadge.text = formatPaymentState(paymentState).uppercase()
+                val paymentState = orderArguments?.paymentState?.name ?: "OPEN"
+                binding.paymentStatusBadge.text = formatPaymentState(paymentState)
                 binding.paymentStatusBadge.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
                     com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_STATUS, 20f, density
                 )

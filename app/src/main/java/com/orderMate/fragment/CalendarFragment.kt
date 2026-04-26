@@ -38,6 +38,8 @@ import com.orderMate.utils.exceptionHandlerWithReturn
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
+import com.orderMate.utils.formatPaymentState
+import com.orderMate.utils.formatOrderState
 import com.orderMate.utils.showView
 import com.orderMate.utils.hideView
 import com.orderMate.modals.NoteLevel
@@ -939,29 +941,9 @@ class CalendarFragment : Fragment() {
      */
     private fun formatFilterValue(categoryId: String, value: String): String {
         return when (categoryId) {
-            FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> formatPaymentStatus(value)
-            FilterCategoryBuilder.CLOVER_ORDER_STATUS -> formatOrderStatus(value)
+            FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> formatPaymentState(value)
+            FilterCategoryBuilder.CLOVER_ORDER_STATUS -> formatOrderState(value)
             else -> value
-        }
-    }
-    
-    private fun formatPaymentStatus(status: String): String {
-        return when (status.uppercase()) {
-            "OPEN" -> "Unpaid"
-            "PAID" -> "Paid"
-            "PARTIALLY_PAID" -> "Partial"
-            "REFUNDED" -> "Refunded"
-            "PARTIALLY_REFUNDED" -> "Partial Refund"
-            "CREDITED" -> "Credited"
-            else -> status.lowercase().replaceFirstChar { it.uppercase() }
-        }
-    }
-    
-    private fun formatOrderStatus(status: String): String {
-        return when (status.lowercase()) {
-            "open" -> "Open"
-            "locked" -> "Closed"
-            else -> status.lowercase().replaceFirstChar { it.uppercase() }
         }
     }
     
