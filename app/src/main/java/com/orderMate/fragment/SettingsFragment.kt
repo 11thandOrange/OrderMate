@@ -1295,6 +1295,7 @@ class SettingsFragment : Fragment() {
                 filterItemLevelRecyclerView?.apply {
                     layoutManager = LinearLayoutManager(requireContext())
                     adapter = filterItemLevelAdapter
+                    setHasFixedSize(false)
                 }
             }
             filterItemLevelAdapter?.setWidgets(itemLevelWidgets.toMutableList())
@@ -1318,6 +1319,7 @@ class SettingsFragment : Fragment() {
                 filterOrderLevelRecyclerView?.apply {
                     layoutManager = LinearLayoutManager(requireContext())
                     adapter = filterOrderLevelAdapter
+                    setHasFixedSize(false)
                 }
             }
             filterOrderLevelAdapter?.setWidgets(orderLevelWidgets.toMutableList())
