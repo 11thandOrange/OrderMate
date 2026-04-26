@@ -651,7 +651,9 @@ data class AdvancedSettings(
     val notificationMinutes: Int = 0,
     val scheduledReceiptEnabled: Boolean = false,
     val receiptDays: Int = 0,
-    val receiptMinutes: Int = 60
+    val receiptMinutes: Int = 60,
+    val printNotesOnCustomerReceipts: Boolean = true,
+    val printNotesOnOrderReceipts: Boolean = true
 )
 
 /**

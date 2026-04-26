@@ -169,6 +169,24 @@ class SettingsManager(private val context: Context) {
         prefs.edit { putInt(KEY_RECEIPT_MINUTES, minutes.coerceIn(0, 999)) }
     }
 
+    // ==================== Receipt Print Settings ====================
+
+    fun getPrintNotesOnCustomerReceipts(): Boolean {
+        return prefs.getBoolean(KEY_PRINT_NOTES_CUSTOMER, true)
+    }
+
+    fun setPrintNotesOnCustomerReceipts(enabled: Boolean) {
+        prefs.edit { putBoolean(KEY_PRINT_NOTES_CUSTOMER, enabled) }
+    }
+
+    fun getPrintNotesOnOrderReceipts(): Boolean {
+        return prefs.getBoolean(KEY_PRINT_NOTES_ORDER, true)
+    }
+
+    fun setPrintNotesOnOrderReceipts(enabled: Boolean) {
+        prefs.edit { putBoolean(KEY_PRINT_NOTES_ORDER, enabled) }
+    }
+
     // Legacy methods for backward compatibility
     fun getReceiptTime(): Int {
         return prefs.getInt(KEY_RECEIPT_TIME, DEFAULT_RECEIPT_TIME)
@@ -376,6 +394,10 @@ class SettingsManager(private val context: Context) {
         private const val KEY_SHOW_FILTER_ORDER_STATUS = "show_filter_order_status"
         private const val KEY_SHOW_FILTER_PAYMENT_TYPE = "show_filter_payment_type"
         private const val KEY_SHOW_FILTER_EMPLOYEE = "show_filter_employee"
+        
+        // Receipt Print Settings Keys
+        private const val KEY_PRINT_NOTES_CUSTOMER = "print_notes_customer"
+        private const val KEY_PRINT_NOTES_ORDER = "print_notes_order"
 
         // Defaults
         private const val DEFAULT_NOTIFICATION_DAYS = 3

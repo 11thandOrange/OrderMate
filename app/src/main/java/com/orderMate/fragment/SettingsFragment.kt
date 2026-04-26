@@ -138,6 +138,10 @@ class SettingsFragment : Fragment() {
     private var inputReceiptDays: EditText? = null
     private var inputReceiptMinutes: EditText? = null
     
+    // Receipt Settings
+    private var switchPrintNotesCustomer: Switch? = null
+    private var switchPrintNotesOrder: Switch? = null
+    
     // Loading
     private var loadingOverlay: View? = null
     
@@ -279,6 +283,10 @@ class SettingsFragment : Fragment() {
         receiptInputsContainer = view.findViewById(R.id.receiptInputsContainer)
         inputReceiptDays = view.findViewById(R.id.inputReceiptDays)
         inputReceiptMinutes = view.findViewById(R.id.inputReceiptMinutes)
+        
+        // Receipt Settings
+        switchPrintNotesCustomer = view.findViewById(R.id.switchPrintNotesCustomer)
+        switchPrintNotesOrder = view.findViewById(R.id.switchPrintNotesOrder)
     }
 
     private fun setupSubTabs() {
@@ -929,6 +937,15 @@ class SettingsFragment : Fragment() {
             scheduleAdvancedSettingsSave()
         }
         
+        // Receipt Settings toggles
+        switchPrintNotesCustomer?.setOnCheckedChangeListener { _, _ ->
+            scheduleAdvancedSettingsSave()
+        }
+        
+        switchPrintNotesOrder?.setOnCheckedChangeListener { _, _ ->
+            scheduleAdvancedSettingsSave()
+        }
+        
         // Initial visibility state
         updateInputsVisibility()
         
@@ -1012,7 +1029,9 @@ class SettingsFragment : Fragment() {
                 notificationMinutes = settingsManager.getNotificationMinutes(),
                 scheduledReceiptEnabled = switchScheduledReceipt?.isChecked ?: false,
                 receiptDays = settingsManager.getReceiptDays(),
-                receiptMinutes = settingsManager.getReceiptMinutes()
+                receiptMinutes = settingsManager.getReceiptMinutes(),
+                printNotesOnCustomerReceipts = switchPrintNotesCustomer?.isChecked ?: true,
+                printNotesOnOrderReceipts = switchPrintNotesOrder?.isChecked ?: true
             )
             firebase.saveAdvancedSettings(mid, settings) { success ->
                 // Silent save - no toast on success
@@ -1099,6 +1118,10 @@ class SettingsFragment : Fragment() {
                     receiptInputsContainer?.alpha = if (receiptEnabled) 1.0f else 0.5f
                     inputReceiptDays?.isEnabled = receiptEnabled
                     inputReceiptMinutes?.isEnabled = receiptEnabled
+                    
+                    // Update Receipt Settings toggles
+                    switchPrintNotesCustomer?.isChecked = settings.printNotesOnCustomerReceipts
+                    switchPrintNotesOrder?.isChecked = settings.printNotesOnOrderReceipts
                 }
             }
         }
@@ -1373,6 +1396,8 @@ class SettingsFragment : Fragment() {
         inputNotificationMinutes = null
         inputReceiptDays = null
         inputReceiptMinutes = null
+        switchPrintNotesCustomer = null
+        switchPrintNotesOrder = null
     }
 
     companion object {

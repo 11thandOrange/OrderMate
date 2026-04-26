@@ -159,6 +159,15 @@ class ReceiptPrintReceiver : BroadcastReceiver() {
     
     private suspend fun printOrderReceipt(context: Context, orderId: String) {
         try {
+            val settingsManager = SettingsManager(context)
+            
+            // Check receipt print settings
+            val printToCustomer = settingsManager.getPrintNotesOnCustomerReceipts()
+            val printToOrder = settingsManager.getPrintNotesOnOrderReceipts()
+            
+            // If notes printing is disabled for both receipt types, skip printing
+            if (!printToCustomer && !printToOrder) return
+            
             val cloverAccount = CloverAccount.getAccount(context) ?: return
             
             // Get order to verify it exists
@@ -169,12 +178,19 @@ class ReceiptPrintReceiver : BroadcastReceiver() {
             
             if (order == null) return
             
-            // Get printer - prefer ORDER category (kitchen), fall back to RECEIPT
+            // Get printer based on enabled receipt settings
             val printerConnector = PrinterConnector(context, cloverAccount, null)
             printerConnector.connect()
             
-            var printer = printerConnector.getPrinters(Category.ORDER)?.firstOrNull()
-            if (printer == null) {
+            var printer: com.clover.sdk.v1.printer.Printer? = null
+            
+            // Try ORDER printer first if order receipts are enabled
+            if (printToOrder) {
+                printer = printerConnector.getPrinters(Category.ORDER)?.firstOrNull()
+            }
+            
+            // Fall back to RECEIPT printer if customer receipts are enabled
+            if (printer == null && printToCustomer) {
                 printer = printerConnector.getPrinters(Category.RECEIPT)?.firstOrNull()
             }
             
