@@ -1263,6 +1263,14 @@ class SettingsFragment : Fragment() {
         // Get Order Level widgets (enabled, not TEXT_BOX)
         val orderLevelWidgets = widgetManager.getFilterableOrderWidgets()
         
+        // DEBUG: Log widget counts
+        android.util.Log.d("FilterSettingsDebug", "=== loadFilterWidgetToggles ===")
+        android.util.Log.d("FilterSettingsDebug", "itemLevelWidgets count: ${itemLevelWidgets.size}")
+        android.util.Log.d("FilterSettingsDebug", "orderLevelWidgets count: ${orderLevelWidgets.size}")
+        orderLevelWidgets.forEach { w ->
+            android.util.Log.d("FilterSettingsDebug", "  ORDER: ${w.label}, enabled=${w.isEnabled}, type=${w.type}")
+        }
+        
         val hasItemWidgets = itemLevelWidgets.isNotEmpty()
         val hasOrderWidgets = orderLevelWidgets.isNotEmpty()
         
