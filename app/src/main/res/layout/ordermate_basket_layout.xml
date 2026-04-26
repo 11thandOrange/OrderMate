@@ -23,6 +23,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Opaque dark background for permanent mode - prevents see-through -->
+    <View
+        android:id="@+id/permanentModeBackground"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#1A1A2E"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <!-- OrderMate floating button (collapsed state) -->
     <androidx.cardview.widget.CardView
         android:id="@+id/orderMateButton"
@@ -71,14 +83,15 @@
     <!-- Main Drawer Container - Glassmorphism style, full screen height (#42) -->
     <LinearLayout
         android:id="@+id/container"
-        android:layout_width="340dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="@drawable/bg_drawer_glass"
         android:orientation="vertical"
         android:padding="20dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <!-- Header: Close + Order Title + Edit Order Notes Button -->

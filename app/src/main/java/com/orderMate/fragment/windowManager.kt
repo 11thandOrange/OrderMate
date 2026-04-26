@@ -85,12 +85,14 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             // Permanent mode: start with drawer expanded, positioned over Clover register item list
             windowManager.addView(binding?.root, setTheWindowParamsForPermanentOverlay())
             binding?.orderMateButton?.hideView()
+            binding?.permanentModeBackground?.showView()  // Show opaque dark background
             binding?.container?.showView()
-            binding?.transparentContainer?.visibility = View.GONE  // No dimming in permanent mode
+            binding?.transparentContainer?.visibility = View.GONE  // No dimming overlay needed
             getTheOrderData()
         } else {
             // Normal mode: show floating button
             windowManager.addView(binding?.root, setTheWindowParams())
+            binding?.permanentModeBackground?.hideView()  // Ensure background is hidden
         }
 
         setupClickListener()
@@ -104,17 +106,30 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     
     /**
      * WindowManager params for permanent overlay mode.
-     * Positions the drawer on the right side to cover Clover register item list.
+     * Positions the drawer over Clover register item list (left panel):
+     * - Below "Current Order" header (~56dp from top)
+     * - Above "Save/Pay" footer (~120dp from bottom)
+     * - Covers the full width of the left panel (~350dp on most devices)
      */
     private fun setTheWindowParamsForPermanentOverlay(): WindowManager.LayoutParams {
         val displayMetrics = resources.displayMetrics
-        // Drawer width matches existing drawer (340dp converted to pixels)
-        val drawerWidth = (340 * displayMetrics.density).toInt()
+        val density = displayMetrics.density
+        
+        // Clover register left panel dimensions (approximate)
+        // Width: ~350dp for item list panel
+        val drawerWidth = (350 * density).toInt()
+        
+        // Height calculation:
+        // - Top offset: ~56dp for "Current Order" header
+        // - Bottom offset: ~120dp for subtotal/tax/total + Save/Pay buttons
+        val topOffset = (56 * density).toInt()
+        val bottomOffset = (120 * density).toInt()
         val screenHeight = displayMetrics.heightPixels
+        val drawerHeight = screenHeight - topOffset - bottomOffset
         
         val permanentParams = WindowManager.LayoutParams(
             drawerWidth,
-            screenHeight,
+            drawerHeight,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             else
@@ -123,9 +138,10 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
             PixelFormat.TRANSLUCENT
         )
-        permanentParams.gravity = Gravity.END or Gravity.TOP
+        // Position at left side (START), below header
+        permanentParams.gravity = Gravity.START or Gravity.TOP
         permanentParams.x = 0
-        permanentParams.y = 0
+        permanentParams.y = topOffset
         return permanentParams
     }
 
@@ -422,12 +438,13 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             setupMinWidth(500)
 
             if (isPermanentMode) {
-                // In permanent mode, expand to full right-side overlay
+                // In permanent mode, expand to cover Clover register item list
                 windowManager.updateViewLayout(
                     binding?.root,
                     setTheWindowParamsForPermanentOverlay()
                 )
-                // No transparent container dimming in permanent mode
+                // Show opaque background and drawer, no transparent dimming
+                binding?.permanentModeBackground?.showView()
                 binding?.container?.showView()
                 binding?.transparentContainer?.visibility = View.GONE
             } else {
@@ -440,6 +457,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                     )
                 )
                 // Show drawer and overlay
+                binding?.permanentModeBackground?.hideView()
                 binding?.container?.showView()
                 binding?.transparentContainer?.showView()
             }
@@ -480,14 +498,15 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         binding?.orderMateButton?.showView()
         
         if (isPermanentMode) {
-            // In permanent mode, collapse to button but position at right edge for easy re-access
+            // In permanent mode, collapse to button but position at left edge for easy re-access
+            // (near where the Clover item list was)
             val displayMetrics = resources.displayMetrics
             windowManager.updateViewLayout(
                 binding?.root,
                 setTheWindowParams(
                     WindowManager.LayoutParams.WRAP_CONTENT,
                     WindowManager.LayoutParams.WRAP_CONTENT,
-                    displayMetrics.widthPixels - 100,
+                    50,  // Left side position
                     displayMetrics.heightPixels / 2
                 )
             )
@@ -503,6 +522,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                 )
             )
         }
+        binding?.permanentModeBackground?.hideView()
         binding?.container?.hideView()
         binding?.transparentContainer?.hideView()
     }
