@@ -303,8 +303,8 @@
                 <!-- Top border -->
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:background="@color/white"/>
+                    android:layout_height="1dp"
+                    android:background="@color/card_border"/>
 
                 <TextView
                     android:layout_width="wrap_content"
