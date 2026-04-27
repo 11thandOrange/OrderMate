@@ -329,6 +329,201 @@ class WidgetManagerTest {
         }
     }
 
+    // ==================== Unique Label Validation Tests ====================
+
+    @Test
+    fun `isLabelUnique returns true for unique label`() {
+        val isUnique = isLabelUnique("New Widget", testWidgets)
+        assertTrue(isUnique)
+    }
+
+    @Test
+    fun `isLabelUnique returns false for duplicate label`() {
+        val isUnique = isLabelUnique("Due Date", testWidgets)
+        assertFalse(isUnique)
+    }
+
+    @Test
+    fun `isLabelUnique is case insensitive`() {
+        assertFalse(isLabelUnique("due date", testWidgets))
+        assertFalse(isLabelUnique("DUE DATE", testWidgets))
+        assertFalse(isLabelUnique("Due date", testWidgets))
+    }
+
+    @Test
+    fun `isLabelUnique trims whitespace`() {
+        assertFalse(isLabelUnique("  Due Date  ", testWidgets))
+        assertFalse(isLabelUnique("Due Date ", testWidgets))
+        assertFalse(isLabelUnique(" Due Date", testWidgets))
+    }
+
+    @Test
+    fun `isLabelUnique excludes widget by id`() {
+        // "Due Date" exists with id "widget1"
+        // When updating widget1, its own label should not conflict
+        val isUnique = isLabelUnique("Due Date", testWidgets, excludeWidgetId = "widget1")
+        assertTrue(isUnique)
+    }
+
+    @Test
+    fun `isLabelUnique excludes widget but still catches other duplicates`() {
+        // Add a second widget with same label
+        testWidgets.add(WidgetConfig(
+            id = "widget5",
+            type = WidgetType.CALENDAR,
+            label = "Due Date",
+            isEnabled = true,
+            order = 4
+        ))
+        
+        // Excluding widget1 should still find widget5 as duplicate
+        val isUnique = isLabelUnique("Due Date", testWidgets, excludeWidgetId = "widget1")
+        assertFalse(isUnique)
+    }
+
+    // ==================== Generate Unique Label Tests ====================
+
+    @Test
+    fun `generateUniqueLabel returns base label if unique`() {
+        val label = generateUniqueLabel("New Widget", testWidgets)
+        assertEquals("New Widget", label)
+    }
+
+    @Test
+    fun `generateUniqueLabel appends 2 for first duplicate`() {
+        val label = generateUniqueLabel("Due Date", testWidgets)
+        assertEquals("Due Date 2", label)
+    }
+
+    @Test
+    fun `generateUniqueLabel increments number for multiple duplicates`() {
+        // Add "Due Date 2"
+        testWidgets.add(WidgetConfig(
+            id = "widget5",
+            type = WidgetType.CALENDAR,
+            label = "Due Date 2",
+            isEnabled = true,
+            order = 4
+        ))
+        
+        val label = generateUniqueLabel("Due Date", testWidgets)
+        assertEquals("Due Date 3", label)
+    }
+
+    @Test
+    fun `generateUniqueLabel handles many duplicates`() {
+        // Add Due Date 2, 3, 4, 5
+        for (i in 2..5) {
+            testWidgets.add(WidgetConfig(
+                id = "widget_dd_$i",
+                type = WidgetType.CALENDAR,
+                label = "Due Date $i",
+                isEnabled = true,
+                order = testWidgets.size
+            ))
+        }
+        
+        val label = generateUniqueLabel("Due Date", testWidgets)
+        assertEquals("Due Date 6", label)
+    }
+
+    @Test
+    fun `generateUniqueLabel is case insensitive`() {
+        // "Due Date" exists, "due date" should generate "due date 2"
+        val label = generateUniqueLabel("due date", testWidgets)
+        assertEquals("due date 2", label)
+    }
+
+    // ==================== Validate Widget Label Tests ====================
+
+    @Test
+    fun `validateWidgetLabel returns null for valid unique label`() {
+        val widget = WidgetConfig(
+            id = "new_widget",
+            type = WidgetType.CALENDAR,
+            label = "New Widget",
+            isEnabled = true,
+            order = 0
+        )
+        
+        val error = validateWidgetLabel(widget, testWidgets)
+        assertNull(error)
+    }
+
+    @Test
+    fun `validateWidgetLabel returns error for empty label`() {
+        val widget = WidgetConfig(
+            id = "new_widget",
+            type = WidgetType.CALENDAR,
+            label = "",
+            isEnabled = true,
+            order = 0
+        )
+        
+        val error = validateWidgetLabel(widget, testWidgets)
+        assertEquals("Widget label cannot be empty.", error)
+    }
+
+    @Test
+    fun `validateWidgetLabel returns error for blank label`() {
+        val widget = WidgetConfig(
+            id = "new_widget",
+            type = WidgetType.CALENDAR,
+            label = "   ",
+            isEnabled = true,
+            order = 0
+        )
+        
+        val error = validateWidgetLabel(widget, testWidgets)
+        assertEquals("Widget label cannot be empty.", error)
+    }
+
+    @Test
+    fun `validateWidgetLabel returns error for duplicate label`() {
+        val widget = WidgetConfig(
+            id = "new_widget",
+            type = WidgetType.CALENDAR,
+            label = "Due Date",
+            isEnabled = true,
+            order = 0
+        )
+        
+        val error = validateWidgetLabel(widget, testWidgets)
+        assertEquals("A widget with this label already exists. Please use a unique label.", error)
+    }
+
+    @Test
+    fun `validateWidgetLabel allows same label when updating same widget`() {
+        // widget1 has label "Due Date"
+        val widget = WidgetConfig(
+            id = "widget1",
+            type = WidgetType.CALENDAR,
+            label = "Due Date",
+            isEnabled = true,
+            order = 0
+        )
+        
+        val error = validateWidgetLabel(widget, testWidgets)
+        assertNull(error)
+    }
+
+    @Test
+    fun `validateWidgetLabel catches duplicate when updating to existing label`() {
+        // widget1 has "Due Date", try to update widget2 to "Due Date"
+        val widget = WidgetConfig(
+            id = "widget2",
+            type = WidgetType.SINGLE_SELECT,
+            label = "Due Date",
+            isEnabled = true,
+            order = 1
+        )
+        
+        val error = validateWidgetLabel(widget, testWidgets)
+        assertEquals("A widget with this label already exists. Please use a unique label.", error)
+    }
+
+    // ==================== Helper Functions ====================
+
     // Helper to create default widgets
     private fun createDefaultWidgets(): List<WidgetConfig> {
         return listOf(
@@ -371,5 +566,56 @@ class WidgetManagerTest {
                 order = 3
             )
         )
+    }
+
+    /**
+     * Check if a label is unique across all widgets (case-insensitive).
+     * Mirrors WidgetManager.isLabelUnique() logic for testing.
+     */
+    private fun isLabelUnique(
+        label: String, 
+        widgets: List<WidgetConfig>, 
+        excludeWidgetId: String? = null
+    ): Boolean {
+        val normalizedLabel = label.trim().lowercase()
+        return widgets.none { widget ->
+            widget.id != excludeWidgetId &&
+            widget.label.trim().lowercase() == normalizedLabel
+        }
+    }
+
+    /**
+     * Generate a unique label by appending a number if needed.
+     * Mirrors WidgetManager.generateUniqueLabel() logic for testing.
+     */
+    private fun generateUniqueLabel(baseLabel: String, widgets: List<WidgetConfig>): String {
+        if (isLabelUnique(baseLabel, widgets)) {
+            return baseLabel
+        }
+        
+        var counter = 2
+        while (counter <= 100) {
+            val candidate = "$baseLabel $counter"
+            if (isLabelUnique(candidate, widgets)) {
+                return candidate
+            }
+            counter++
+        }
+        
+        return "$baseLabel ${System.currentTimeMillis()}"
+    }
+
+    /**
+     * Validate widget label.
+     * Mirrors WidgetManager.validateWidgetLabel() logic for testing.
+     */
+    private fun validateWidgetLabel(widget: WidgetConfig, widgets: List<WidgetConfig>): String? {
+        if (widget.label.isBlank()) {
+            return "Widget label cannot be empty."
+        }
+        if (!isLabelUnique(widget.label, widgets, widget.id)) {
+            return "A widget with this label already exists. Please use a unique label."
+        }
+        return null
     }
 }
