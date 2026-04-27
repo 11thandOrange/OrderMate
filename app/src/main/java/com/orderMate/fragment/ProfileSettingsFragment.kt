@@ -18,6 +18,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.orderMate.R
@@ -26,6 +27,9 @@ import com.orderMate.utils.FirebaseConfigManager
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.ProfileSettings
 import com.orderMate.utils.ProfileSettingsManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Profile Settings Fragment (Issue #85)
@@ -87,6 +91,35 @@ class ProfileSettingsFragment : Fragment() {
         
         setupClickListeners()
         loadCurrentSettings()
+        loadUserAndMerchantInfo()
+    }
+    
+    /**
+     * Load active user's name and merchant business name from Clover
+     * Must run on background thread as Clover API calls are blocking
+     */
+    private fun loadUserAndMerchantInfo() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val myApp = MyApp.getInstance()
+                val employee = myApp.getEmployeeConnector()?.employee
+                val merchantName = myApp.getMerchantName()
+                
+                withContext(Dispatchers.Main) {
+                    // Active user's name
+                    binding.profileName.text = employee?.name ?: "Unknown User"
+                    
+                    // Merchant business name
+                    binding.profileEmail.text = merchantName ?: "Unknown Business"
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    binding.profileName.text = "Unknown User"
+                    binding.profileEmail.text = "Unknown Business"
+                }
+            }
+        }
     }
 
     private fun setupClickListeners() {
