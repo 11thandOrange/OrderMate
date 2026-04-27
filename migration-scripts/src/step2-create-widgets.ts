@@ -12,9 +12,13 @@
  *   - type -> MULTI_SELECT
  *   - description -> TEXT_BOX
  * 
- * Output is written to local files for testing.
- * To apply to Firebase: upload step2_firebase_widgets_<merchantId>.json
- * to: merchants/<merchantId>/widgets
+ * Data Output:
+ * - If FIREBASE_DATABASE_URL is set: saves widgets directly to Firebase
+ * - Otherwise: writes to local files only
+ * 
+ * Environment Variables (for Firebase):
+ *   FIREBASE_DATABASE_URL    - Firebase Realtime Database URL
+ *   FIREBASE_SERVICE_ACCOUNT - Path to service account JSON or JSON string
  * 
  * NOTE: Legacy code and orders are NOT touched.
  * 
@@ -73,6 +77,7 @@ import {
   ensureOutputDir,
   widgetToFirebaseFormat
 } from './utils';
+import { isFirebaseConfigured, saveWidgetsToFirebase } from './firebaseApi';
 
 /**
  * Create a widget from label statistics
@@ -199,6 +204,14 @@ async function main(): Promise<void> {
     console.log(`Processing single merchant: ${targetMerchantId}`);
   }
   
+  // Check if Firebase is configured
+  const useFirebase = isFirebaseConfigured();
+  if (useFirebase) {
+    console.log('\n✅ Firebase configured - widgets will be saved to Firebase');
+  } else {
+    console.log('\n⚠️  Firebase not configured - widgets will be saved to local files only');
+  }
+  
   // Process each merchant
   const allOutputs: Step2Output[] = [];
   
@@ -206,22 +219,28 @@ async function main(): Promise<void> {
     const output = createWidgetsForMerchant(merchantAnalysis);
     allOutputs.push(output);
     
-    // Write individual merchant output
+    // Write individual merchant output to local file
     writeOutput(`step2_widgets_${merchantAnalysis.merchantId}.json`, output);
     
-    // Also write Firebase-format JSON (what would be uploaded)
+    // Generate Firebase-format JSON
     const firebaseWidgets = generateFirebaseWidgetsJson(output.createdWidgets);
     writeOutput(`step2_firebase_widgets_${merchantAnalysis.merchantId}.json`, {
       merchantId: merchantAnalysis.merchantId,
       path: `merchants/${merchantAnalysis.merchantId}/widgets`,
       data: firebaseWidgets
     });
+    
+    // Save to Firebase if configured
+    if (useFirebase) {
+      await saveWidgetsToFirebase(merchantAnalysis.merchantId, output.createdWidgets);
+    }
   }
   
   // Write combined output
   const combinedOutput = {
     timestamp: new Date().toISOString(),
     totalMerchants: allOutputs.length,
+    savedToFirebase: useFirebase,
     merchants: allOutputs.map(o => ({
       merchantId: o.merchantId,
       widgetCount: o.createdWidgets.length,
@@ -254,12 +273,18 @@ async function main(): Promise<void> {
   console.log(`  - step2_summary.json (summary of all merchants)`);
   
   console.log('\n' + '='.repeat(60));
-  console.log('NOTE: Widgets have been written to LOCAL FILES only.');
-  console.log('To apply to Firebase, manually upload the firebase_widgets JSON');
-  console.log('to: merchants/<merchantId>/widgets');
+  if (useFirebase) {
+    console.log('✅ Widgets have been SAVED TO FIREBASE');
+    console.log('Path: merchants/<merchantId>/widgets');
+  } else {
+    console.log('NOTE: Widgets have been written to LOCAL FILES only.');
+    console.log('To save to Firebase, set environment variables:');
+    console.log('  FIREBASE_DATABASE_URL=https://your-project.firebaseio.com');
+    console.log('  FIREBASE_SERVICE_ACCOUNT=./path/to/service-account.json');
+  }
   console.log('='.repeat(60));
   
-  console.log('\nStep 2 complete. Run step3-migrate-orders.ts next.');
+  console.log('\nStep 2 complete. Run step3-validate-widgets.ts next.');
 }
 
 // Run main

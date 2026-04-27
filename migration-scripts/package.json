@@ -12,7 +12,12 @@
     "run-all": "npm run step1 && npm run step2 && npm run step3",
     "clean": "rm -rf output/* dist/*"
   },
-  "keywords": ["ordermate", "migration", "clover", "firebase"],
+  "keywords": [
+    "ordermate",
+    "migration",
+    "clover",
+    "firebase"
+  ],
   "author": "OrderMate",
   "license": "UNLICENSED",
   "dependencies": {

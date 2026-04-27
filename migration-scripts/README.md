@@ -45,6 +45,21 @@ export CLOVER_ENVIRONMENT="sandbox"  # or "production"
 | `CLOVER_MERCHANT_ID` | Yes | Merchant ID to fetch orders for |
 | `CLOVER_ENVIRONMENT` | No | `sandbox` (default) or `production` |
 
+### 3. Firebase (for Step 2 output)
+Set environment variables to save widgets directly to Firebase:
+
+```bash
+export FIREBASE_DATABASE_URL="https://your-project.firebaseio.com"
+export FIREBASE_SERVICE_ACCOUNT="./path/to/service-account.json"
+```
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `FIREBASE_DATABASE_URL` | Yes | Firebase Realtime Database URL |
+| `FIREBASE_SERVICE_ACCOUNT` | Yes | Path to service account JSON file |
+
+If Firebase is not configured, Step 2 writes to local files only.
+
 ## Scripts
 
 ### Step 1: Analyze Notes
