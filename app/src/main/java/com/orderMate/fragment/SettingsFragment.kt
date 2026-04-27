@@ -658,9 +658,20 @@ class SettingsFragment : Fragment() {
     /**
      * Save item-level widget using level-specific method.
      * Only updates the single widget, does not affect order widgets.
+     * Validates unique label before saving.
      */
     private fun saveItemWidget(widget: WidgetConfig) {
         android.util.Log.d("SettingsFragment", "saveItemWidget: ${widget.label}, id=${widget.id}")
+        
+        // Validate unique label before saving
+        val validationError = widgetManager.validateWidgetLabel(widget)
+        if (validationError != null) {
+            activity?.runOnUiThread {
+                Toast.makeText(context, validationError, Toast.LENGTH_LONG).show()
+            }
+            return
+        }
+        
         widgetManager.updateItemWidget(widget) { success ->
             android.util.Log.d("SettingsFragment", "saveItemWidget result: success=$success")
             if (!success) {
@@ -674,9 +685,20 @@ class SettingsFragment : Fragment() {
     /**
      * Save order-level widget using level-specific method.
      * Only updates the single widget, does not affect item widgets.
+     * Validates unique label before saving.
      */
     private fun saveOrderWidget(widget: WidgetConfig) {
         android.util.Log.d("SettingsFragment", "saveOrderWidget: ${widget.label}, id=${widget.id}")
+        
+        // Validate unique label before saving
+        val validationError = widgetManager.validateWidgetLabel(widget)
+        if (validationError != null) {
+            activity?.runOnUiThread {
+                Toast.makeText(context, validationError, Toast.LENGTH_LONG).show()
+            }
+            return
+        }
+        
         widgetManager.updateOrderWidget(widget) { success ->
             android.util.Log.d("SettingsFragment", "saveOrderWidget result: success=$success")
             if (!success) {
@@ -774,21 +796,37 @@ class SettingsFragment : Fragment() {
         
         // Helper function to add widget and dismiss dialog
         fun addWidgetOfType(type: FirebaseWidgetType) {
+            // Generate unique label (e.g., "Calendar", "Calendar 2", "Calendar 3")
+            val uniqueLabel = widgetManager.generateUniqueLabel(type.displayName)
+            
+            // Create widget with unique label
+            val widget = DefaultWidgetFactory.createWidget(
+                type = type,
+                label = uniqueLabel,
+                level = level,
+                isEnabled = true,
+                order = if (level == NoteLevel.ITEM) {
+                    widgetManager.getItemWidgets().size
+                } else {
+                    widgetManager.getOrderWidgets().size
+                }
+            )
+            
             if (level == NoteLevel.ITEM) {
-                widgetManager.addItemWidget(type) { newWidget ->
+                widgetManager.addItemWidget(widget) { success ->
                     activity?.runOnUiThread {
-                        if (newWidget != null) {
-                            itemLevelWidgetAdapter?.addWidget(newWidget)
+                        if (success) {
+                            itemLevelWidgetAdapter?.addWidget(widget)
                         } else {
                             Toast.makeText(context, "Failed to add widget", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
             } else {
-                widgetManager.addOrderWidget(type) { newWidget ->
+                widgetManager.addOrderWidget(widget) { success ->
                     activity?.runOnUiThread {
-                        if (newWidget != null) {
-                            orderLevelWidgetAdapter?.addWidget(newWidget)
+                        if (success) {
+                            orderLevelWidgetAdapter?.addWidget(widget)
                         } else {
                             Toast.makeText(context, "Failed to add widget", Toast.LENGTH_SHORT).show()
                         }

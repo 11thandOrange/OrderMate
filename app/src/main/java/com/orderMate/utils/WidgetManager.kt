@@ -31,6 +31,9 @@ class WidgetManager private constructor(private val context: Context) {
         private const val KEY_SETTINGS = "settings"
         const val MAX_WIDGETS_PER_LEVEL = 7
         
+        // Error message for duplicate label
+        const val ERROR_DUPLICATE_LABEL = "A widget with this label already exists. Please use a unique label."
+        
         @Volatile
         private var instance: WidgetManager? = null
         
@@ -248,6 +251,62 @@ class WidgetManager private constructor(private val context: Context) {
         return getOrderWidgetsFromCache().size < MAX_WIDGETS_PER_LEVEL
     }
     
+    // ==================== Unique Label Validation ====================
+    
+    /**
+     * Check if a label is unique across ALL widgets (both ORDER and ITEM level).
+     * Labels are compared case-insensitively.
+     * 
+     * @param label The label to check
+     * @param excludeWidgetId Optional widget ID to exclude (for updates)
+     * @return true if label is unique, false if duplicate exists
+     */
+    fun isLabelUnique(label: String, excludeWidgetId: String? = null): Boolean {
+        val allWidgets = getAllWidgets()
+        val normalizedLabel = label.trim().lowercase()
+        
+        return allWidgets.none { widget ->
+            widget.id != excludeWidgetId && 
+            widget.label.trim().lowercase() == normalizedLabel
+        }
+    }
+    
+    /**
+     * Generate a unique label by appending a number if needed.
+     * E.g., "Calendar" -> "Calendar 2" -> "Calendar 3"
+     */
+    fun generateUniqueLabel(baseLabel: String): String {
+        if (isLabelUnique(baseLabel)) {
+            return baseLabel
+        }
+        
+        var counter = 2
+        while (counter <= 100) { // Safety limit
+            val candidate = "$baseLabel $counter"
+            if (isLabelUnique(candidate)) {
+                return candidate
+            }
+            counter++
+        }
+        
+        // Fallback (shouldn't happen with max 7 widgets per level)
+        return "$baseLabel ${System.currentTimeMillis()}"
+    }
+    
+    /**
+     * Validate that a widget's label is unique before saving.
+     * Returns error message if validation fails, null if valid.
+     */
+    fun validateWidgetLabel(widget: WidgetConfig): String? {
+        if (widget.label.isBlank()) {
+            return "Widget label cannot be empty."
+        }
+        if (!isLabelUnique(widget.label, widget.id)) {
+            return ERROR_DUPLICATE_LABEL
+        }
+        return null
+    }
+    
     /**
      * Get settings from local cache.
      */
@@ -375,11 +434,20 @@ class WidgetManager private constructor(private val context: Context) {
     
     /**
      * Add a pre-configured item-level widget.
+     * Validates that the label is unique across all widgets.
      */
     fun addItemWidget(widget: WidgetConfig, callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
         
         if (!canAddItemWidget()) {
+            callback(false)
+            return
+        }
+        
+        // Validate unique label
+        val validationError = validateWidgetLabel(widget)
+        if (validationError != null) {
+            android.util.Log.w("WidgetManager", "addItemWidget failed: $validationError")
             callback(false)
             return
         }
@@ -400,9 +468,18 @@ class WidgetManager private constructor(private val context: Context) {
     /**
      * Update a single item-level widget by ID.
      * Only updates the specified widget, does not affect others.
+     * Validates that the label is unique across all widgets.
      */
     fun updateItemWidget(widget: WidgetConfig, callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
+        
+        // Validate unique label (excluding this widget's own ID)
+        val validationError = validateWidgetLabel(widget)
+        if (validationError != null) {
+            android.util.Log.w("WidgetManager", "updateItemWidget failed: $validationError")
+            callback(false)
+            return
+        }
         
         widget.level = NoteLevel.ITEM
         val currentWidgets = getItemWidgetsFromCache().toMutableList()
@@ -523,11 +600,20 @@ class WidgetManager private constructor(private val context: Context) {
     
     /**
      * Add a pre-configured order-level widget.
+     * Validates that the label is unique across all widgets.
      */
     fun addOrderWidget(widget: WidgetConfig, callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
         
         if (!canAddOrderWidget()) {
+            callback(false)
+            return
+        }
+        
+        // Validate unique label
+        val validationError = validateWidgetLabel(widget)
+        if (validationError != null) {
+            android.util.Log.w("WidgetManager", "addOrderWidget failed: $validationError")
             callback(false)
             return
         }
@@ -548,9 +634,18 @@ class WidgetManager private constructor(private val context: Context) {
     /**
      * Update a single order-level widget by ID.
      * Only updates the specified widget, does not affect others.
+     * Validates that the label is unique across all widgets.
      */
     fun updateOrderWidget(widget: WidgetConfig, callback: (Boolean) -> Unit) {
         val mid = merchantId ?: return callback(false)
+        
+        // Validate unique label (excluding this widget's own ID)
+        val validationError = validateWidgetLabel(widget)
+        if (validationError != null) {
+            android.util.Log.w("WidgetManager", "updateOrderWidget failed: $validationError")
+            callback(false)
+            return
+        }
         
         widget.level = NoteLevel.ORDER
         val currentWidgets = getOrderWidgetsFromCache().toMutableList()

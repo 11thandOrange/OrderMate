@@ -12,6 +12,9 @@ import java.util.Locale
  * 
  * Note format: "label:value • label:value • label:value"
  * Example: "Category:Custom Cake • Status:In Progress • Due Date:Apr 20, 2026"
+ * 
+ * Widgets are matched by label (case-insensitive). Unique labels are enforced
+ * by WidgetManager across all widgets (both ORDER and ITEM level).
  */
 object OrderNoteParser {
     
@@ -30,100 +33,67 @@ object OrderNoteParser {
     )
     
     /**
-     * Parse a note string and match values to widgets by ID.
-     * Format: [widgetId]label:value
+     * Parse a note string and match values to widgets by label (case-insensitive).
+     * Format: label:value • label:value
+     * Also handles legacy format: [widgetId]label:value
      */
     fun parseNotesByWidgetType(
         note: String?,
         widgets: List<WidgetConfig>,
         level: NoteLevel
     ): Map<WidgetConfig, String> {
-        android.util.Log.d("NoteParserDebug", "--- parseNotesByWidgetType ---")
-        android.util.Log.d("NoteParserDebug", "note: '$note'")
-        android.util.Log.d("NoteParserDebug", "level: $level")
-        android.util.Log.d("NoteParserDebug", "widgets count: ${widgets.size}")
-        
         if (note.isNullOrBlank()) {
-            android.util.Log.d("NoteParserDebug", "RETURN EMPTY: note is null/blank")
             return emptyMap()
         }
         
         val filteredWidgets = widgets.filter { it.level == level && it.isEnabled }
-        android.util.Log.d("NoteParserDebug", "filteredWidgets count (level=$level, enabled=true): ${filteredWidgets.size}")
-        filteredWidgets.forEach { w ->
-            android.util.Log.d("NoteParserDebug", "  Filtered widget: id=${w.id}, label=${w.label}, level=${w.level}")
-        }
         
         if (filteredWidgets.isEmpty()) {
-            android.util.Log.d("NoteParserDebug", "RETURN EMPTY: no widgets match level=$level and enabled=true")
             return emptyMap()
         }
         
         val result = mutableMapOf<WidgetConfig, String>()
-        val parsedValues = parseNoteToMapWithIds(note)
-        
-        android.util.Log.d("NoteParserDebug", "parsedValues from note:")
-        parsedValues.forEach { (key, value) ->
-            android.util.Log.d("NoteParserDebug", "  ParsedKey: widgetId=${key.widgetId}, label=${key.label} -> value=$value")
-        }
+        val parsedValues = parseNoteToLabelMap(note)
         
         for (widget in filteredWidgets) {
-            val matchingEntry = parsedValues.entries.find { (key, _) ->
-                key.widgetId == widget.id
+            // Match by label (case-insensitive)
+            val matchingEntry = parsedValues.entries.find { (label, _) ->
+                label.equals(widget.label, ignoreCase = true)
             }
-            android.util.Log.d("NoteParserDebug", "Matching widget.id=${widget.id} -> found=${matchingEntry != null}")
             
             val value = matchingEntry?.value
             if (!value.isNullOrBlank()) {
                 result[widget] = value
-                android.util.Log.d("NoteParserDebug", "  MATCH! widget=${widget.label} -> value=$value")
             }
         }
         
-        android.util.Log.d("NoteParserDebug", "RESULT count: ${result.size}")
         return result
     }
     
     /**
-     * Parsed key containing optional widget ID and label.
+     * Parse a note string into a map of label -> value.
+     * Handles both new format (label:value) and legacy format ([widgetId]label:value).
      */
-    data class ParsedKey(val widgetId: String?, val label: String)
-    
-    /**
-     * Parse a note string into a map of ParsedKey -> value.
-     * Handles both new format [widgetId]label:value and old format label:value
-     */
-    private fun parseNoteToMapWithIds(note: String?): Map<ParsedKey, String> {
+    private fun parseNoteToLabelMap(note: String?): Map<String, String> {
         if (note.isNullOrBlank()) return emptyMap()
         
-        val result = mutableMapOf<ParsedKey, String>()
+        val result = mutableMapOf<String, String>()
         val delimiter = if (note.contains("•")) "•" else "|"
         val parts = note.split(delimiter).map { it.trim() }
-        
-        android.util.Log.d("NoteParserDebug", "parseNoteToMapWithIds: delimiter='$delimiter', parts=${parts.size}")
         
         for (part in parts) {
             val colonIndex = part.indexOf(':')
             if (colonIndex > 0) {
-                val keyPart = part.substring(0, colonIndex).trim()
+                var label = part.substring(0, colonIndex).trim()
                 val value = part.substring(colonIndex + 1).trim()
                 
-                android.util.Log.d("NoteParserDebug", "  part: '$part' -> keyPart='$keyPart', value='$value'")
-                
-                if (keyPart.isNotBlank() && value.isNotBlank()) {
-                    // Try to extract widget ID from new format: [widgetId]label
-                    val parsedKey = if (keyPart.startsWith("[") && keyPart.contains("]")) {
-                        val closeBracket = keyPart.indexOf(']')
-                        val widgetId = keyPart.substring(1, closeBracket)
-                        val label = keyPart.substring(closeBracket + 1)
-                        android.util.Log.d("NoteParserDebug", "    NEW FORMAT: widgetId=$widgetId, label=$label")
-                        ParsedKey(widgetId, label)
-                    } else {
-                        // Old format: just label
-                        android.util.Log.d("NoteParserDebug", "    OLD FORMAT: label=$keyPart (no widgetId)")
-                        ParsedKey(null, keyPart)
+                if (label.isNotBlank() && value.isNotBlank()) {
+                    // Handle legacy format: [widgetId]label -> extract just the label
+                    if (label.startsWith("[") && label.contains("]")) {
+                        val closeBracket = label.indexOf(']')
+                        label = label.substring(closeBracket + 1)
                     }
-                    result[parsedKey] = value
+                    result[label] = value
                 }
             }
         }
@@ -133,13 +103,10 @@ object OrderNoteParser {
     
     /**
      * Parse a note string into a map of label -> value.
-     * Note: This strips widget IDs for backward compatibility.
+     * Public method for external use.
      */
     fun parseNoteToMap(note: String?): Map<String, String> {
-        if (note.isNullOrBlank()) return emptyMap()
-        
-        val parsed = parseNoteToMapWithIds(note)
-        return parsed.map { (key, value) -> key.label to value }.toMap()
+        return parseNoteToLabelMap(note)
     }
     
     /**

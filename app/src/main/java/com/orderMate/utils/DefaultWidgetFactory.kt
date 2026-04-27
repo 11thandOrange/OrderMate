@@ -103,7 +103,7 @@ object DefaultWidgetFactory {
         ),
         createWidget(
             type = WidgetType.MULTI_SELECT,
-            label = "Tags",
+            label = "Order Tags",  // Unique label (ITEM level has "Tags")
             level = NoteLevel.ORDER,
             isEnabled = false,
             order = 2,

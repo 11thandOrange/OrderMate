@@ -438,38 +438,32 @@ class ItemNoteDialogFragment : DialogFragment() {
     private fun buildNoteString(): String {
         val parts = mutableListOf<String>()
 
+        // Build note using label:value format (unique labels enforced by WidgetManager)
         widgets.filter { it.isEnabled }.sortedBy { it.order }.forEach { widget ->
             when (widget.type) {
                 WidgetType.SINGLE_SELECT -> {
                     singleSelections[widget.id]?.let { value ->
-                        parts.add("[${widget.id}]${widget.label}:$value")
+                        parts.add("${widget.label}:$value")
                     }
                 }
                 WidgetType.MULTI_SELECT -> {
                     multiSelections[widget.id]?.let { values ->
                         if (values.isNotEmpty()) {
-                            parts.add("[${widget.id}]${widget.label}:${values.joinToString(",")}")
+                            parts.add("${widget.label}:${values.joinToString(",")}")
                         }
                     }
                 }
                 WidgetType.CALENDAR -> {
                     dateSelections[widget.id]?.let { value ->
                         if (value.isNotEmpty()) {
-                            parts.add("[${widget.id}]${widget.label}:$value")
+                            parts.add("${widget.label}:$value")
                         }
                     }
                 }
                 WidgetType.TEXT_BOX -> {
-                    android.util.Log.d("TextBoxDebug", "buildNoteString TEXT_BOX: id=${widget.id}, label=${widget.label}")
-                    android.util.Log.d("TextBoxDebug", "  textInputViews.keys: ${textInputViews.keys}")
-                    android.util.Log.d("TextBoxDebug", "  textInputViews[${widget.id}]: ${textInputViews[widget.id]}")
                     val value = textInputViews[widget.id]?.text?.toString()?.trim()
-                    android.util.Log.d("TextBoxDebug", "  value retrieved: '$value'")
                     if (!value.isNullOrEmpty()) {
-                        parts.add("[${widget.id}]${widget.label}:$value")
-                        android.util.Log.d("TextBoxDebug", "  ADDED to parts")
-                    } else {
-                        android.util.Log.d("TextBoxDebug", "  SKIPPED - value is null or empty")
+                        parts.add("${widget.label}:$value")
                     }
                 }
             }
@@ -484,24 +478,22 @@ class ItemNoteDialogFragment : DialogFragment() {
     private fun parseExistingNote() {
         if (existingNote.isNullOrEmpty()) return
 
-        // Parse format: "[widgetId]Label:Value • [widgetId]Label:Value" (or legacy format without ID)
         val delimiter = if (existingNote!!.contains("•")) "•" else "|"
         existingNote?.split(delimiter)?.forEach { part ->
             val trimmed = part.trim()
             val colonIndex = trimmed.indexOf(':')
             if (colonIndex > 0) {
-                val keyPart = trimmed.substring(0, colonIndex).trim()
+                var label = trimmed.substring(0, colonIndex).trim()
                 val value = trimmed.substring(colonIndex + 1).trim()
 
-                // Try to extract widget ID from new format: [widgetId]label
-                val widget = if (keyPart.startsWith("[") && keyPart.contains("]")) {
-                    val closeBracket = keyPart.indexOf(']')
-                    val widgetId = keyPart.substring(1, closeBracket)
-                    widgets.find { it.id == widgetId }
-                } else {
-                    // Fallback to old format: match by label (first match only)
-                    widgets.find { it.label.equals(keyPart, ignoreCase = true) }
+                // Handle legacy format: [widgetId]label -> extract just the label
+                if (label.startsWith("[") && label.contains("]")) {
+                    val closeBracket = label.indexOf(']')
+                    label = label.substring(closeBracket + 1)
                 }
+                
+                // Match widget by label (case-insensitive, unique labels enforced)
+                val widget = widgets.find { it.label.equals(label, ignoreCase = true) }
                 
                 widget?.let {
                     when (it.type) {
