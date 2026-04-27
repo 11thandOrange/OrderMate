@@ -27,7 +27,7 @@ class SettingsManager(private val context: Context) {
     // ==================== General Settings ====================
 
     fun getUseOrderMateRegister(): Boolean {
-        return prefs.getBoolean(KEY_USE_ORDERMATE_REGISTER, true)
+        return prefs.getBoolean(KEY_USE_ORDERMATE_REGISTER, false)
     }
 
     fun setUseOrderMateRegister(enabled: Boolean) {
@@ -39,7 +39,7 @@ class SettingsManager(private val context: Context) {
     }
 
     fun getUseOrderMateRegisterInstead(): Boolean {
-        return prefs.getBoolean(KEY_USE_ORDERMATE_REGISTER_INSTEAD, false)
+        return prefs.getBoolean(KEY_USE_ORDERMATE_REGISTER_INSTEAD, true)
     }
 
     fun setUseOrderMateRegisterInstead(enabled: Boolean) {
