@@ -69,6 +69,28 @@ export FIREBASE_SERVICE_ACCOUNT="./service-account.json"
 
 If Firebase is not configured, scripts use local files only.
 
+## Workflow
+
+```
+Step 1: Analyze Notes
+    ↓
+    Reads: Clover orders (mock or API)
+    Writes: output/step1_*.json
+    ↓
+Step 2: Create Widgets
+    ↓
+    Reads: Step 1 output
+    Writes: output/step2_*.json (LOCAL ONLY)
+    ↓
+Step 3: Validate & Save
+    ↓
+    Reads: Step 2 output (local files)
+    Validates widgets
+    ↓
+    If NO errors → Saves to Firebase + output/step3_*.json
+    If errors    → Only output/step3_*.json (NO Firebase)
+```
+
 ## Scripts
 
 ### Step 1: Analyze Notes

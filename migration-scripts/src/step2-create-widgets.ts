@@ -3,7 +3,7 @@
  * 
  * This script reads the analysis from Step 1 and creates V2 widgets for each merchant:
  * - For each legacy note type/label found, creates a V2 widget with the exact same label
- * - Applies all legacy note values as widget options
+ * - Applies all legacy note values as widget options (SINGLE_SELECT/MULTI_SELECT only)
  * - Widget type is determined by label name inference:
  *   - pickup date -> CALENDAR
  *   - status -> SINGLE_SELECT  
@@ -12,46 +12,15 @@
  *   - type -> MULTI_SELECT
  *   - description -> TEXT_BOX
  * 
- * Data Output:
- * - If FIREBASE_DATABASE_URL is set: saves widgets directly to Firebase
- * - Otherwise: writes to local files only
+ * Output: LOCAL FILES ONLY
+ * - step2_widgets_<merchantId>.json
+ * - step2_firebase_widgets_<merchantId>.json
  * 
- * Environment Variables (for Firebase):
- *   FIREBASE_DATABASE_URL    - Firebase Realtime Database URL
- *   FIREBASE_SERVICE_ACCOUNT - Path to service account JSON or JSON string
+ * Step 3 will validate and write to Firebase if no errors.
  * 
  * NOTE: Legacy code and orders are NOT touched.
  * 
  * Usage: npx ts-node src/step2-create-widgets.ts [merchantId]
- * 
- * Example Output (step2_widgets_MERCHANT_001.json):
- * {
- *   "timestamp": "2026-04-27T01:00:00.000Z",
- *   "merchantId": "MERCHANT_001",
- *   "createdWidgets": [
- *     {
- *       "id": "uuid-1",
- *       "type": "SINGLE_SELECT",
- *       "label": "Category",
- *       "level": "ITEM",
- *       "options": [
- *         { "id": "opt-1", "label": "Birthday", "value": "Birthday" },
- *         { "id": "opt-2", "label": "Wedding", "value": "Wedding" }
- *       ]
- *     },
- *     {
- *       "id": "uuid-2",
- *       "type": "CALENDAR",
- *       "label": "Pickup Date",
- *       "level": "ITEM",
- *       "options": []
- *     }
- *   ],
- *   "widgetLabelMapping": {
- *     "Category": "uuid-1",
- *     "Pickup Date": "uuid-2"
- *   }
- * }
  */
 
 import * as fs from 'fs';
@@ -77,7 +46,6 @@ import {
   ensureOutputDir,
   widgetToFirebaseFormat
 } from './utils';
-import { isFirebaseConfigured, saveWidgetsToFirebase } from './firebaseApi';
 
 /**
  * Create a widget from label statistics
@@ -204,14 +172,6 @@ async function main(): Promise<void> {
     console.log(`Processing single merchant: ${targetMerchantId}`);
   }
   
-  // Check if Firebase is configured
-  const useFirebase = isFirebaseConfigured();
-  if (useFirebase) {
-    console.log('\n✅ Firebase configured - widgets will be saved to Firebase');
-  } else {
-    console.log('\n⚠️  Firebase not configured - widgets will be saved to local files only');
-  }
-  
   // Process each merchant
   const allOutputs: Step2Output[] = [];
   
@@ -229,18 +189,12 @@ async function main(): Promise<void> {
       path: `merchants/${merchantAnalysis.merchantId}/widgets`,
       data: firebaseWidgets
     });
-    
-    // Save to Firebase if configured
-    if (useFirebase) {
-      await saveWidgetsToFirebase(merchantAnalysis.merchantId, output.createdWidgets);
-    }
   }
   
   // Write combined output
   const combinedOutput = {
     timestamp: new Date().toISOString(),
     totalMerchants: allOutputs.length,
-    savedToFirebase: useFirebase,
     merchants: allOutputs.map(o => ({
       merchantId: o.merchantId,
       widgetCount: o.createdWidgets.length,
@@ -273,15 +227,8 @@ async function main(): Promise<void> {
   console.log(`  - step2_summary.json (summary of all merchants)`);
   
   console.log('\n' + '='.repeat(60));
-  if (useFirebase) {
-    console.log('✅ Widgets have been SAVED TO FIREBASE');
-    console.log('Path: merchants/<merchantId>/widgets');
-  } else {
-    console.log('NOTE: Widgets have been written to LOCAL FILES only.');
-    console.log('To save to Firebase, set environment variables:');
-    console.log('  FIREBASE_DATABASE_URL=https://your-project.firebaseio.com');
-    console.log('  FIREBASE_SERVICE_ACCOUNT=./path/to/service-account.json');
-  }
+  console.log('Widgets have been written to LOCAL FILES.');
+  console.log('Run Step 3 to validate and save to Firebase.');
   console.log('='.repeat(60));
   
   console.log('\nStep 2 complete. Run step3-validate-widgets.ts next.');
