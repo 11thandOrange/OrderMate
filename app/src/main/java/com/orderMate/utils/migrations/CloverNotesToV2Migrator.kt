@@ -6,7 +6,7 @@ import com.clover.sdk.v3.order.Order
 import com.clover.sdk.v3.order.LineItem
 import com.orderMate.modals.*
 import com.orderMate.utils.FirebaseConfigManager
-import com.orderMate.utils.OrderAppApplication
+import com.orderMate.utils.MyApp
 import java.util.UUID
 
 /**
@@ -158,7 +158,7 @@ object CloverNotesToV2Migrator {
      */
     private fun readCloverOrders(context: Context, callback: (List<Order>?) -> Unit) {
         try {
-            val app = context.applicationContext as OrderAppApplication
+            val app = context.applicationContext as MyApp
             val orderConnector = app.getOrderConnector()
             
             // Run on background thread
@@ -392,7 +392,7 @@ object CloverNotesToV2Migrator {
     ) {
         val firebase = FirebaseConfigManager.getInstance()
         
-        firebase.getWidgets(merchantId, NoteLevel.ITEM) { widgets ->
+        firebase.getWidgets(merchantId) { widgets ->
             val actualCount = widgets.size
             val success = actualCount >= expectedCount
             
