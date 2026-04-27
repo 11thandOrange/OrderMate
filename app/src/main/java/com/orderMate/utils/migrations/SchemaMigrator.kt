@@ -1,5 +1,6 @@
 package com.orderMate.utils.migrations
 
+import android.content.Context
 import com.orderMate.modals.MerchantMeta
 import com.orderMate.modals.PopupSettings
 import com.orderMate.utils.DefaultWidgetFactory
@@ -17,6 +18,15 @@ object SchemaMigrator {
         fun onSuccess()
         fun onFailure(error: String)
         fun onProgress(message: String)
+    }
+    
+    /**
+     * Run Clover notes migration
+     * Reads orders from Clover, analyzes legacy notes, creates V2 widgets in Firebase
+     */
+    fun migrateCloverNotes(context: Context, merchantId: String, callback: (CloverNotesToV2Migrator.MigrationResult) -> Unit) {
+        android.util.Log.d(TAG, "Starting Clover notes migration...")
+        CloverNotesToV2Migrator.migrate(context, merchantId, callback)
     }
     
     /**

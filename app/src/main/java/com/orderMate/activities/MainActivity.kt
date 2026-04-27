@@ -26,9 +26,11 @@ import com.orderMate.utils.ProfileSettingsManager
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.createAndShowDialog
 import com.orderMate.utils.exceptionHandler
+import com.orderMate.utils.migrations.SchemaMigrator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import android.util.Log
 
 /**
  * Main Activity with iOS-style side navigation (#80 requirement)
@@ -156,6 +158,30 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+            
+            // Run Clover notes migration (one-time)
+            runCloverNotesMigration(merchantId)
+        }
+    }
+    
+    /**
+     * Run migration from legacy Clover notes to V2 widgets
+     * Reads orders, analyzes notes, creates widgets in Firebase
+     */
+    private fun runCloverNotesMigration(merchantId: String) {
+        Log.d("MainActivity", "Starting Clover notes migration...")
+        
+        SchemaMigrator.migrateCloverNotes(this, merchantId) { result ->
+            Log.d("MainActivity", "=== Migration Result ===")
+            Log.d("MainActivity", "Success: ${result.success}")
+            Log.d("MainActivity", "Orders analyzed: ${result.ordersAnalyzed}")
+            Log.d("MainActivity", "Items analyzed: ${result.itemsAnalyzed}")
+            Log.d("MainActivity", "Legacy notes found: ${result.legacyNotesFound}")
+            Log.d("MainActivity", "Widgets created: ${result.widgetsCreated}")
+            if (result.errors.isNotEmpty()) {
+                Log.e("MainActivity", "Errors: ${result.errors}")
+            }
+            Log.d("MainActivity", "========================")
         }
     }
     
