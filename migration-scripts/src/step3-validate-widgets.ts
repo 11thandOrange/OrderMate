@@ -38,7 +38,7 @@ import {
   ensureOutputDir
 } from './utils';
 import { MOCK_MERCHANT_IDS } from './mockData';
-import { isFirebaseConfigured, saveWidgetsToFirebase } from './firebaseApi';
+import { isFirebaseConfigured, saveWidgetsToFirebase, getWidgetsFromFirebase } from './firebaseApi';
 
 // Valid widget types
 const VALID_WIDGET_TYPES = ['SINGLE_SELECT', 'MULTI_SELECT', 'CALENDAR', 'TEXT_BOX'];
@@ -283,22 +283,35 @@ interface ValidationResult {
 }
 
 /**
- * Validate all widgets for a merchant (always reads from local file)
+ * Convert Firebase widget data to WidgetConfig array
  */
-function validateMerchantWidgets(merchantId: string): ValidationResult | null {
-  console.log(`\nValidating widgets for merchant: ${merchantId}`);
-
-  // Always load from local file (Step 2 output)
-  const step2File = `step2_widgets_${merchantId}.json`;
-  if (!fileExists(step2File)) {
-    console.error(`  Error: Step 2 output not found for ${merchantId}.`);
-    return null;
+function firebaseDataToWidgets(data: Record<string, any>): WidgetConfig[] {
+  const widgets: WidgetConfig[] = [];
+  
+  for (const [id, widgetData] of Object.entries(data)) {
+    if (widgetData && typeof widgetData === 'object') {
+      widgets.push({
+        id,
+        type: widgetData.type,
+        label: widgetData.label,
+        isEnabled: widgetData.isEnabled ?? true,
+        isRequired: widgetData.isRequired ?? false,
+        showInFilter: widgetData.showInFilter ?? true,
+        order: widgetData.order ?? 0,
+        level: widgetData.level,
+        options: widgetData.options || []
+      });
+    }
   }
+  
+  return widgets;
+}
 
-  const step2Output = readInput<Step2Output>(step2File);
-  const widgets = step2Output.createdWidgets;
-  console.log(`  Loaded ${widgets.length} widgets from local file`);
-  console.log(`  Source: output/${step2File}`);
+/**
+ * Validate widgets array and return validation output
+ */
+function validateWidgets(merchantId: string, widgets: WidgetConfig[], source: string): Step3Output {
+  console.log(`  Validating ${widgets.length} widgets from ${source}`);
 
   const allErrors: ValidationError[] = [];
   const allWarnings: ValidationWarning[] = [];
@@ -323,15 +336,15 @@ function validateMerchantWidgets(merchantId: string): ValidationResult | null {
     // Check for duplicate labels
     if (widget.label && widgetLabels.has(widget.label.toLowerCase())) {
       allWarnings.push({
-        widgetId: widget.id,
+        widgetId: widget.id || `index-${index}`,
         widgetLabel: widget.label,
         field: 'label',
-        message: `Duplicate widget label: ${widget.label}`
+        message: `Duplicate label (case-insensitive): ${widget.label}`
       });
     }
     if (widget.label) widgetLabels.add(widget.label.toLowerCase());
 
-    // Validate widget
+    // Validate widget structure
     const result = validateWidget(widget, index);
     allErrors.push(...result.errors);
     allWarnings.push(...result.warnings);
@@ -341,34 +354,87 @@ function validateMerchantWidgets(merchantId: string): ValidationResult | null {
     }
   });
 
-  // Log results
-  console.log(`  Valid widgets: ${widgets.length - invalidCount}`);
-  console.log(`  Invalid widgets: ${invalidCount}`);
-  console.log(`  Errors: ${allErrors.length}`);
-  console.log(`  Warnings: ${allWarnings.length}`);
+  return {
+    timestamp: new Date().toISOString(),
+    merchantId,
+    totalWidgets: widgets.length,
+    validWidgets: widgets.length - invalidCount,
+    invalidWidgets: invalidCount,
+    errors: allErrors,
+    warnings: allWarnings
+  };
+}
 
-  if (allErrors.length > 0) {
+/**
+ * Validate all widgets for a merchant (reads from local file)
+ */
+function validateMerchantWidgetsFromLocal(merchantId: string): ValidationResult | null {
+  console.log(`\nValidating LOCAL widgets for merchant: ${merchantId}`);
+
+  // Load from local file (Step 2 output)
+  const step2File = `step2_widgets_${merchantId}.json`;
+  if (!fileExists(step2File)) {
+    console.error(`  Error: Step 2 output not found for ${merchantId}.`);
+    return null;
+  }
+
+  const step2Output = readInput<Step2Output>(step2File);
+  const widgets = step2Output.createdWidgets;
+  console.log(`  Loaded ${widgets.length} widgets from local file`);
+  console.log(`  Source: output/${step2File}`);
+
+  const output = validateWidgets(merchantId, widgets, 'local file');
+  
+  // Log results
+  console.log(`  Valid widgets: ${output.validWidgets}`);
+  console.log(`  Invalid widgets: ${output.invalidWidgets}`);
+  console.log(`  Errors: ${output.errors.length}`);
+  console.log(`  Warnings: ${output.warnings.length}`);
+
+  if (output.errors.length > 0) {
     console.log('  Errors found:');
-    allErrors.slice(0, 5).forEach(err => {
+    output.errors.slice(0, 5).forEach(err => {
       console.log(`    - [${err.widgetLabel}] ${err.field}: ${err.message}`);
     });
-    if (allErrors.length > 5) {
-      console.log(`    ... and ${allErrors.length - 5} more errors`);
+    if (output.errors.length > 5) {
+      console.log(`    ... and ${output.errors.length - 5} more errors`);
     }
   }
 
-  return {
-    output: {
-      timestamp: new Date().toISOString(),
-      merchantId,
-      totalWidgets: widgets.length,
-      validWidgets: widgets.length - invalidCount,
-      invalidWidgets: invalidCount,
-      errors: allErrors,
-      warnings: allWarnings
-    },
-    widgets
-  };
+  return { output, widgets };
+}
+
+/**
+ * Validate widgets from Firebase for a merchant
+ */
+async function validateMerchantWidgetsFromFirebase(merchantId: string): Promise<Step3Output | null> {
+  console.log(`\n  Verifying FIREBASE widgets for merchant: ${merchantId}`);
+
+  const firebaseData = await getWidgetsFromFirebase(merchantId);
+  
+  if (!firebaseData) {
+    console.error(`  Error: No widgets found in Firebase for ${merchantId}.`);
+    return null;
+  }
+  
+  const widgets = firebaseDataToWidgets(firebaseData);
+  console.log(`  Loaded ${widgets.length} widgets from Firebase`);
+
+  const output = validateWidgets(merchantId, widgets, 'Firebase');
+  
+  // Log results
+  console.log(`  Firebase validation - Valid: ${output.validWidgets}, Invalid: ${output.invalidWidgets}`);
+  
+  if (output.errors.length > 0) {
+    console.log('  ❌ Firebase validation errors:');
+    output.errors.slice(0, 5).forEach(err => {
+      console.log(`    - [${err.widgetLabel}] ${err.field}: ${err.message}`);
+    });
+  } else {
+    console.log('  ✅ Firebase validation passed');
+  }
+
+  return output;
 }
 
 /**
@@ -406,9 +472,12 @@ async function main(): Promise<void> {
   const allOutputs: Step3Output[] = [];
   const merchantsWithErrors: string[] = [];
   const merchantsSavedToFirebase: string[] = [];
+  const merchantsFirebaseVerified: string[] = [];
+  const merchantsFirebaseVerifyFailed: string[] = [];
 
   for (const merchantId of merchantIds) {
-    const result = validateMerchantWidgets(merchantId);
+    // Step 1: Validate local file
+    const result = validateMerchantWidgetsFromLocal(merchantId);
 
     if (result) {
       allOutputs.push(result.output);
@@ -419,6 +488,18 @@ async function main(): Promise<void> {
         console.log(`  ✅ No errors - saving to Firebase...`);
         await saveWidgetsToFirebase(merchantId, result.widgets);
         merchantsSavedToFirebase.push(merchantId);
+        
+        // Step 2: Verify Firebase after saving
+        const firebaseValidation = await validateMerchantWidgetsFromFirebase(merchantId);
+        if (firebaseValidation && firebaseValidation.errors.length === 0) {
+          merchantsFirebaseVerified.push(merchantId);
+          writeOutput(`step3_firebase_validation_${merchantId}.json`, firebaseValidation);
+        } else {
+          merchantsFirebaseVerifyFailed.push(merchantId);
+          if (firebaseValidation) {
+            writeOutput(`step3_firebase_validation_${merchantId}.json`, firebaseValidation);
+          }
+        }
       } else if (result.output.errors.length > 0) {
         console.log(`  ❌ Has errors - NOT saving to Firebase`);
         merchantsWithErrors.push(merchantId);
@@ -440,6 +521,8 @@ async function main(): Promise<void> {
     totalErrors,
     totalWarnings,
     savedToFirebase: merchantsSavedToFirebase,
+    firebaseVerified: merchantsFirebaseVerified,
+    firebaseVerifyFailed: merchantsFirebaseVerifyFailed,
     notSavedDueToErrors: merchantsWithErrors,
     merchants: allOutputs.map(o => ({
       merchantId: o.merchantId,
@@ -448,7 +531,8 @@ async function main(): Promise<void> {
       invalidWidgets: o.invalidWidgets,
       errors: o.errors.length,
       warnings: o.warnings.length,
-      savedToFirebase: merchantsSavedToFirebase.includes(o.merchantId)
+      savedToFirebase: merchantsSavedToFirebase.includes(o.merchantId),
+      firebaseVerified: merchantsFirebaseVerified.includes(o.merchantId)
     }))
   };
 
@@ -461,12 +545,26 @@ async function main(): Promise<void> {
 
   for (const output of allOutputs) {
     const savedToFB = merchantsSavedToFirebase.includes(output.merchantId);
-    const statusIcon = output.errors.length === 0 ? (savedToFB ? '✅' : '⚠️') : '❌';
+    const verified = merchantsFirebaseVerified.includes(output.merchantId);
+    const verifyFailed = merchantsFirebaseVerifyFailed.includes(output.merchantId);
+    
+    let statusIcon = '❌';
+    if (output.errors.length === 0) {
+      if (verified) statusIcon = '✅';
+      else if (savedToFB) statusIcon = '⚠️';
+      else statusIcon = '⚠️';
+    }
+    
     console.log(`\n${statusIcon} Merchant: ${output.merchantId}`);
     console.log(`  Widgets: ${output.totalWidgets} total, ${output.validWidgets} valid, ${output.invalidWidgets} invalid`);
     console.log(`  Errors: ${output.errors.length}, Warnings: ${output.warnings.length}`);
-    if (savedToFB) {
-      console.log(`  Firebase: SAVED`);
+    
+    if (verified) {
+      console.log(`  Firebase: SAVED & VERIFIED ✓`);
+    } else if (verifyFailed) {
+      console.log(`  Firebase: SAVED but VERIFICATION FAILED ✗`);
+    } else if (savedToFB) {
+      console.log(`  Firebase: SAVED (verification pending)`);
     } else if (output.errors.length > 0) {
       console.log(`  Firebase: NOT SAVED (has errors)`);
     } else if (!canSaveToFirebase) {
@@ -487,22 +585,31 @@ async function main(): Promise<void> {
   if (canSaveToFirebase) {
     console.log(`\nFirebase:`);
     console.log(`  Saved: ${merchantsSavedToFirebase.length} merchants`);
+    console.log(`  Verified: ${merchantsFirebaseVerified.length} merchants`);
+    if (merchantsFirebaseVerifyFailed.length > 0) {
+      console.log(`  Verify failed: ${merchantsFirebaseVerifyFailed.length} merchants`);
+    }
     console.log(`  Not saved (errors): ${merchantsWithErrors.length} merchants`);
   }
 
   console.log('\nOutput files:');
-  console.log(`  - step3_validation_<merchantId>.json (detailed results)`);
+  console.log(`  - step3_validation_<merchantId>.json (local validation)`);
+  console.log(`  - step3_firebase_validation_<merchantId>.json (Firebase verification)`);
   console.log(`  - step3_validation_summary.json (summary)`);
 
   // Final status
   console.log('\n' + '='.repeat(60));
-  if (totalErrors === 0) {
-    console.log('✅ ALL WIDGETS VALIDATED SUCCESSFULLY');
-    if (canSaveToFirebase && merchantsSavedToFirebase.length > 0) {
-      console.log(`Saved ${merchantsSavedToFirebase.length} merchant(s) to Firebase.`);
+  if (totalErrors === 0 && merchantsFirebaseVerifyFailed.length === 0) {
+    console.log('✅ ALL WIDGETS VALIDATED AND VERIFIED');
+    if (canSaveToFirebase && merchantsFirebaseVerified.length > 0) {
+      console.log(`Saved and verified ${merchantsFirebaseVerified.length} merchant(s) in Firebase.`);
     } else if (!canSaveToFirebase) {
       console.log('To save to Firebase, configure FIREBASE_DATABASE_URL and FIREBASE_SERVICE_ACCOUNT');
     }
+  } else if (merchantsFirebaseVerifyFailed.length > 0) {
+    console.log('⚠️  FIREBASE VERIFICATION FAILED');
+    console.log(`${merchantsFirebaseVerifyFailed.length} merchant(s) saved but failed verification.`);
+    console.log('Check step3_firebase_validation_*.json for details.');
   } else {
     console.log('❌ VALIDATION ERRORS FOUND');
     console.log(`${merchantsWithErrors.length} merchant(s) NOT saved to Firebase due to errors.`);
