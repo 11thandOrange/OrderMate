@@ -9,8 +9,9 @@
  * - Verifies no duplicate widget IDs or option IDs
  * - Verifies no duplicate labels within a merchant
  * 
- * NOTE: This validates the LOCAL output files, not Firebase.
- * Run this before uploading to Firebase to catch errors.
+ * Data Source:
+ * - If FIREBASE_DATABASE_URL is set: validates widgets from Firebase
+ * - Otherwise: validates local output files
  * 
  * Usage: npx ts-node src/step3-validate-widgets.ts [merchantId]
  * 
@@ -43,6 +44,7 @@ import {
   ensureOutputDir
 } from './utils';
 import { MOCK_MERCHANT_IDS } from './mockData';
+import { isFirebaseConfigured, getWidgetsFromFirebase } from './firebaseApi';
 
 // Valid widget types
 const VALID_WIDGET_TYPES = ['SINGLE_SELECT', 'MULTI_SELECT', 'CALENDAR', 'TEXT_BOX'];
@@ -279,22 +281,63 @@ function validateWidget(
 }
 
 /**
+ * Convert Firebase widget data to WidgetConfig array
+ */
+function firebaseDataToWidgets(data: Record<string, any>): WidgetConfig[] {
+  const widgets: WidgetConfig[] = [];
+  
+  for (const [id, widgetData] of Object.entries(data)) {
+    if (widgetData && typeof widgetData === 'object') {
+      widgets.push({
+        id,
+        type: widgetData.type,
+        label: widgetData.label,
+        isEnabled: widgetData.isEnabled ?? true,
+        isRequired: widgetData.isRequired ?? false,
+        showInFilter: widgetData.showInFilter ?? true,
+        order: widgetData.order ?? 0,
+        level: widgetData.level,
+        options: widgetData.options || []
+      });
+    }
+  }
+  
+  return widgets;
+}
+
+/**
  * Validate all widgets for a merchant
  */
-function validateMerchantWidgets(merchantId: string): Step3Output | null {
+async function validateMerchantWidgets(merchantId: string, useFirebase: boolean): Promise<Step3Output | null> {
   console.log(`\nValidating widgets for merchant: ${merchantId}`);
 
-  // Load Step 2 output
-  const step2File = `step2_widgets_${merchantId}.json`;
-  if (!fileExists(step2File)) {
-    console.error(`  Error: Step 2 output not found for ${merchantId}.`);
-    return null;
+  let widgets: WidgetConfig[];
+
+  if (useFirebase) {
+    // Load from Firebase
+    console.log(`  Data source: Firebase`);
+    const firebaseData = await getWidgetsFromFirebase(merchantId);
+    
+    if (!firebaseData) {
+      console.error(`  Error: No widgets found in Firebase for ${merchantId}.`);
+      return null;
+    }
+    
+    widgets = firebaseDataToWidgets(firebaseData);
+    console.log(`  Loaded ${widgets.length} widgets from Firebase`);
+  } else {
+    // Load from local file
+    console.log(`  Data source: Local file`);
+    const step2File = `step2_widgets_${merchantId}.json`;
+    if (!fileExists(step2File)) {
+      console.error(`  Error: Step 2 output not found for ${merchantId}.`);
+      return null;
+    }
+
+    const step2Output = readInput<Step2Output>(step2File);
+    widgets = step2Output.createdWidgets;
+    console.log(`  Loaded ${widgets.length} widgets from local file`);
   }
-
-  const step2Output = readInput<Step2Output>(step2File);
-  const widgets = step2Output.createdWidgets;
-
-  console.log(`  Loaded ${widgets.length} widgets from Step 2`);
 
   const allErrors: ValidationError[] = [];
   const allWarnings: ValidationWarning[] = [];
@@ -374,6 +417,14 @@ async function main(): Promise<void> {
 
   ensureOutputDir();
 
+  // Check if Firebase is configured
+  const useFirebase = isFirebaseConfigured();
+  if (useFirebase) {
+    console.log('\n✅ Firebase configured - validating widgets from Firebase');
+  } else {
+    console.log('\n⚠️  Firebase not configured - validating local files');
+  }
+
   // Get merchant ID from command line
   const args = process.argv.slice(2);
   const targetMerchantId = args[0];
@@ -383,6 +434,16 @@ async function main(): Promise<void> {
   if (targetMerchantId) {
     merchantIds = [targetMerchantId];
     console.log(`Validating single merchant: ${targetMerchantId}`);
+  } else if (useFirebase) {
+    // When using Firebase, merchant ID is required
+    const envMerchantId = process.env.CLOVER_MERCHANT_ID;
+    if (envMerchantId) {
+      merchantIds = [envMerchantId];
+      console.log(`Validating merchant from environment: ${envMerchantId}`);
+    } else {
+      console.error('Error: When using Firebase, provide merchant ID as argument or set CLOVER_MERCHANT_ID');
+      process.exit(1);
+    }
   } else {
     merchantIds = MOCK_MERCHANT_IDS;
     console.log(`Validating ${merchantIds.length} merchants`);
@@ -391,7 +452,7 @@ async function main(): Promise<void> {
   const allOutputs: Step3Output[] = [];
 
   for (const merchantId of merchantIds) {
-    const output = validateMerchantWidgets(merchantId);
+    const output = await validateMerchantWidgets(merchantId, useFirebase);
 
     if (output) {
       allOutputs.push(output);
@@ -453,10 +514,18 @@ async function main(): Promise<void> {
   console.log('\n' + '='.repeat(60));
   if (totalErrors === 0) {
     console.log('✅ ALL WIDGETS VALIDATED SUCCESSFULLY');
-    console.log('Ready to upload to Firebase.');
+    if (useFirebase) {
+      console.log('Firebase widgets are correctly configured.');
+    } else {
+      console.log('Ready to upload to Firebase.');
+    }
   } else {
     console.log('❌ VALIDATION ERRORS FOUND');
-    console.log('Fix errors before uploading to Firebase.');
+    if (useFirebase) {
+      console.log('Firebase widgets have errors that need to be fixed.');
+    } else {
+      console.log('Fix errors before uploading to Firebase.');
+    }
   }
   console.log('='.repeat(60));
 
