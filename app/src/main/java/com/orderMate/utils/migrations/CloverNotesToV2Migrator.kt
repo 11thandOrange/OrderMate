@@ -164,7 +164,7 @@ object CloverNotesToV2Migrator {
             // Run on background thread
             Thread {
                 try {
-                    val orders = orderConnector.getOrders()
+                    val orders = orderConnector.getOrders(mutableListOf())
                     callback(orders)
                 } catch (e: Exception) {
                     Log.e(TAG, "Error fetching orders: ${e.message}")
