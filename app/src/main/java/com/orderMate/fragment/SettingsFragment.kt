@@ -1178,7 +1178,8 @@ class SettingsFragment : Fragment() {
     private fun saveAdvancedSettingsToFirebase() {
         merchantId?.let { mid ->
             val settings = AdvancedSettings(
-                useOrderMateInRegister = switchUseInCloverRegister?.isChecked ?: true,
+                useOrderMateInRegister = switchUseInCloverRegister?.isChecked ?: false,
+                useOrderMateRegisterInstead = switchUseOrderMateInstead?.isChecked ?: true,
                 scheduledNotificationsEnabled = switchScheduledNotifications?.isChecked ?: false,
                 notificationDays = settingsManager.getNotificationDays(),
                 notificationMinutes = settingsManager.getNotificationMinutes(),
@@ -1253,12 +1254,14 @@ class SettingsFragment : Fragment() {
                     settingsManager.setReceiptDays(settings.receiptDays)
                     settingsManager.setReceiptMinutes(settings.receiptMinutes)
                     settingsManager.setUseOrderMateRegister(settings.useOrderMateInRegister)
+                    settingsManager.setUseOrderMateRegisterInstead(settings.useOrderMateRegisterInstead)
                     settingsManager.setScheduledNotificationsEnabled(settings.scheduledNotificationsEnabled)
                     settingsManager.setScheduledReceiptEnabled(settings.scheduledReceiptEnabled)
                     settingsManager.setPrintNotesOnCustomerReceipts(settings.printNotesOnCustomerReceipts)
                     settingsManager.setPrintNotesOnOrderReceipts(settings.printNotesOnOrderReceipts)
                     
                     // Update UI - toggles
+                    switchUseOrderMateInstead?.isChecked = settings.useOrderMateRegisterInstead
                     switchScheduledNotifications?.isChecked = settings.scheduledNotificationsEnabled
                     switchScheduledReceipt?.isChecked = settings.scheduledReceiptEnabled
                     
