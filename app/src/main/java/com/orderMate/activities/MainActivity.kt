@@ -167,8 +167,18 @@ class MainActivity : AppCompatActivity() {
     /**
      * Run migration from legacy Clover notes to V2 widgets
      * Reads orders, analyzes notes, creates widgets in Firebase
+     * Only runs once per merchant (tracks completion in SharedPreferences)
      */
     private fun runCloverNotesMigration(merchantId: String) {
+        val migrationKey = "clover_notes_migration_completed_$merchantId"
+        val prefs = getSharedPreferences("migration_prefs", MODE_PRIVATE)
+        val alreadyMigrated = prefs.getBoolean(migrationKey, false)
+        
+        if (alreadyMigrated) {
+            Log.d("MainActivity", "Clover notes migration already completed for $merchantId")
+            return
+        }
+        
         Log.d("MainActivity", "Starting Clover notes migration...")
         
         SchemaMigrator.migrateCloverNotes(this, merchantId) { result ->
@@ -182,6 +192,12 @@ class MainActivity : AppCompatActivity() {
                 Log.e("MainActivity", "Errors: ${result.errors}")
             }
             Log.d("MainActivity", "========================")
+            
+            // Mark migration as completed if successful
+            if (result.success) {
+                prefs.edit().putBoolean(migrationKey, true).apply()
+                Log.d("MainActivity", "Migration marked as completed")
+            }
         }
     }
     
