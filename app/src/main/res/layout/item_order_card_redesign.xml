@@ -297,7 +297,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginTop="15dp"
-                android:paddingTop="15dp"
                 android:visibility="gone"
                 tools:visibility="visible">
 
@@ -305,8 +304,6 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="2dp"
-                    android:layout_marginBottom="15dp"
-                    android:layout_marginTop="-15dp"
                     android:background="@color/white"/>
 
                 <TextView
@@ -316,6 +313,7 @@
                     android:textColor="@color/text_muted"
                     android:textSize="11sp"
                     android:letterSpacing="0.05"
+                    android:layout_marginTop="15dp"
                     android:layout_marginBottom="8dp"/>
 
                 <!-- Notes Chips Container -->
