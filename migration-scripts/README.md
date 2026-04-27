@@ -45,20 +45,29 @@ export CLOVER_ENVIRONMENT="sandbox"  # or "production"
 | `CLOVER_MERCHANT_ID` | Yes | Merchant ID to fetch orders for |
 | `CLOVER_ENVIRONMENT` | No | `sandbox` (default) or `production` |
 
-### 3. Firebase (for Step 2 output)
-Set environment variables to save widgets directly to Firebase:
+### 3. Firebase (for Step 2 output and Step 3 validation)
+Set environment variables to save/read widgets directly from Firebase:
 
 ```bash
-export FIREBASE_DATABASE_URL="https://your-project.firebaseio.com"
-export FIREBASE_SERVICE_ACCOUNT="./path/to/service-account.json"
+# Use the setup script (recommended)
+source setup-env.sh
+
+# Or set manually:
+export FIREBASE_DATABASE_URL="https://ordermate-53077-default-rtdb.firebaseio.com"
+export FIREBASE_SERVICE_ACCOUNT="./service-account.json"
 ```
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `FIREBASE_DATABASE_URL` | Yes | Firebase Realtime Database URL |
+| `FIREBASE_DATABASE_URL` | Yes | `https://ordermate-53077-default-rtdb.firebaseio.com` |
 | `FIREBASE_SERVICE_ACCOUNT` | Yes | Path to service account JSON file |
 
-If Firebase is not configured, Step 2 writes to local files only.
+**To get the service account file:**
+1. Go to [Firebase Console](https://console.firebase.google.com/project/ordermate-53077/settings/serviceaccounts/adminsdk)
+2. Click "Generate new private key"
+3. Save as `service-account.json` in this directory
+
+If Firebase is not configured, scripts use local files only.
 
 ## Scripts
 
