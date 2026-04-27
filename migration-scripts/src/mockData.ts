@@ -225,9 +225,9 @@ export function generateMockV2Widgets(merchantId: string): WidgetConfig[] {
       order: 1,
       level: NoteLevel.ORDER,
       options: [
-        { id: uuidv4(), label: 'Birthday', value: 'Birthday', isDefault: true },
-        { id: uuidv4(), label: 'Wedding', value: 'Wedding', isDefault: false },
-        { id: uuidv4(), label: 'Custom', value: 'Custom', isDefault: false }
+        { id: uuidv4(), label: 'Birthday', value: 'Birthday', isDefault: true, color: null },
+        { id: uuidv4(), label: 'Wedding', value: 'Wedding', isDefault: false, color: null },
+        { id: uuidv4(), label: 'Custom', value: 'Custom', isDefault: false, color: null }
       ]
     },
     {
@@ -240,9 +240,9 @@ export function generateMockV2Widgets(merchantId: string): WidgetConfig[] {
       order: 2,
       level: NoteLevel.ORDER,
       options: [
-        { id: uuidv4(), label: 'Pending', value: 'Pending', isDefault: true },
-        { id: uuidv4(), label: 'In Progress', value: 'In Progress', isDefault: false },
-        { id: uuidv4(), label: 'Ready', value: 'Ready', isDefault: false }
+        { id: uuidv4(), label: 'Pending', value: 'Pending', isDefault: true, color: null },
+        { id: uuidv4(), label: 'In Progress', value: 'In Progress', isDefault: false, color: null },
+        { id: uuidv4(), label: 'Ready', value: 'Ready', isDefault: false, color: null }
       ]
     },
     {

@@ -39,7 +39,7 @@ export interface WidgetOption {
   label: string;
   value: string;
   isDefault: boolean;
-  color?: string;
+  color: string | null;  // null is default per Android WidgetOption model
 }
 
 // Widget configuration for V2 schema

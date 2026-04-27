@@ -210,7 +210,7 @@ export function createWidget(
     label: value,
     value: value,
     isDefault: index === 0,
-    color: undefined
+    color: null  // Default is null per Android WidgetOption model
   }));
 
   return {
@@ -309,32 +309,18 @@ export function getTimestamp(): string {
 /**
  * Convert widget config to Firebase format
  */
-/**
- * Remove undefined values from object (Firebase doesn't accept undefined)
- */
-function removeUndefined(obj: Record<string, unknown>): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(obj)) {
-    if (value !== undefined) {
-      result[key] = value;
-    }
-  }
-  return result;
-}
-
 export function widgetToFirebaseFormat(widget: WidgetConfig): Record<string, unknown> {
   const optionsMap: Record<string, unknown> = {};
   for (const opt of widget.options) {
-    // Only include defined values (Firebase rejects undefined)
-    optionsMap[opt.id] = removeUndefined({
+    optionsMap[opt.id] = {
       label: opt.label,
       value: opt.value,
       isDefault: opt.isDefault,
-      color: opt.color
-    });
+      color: opt.color  // null is valid, undefined is not
+    };
   }
   
-  return removeUndefined({
+  return {
     type: widget.type,
     label: widget.label,
     isEnabled: widget.isEnabled,
@@ -342,6 +328,6 @@ export function widgetToFirebaseFormat(widget: WidgetConfig): Record<string, unk
     showInFilter: widget.showInFilter,
     order: widget.order,
     level: widget.level,
-    options: Object.keys(optionsMap).length > 0 ? optionsMap : undefined
-  });
+    options: optionsMap
+  };
 }

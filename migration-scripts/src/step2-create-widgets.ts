@@ -64,7 +64,7 @@ function createWidgetFromLabelStats(
       label: value,
       value: value,
       isDefault: index === 0,
-      color: undefined
+      color: null  // Default is null per Android WidgetOption model
     }));
   }
   
