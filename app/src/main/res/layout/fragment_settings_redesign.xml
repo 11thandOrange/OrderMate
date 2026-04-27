@@ -172,7 +172,7 @@
                             android:id="@+id/switchUseInCloverRegister"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="true"
+                            android:checked="false"
                             android:thumb="@drawable/bg_toggle_thumb"
                             android:track="@drawable/bg_toggle_track" />
 
@@ -216,7 +216,7 @@
                             android:id="@+id/switchUseOrderMateInstead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:thumb="@drawable/bg_toggle_thumb"
                             android:track="@drawable/bg_toggle_track" />
 
