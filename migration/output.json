@@ -98,7 +98,7 @@
         "e53e55ac-2344-4012-bcff-e2e10d3f6ebe": {
           "content": "Your order from {{merchant_name}} is ready for pickup! ",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
@@ -295,12 +295,12 @@
         "87de7f7d-423e-4678-8620-55aa5cb7579c": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         },
         "ab1121f9-bd81-4576-ac1d-80fbb08843e2": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
@@ -703,7 +703,7 @@
     },
     "1ZDDZMNGT3YC1": {
       "meta": {
-        "updatedAt": 1777418521043
+        "updatedAt": 1777419032673
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -722,14 +722,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "493f15bd-b150-4834-83fa-a96e83add0bd": {
+        "61d8e3cb-5df3-4713-8f02-52404d4ad4b5": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "5310ad5e-a650-44aa-84e2-e70b19f4ba85": {
+        "dc88112e-aa4b-45f7-b812-dc96b3fa7815": {
           "isEnabled": false,
           "isRequired": false,
           "label": "PickUp Date",
@@ -738,7 +738,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "7b63b056-f220-4ca5-90a2-0d75d2953bf8": {
+        "a7b8cb07-19cf-4d73-bba9-ab15679f24c6": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -747,7 +747,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "74ccc644-97bb-4f5b-a6da-ba40296d6dc5": {
+        "7cc026e1-d792-43c6-9db9-217852c4e944": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -756,7 +756,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "be642819-a957-46ba-966f-69cbd0942fe6": {
+        "7c02c418-8f22-44ab-adbd-4e1d39ea447e": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -765,7 +765,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "186d6f30-3637-4b57-af2b-18edb30f3414": {
+        "44c40e2d-7c88-428d-b57c-90dbebc82820": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Description",
@@ -774,7 +774,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "81252fd5-8d66-4745-9442-a8a4c5b0bfc3": {
+        "6dbe5a8b-5467-4f1b-bd52-7ae2d0f1c17b": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Status",
@@ -787,7 +787,7 @@
     },
     "21EVWERJPYZ91": {
       "meta": {
-        "updatedAt": 1777418521043
+        "updatedAt": 1777419032673
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -806,14 +806,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "b097b70c-fb13-4fd4-959d-142b8c599649": {
+        "dc81daa4-d444-4a66-8cf3-1a0dbfcd162d": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "651a28de-0651-4d6c-83ad-e27a0b499be6": {
+        "d78a0605-c7fc-4aa4-a98e-403a1d73f06e": {
           "isEnabled": false,
           "isRequired": false,
           "label": "PickUp Date",
@@ -822,7 +822,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "c6e43648-254f-472e-bfcc-87c8c641dacf": {
+        "22c01250-94a6-4117-bd82-36b6b9b400b5": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -831,7 +831,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "2630e6a2-179d-4bdf-b0f0-11b837b1e31c": {
+        "1533695f-9f00-4d8f-9cc9-6037f666c6c1": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -840,7 +840,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "1cb26f95-9b79-4ffc-8ec5-da3a80d7aa1d": {
+        "99e3a10b-d4b7-405d-8be4-5eb1481c29c5": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -849,7 +849,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "2a0253a6-5d43-4330-8bbf-d719558d4b57": {
+        "1057697c-32d1-42b8-b4c5-ac9c34e634da": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Description",
@@ -858,7 +858,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "93197270-a117-498a-841e-5594ad834710": {
+        "3a74987b-a302-472c-a6ea-6412774ecb92": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Status",
@@ -871,7 +871,7 @@
     },
     "3CJDWM24K7AG1": {
       "meta": {
-        "updatedAt": 1777418521043
+        "updatedAt": 1777419032673
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -890,14 +890,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "92247f5a-4dee-4ee9-b597-2c38c937d315": {
+        "e2aa8ca2-108e-4046-9c2b-288d3e08b25d": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "843b28e8-e6ec-4baf-b9e4-bfd31f9a2a95": {
+        "ae7a1e09-6289-4384-8d24-f02ae13f4c2a": {
           "isEnabled": true,
           "isRequired": false,
           "label": "PickUp Date",
@@ -906,7 +906,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "65f3b0cd-224d-4beb-8d3a-1153311b0538": {
+        "1e07894d-18ed-4998-93bc-9d6924633505": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Category",
@@ -915,7 +915,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "44878904-a9f5-413f-afb3-58c9ee29351f": {
+        "ba29fbf0-46ff-4e8a-994b-83de75e2549c": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Sub-Category",
@@ -924,7 +924,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "0aa759f5-578e-4be6-91b3-78885474dd8e": {
+        "7d56195b-a974-4710-b66d-11c2fcc552f3": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Type",
@@ -933,7 +933,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "3bdbce74-fd39-43cc-924c-4c9d2ca11b5a": {
+        "c95a4ede-338f-4284-8d1e-b3a38b15c919": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Description",
@@ -942,7 +942,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "fdf5b81f-40bd-433e-b735-da80960b7885": {
+        "43c4ffa0-452b-49b3-b3ab-063cfa5dddbc": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Status",
@@ -955,7 +955,7 @@
     },
     "44T13DD520SS1": {
       "meta": {
-        "updatedAt": 1777418521043
+        "updatedAt": 1777419032673
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -974,14 +974,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "49623820-f605-42ad-9c13-b76d1feba3b6": {
+        "2a8947a8-01cd-4620-8fe8-06339ae1fa59": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "b954170f-c660-418a-a6c7-80b5dfb53c63": {
+        "4265b9ba-2c20-416b-9f75-5f71c594109b": {
           "isEnabled": false,
           "isRequired": false,
           "label": "PickUp Date",
@@ -990,7 +990,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "ec8fd105-9fe2-4a93-9c8c-a71caff39574": {
+        "fa7c2074-f0f0-454f-a4c8-d89cceddfb24": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -999,7 +999,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "18499bcb-3350-4ec0-8e85-c3f75f9ba4a1": {
+        "8d3da36c-0641-4e30-9b5d-3341eb19a34e": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -1008,7 +1008,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "6ca1e827-d5f7-4bb1-8bc6-8ce85288321b": {
+        "f99e75d6-df60-4c08-9489-f8569d2dc454": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -1017,7 +1017,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "f3fdc906-454a-48bb-b378-66a3655c47f7": {
+        "1c5b319f-f92a-4478-89f1-871ccd05ddce": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Description",
@@ -1026,7 +1026,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "322448eb-1404-4164-8221-cc5eaada05e0": {
+        "9d00cc37-e35e-41a1-b7e6-5693092a8056": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Status",
@@ -1039,7 +1039,7 @@
     },
     "4ERXG6C3RSXR1": {
       "meta": {
-        "updatedAt": 1777418521043
+        "updatedAt": 1777419032673
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -1058,14 +1058,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "95fb3ed8-5506-41ec-b5a2-db44b714fa3f": {
+        "7c05f4f7-2d8c-4399-af24-197f2156146f": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "8a1ec313-f4bf-47a9-b1c2-316a7347637c": {
+        "834f1943-2bb8-457e-9809-8e507eade70b": {
           "isEnabled": true,
           "isRequired": false,
           "label": "PickUp Date",
@@ -1074,7 +1074,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "293fec13-16fd-4222-b694-38870e84af5a": {
+        "5c4b92e2-64a2-4da7-b8ba-3350c43299cf": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -1083,7 +1083,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "1630ab2c-b223-443e-a15b-eed3ddc4c45e": {
+        "9e234222-24fa-4d21-b9c5-58de69e9bdbd": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -1092,7 +1092,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "020605cf-386d-4dcd-92f3-70c649105001": {
+        "e95a9182-b8fa-49a4-9164-73b798fdd815": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Type",
@@ -1101,19 +1101,19 @@
           "showInFilter": true,
           "type": "MULTI_SELECT",
           "options": {
-            "5dee3640-2d8f-4a1a-adf4-8c826d4e1521": {
+            "9628c427-5992-40c7-bcca-62fd86a9214e": {
               "isDefault": true,
               "label": "Church Orders",
               "value": "Church Orders"
             },
-            "481c52f4-2b70-4ccd-8ae6-12f5514ed325": {
+            "a8e5cc38-e00c-463f-a7a6-d827e2447da4": {
               "isDefault": false,
               "label": "Basket Orders",
               "value": "Basket Orders"
             }
           }
         },
-        "3f9f8f30-79ef-45ac-b1cf-e4ee0be2279c": {
+        "70a389ac-6004-4b9d-af5c-98cf07058944": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Description",
@@ -1122,7 +1122,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "82aa921a-d1cc-4702-8f4f-e5204056eca9": {
+        "98d32455-3cf7-4784-9d5d-ddff4923f86e": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Status",
@@ -1131,12 +1131,12 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT",
           "options": {
-            "6c6c3a54-7b78-4b5c-a403-bdee14c5787b": {
+            "ed8e2a25-2b9c-4399-b0c5-38dffb7582f6": {
               "isDefault": true,
               "label": "Paid",
               "value": "Paid"
             },
-            "7a2308b3-459d-4bfb-9278-ddeea6d27a1e": {
+            "0f5f30c7-e7e7-4adb-8472-e9cd330bf6a2": {
               "isDefault": false,
               "label": "Not Paid",
               "value": "Not Paid"
@@ -1147,7 +1147,7 @@
     },
     "900AYZATDGVH1": {
       "meta": {
-        "updatedAt": 1777418521043
+        "updatedAt": 1777419032673
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -1166,14 +1166,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "9d4ff389-5e68-4a3d-ba57-1f793d00d24c": {
+        "d61f6387-3d7f-4a45-a100-3780ffe02618": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "1288b32b-0afe-4e39-b3ab-e31a7ae9b4b0": {
+        "d5e71fae-e40a-446c-bbf2-7676cfe34dcb": {
           "isEnabled": true,
           "isRequired": false,
           "label": "PickUp Date",
@@ -1182,7 +1182,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "b08542dc-9ca8-478f-8524-9c5a516c041d": {
+        "46e5ad50-6c00-4597-b8d2-3b93eccbbb73": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Category",
@@ -1191,19 +1191,19 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT",
           "options": {
-            "033f6c3a-92f7-4d0d-869d-3f38e2156315": {
+            "a0237149-958e-45b8-ab49-b55c605b5f76": {
               "isDefault": true,
               "label": "Fresh",
               "value": "Fresh"
             },
-            "59d51bb4-9b67-41a0-ac38-65a12786d370": {
+            "6afe52a2-a895-482c-9ca9-d87ccf6d0f47": {
               "isDefault": false,
               "label": "Frozen",
               "value": "Frozen"
             }
           }
         },
-        "cf0c0de3-aee9-457f-97df-6e8fe8791e1d": {
+        "7ff53a9d-eff7-46b3-a960-8c072dd1eedd": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -1212,7 +1212,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "32b84b71-ebf1-48b3-87a5-f16032e67cab": {
+        "c699e140-b543-488f-b6cf-5eacf0ff5dfa": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Type",
@@ -1221,24 +1221,24 @@
           "showInFilter": true,
           "type": "MULTI_SELECT",
           "options": {
-            "50327065-6883-4414-b082-f769367ff6e7": {
+            "47620226-cb91-4a4d-b0a8-782545afe074": {
               "isDefault": true,
               "label": "Catering",
               "value": "Catering"
             },
-            "d4ae82a2-f292-46f3-85de-74c0e15b05c9": {
+            "65948649-6b5f-437a-aced-a8ba4f1b61ef": {
               "isDefault": false,
               "label": "Delivery",
               "value": "Delivery"
             },
-            "cb57ad43-4f1f-4a52-98b1-8aae8b32c06d": {
+            "76ccc1e4-040b-4ef0-a38e-442f023da5c7": {
               "isDefault": false,
               "label": "Store Pickup",
               "value": "Store Pickup"
             }
           }
         },
-        "50a814d6-b04c-4e3c-8ad4-073f463f2df6": {
+        "8e55b6e4-d497-466e-9676-cfd6aed3672f": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Description",
@@ -1247,7 +1247,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "64803d1a-8004-4678-84a0-a9f1ad4fd853": {
+        "226164b3-5c3f-4898-8a8e-e7dd9f836973": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Status",
@@ -1256,22 +1256,22 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT",
           "options": {
-            "df9d015d-7ba0-4356-b570-8f8e30626c10": {
+            "d0dabc8c-d226-4f5f-bb8c-52029f714c58": {
               "isDefault": true,
               "label": "In Progress",
               "value": "In Progress"
             },
-            "0a5d74d6-58f1-45a1-becb-be4ec09616d6": {
+            "ee427821-04dd-46ba-a128-b5b2c8cee66e": {
               "isDefault": false,
               "label": "Waiting on Product",
               "value": "Waiting on Product"
             },
-            "ec134336-acf9-43fd-842d-7c9dbaabf878": {
+            "969c95f9-7df8-482c-8aef-723fbfecb363": {
               "isDefault": false,
               "label": "Ready for Pick Up",
               "value": "Ready for Pick Up"
             },
-            "6b3ed4ed-b5d1-409b-9591-7dc2bc91dcfa": {
+            "eb73623c-4cf6-444c-8ba5-297a75f0aa8b": {
               "isDefault": false,
               "label": "Ready for Delivery",
               "value": "Ready for Delivery"
@@ -1282,7 +1282,7 @@
     },
     "A1SV9C834EP81": {
       "meta": {
-        "updatedAt": 1777418521043
+        "updatedAt": 1777419032673
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -1301,14 +1301,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "cc7b50e1-6ace-4320-8833-958449ff9071": {
+        "fd998b24-7a77-41b7-b717-350272ca331b": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "69e81448-bbc1-4b9d-b2dd-313d2b85859f": {
+        "6f1bf56a-7e73-4b63-8bac-3b60d215d66c": {
           "isEnabled": false,
           "isRequired": false,
           "label": "PickUp Date",
@@ -1317,7 +1317,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "d916bcd1-6c46-4b4d-a277-c52b492086e6": {
+        "5488fc74-ca3c-4a99-a0c4-c5661aff96f8": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -1326,7 +1326,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "4d03fa2d-fa31-43fe-9442-9494d109dd9e": {
+        "c5e5b8c2-4c4a-4165-835d-80dabb74e22f": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -1335,7 +1335,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "220e06b4-e8bc-4918-b336-4c143b4388ca": {
+        "92c7f805-3aec-4940-843e-e4bc75ff421f": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -1344,7 +1344,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "3c3e7a7b-4840-41e5-b925-4e5c1ade713b": {
+        "e2358318-5d65-45ee-a434-ab0c0e5340c9": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Description",
@@ -1353,7 +1353,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "bca2bd4e-0ad8-4349-adca-26b59d81d888": {
+        "d53c87d8-c5d2-4af3-be5f-21db4cc44ffb": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Status",
@@ -1366,7 +1366,7 @@
     },
     "AK1Z1ZGFMX8GA": {
       "meta": {
-        "updatedAt": 1777418521043
+        "updatedAt": 1777419032673
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -1385,14 +1385,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "344ea172-ecc3-4cf7-951f-0bcb2b838a34": {
+        "009fa33b-df3e-4455-9e2f-43c478513f06": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "0e6250ee-1d2a-42cb-ae23-4eaf7634b959": {
+        "c2e8fac7-da63-4c8f-9a27-b47cf22ac87c": {
           "isEnabled": true,
           "isRequired": false,
           "label": "PickUp Date",
@@ -1401,7 +1401,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "ab0fdd38-f13f-4e65-b369-6b2321948388": {
+        "0b6f78cd-51b9-46fe-860a-d523f7d74637": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -1410,7 +1410,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "c83511b2-a452-4052-ac12-ebce9c28ab1d": {
+        "de814114-ce65-42bc-9e38-027c2bed10f1": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -1419,7 +1419,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "62c5a232-7b45-41e7-aa69-733d763a17c8": {
+        "9b4a8c6b-ef1d-459a-b5f5-d3a0c08d1343": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Type",
@@ -1428,24 +1428,24 @@
           "showInFilter": true,
           "type": "MULTI_SELECT",
           "options": {
-            "fde0e975-2773-4319-be22-326e56a63305": {
+            "ffaad01c-ac40-4b3f-ac38-ab130d22ba29": {
               "isDefault": true,
               "label": "John",
               "value": "John"
             },
-            "5b2e9afb-e1c3-4352-a110-1037fa762c93": {
+            "5e5b42b8-ba9d-4536-a1bb-71a7f549a641": {
               "isDefault": false,
               "label": "Jane",
               "value": "Jane"
             },
-            "64f71e9a-5352-4adc-a245-f8c05be08f91": {
+            "58e19187-59ff-47a3-8609-0041ba0f7728": {
               "isDefault": false,
               "label": "Bob",
               "value": "Bob"
             }
           }
         },
-        "16fab7d6-5d8c-47b0-a426-f392b5e9bc33": {
+        "dbed55da-7a63-4739-85d8-2f3a584d73d4": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Description",
@@ -1454,7 +1454,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "308ddc5b-cb7c-4628-b8ba-619e1c2a4e99": {
+        "d154fbf1-d119-4690-9a88-c903e7057ea5": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Status",
@@ -1463,22 +1463,22 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT",
           "options": {
-            "3bf8faa8-733d-405a-9472-78ab21350c6a": {
+            "c2fada68-add0-43a0-a958-851d54499532": {
               "isDefault": true,
               "label": "Not Started",
               "value": "Not Started"
             },
-            "0f31726c-55c3-4e20-817c-b260776db46d": {
+            "041376b2-0ef6-42d5-83dc-0e2ccc47076e": {
               "isDefault": false,
               "label": "In Progress",
               "value": "In Progress"
             },
-            "9b60957d-7658-4baa-a366-35214da1b5f1": {
+            "ca4f994a-0543-4153-8789-4619c632b11a": {
               "isDefault": false,
               "label": "Parts Ordered",
               "value": "Parts Ordered"
             },
-            "700db931-8b22-46ed-9527-352752cddc9a": {
+            "aa417a49-3186-40eb-9515-cb5a2df809e4": {
               "isDefault": false,
               "label": "Complete",
               "value": "Complete"
@@ -1489,7 +1489,7 @@
     },
     "E9N6PKK0DYN76": {
       "meta": {
-        "updatedAt": 1777418521044
+        "updatedAt": 1777419032673
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -1508,14 +1508,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "12be6157-1655-4c1d-88fc-016c802338f9": {
+        "36eb7c76-ebcf-4fcb-aaf5-bb2b10629e2f": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "6cfbe74f-b9b2-4c86-ae52-3aa7458193ff": {
+        "c59bce1b-8733-413b-8f0d-10022688bedb": {
           "isEnabled": false,
           "isRequired": false,
           "label": "PickUp Date",
@@ -1524,7 +1524,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "e971d462-d3f1-496f-a7da-e6628a185ac9": {
+        "d32499b7-a50f-40fe-b29b-bdd1cbca2404": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -1533,7 +1533,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "f339ab3c-ba7e-4f53-99d7-4ab9a1ecbea0": {
+        "5db86da3-1730-4574-bda2-91db7a02447f": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -1542,7 +1542,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "2e455869-f864-4119-84b6-93fea0379e26": {
+        "8f1b6949-53d0-4b91-8cc9-6f47b49148ed": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -1551,7 +1551,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "dc2ab80e-3b28-4872-85e2-5423ab1a7035": {
+        "5f94cf7e-684b-4226-af04-80c55a87f3f4": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Description",
@@ -1560,7 +1560,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "55879c9e-2647-486f-bdce-e10b5880a438": {
+        "80ad4210-9729-40be-afb0-b4cfd10724c8": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Status",
@@ -1573,7 +1573,7 @@
     },
     "F536253VJTDZ1": {
       "meta": {
-        "updatedAt": 1777418521044
+        "updatedAt": 1777419032673
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -1592,14 +1592,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "39490d56-dd7b-402f-93ad-5581f29df5c4": {
+        "5b109944-e3ee-48f8-986d-c2ea0f5fc1f4": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "a09ff11a-e006-4a78-b04d-6da39ddf9372": {
+        "0d94fca8-6916-42a9-96f7-512d44f43427": {
           "isEnabled": true,
           "isRequired": false,
           "label": "PickUp Date",
@@ -1608,7 +1608,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "0f80c677-9e96-43c2-9dcb-8d0c040959c2": {
+        "e4410b82-45d3-44d5-9837-1ea22c1f5f44": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Category",
@@ -1617,24 +1617,24 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT",
           "options": {
-            "361dc42a-2878-4bdc-aba4-36bbf3fca29f": {
+            "d7359bc6-b02a-4351-b709-ec63b9453967": {
               "isDefault": true,
               "label": "Breakfast",
               "value": "Breakfast"
             },
-            "6fdc6674-cb70-4ef1-bbf0-c9dcf7cacf1f": {
+            "71d6ecb5-1360-406f-9d3c-42e2d7cde59f": {
               "isDefault": false,
               "label": "lunch",
               "value": "lunch"
             },
-            "b88da00c-7f3f-44a5-acdc-b20884568c7b": {
+            "989d73e0-b070-4fd2-920d-fda94b194f3a": {
               "isDefault": false,
               "label": "dinner",
               "value": "dinner"
             }
           }
         },
-        "60523a37-a82e-4c10-93fa-b0ff3f370f6d": {
+        "53915f62-1b95-43f3-a786-1cf71a4190f2": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Sub-Category",
@@ -1643,34 +1643,34 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT",
           "options": {
-            "f2a44c24-5c02-42b0-8a57-b21346e7d439": {
+            "bf7579f7-7878-4840-a880-d04a87778b2a": {
               "isDefault": true,
               "label": "sandwich",
               "value": "sandwich"
             },
-            "22e3afe7-749c-4aba-a483-79664713b46d": {
+            "1f833a1b-e47c-4083-91b5-b59a293805d1": {
               "isDefault": false,
               "label": "cereals",
               "value": "cereals"
             },
-            "f8906bc2-23ef-450b-a801-4d031ff63d9d": {
+            "2d2acbbf-79b4-4659-8abe-65b54057f903": {
               "isDefault": false,
               "label": "milk",
               "value": "milk"
             },
-            "2027abec-8877-4387-8d57-496b60e5c3d2": {
+            "c9ceaad2-60f4-49be-826a-edd9327d044e": {
               "isDefault": false,
               "label": "oats",
               "value": "oats"
             },
-            "ede40053-9349-4f91-bccd-0ec5dfb6b57e": {
+            "0753144a-e964-4847-9873-ae424e9a2bfd": {
               "isDefault": false,
               "label": "cornflakes",
               "value": "cornflakes"
             }
           }
         },
-        "e9616e60-2a46-4c46-9043-58bcc40ea083": {
+        "d91827a5-134c-4388-abd1-dcad30a5ab9a": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Type",
@@ -1679,19 +1679,19 @@
           "showInFilter": true,
           "type": "MULTI_SELECT",
           "options": {
-            "216f9829-3ee5-41b4-8547-556ac93878db": {
+            "c0b0067b-a263-4400-b442-cf6dac18d0d2": {
               "isDefault": true,
               "label": "pre_order",
               "value": "pre_order"
             },
-            "8a722a85-6c7d-4ce9-89b9-81997ffd8a90": {
+            "e112f9a5-d80b-4108-aea3-f015db1c2f2b": {
               "isDefault": false,
               "label": "takeAway",
               "value": "takeAway"
             }
           }
         },
-        "11a50659-aa4b-4ce9-b258-438dcc3e1181": {
+        "73f54971-3c70-4d8d-82fb-0f8c5fb53bff": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Description",
@@ -1700,7 +1700,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "305dc0f1-1e9f-4c95-86ad-dcb48462f6fc": {
+        "0825986b-5829-4527-8787-6c982cfdb840": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Status",
@@ -1709,17 +1709,17 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT",
           "options": {
-            "5fa121e2-2e4e-48a6-af61-24d7e496742b": {
+            "ad98939d-b63e-49c9-9094-a43c6b9087f8": {
               "isDefault": true,
               "label": "complete",
               "value": "complete"
             },
-            "b1e2ace1-7ce6-4066-a421-dc3ecb131910": {
+            "85002da2-c863-4c24-96ca-36b27894c0e6": {
               "isDefault": false,
               "label": "pending",
               "value": "pending"
             },
-            "0e3134f5-f1a0-4b4e-ac2d-34c40368b5cc": {
+            "6b882070-ed4b-4462-91f6-5a1ff28b0eab": {
               "isDefault": false,
               "label": "delivered",
               "value": "delivered"
@@ -1730,7 +1730,7 @@
     },
     "G45V7859GNQT1": {
       "meta": {
-        "updatedAt": 1777418521044
+        "updatedAt": 1777419032673
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -1749,14 +1749,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "f79d62c2-e781-4f8e-8386-ca9b50f33a3f": {
+        "97a9b84f-2b83-4863-baea-6962400aa06a": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "5354b587-4bde-4aeb-bfaf-a576170571bc": {
+        "2faad816-826a-482d-bb31-33751fc6a1f8": {
           "isEnabled": true,
           "isRequired": false,
           "label": "PickUp Date",
@@ -1765,7 +1765,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "38892709-6fd8-4746-8da4-237317e3404d": {
+        "71649e1f-9c89-4f52-888b-d20485642685": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -1774,7 +1774,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "cf01c7cb-46ab-4787-b78c-a30327089aac": {
+        "721c9f3e-c949-4990-aae0-374de7dadf80": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -1783,7 +1783,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "1b77b087-4fdd-40c5-8dbc-1ea37963c6da": {
+        "6eab17fb-a811-4bd2-a25d-8ebdd0097e3b": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -1792,7 +1792,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "0eeb43eb-8386-478d-a05b-4347b1a6d265": {
+        "5b99aa90-5e94-4bef-858d-ae38a8a8ae08": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Description",
@@ -1801,7 +1801,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "c341f087-f18f-42c8-a2c0-fafaf0380f08": {
+        "6f494611-7002-4fc5-a939-87d331dfe697": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Status",
@@ -1814,7 +1814,7 @@
     },
     "GGCE5ARSC5C21": {
       "meta": {
-        "updatedAt": 1777418521044
+        "updatedAt": 1777419032673
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -1833,14 +1833,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "388c67e2-b930-4e45-b888-f8daf29c6d2e": {
+        "1c2d15fb-5e58-47e1-a4ff-82523911086a": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "b062e568-ecb6-46df-b120-a3068bbc82ba": {
+        "77c22fea-6ad4-481e-9a7d-c5173351833c": {
           "isEnabled": true,
           "isRequired": false,
           "label": "PickUp Date",
@@ -1849,7 +1849,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "5f16665c-00a0-4ca1-9abf-6874f35f368f": {
+        "6c001245-1aee-4426-87bf-8b1e003ff614": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Category",
@@ -1858,7 +1858,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "22672d18-7565-438f-a1f7-edc8ab2a314f": {
+        "3a48c420-cd82-47ab-855b-454d01d39b78": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Sub-Category",
@@ -1867,7 +1867,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "8c9adf90-eef9-49c2-b44d-66c0e0f5bac7": {
+        "b65c19db-c819-46f6-ac9b-afc1d63cca9b": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Type",
@@ -1876,7 +1876,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "65cfa210-c111-4f14-b4f1-7357b4c22efd": {
+        "d38dc045-4396-4c79-a96b-8921225fddcc": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Description",
@@ -1885,7 +1885,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "d69bb9a9-55c8-4aca-b12e-624be5f17868": {
+        "8ee10028-4787-446a-8e08-2e0b8bd9f73b": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Status",
@@ -1898,7 +1898,7 @@
     },
     "JA701ZWWF16E1": {
       "meta": {
-        "updatedAt": 1777418521044
+        "updatedAt": 1777419032673
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -1917,14 +1917,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "54b23aef-a0d6-4eb3-af6f-2244be14e7d4": {
+        "e3388307-5def-4896-8dd4-ec14ca5c173d": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "258d925e-283f-4d1c-8554-2d80eb8aebe1": {
+        "95876b27-5260-45b8-84f6-3d0716addf7d": {
           "isEnabled": false,
           "isRequired": false,
           "label": "PickUp Date",
@@ -1933,7 +1933,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "3e240e0a-0d30-435d-b665-3cd226dc4567": {
+        "b0b4120c-5b07-4616-b0b3-d6b003c108b6": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -1942,7 +1942,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "ce254c7b-380e-40a1-8fe0-9d1e47115c26": {
+        "3ce0c46e-69b2-4e74-aaab-b967d78fab2d": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -1951,7 +1951,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "6792f181-2325-4523-b8eb-2cfb7df606e1": {
+        "586e2c07-3da9-40fd-b397-6b5165560db1": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -1960,7 +1960,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "c4482892-db7f-4b5d-8c46-a5fa401104c1": {
+        "b82de46b-f695-4f2c-ad59-181969652f00": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Description",
@@ -1969,7 +1969,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "25d99765-4034-4bb9-b7ba-48fb248a4ca7": {
+        "b4f449ac-0ec4-498e-bce1-1dd3ca2f7b06": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Status",
@@ -1982,7 +1982,7 @@
     },
     "MCCPAA53MGEG1": {
       "meta": {
-        "updatedAt": 1777418521044
+        "updatedAt": 1777419032673
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -2001,14 +2001,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "90c7159a-b962-422c-b57c-6eb57f9fa491": {
+        "a25ab778-6a47-46b6-8f8f-c2f577ddf998": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "abaf76ce-1995-4db1-8999-df157cb284fa": {
+        "a0a5c399-681a-4d0b-b838-68804e68df4f": {
           "isEnabled": false,
           "isRequired": false,
           "label": "PickUp Date",
@@ -2017,7 +2017,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "c7aa63ed-6591-4786-83bb-e05cbc94dcd4": {
+        "2f561414-48df-4573-9a63-28d57c9c9d73": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -2026,7 +2026,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "1d0f6c34-c877-4a4f-9f3e-b7796f4bff46": {
+        "7ad5b47a-e3ca-4086-920f-d4cb709d79cd": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -2035,7 +2035,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "196a23f1-ad75-4a8c-8cae-a7f2faf7d2fc": {
+        "7f13b659-03be-419f-abbf-67ce554012b7": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -2044,7 +2044,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "0c03458c-52af-4320-9e8b-d6e66fe833a9": {
+        "4093960a-5bfe-4493-870f-90a80abd6ed4": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Description",
@@ -2053,7 +2053,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "87bb3c48-884a-4261-9a93-1d7f039c66cb": {
+        "c66350bc-7fc8-43a1-9362-b1c9aef94d8d": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Status",
@@ -2066,7 +2066,7 @@
     },
     "MMEQK0MXFNKT1": {
       "meta": {
-        "updatedAt": 1777418521044
+        "updatedAt": 1777419032674
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -2085,14 +2085,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "fc435d55-a708-4ed7-93cc-2ae8cc763d67": {
+        "2fad7427-021c-4e93-8e1e-0704952f0cdd": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "07c1c8f6-832d-4546-a46a-5ed1aac3e44c": {
+        "f854e2f6-377c-4011-9b0f-d0aad7cfa61a": {
           "isEnabled": false,
           "isRequired": false,
           "label": "PickUp Date",
@@ -2101,7 +2101,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "cb7df851-34e9-4ec7-815f-1ae3358ef7a8": {
+        "b8957e78-385f-4abd-bd62-3be20a86cad1": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -2110,7 +2110,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "db317763-6882-417a-8ac3-9ed2447c9736": {
+        "430dd4b7-8121-47cc-b03f-b0d3e58abdfc": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -2119,7 +2119,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "a5d2a80b-8ec5-4d32-96b6-c2b343ed2147": {
+        "60e227c6-fc89-448a-81f9-879a8f34edc6": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -2128,7 +2128,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "348faee9-96e5-49c8-aa9e-99d6095612be": {
+        "a209c14c-3bbe-43f1-ac1d-6a51d691013d": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Description",
@@ -2137,7 +2137,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "1e2adc52-f7bb-4f0e-9a33-fae98d10cc09": {
+        "4d8512ce-e24d-4d8c-8612-28c812cb19a2": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Status",
@@ -2150,7 +2150,7 @@
     },
     "P6Y8B121FWR61": {
       "meta": {
-        "updatedAt": 1777418521044
+        "updatedAt": 1777419032674
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -2169,14 +2169,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "f2ae184d-f42f-4925-b682-b73c19051174": {
+        "9225bec9-aa44-464a-b80e-b04c451bed21": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "b1aca308-ae7f-4e45-979f-60e4392b5227": {
+        "cadb05d7-caa8-442f-9ec8-2d6536bf91e4": {
           "isEnabled": false,
           "isRequired": false,
           "label": "PickUp Date",
@@ -2185,7 +2185,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "77ce26b4-f3dd-4dd5-8bc1-89bd0e70716b": {
+        "37177182-188e-4698-9a8c-f3969c0f0c47": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -2194,7 +2194,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "9d9a49e9-2eec-4d72-a431-2dade344a713": {
+        "4de841ee-4659-44de-bb29-ec4a3c7f1d4d": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -2203,7 +2203,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "b6345d4f-fb84-40bd-a2b1-ffde06368c88": {
+        "865484fe-c270-43ed-a473-2eba1f1af8f4": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -2212,7 +2212,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "81220087-0496-4f2a-8fa0-1a8c0116a1ed": {
+        "c2187e9c-e90a-428b-ab18-78a6287108c2": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Description",
@@ -2221,7 +2221,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "4a38d593-9e45-4715-a26d-d15b63a902f3": {
+        "c73f4dc1-fdda-4141-8635-bfba94bbac8b": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Status",
@@ -2234,7 +2234,7 @@
     },
     "PRYYAZP59EBN1": {
       "meta": {
-        "updatedAt": 1777418521044
+        "updatedAt": 1777419032674
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -2253,14 +2253,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "9d023d6a-45a6-4637-a4ab-5431cf363539": {
+        "3c1f59a3-4b42-4239-9a9a-95fd46237042": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "58ab227c-94a4-4885-a400-89bf36e69a9f": {
+        "dc08d5c4-1b4a-4fcb-9e46-a9db02328a12": {
           "isEnabled": false,
           "isRequired": false,
           "label": "PickUp Date",
@@ -2269,7 +2269,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "651ebebc-ba5b-4626-b4b1-836316f0660a": {
+        "3face7b0-42ce-4942-93e2-6d1745ccaee5": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -2278,7 +2278,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "b22c2345-4d3c-493d-ace3-79e29d28defc": {
+        "1e75f749-6708-4150-98c3-5fade89987c8": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -2287,7 +2287,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "3c5870eb-55fe-4200-bfd8-fc54ccc0c062": {
+        "1c11e230-18cd-41c8-bb86-511946c80aa3": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -2296,7 +2296,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "58b1618b-2514-4ef8-b7e9-08940bff413b": {
+        "682c6627-b7b8-41f4-af4f-be89b9f76650": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Description",
@@ -2305,7 +2305,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "5e8ebc4b-4017-4e17-91b3-79e811b391b7": {
+        "bcd3cc37-0063-4ee1-adfb-f39c8f3ba0d4": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Status",
@@ -2314,12 +2314,12 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT",
           "options": {
-            "252e76d4-5d92-4f29-a60d-1bc924552052": {
+            "d02a2977-1765-4fc0-83f7-4b61b7307673": {
               "isDefault": true,
               "label": "Ready",
               "value": "Ready"
             },
-            "19d727f7-b06a-4569-99f9-074d0691e702": {
+            "35cb1370-53ec-4b9e-8073-20473cde120e": {
               "isDefault": false,
               "label": "Almost Ready",
               "value": "Almost Ready"
@@ -2330,7 +2330,7 @@
     },
     "PXB9FKN8PPP11": {
       "meta": {
-        "updatedAt": 1777418521044
+        "updatedAt": 1777419032674
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -2349,14 +2349,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "ce8dbdae-8606-41d2-9072-e6dcfb0d4e3d": {
+        "deeb8e96-5bc1-48c8-b6fb-f9d054ecdb97": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "5e847315-9a36-4c44-97a8-b3306e5f09bd": {
+        "b8bfce28-65d0-4c81-854e-49eb2cbfc495": {
           "isEnabled": true,
           "isRequired": false,
           "label": "PickUp Date",
@@ -2365,7 +2365,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "67c8ef2c-4cdb-4bd4-90db-b68de38e7a33": {
+        "4b55d563-d735-4f04-86d8-ed3bb26881d3": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -2374,7 +2374,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "6d055088-39c7-4207-9737-4a2344d3ffcf": {
+        "131cbb54-8c05-43af-ab32-21d4319ef2e3": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -2383,7 +2383,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "9283518a-41c5-40dc-80fb-e21a9c662198": {
+        "b4afbc14-ca54-45e1-a20c-201f75626455": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -2392,7 +2392,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "e551fcdd-46f6-4c22-861e-3d879df76f9b": {
+        "0084d2b4-1b00-4a3a-a3e6-4656a83b0b3b": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Description",
@@ -2401,7 +2401,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "4272c96b-42d0-4858-bda2-4b6c60901821": {
+        "a3c2b374-d527-4d1c-9524-40f1d5aa9b20": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Status",
@@ -2410,17 +2410,17 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT",
           "options": {
-            "929a3275-b870-4a55-9fe6-7a0515d79916": {
+            "c8e5c9ce-23c3-492e-a211-a616832275ef": {
               "isDefault": true,
               "label": "ready",
               "value": "ready"
             },
-            "bffbaaf6-8460-49a1-93b1-1a9e36da6bba": {
+            "70eddb03-a4af-4b09-92e0-cc22793f62a9": {
               "isDefault": false,
               "label": "picked up",
               "value": "picked up"
             },
-            "bf7c6fe2-effb-43a9-875b-ac32449db31b": {
+            "1b37ebf3-07b5-4fa2-8cfb-6da1434a2162": {
               "isDefault": false,
               "label": "paid for",
               "value": "paid for"
@@ -2431,7 +2431,7 @@
     },
     "Q8EEC8DYZB2C1": {
       "meta": {
-        "updatedAt": 1777418521044
+        "updatedAt": 1777419032674
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -2450,14 +2450,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "d9939043-dbf2-404e-b8b6-493e25017ccd": {
+        "ff88602e-e01a-4844-a900-898a8535bd45": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "8e28c980-a61e-4872-90b0-112d1eaac9d4": {
+        "db0e6d63-53b2-41e4-9f95-2138746d1182": {
           "isEnabled": true,
           "isRequired": false,
           "label": "PickUp Date",
@@ -2466,7 +2466,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "7c65f66b-e160-4937-8d66-e297555c88fa": {
+        "940e584a-2603-42cf-aa29-6e33a5bba9f2": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -2475,7 +2475,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "df9a18e4-0489-41e7-bc42-cbe25ca28619": {
+        "ff53586a-211c-4819-ae80-0d901bd611f9": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -2484,7 +2484,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "1980c1fb-427a-4ada-8a3d-08876b79ebe1": {
+        "5edc70f8-b861-4c1a-a6a6-dda693477f56": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -2493,7 +2493,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "81dc284e-9d99-4661-a483-aa8f90829d10": {
+        "3694bd03-4856-4b0a-a72b-7430186dec31": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Description",
@@ -2502,7 +2502,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "2319e1e4-cb8b-4613-8295-df36241fdcb6": {
+        "f2a7ddb4-63de-4e2e-b71a-9e1fe6d4e013": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Status",
@@ -2515,7 +2515,7 @@
     },
     "QSK6YQ5GCR94C": {
       "meta": {
-        "updatedAt": 1777418521044
+        "updatedAt": 1777419032674
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -2534,14 +2534,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "4586c07d-9524-419a-ad26-a1bc6bcbab8d": {
+        "16d8841d-2f22-45ea-8293-4f4e3bbb5392": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "3eda0522-9917-4fe7-bf5f-74cbfd092d7e": {
+        "d67f3d3f-c8fc-434d-8ab5-4c229f14f41f": {
           "isEnabled": true,
           "isRequired": false,
           "label": "PickUp Date",
@@ -2550,7 +2550,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "60be0433-352d-4291-87c9-b78191891217": {
+        "90cbb512-f456-4b80-9cb5-fd526dc0d848": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -2559,14 +2559,14 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT",
           "options": {
-            "040243eb-9983-4408-b436-7ec3c64af20a": {
+            "4085e57f-84f8-4dd2-b121-c361e24057b0": {
               "isDefault": true,
               "label": "Referral",
               "value": "Referral"
             }
           }
         },
-        "23dd389a-fc84-43f6-afff-b2eb5dbadcc5": {
+        "82478d3d-7c9a-4d9b-9a4f-1ed8e3472720": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -2575,59 +2575,59 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT",
           "options": {
-            "2713b845-62e6-40fe-8a08-8c95a7f5ce32": {
+            "94f0010c-c492-4156-a7e0-db3ab1e787bf": {
               "isDefault": true,
               "label": "Fish-On Charters",
               "value": "Fish-On Charters"
             },
-            "439dc457-c880-475f-9022-b72cc1cf42c8": {
+            "aa12cfc0-014e-4d39-a39d-4a17b55ac209": {
               "isDefault": false,
               "label": "Tower Rock Lodge",
               "value": "Tower Rock Lodge"
             },
-            "13996fe0-7672-4b8d-8f60-0dfbec410865": {
+            "8faa70d8-63cf-4876-92b1-19f7bb08f022": {
               "isDefault": false,
               "label": "Big Dan's",
               "value": "Big Dan's"
             },
-            "8367ffae-0c32-4985-90b4-3870a6914420": {
+            "d55bf797-3ac7-4b1f-8416-bb41600be4e0": {
               "isDefault": false,
               "label": "Talon Air Service",
               "value": "Talon Air Service"
             },
-            "a18e5b1a-bea0-475a-9ac4-ad34de8495a2": {
+            "0e1ae37a-c8e8-4fcb-b1f0-110d3afb9264": {
               "isDefault": false,
               "label": "Fishology",
               "value": "Fishology"
             },
-            "61622de4-289e-4e76-bd2b-cdac9adda951": {
+            "5a9bc1da-bcc7-41d6-918d-ff00aee85d7a": {
               "isDefault": false,
               "label": "Trophy Drifters",
               "value": "Trophy Drifters"
             },
-            "ea906661-dc43-436b-b0a8-fd4e7b14aed2": {
+            "8e686e82-5d84-4ba3-8304-17aa8d007c06": {
               "isDefault": false,
               "label": "Legends Sportfishing",
               "value": "Legends Sportfishing"
             },
-            "c34e2874-69cb-4710-ae0a-e613bd755ac4": {
+            "45ddfe64-4b66-4ace-aee4-b71aee4ac4f3": {
               "isDefault": false,
               "label": "Eagle Eye Cabins",
               "value": "Eagle Eye Cabins"
             },
-            "feae661d-976a-4c46-9a70-c93d1fdacf3e": {
+            "373bb5f3-1500-4e6c-bff6-375714d857c2": {
               "isDefault": false,
               "label": "KRSA",
               "value": "KRSA"
             },
-            "ce45677e-4595-463b-afe9-d07001b8f704": {
+            "02627579-6dd4-435d-95c9-7fec255927b1": {
               "isDefault": false,
               "label": "Kenai Drift Anglers",
               "value": "Kenai Drift Anglers"
             }
           }
         },
-        "c735e8bf-9f2d-4d46-bb27-4e7d00186b67": {
+        "68f62630-796e-4493-b345-d5fd4455fb4e": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Type",
@@ -2636,24 +2636,24 @@
           "showInFilter": true,
           "type": "MULTI_SELECT",
           "options": {
-            "9220b870-0216-4fec-becf-1aac4bc1edc6": {
+            "0a73cf81-f9c0-41a7-9f8e-da07bf69a333": {
               "isDefault": true,
               "label": "Fish-On Charters",
               "value": "Fish-On Charters"
             },
-            "2e3abe7b-34d9-4f2d-b2bc-1301d2f62afe": {
+            "2a59d51b-9db1-49a9-9f9c-cbdd7097ca94": {
               "isDefault": false,
               "label": "Tower Rock Lodge",
               "value": "Tower Rock Lodge"
             },
-            "4e61b4d1-b6f8-413a-b6e5-b045b0f5431d": {
+            "42e194a2-eee1-41f7-b09e-e50afbe6944e": {
               "isDefault": false,
               "label": "Big Dan's",
               "value": "Big Dan's"
             }
           }
         },
-        "85b2d3d1-d9f6-4d15-ad72-9768bda6ba54": {
+        "a57fb2b8-0921-487c-98f5-6e03bb1b5c08": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Description",
@@ -2662,7 +2662,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "c43d574b-40ea-4fb6-b05f-3698f519cfa1": {
+        "d8637a91-243a-49d9-bfd7-add89ba592ca": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Status",
@@ -2671,12 +2671,12 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT",
           "options": {
-            "2917ff8f-9b42-4d2c-bc0f-3d976e46359b": {
+            "1b5de939-e186-44d8-9a76-630c6dbd7b0f": {
               "isDefault": true,
               "label": "Pending",
               "value": "Pending"
             },
-            "35eca13f-04ac-4edd-b8d1-76003a7c5c20": {
+            "02666fc9-5093-4105-9e48-9cd05b5266db": {
               "isDefault": false,
               "label": "Completed",
               "value": "Completed"
@@ -2687,7 +2687,7 @@
     },
     "RZCM605FA4BF1": {
       "meta": {
-        "updatedAt": 1777418521044
+        "updatedAt": 1777419032674
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -2706,14 +2706,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "010f3258-c1fd-4e85-8b76-db4f3658c03e": {
+        "05c32024-3172-4cdc-a326-f19cdfea4851": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "4aa268be-e9af-4f22-a313-92d212944139": {
+        "948588ee-5206-44b5-abbe-946e55fc4529": {
           "isEnabled": true,
           "isRequired": false,
           "label": "PickUp Date",
@@ -2722,7 +2722,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "9c273770-31dc-4e22-b7e8-5839d33de238": {
+        "4715113c-8118-49ca-a459-1ae80012310d": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -2731,7 +2731,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "2609924f-0003-40f4-9f21-8c6d9ba027c9": {
+        "862488b6-58da-4a6d-9e1d-056d59b0e5c6": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -2740,7 +2740,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "a1c72435-668b-4d59-86f8-d7dc73263141": {
+        "4cb8208d-4b97-4a41-8b10-bc01f3a10f34": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -2749,7 +2749,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "909004be-4ef3-4eb6-a169-98d723d3bce7": {
+        "e586308d-8d90-47cf-96a6-cc61c020f66d": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Description",
@@ -2758,7 +2758,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "e2678d17-2a63-453f-94c2-4bf83df13d8a": {
+        "c045eaa3-a89c-433c-a517-67b9094b979d": {
           "isEnabled": true,
           "isRequired": false,
           "label": "Status",
@@ -2767,22 +2767,22 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT",
           "options": {
-            "4638cb64-8373-4a59-be46-b8a1b2457866": {
+            "d8b22af4-98f1-42e5-a50c-0784f25a895e": {
               "isDefault": true,
               "label": "pending",
               "value": "pending"
             },
-            "80ff3fdb-2857-490d-81d2-29b5fa6317e8": {
+            "cd153025-e286-46ea-b8f5-7fb2486fdc5c": {
               "isDefault": false,
               "label": "ready",
               "value": "ready"
             },
-            "543a33fc-b1c7-47e7-8366-0f3b7d77e01a": {
+            "3d67ed6c-a0ea-4894-8e30-91f7077770a1": {
               "isDefault": false,
               "label": "delivery pending",
               "value": "delivery pending"
             },
-            "34d2abb0-cc7b-4f49-815e-595b4f7e156e": {
+            "bb9c83ca-c802-4233-bce4-9f2d6c863448": {
               "isDefault": false,
               "label": "delivered",
               "value": "delivered"
@@ -2793,7 +2793,7 @@
     },
     "XM8P0X21XTZ81": {
       "meta": {
-        "updatedAt": 1777418521044
+        "updatedAt": 1777419032674
       },
       "settings": {
         "itemNotesEnabled": true,
@@ -2812,14 +2812,14 @@
         "useOrderMateRegisterInstead": true
       },
       "templates": {
-        "e8fd85ad-0a7b-4c8e-be7d-30bbd5eeac14": {
+        "1147031c-c027-4b26-8e5c-adc239c214c0": {
           "content": "Your order from {{merchant_name}} is ready for pickup!",
           "name": "Order Ready",
-          "subject": "Hello, {{customer_name}}! Your Order Is Ready \ud83d\udd25"
+          "subject": "Hello, {{customer_name}}! Your Order Is Ready 🔥"
         }
       },
       "widgets": {
-        "3ff60276-3b49-4a89-89d5-cfe7f4e23f4c": {
+        "25825064-8e2a-4f1a-9178-870953facd9a": {
           "isEnabled": false,
           "isRequired": false,
           "label": "PickUp Date",
@@ -2828,7 +2828,7 @@
           "showInFilter": true,
           "type": "CALENDAR"
         },
-        "7160d5e9-a7a4-4adc-bb53-762d6b48e35c": {
+        "6ed54d89-1438-4111-80e9-ade00b57cbba": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Category",
@@ -2837,7 +2837,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "80c18df3-4564-425e-a283-bb6c9168992b": {
+        "2f889139-3732-44e4-8a00-4aa69ee2f13c": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Sub-Category",
@@ -2846,7 +2846,7 @@
           "showInFilter": true,
           "type": "SINGLE_SELECT"
         },
-        "ce844b13-3c14-489a-81f2-28a98cc0b2e3": {
+        "1728ac44-93ea-4c0f-b73f-6c5f933d118c": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Type",
@@ -2855,7 +2855,7 @@
           "showInFilter": true,
           "type": "MULTI_SELECT"
         },
-        "c6f580b6-2f78-44c6-a5d7-2bea437a85d3": {
+        "be7af9e9-142f-423d-a530-2e9902d8c0cc": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Description",
@@ -2864,7 +2864,7 @@
           "showInFilter": true,
           "type": "TEXT_BOX"
         },
-        "4a64f4c8-a205-4cdf-af1f-1a8b1cf83421": {
+        "0f26a86d-751e-4568-bfae-f622e28bbd36": {
           "isEnabled": false,
           "isRequired": false,
           "label": "Status",

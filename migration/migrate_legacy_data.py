@@ -150,17 +150,17 @@ def migrate_all(input_data):
 
 def main():
     # Read from input.json file
-    with open("input.json", "r") as f:
+    with open("input.json", "r", encoding="utf-8") as f:
         input_data = json.load(f)
     
     output_data = migrate_all(input_data)
     
-    # Write to output.json file
-    with open("output.json", "w") as f:
-        json.dump(output_data, f, indent=2)
+    # Write to output.json file - ensure_ascii=False preserves emojis
+    with open("output.json", "w", encoding="utf-8") as f:
+        json.dump(output_data, f, indent=2, ensure_ascii=False)
     
     # Also print to stdout
-    print(json.dumps(output_data, indent=2))
+    print(json.dumps(output_data, indent=2, ensure_ascii=False))
 
 if __name__ == "__main__":
     main()
