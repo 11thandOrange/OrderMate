@@ -239,16 +239,11 @@ class MyApp : Application() {
     }
 
     /**
-     * #78: Get order fees from Clover OrderCalc
-     * Uses getTotalOrderFeeFromLineItems if available, otherwise returns 0
+     * #78: Get order fees - not available in this SDK version
+     * Returns 0 as order fees are included in the total via additionalCharges
      */
     fun orderFees(order: Order?): Long {
-        if (order == null) return 0L
-        return try {
-            OrderCalc(order).getTotalOrderFeeFromLineItems(order.lineItems)
-        } catch (e: Exception) {
-            0L
-        }
+        return 0L
     }
 
     /**
