@@ -28,6 +28,7 @@ import com.orderMate.model.LineItemPreview
 import com.orderMate.utils.CalendarManager
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FilterCategoryBuilder
+import com.orderMate.utils.getPaymentStateFromOrder
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.OrderDueDateResolver
 import com.orderMate.utils.OrderNoteParser
@@ -550,8 +551,8 @@ class CalendarFragment : Fragment() {
             // (#30) Extract order-level tags for event preview (ORDER level widgets only)
             val customTags = extractOrderLevelTags(order.note, orderLevelWidgets)
             
-            // (#76) Get payment state from order (fallback to "OPEN" like Order Detail page)
-            val paymentState = order.paymentState?.name ?: "OPEN"
+            // (#76) Get payment state from order using shared function
+            val paymentState = getPaymentStateFromOrder(order)
             
             ScheduledEvent(
                 id = order.id?.hashCode()?.toLong() ?: System.currentTimeMillis(),
