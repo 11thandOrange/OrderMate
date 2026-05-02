@@ -550,8 +550,8 @@ class CalendarFragment : Fragment() {
             // (#30) Extract order-level tags for event preview (ORDER level widgets only)
             val customTags = extractOrderLevelTags(order.note, orderLevelWidgets)
             
-            // (#76) Get payment state from order
-            val paymentState = order.paymentState?.name ?: order.state
+            // (#76) Get payment state from order (fallback to "OPEN" like Order Detail page)
+            val paymentState = order.paymentState?.name ?: "OPEN"
             
             ScheduledEvent(
                 id = order.id?.hashCode()?.toLong() ?: System.currentTimeMillis(),
