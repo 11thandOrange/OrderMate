@@ -480,29 +480,11 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         // Show section when there are tags
         tagsSection.visibility = View.VISIBLE
         
-        val density = resources.displayMetrics.density
-        
         tags.forEach { tag ->
-            // Use WidgetColorUtils for consistent colors and icons (same as item-level)
-            val tagColor = com.orderMate.utils.WidgetColorUtils.getColorForWidgetType(tag.widgetType)
-            val iconRes = com.orderMate.utils.WidgetColorUtils.getIconForWidgetType(tag.widgetType)
-            
-            // Inflate the same pill layout used by item-level widgets
-            val pillView = layoutInflater.inflate(R.layout.item_note_pill, tagsContainer, false) as LinearLayout
-            
-            val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-            val pillText = pillView.findViewById<TextView>(R.id.pillText)
-            
-            pillText.text = tag.value
-            pillText.setTextColor(tagColor)
-            
-            pillIcon.setImageResource(iconRes)
-            pillIcon.setColorFilter(tagColor)
-            
-            // Unified pill background: 15% opacity + 25% border
-            pillView.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(tagColor, 10f, density)
-            
-            tagsContainer.addView(pillView)
+            // Use shared pill utility for consistent styling
+            com.orderMate.utils.WidgetColorUtils.addPillToContainer(
+                requireContext(), tagsContainer, tag.value, tag.widgetType
+            )
         }
     }
     

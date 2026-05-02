@@ -4,17 +4,12 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.orderMate.R
 import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.databinding.ItemDrawerLineItemBinding
 import com.orderMate.fragment.orderDetail.OrderDetailFragment
 import com.orderMate.modals.ItemModal
 import com.orderMate.modals.NoteLevel
-import com.orderMate.modals.WidgetType
 import com.orderMate.utils.OrderNoteParser
 import com.orderMate.utils.WidgetColorUtils
 import com.orderMate.utils.WidgetManager
@@ -98,43 +93,13 @@ class DrawerItemAdapter(
             
             if (noteString.isNullOrEmpty() || noteString.trim().isEmpty()) return
 
-            val density = context.resources.displayMetrics.density
-            
             val widgets = WidgetManager.getCachedWidgets()
             val itemLevelWidgets = widgets.filter { it.level == NoteLevel.ITEM }
             
             val parsedTags = OrderNoteParser.extractTagsFromNote(noteString, itemLevelWidgets, NoteLevel.ITEM, includeTextBox = true)
             parsedTags.forEach { tag ->
-                addPillView(context, container, tag.value, tag.widgetType, density)
+                WidgetColorUtils.addPillToContainer(context, container, tag.value, tag.widgetType)
             }
-        }
-        
-        private fun addPillView(
-            context: Context,
-            container: com.google.android.flexbox.FlexboxLayout,
-            value: String,
-            widgetType: WidgetType,
-            density: Float
-        ) {
-            val pillView = LayoutInflater.from(context)
-                .inflate(R.layout.item_note_pill, container, false) as LinearLayout
-            
-            val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-            val pillText = pillView.findViewById<TextView>(R.id.pillText)
-            
-            val color = WidgetColorUtils.getColorForWidgetType(widgetType)
-            val iconRes = WidgetColorUtils.getIconForWidgetType(widgetType)
-            
-            // (#77) Use consistent pill truncation
-            pillText.text = WidgetColorUtils.truncateForPill(value)
-            pillText.maxLines = 1
-            pillText.setTextColor(color)
-            pillIcon.setImageResource(iconRes)
-            pillIcon.setColorFilter(color)
-            
-            pillView.background = WidgetColorUtils.createPillBackground(color, 10f, density)
-            
-            container.addView(pillView)
         }
     }
 }

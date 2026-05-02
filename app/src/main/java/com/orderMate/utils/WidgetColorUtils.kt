@@ -1,7 +1,13 @@
 package com.orderMate.utils
 
+import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.orderMate.R
 import com.orderMate.modals.WidgetType
 
@@ -162,5 +168,63 @@ object WidgetColorUtils {
         } else {
             cleaned
         }
+    }
+    
+    /**
+     * Create and style a pill view with consistent styling across the app.
+     * This is the SINGLE source of truth for all pill rendering.
+     * 
+     * @param context Context for inflation
+     * @param container Parent container to attach pill to (not added automatically)
+     * @param text Text to display (will be truncated)
+     * @param widgetType Widget type for color and icon
+     * @param cornerRadiusDp Corner radius in dp (default 10f)
+     * @param truncate Whether to truncate text (default true)
+     * @return Styled LinearLayout pill view (not attached to container)
+     */
+    fun createPillView(
+        context: Context,
+        container: ViewGroup,
+        text: String,
+        widgetType: WidgetType,
+        cornerRadiusDp: Float = 10f,
+        truncate: Boolean = true
+    ): LinearLayout {
+        val density = context.resources.displayMetrics.density
+        val color = getColorForWidgetType(widgetType)
+        val iconRes = getIconForWidgetType(widgetType)
+        
+        val pillView = LayoutInflater.from(context)
+            .inflate(R.layout.item_note_pill, container, false) as LinearLayout
+        
+        val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
+        val pillText = pillView.findViewById<TextView>(R.id.pillText)
+        
+        pillText.text = if (truncate) truncateForPill(text) else text
+        pillText.maxLines = 1
+        pillText.setTextColor(color)
+        
+        pillIcon.setImageResource(iconRes)
+        pillIcon.setColorFilter(color)
+        
+        pillView.background = createPillBackground(color, cornerRadiusDp, density)
+        
+        return pillView
+    }
+    
+    /**
+     * Create and add a pill view to a container.
+     * Convenience method that creates and immediately adds the pill.
+     */
+    fun addPillToContainer(
+        context: Context,
+        container: ViewGroup,
+        text: String,
+        widgetType: WidgetType,
+        cornerRadiusDp: Float = 10f,
+        truncate: Boolean = true
+    ) {
+        val pillView = createPillView(context, container, text, widgetType, cornerRadiusDp, truncate)
+        container.addView(pillView)
     }
 }

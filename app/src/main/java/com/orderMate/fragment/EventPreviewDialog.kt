@@ -313,7 +313,7 @@ class EventPreviewDialog : DialogFragment() {
      * (#30) Setup order-level notes pills display.
      * Uses pre-parsed customTags from ScheduledEvent (widget-based parsing done in CalendarFragment).
      * (#77) TEXT_BOX rendered as rows, not pills - only SINGLE_SELECT, MULTI_SELECT, CALENDAR as pills.
-     * Uses item_note_pill layout with icons matching item-level pills.
+     * Uses shared pill utility for consistent styling.
      */
     private fun setupOrderNotesPills(view: View, event: ScheduledEvent) {
         val container = view.findViewById<FlexboxLayout>(R.id.orderNotesPillsContainer)
@@ -329,31 +329,12 @@ class EventPreviewDialog : DialogFragment() {
         }
         
         container.visibility = View.VISIBLE
-        val density = resources.displayMetrics.density
-        val inflater = LayoutInflater.from(requireContext())
         
         // Add order-level widget pills (CALENDAR, SINGLE_SELECT, MULTI_SELECT - not TEXT_BOX)
         pillTags.forEach { tag ->
-            val color = WidgetColorUtils.getColorForWidgetType(tag.widgetType)
-            val iconRes = WidgetColorUtils.getIconForWidgetType(tag.widgetType)
-            
-            // (#77) Use consistent pill truncation
-            val displayText = WidgetColorUtils.truncateForPill(tag.text)
-            
-            // Inflate the same pill layout used by item-level widgets
-            val pillView = inflater.inflate(R.layout.item_note_pill, container, false) as android.widget.LinearLayout
-            
-            val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-            val pillText = pillView.findViewById<TextView>(R.id.pillText)
-            
-            pillText.text = displayText
-            pillText.setTextColor(color)
-            
-            pillIcon.setImageResource(iconRes)
-            pillIcon.setColorFilter(color)
-            
-            // Same pill styling as everywhere else: 15% opacity bg + 25% border
-            pillView.background = WidgetColorUtils.createPillBackground(color, 10f, density)
+            val pillView = WidgetColorUtils.createPillView(
+                requireContext(), container, tag.text, tag.widgetType
+            )
             
             val lp = FlexboxLayout.LayoutParams(
                 FlexboxLayout.LayoutParams.WRAP_CONTENT,
@@ -433,46 +414,22 @@ class EventPreviewDialog : DialogFragment() {
                 }
                 
                 notesPillsContainer.visibility = View.VISIBLE
-                val density = itemView.resources.displayMetrics.density
+                val context = itemView.context
                 
                 parsedTags.forEach { tag ->
-                    val color = WidgetColorUtils.getColorForWidgetType(tag.widgetType)
-                    val iconRes = WidgetColorUtils.getIconForWidgetType(tag.widgetType)
+                    val pillView = WidgetColorUtils.createPillView(
+                        context, notesPillsContainer, tag.value, tag.widgetType, cornerRadiusDp = 8f
+                    )
                     
-                    // (#77) Use consistent pill truncation
-                    val displayText = WidgetColorUtils.truncateForPill(tag.value)
+                    val lp = FlexboxLayout.LayoutParams(
+                        FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                        FlexboxLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    lp.setMargins(0, 0, dpToPx(4), dpToPx(4))
+                    pillView.layoutParams = lp
                     
-                    addWidgetPill(displayText, color, iconRes, density)
+                    notesPillsContainer.addView(pillView)
                 }
-            }
-            
-            private fun addWidgetPill(text: String, color: Int, iconRes: Int, density: Float) {
-                val context = itemView.context
-                val inflater = LayoutInflater.from(context)
-                
-                // Inflate the same pill layout used everywhere
-                val pillView = inflater.inflate(R.layout.item_note_pill, notesPillsContainer, false) as android.widget.LinearLayout
-                
-                val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-                val pillText = pillView.findViewById<TextView>(R.id.pillText)
-                
-                pillText.text = text
-                pillText.setTextColor(color)
-                
-                pillIcon.setImageResource(iconRes)
-                pillIcon.setColorFilter(color)
-                
-                // Use WidgetColorUtils for consistent pill styling
-                pillView.background = WidgetColorUtils.createPillBackground(color, 8f, density)
-                
-                val lp = FlexboxLayout.LayoutParams(
-                    FlexboxLayout.LayoutParams.WRAP_CONTENT,
-                    FlexboxLayout.LayoutParams.WRAP_CONTENT
-                )
-                lp.setMargins(0, 0, dpToPx(4), dpToPx(4))
-                pillView.layoutParams = lp
-                
-                notesPillsContainer.addView(pillView)
             }
             
             private fun dpToPx(dp: Int): Int {

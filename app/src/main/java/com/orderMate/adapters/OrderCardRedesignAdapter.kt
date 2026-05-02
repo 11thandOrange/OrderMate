@@ -3,9 +3,7 @@ package com.orderMate.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -175,13 +173,12 @@ class OrderCardRedesignAdapter(
          * (#19) Setup custom order tags from line item notes
          * Task 15: Uses WidgetColorUtils for consistent color coding across app
          * Task 20: Includes CALENDAR type widgets
-         * Uses item_note_pill layout with icons matching item-level pills
+         * Uses shared pill utility for consistent styling
          */
         private fun setupCustomTags(order: Order) {
             val context = binding.root.context
             val tagsContainer = binding.tagsContainer
             val density = context.resources.displayMetrics.density
-            val inflater = LayoutInflater.from(context)
             
             // Remove any previously added custom tags (keep first 2 - order status and payment status)
             while (tagsContainer.childCount > 2) {
@@ -192,25 +189,10 @@ class OrderCardRedesignAdapter(
             if (customTags.isEmpty()) return
             
             customTags.forEach { tag ->
-                // Use WidgetColorUtils for consistent colors and icons based on widget type
-                val tagColor = WidgetColorUtils.getColorForWidgetType(tag.widgetType)
-                val iconRes = WidgetColorUtils.getIconForWidgetType(tag.widgetType)
-                
-                // Inflate the same pill layout used by item-level widgets
-                val pillView = inflater.inflate(R.layout.item_note_pill, tagsContainer, false) as LinearLayout
-                
-                val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-                val pillText = pillView.findViewById<TextView>(R.id.pillText)
-                
-                pillText.text = tag.value
-                pillText.textSize = 11f
-                pillText.setTextColor(tagColor)
-                
-                pillIcon.setImageResource(iconRes)
-                pillIcon.setColorFilter(tagColor)
-                
-                // Unified pill background: 15% opacity + 25% border
-                pillView.background = WidgetColorUtils.createPillBackground(tagColor, 12f, density)
+                val pillView = WidgetColorUtils.createPillView(
+                    context, tagsContainer, tag.value, tag.widgetType, 
+                    cornerRadiusDp = 12f, truncate = false
+                )
                 
                 // Margin between pills
                 val params = LinearLayout.LayoutParams(
@@ -419,33 +401,12 @@ class OrderCardRedesignAdapter(
             container.removeAllViews()
             
             val context = binding.root.context
-            val density = context.resources.displayMetrics.density
             
             notes.forEach { noteItem ->
-                val pillView = LayoutInflater.from(context)
-                    .inflate(R.layout.item_note_pill, container, false) as LinearLayout
-                
-                val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-                val pillText = pillView.findViewById<TextView>(R.id.pillText)
-                
-                // Get widget color from widgetType
-                val pillColor = WidgetColorUtils.getColorForWidgetType(noteItem.widgetType)
-                
-                val iconRes = WidgetColorUtils.getIconForWidgetType(noteItem.widgetType)
-                
-                // (#77) Text already truncated in extraction, just display
-                pillText.text = noteItem.text
-                pillText.maxLines = 1
-                
-                // Use widget color for text and icon (same as order details page)
-                pillText.setTextColor(pillColor)
-                pillIcon.setImageResource(iconRes)
-                pillIcon.setColorFilter(pillColor)
-                
-                // Unified pill background: 15% opacity + 25% border
-                pillView.background = WidgetColorUtils.createPillBackground(pillColor, 10f, density)
-                
-                container.addView(pillView)
+                // (#77) Text already truncated in extraction, use shared pill utility
+                WidgetColorUtils.addPillToContainer(
+                    context, container, noteItem.text, noteItem.widgetType, truncate = false
+                )
             }
         }
     }
