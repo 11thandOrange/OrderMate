@@ -11,6 +11,7 @@ import com.orderMate.databinding.ItemDrawerLineItemBinding
 import com.orderMate.fragment.orderDetail.OrderDetailFragment
 import com.orderMate.modals.ItemModal
 import com.orderMate.modals.NoteLevel
+import com.orderMate.modals.WidgetType
 import com.orderMate.utils.OrderNoteParser
 import com.orderMate.utils.WidgetColorUtils
 import com.orderMate.utils.WidgetManager
@@ -99,7 +100,13 @@ class DrawerItemAdapter(
             
             val parsedTags = OrderNoteParser.extractTagsFromNote(noteString, itemLevelWidgets, NoteLevel.ITEM, includeTextBox = true)
             parsedTags.forEach { tag ->
-                WidgetColorUtils.addPillToContainer(context, container, tag.value, tag.widgetType)
+                if (tag.widgetType == WidgetType.TEXT_BOX) {
+                    // (#77) TEXT_BOX uses styled widget icon + text, not a pill
+                    val textBoxRow = WidgetColorUtils.createTextBoxRow(context, tag.value)
+                    container.addView(textBoxRow)
+                } else {
+                    WidgetColorUtils.addPillToContainer(context, container, tag.value, tag.widgetType)
+                }
             }
         }
     }

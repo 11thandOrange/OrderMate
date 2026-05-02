@@ -109,6 +109,110 @@ object WidgetColorUtils {
     }
     
     /**
+     * Get background drawable resource for widget icon container.
+     * Used in Settings tabs and Register drawer for styled widget icons.
+     */
+    fun getIconBackgroundForWidgetType(type: WidgetType): Int {
+        return when (type) {
+            WidgetType.CALENDAR -> R.drawable.bg_widget_icon_calendar
+            WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
+            WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
+            WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
+        }
+    }
+    
+    /**
+     * Get background drawable resource for widget icon container.
+     * Overload for compatibility with com.orderMate.utils.WidgetType
+     */
+    fun getIconBackgroundForWidgetType(type: com.orderMate.utils.WidgetType): Int {
+        return when (type) {
+            com.orderMate.utils.WidgetType.CALENDAR -> R.drawable.bg_widget_icon_calendar
+            com.orderMate.utils.WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
+            com.orderMate.utils.WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
+            com.orderMate.utils.WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
+        }
+    }
+    
+    /**
+     * Create a styled widget icon view with colored background container.
+     * Used in Register drawer for TEXT_BOX widgets and Settings tabs.
+     * 
+     * @param context Context
+     * @param widgetType The widget type
+     * @param sizeDp Size of the icon container in dp (default 24dp)
+     * @return LinearLayout containing the styled icon
+     */
+    fun createStyledWidgetIcon(
+        context: Context,
+        widgetType: WidgetType,
+        sizeDp: Int = 24
+    ): LinearLayout {
+        val density = context.resources.displayMetrics.density
+        val sizePx = (sizeDp * density).toInt()
+        val iconSizePx = (sizeDp * 0.6 * density).toInt() // Icon is 60% of container
+        
+        val iconRes = getIconForWidgetType(widgetType)
+        val tintColor = getColorForWidgetType(widgetType)
+        val bgRes = getIconBackgroundForWidgetType(widgetType)
+        
+        return LinearLayout(context).apply {
+            layoutParams = ViewGroup.MarginLayoutParams(sizePx, sizePx).apply {
+                setMargins(0, 0, (4 * density).toInt(), 0)
+            }
+            gravity = android.view.Gravity.CENTER
+            setBackgroundResource(bgRes)
+            
+            addView(ImageView(context).apply {
+                layoutParams = ViewGroup.LayoutParams(iconSizePx, iconSizePx)
+                setImageResource(iconRes)
+                setColorFilter(tintColor)
+            })
+        }
+    }
+    
+    /**
+     * Create a TEXT_BOX row with styled widget icon + text.
+     * Used in Register drawer to differentiate TEXT_BOX from other pill types.
+     * 
+     * @param context Context
+     * @param text The text box content
+     * @return LinearLayout with icon + text
+     */
+    fun createTextBoxRow(
+        context: Context,
+        text: String
+    ): LinearLayout {
+        val density = context.resources.displayMetrics.density
+        val tintColor = COLOR_TEXT_BOX
+        
+        return LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            layoutParams = ViewGroup.MarginLayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 0, 0, (4 * density).toInt())
+            }
+            
+            // Add styled widget icon
+            addView(createStyledWidgetIcon(context, WidgetType.TEXT_BOX, 20))
+            
+            // Add text
+            addView(TextView(context).apply {
+                this.text = truncateForPill(text)
+                setTextColor(tintColor)
+                textSize = 12f
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            })
+        }
+    }
+    
+    /**
      * Get color for Clover filter type
      */
     fun getColorForCloverFilter(filterType: String): Int {

@@ -1395,12 +1395,7 @@ class SettingsFragment : Fragment() {
         // Set icon and colors based on type - uses centralized WidgetColorUtils
         val iconRes = WidgetColorUtils.getIconForWidgetType(widget.type)
         val tintColor = WidgetColorUtils.getColorForWidgetType(widget.type)
-        val bgRes = when (widget.type) {
-            com.orderMate.modals.WidgetType.CALENDAR -> R.drawable.bg_widget_icon_calendar
-            com.orderMate.modals.WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
-            com.orderMate.modals.WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
-            com.orderMate.modals.WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
-        }
+        val bgRes = WidgetColorUtils.getIconBackgroundForWidgetType(widget.type)
         widgetIcon.setImageResource(iconRes)
         widgetIcon.setColorFilter(tintColor)
         widgetIconContainer.setBackgroundResource(bgRes)
@@ -1736,12 +1731,7 @@ class WidgetEditorAdapter(
             // Set icon and colors based on type - uses centralized WidgetColorUtils
             val iconRes = WidgetColorUtils.getIconForWidgetType(widget.type)
             val tintColor = WidgetColorUtils.getColorForWidgetType(widget.type)
-            val bgRes = when (widget.type) {
-                WidgetType.CALENDAR -> R.drawable.bg_widget_icon_calendar
-                WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
-                WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
-                WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
-            }
+            val bgRes = WidgetColorUtils.getIconBackgroundForWidgetType(widget.type)
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
             widgetIconContainer.setBackgroundResource(bgRes)
@@ -1955,12 +1945,7 @@ class FirebaseWidgetEditorAdapter(
             // Set icon and colors based on type - uses centralized WidgetColorUtils
             val iconRes = WidgetColorUtils.getIconForWidgetType(widget.type)
             val tintColor = WidgetColorUtils.getColorForWidgetType(widget.type)
-            val bgRes = when (widget.type) {
-                com.orderMate.modals.WidgetType.CALENDAR -> R.drawable.bg_widget_icon_calendar
-                com.orderMate.modals.WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
-                com.orderMate.modals.WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
-                com.orderMate.modals.WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
-            }
+            val bgRes = WidgetColorUtils.getIconBackgroundForWidgetType(widget.type)
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
             widgetIconContainer.setBackgroundResource(bgRes)
@@ -2317,12 +2302,7 @@ class FilterWidgetAdapter(
             // Set icon and colors based on type - uses centralized WidgetColorUtils
             val iconRes = WidgetColorUtils.getIconForWidgetType(widget.type)
             val tintColor = WidgetColorUtils.getColorForWidgetType(widget.type)
-            val bgRes = when (widget.type) {
-                com.orderMate.modals.WidgetType.CALENDAR -> R.drawable.bg_widget_icon_calendar
-                com.orderMate.modals.WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
-                com.orderMate.modals.WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
-                com.orderMate.modals.WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
-            }
+            val bgRes = WidgetColorUtils.getIconBackgroundForWidgetType(widget.type)
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
             widgetIconContainer.setBackgroundResource(bgRes)
