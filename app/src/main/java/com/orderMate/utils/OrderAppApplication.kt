@@ -192,12 +192,15 @@ class MyApp : Application() {
         }
     }
 
-    fun orderTax(order: Order?): Long {
-        return OrderCalc(order).tax
+    // All methods use OrderCalc to match Clover Register exactly
+    
+    fun orderSubtotal(order: Order?): Long {
+        return OrderCalc(order).getLineSubtotalWithoutDiscounts(order?.lineItems)
     }
 
-    fun orderLineItemTotal(order: Order?): Long {
-        return OrderCalc(order).getLineSubtotalWithoutDiscounts(order?.lineItems)
+    fun orderTaxesAndFees(order: Order?): Long {
+        val calc = OrderCalc(order)
+        return calc.getTax(order?.lineItems) + calc.getServiceCharge(order?.lineItems)
     }
 
     fun orderDiscount(order: Order?): Long {
@@ -206,6 +209,14 @@ class MyApp : Application() {
         val discountedSubtotal = calc.getDiscountedSubtotal(order?.lineItems)
         return subtotal - discountedSubtotal
     }
+
+    fun orderTotal(order: Order?): Long {
+        return OrderCalc(order).getTotal(order?.lineItems)
+    }
+
+    // Legacy method names for compatibility
+    fun orderTax(order: Order?): Long = orderTaxesAndFees(order)
+    fun orderLineItemTotal(order: Order?): Long = orderSubtotal(order)
 
     fun disconnectConnectors() {
         orderConnector?.disconnect()
