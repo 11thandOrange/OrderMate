@@ -69,9 +69,9 @@ class EventPreviewDialog : DialogFragment() {
         val itemCount = view.findViewById<TextView>(R.id.itemCount)
         val itemsList = view.findViewById<RecyclerView>(R.id.itemsList)
 
-        // Set order title
+        // Set order title (#76 - removed "Order" prefix)
         val shortId = currentEvent.orderId.takeLast(4).uppercase()
-        orderTitle.text = "Order #$shortId"
+        orderTitle.text = "#$shortId"
 
         // (#76) Setup Clover default pill (payment status) above order level pills
         setupCloverDefaultPill(view, currentEvent)
