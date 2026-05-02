@@ -232,7 +232,8 @@ class EventPreviewDialog : DialogFragment() {
         val density = resources.displayMetrics.density
         
         textBoxTags.forEach { tag ->
-            addTextBoxRow(container, tag.label, tag.text, density)
+            // EventTag only has 'text' and 'widgetType', use "Note" as generic label
+            addTextBoxRow(container, "Note", tag.text, density)
         }
     }
     
@@ -241,7 +242,6 @@ class EventPreviewDialog : DialogFragment() {
      */
     private fun addTextBoxRow(container: android.widget.LinearLayout, label: String, value: String, density: Float) {
         val context = requireContext()
-        val color = WidgetColorUtils.getColorForWidgetType(com.orderMate.modals.WidgetType.TEXT_BOX)
         val iconRes = WidgetColorUtils.getIconForWidgetType(com.orderMate.modals.WidgetType.TEXT_BOX)
         
         // Row container
