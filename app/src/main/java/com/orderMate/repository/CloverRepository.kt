@@ -4,6 +4,7 @@ import android.content.Context
 import com.clover.sdk.v3.customers.Customer
 import com.clover.sdk.v3.customers.EmailAddress
 import com.clover.sdk.v3.customers.PhoneNumber
+import com.clover.sdk.v3.order.Order
 import com.orderMate.modals.ShareMessageJson
 import com.orderMate.modals.ShareSmsModal
 import com.orderMate.networkManager.RetrofitInstanceWithAuth

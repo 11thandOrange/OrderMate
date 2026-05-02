@@ -862,7 +862,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
     suspend fun updateTheTransaction(){
-        exceptionHandler {
+        try {
             // update the dashboard after the order is delay
             var orderData = myApp.getOrderConnector().getOrder(orderArguments?.id)
             
@@ -872,6 +872,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             }
             
             orderArguments = orderData
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         CoroutineScope(Dispatchers.Main).launch {
             showThePaymentData()
