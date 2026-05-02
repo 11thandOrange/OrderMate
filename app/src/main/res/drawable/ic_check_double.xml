@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- (#77) Double checkmark icon for Multi-Select widget type -->
+<!-- (#77) Double checkbox icon for Multi-Select widget type -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-    <!-- First checkmark (left) -->
+    <!-- First checkbox (back/left, slightly offset) -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M18,7l-1.41,-1.41 -6.34,6.34 1.41,1.41L18,7z"/>
+        android:pathData="M14,5H4C3.45,5 3,5.45 3,6v10c0,0.55 0.45,1 1,1h10c0.55,0 1,-0.45 1,-1V6C15,5.45 14.55,5 14,5zM14,16H4V6h10V16zM12.5,10l-1,-1 -4,4 -1.5,-1.5 -1,1 2.5,2.5z"/>
+    <!-- Second checkbox (front/right, overlapping) -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M22.24,5.59L11.66,16.17 7.48,12l-1.41,1.41L11.66,19l12,-12 -1.42,-1.41z"/>
-    <!-- Second checkmark (overlapping) -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M1.41,11.87L6.58,17.03l1.41,-1.41 -5.17,-5.17 -1.41,1.42z"/>
+        android:pathData="M20,7H10C9.45,7 9,7.45 9,8v10c0,0.55 0.45,1 1,1h10c0.55,0 1,-0.45 1,-1V8C21,7.45 20.55,7 20,7zM20,18H10V8h10V18zM18.5,12l-1,-1 -4,4 -1.5,-1.5 -1,1 2.5,2.5z"/>
 </vector>

@@ -82,7 +82,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Due Dates, pick-up dates, deadlines"
+                    android:text="Due dates, pick-up dates, deadlines"
                     android:textColor="@color/text_muted"
                     android:textSize="11sp"/>
 
