@@ -246,7 +246,6 @@ object WidgetColorUtils {
         val density = context.resources.displayMetrics.density
         val color = getColorForWidgetType(widgetType)
         val iconRes = getIconForWidgetType(widgetType)
-        val iconBgRes = getIconBackgroundForWidgetType(widgetType)
         
         val pillView = LayoutInflater.from(context)
             .inflate(R.layout.item_note_pill, container, false) as LinearLayout
@@ -259,8 +258,13 @@ object WidgetColorUtils {
         pillText.maxLines = 1
         pillText.setTextColor(color)
         
-        // (#77) Set icon container background to match Settings tab
-        pillIconContainer.setBackgroundResource(iconBgRes)
+        // (#77) Set icon container background programmatically to match Settings tab
+        val iconBgDrawable = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 4 * density
+            setColor(getBackgroundColor(color)) // 15% opacity of widget color
+        }
+        pillIconContainer.background = iconBgDrawable
         pillIcon.setImageResource(iconRes)
         pillIcon.setColorFilter(color)
         
