@@ -201,10 +201,8 @@ class MyApp : Application() {
     }
 
     fun orderDiscount(order: Order?): Long {
-        val calc = OrderCalc(order)
-        val beforeDiscount = calc.getLineSubtotalWithoutDiscounts(order?.lineItems)
-        val afterDiscount = calc.getLineSubtotal(order?.lineItems)
-        return beforeDiscount - afterDiscount
+        // Order-level discounts are stored in order.discounts
+        return order?.discounts?.sumOf { it.amount ?: 0L } ?: 0L
     }
 
     fun disconnectConnectors() {
