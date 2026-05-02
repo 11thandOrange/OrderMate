@@ -404,15 +404,28 @@ class FirebaseConfigManager private constructor() {
     
     fun initializeMerchant(merchantId: String, widgets: List<WidgetConfig>, settings: PopupSettings, callback: (Boolean) -> Unit) {
         val updates = mutableMapOf<String, Any?>()
+        val advancedDefaults = AdvancedSettings()  // #78: Use data class defaults
         
         // Meta
         updates["${FirebasePaths.meta(merchantId)}/${FirebasePaths.SCHEMA_VERSION}"] = MerchantMeta.CURRENT_SCHEMA_VERSION
         updates["${FirebasePaths.meta(merchantId)}/${FirebasePaths.CREATED_AT}"] = ServerValue.TIMESTAMP
         updates["${FirebasePaths.meta(merchantId)}/${FirebasePaths.UPDATED_AT}"] = ServerValue.TIMESTAMP
         
-        // Settings
+        // PopupSettings
         updates["${FirebasePaths.settings(merchantId)}/triggerOnItemAdd"] = settings.triggerOnItemAdd
         updates["${FirebasePaths.settings(merchantId)}/showOMButtonInRegister"] = settings.showOMButtonInRegister
+        
+        // #78: AdvancedSettings defaults - store in DB for new merchants
+        updates["${FirebasePaths.settings(merchantId)}/useOrderMateInRegister"] = advancedDefaults.useOrderMateInRegister
+        updates["${FirebasePaths.settings(merchantId)}/useOrderMateRegisterInstead"] = advancedDefaults.useOrderMateRegisterInstead
+        updates["${FirebasePaths.settings(merchantId)}/scheduledNotificationsEnabled"] = advancedDefaults.scheduledNotificationsEnabled
+        updates["${FirebasePaths.settings(merchantId)}/notificationDays"] = advancedDefaults.notificationDays
+        updates["${FirebasePaths.settings(merchantId)}/notificationMinutes"] = advancedDefaults.notificationMinutes
+        updates["${FirebasePaths.settings(merchantId)}/scheduledReceiptEnabled"] = advancedDefaults.scheduledReceiptEnabled
+        updates["${FirebasePaths.settings(merchantId)}/receiptDays"] = advancedDefaults.receiptDays
+        updates["${FirebasePaths.settings(merchantId)}/receiptMinutes"] = advancedDefaults.receiptMinutes
+        updates["${FirebasePaths.settings(merchantId)}/printNotesOnCustomerReceipts"] = advancedDefaults.printNotesOnCustomerReceipts
+        updates["${FirebasePaths.settings(merchantId)}/printNotesOnOrderReceipts"] = advancedDefaults.printNotesOnOrderReceipts
         
         // Widgets
         widgets.forEach { widget ->
