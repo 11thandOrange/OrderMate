@@ -232,8 +232,11 @@ class EventPreviewDialog : DialogFragment() {
         val density = resources.displayMetrics.density
         
         textBoxTags.forEach { tag ->
-            // EventTag only has 'text' and 'widgetType', use "Note" as generic label
-            addTextBoxRow(container, "Note", tag.text, density)
+            // EventTag text is in format "Label: Value", parse to extract both
+            val parts = tag.text.split(": ", limit = 2)
+            val label = if (parts.size > 1) parts[0] else "Note"
+            val value = if (parts.size > 1) parts[1] else tag.text
+            addTextBoxRow(container, label, value, density)
         }
     }
     

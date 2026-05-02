@@ -361,6 +361,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     private fun addDynamicWidgetRow(container: android.widget.LinearLayout, label: String, value: String, widgetType: WidgetType, density: Float) {
         val color = WidgetColorUtils.getColorForWidgetType(widgetType)
         val iconRes = WidgetColorUtils.getIconForWidgetType(widgetType)
+        val iconBgRes = WidgetColorUtils.getIconBackgroundForWidgetType(widgetType)
         
         // Row container
         val rowLayout = android.widget.LinearLayout(this).apply {
@@ -369,11 +370,11 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             setPadding(0, dpToPx(8), 0, dpToPx(8))
         }
         
-        // Icon container (matches Order Details style)
+        // Icon container - use widget-specific background color
         val iconFrame = android.widget.FrameLayout(this).apply {
             val size = dpToPx(32)
             layoutParams = android.widget.LinearLayout.LayoutParams(size, size)
-            setBackgroundResource(R.drawable.bg_detail_icon)
+            setBackgroundResource(iconBgRes)
         }
         
         val icon = android.widget.ImageView(this).apply {
@@ -382,7 +383,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                 gravity = android.view.Gravity.CENTER
             }
             setImageResource(iconRes)
-            setColorFilter(ContextCompat.getColor(this@FloatingWidgetService, R.color.text_muted))
+            setColorFilter(color)
         }
         iconFrame.addView(icon)
         rowLayout.addView(iconFrame)
