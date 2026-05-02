@@ -316,7 +316,7 @@ object WidgetColorUtils {
      * @param tintColor Widget/filter color
      * @return TextView styled as a filter chip
      */
-    fun createFilterChip(
+    fun createFilterTabChip(
         context: Context,
         text: String,
         tintColor: Int

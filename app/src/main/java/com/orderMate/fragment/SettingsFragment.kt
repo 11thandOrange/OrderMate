@@ -1463,7 +1463,7 @@ class SettingsFragment : Fragment() {
         
         widget.options.forEach { option ->
             // Use shared filter chip function for consistent styling
-            val chip = WidgetColorUtils.createFilterChip(requireContext(), option.label, tintColor)
+            val chip = WidgetColorUtils.createFilterTabChip(requireContext(), option.label, tintColor)
             container.addView(chip)
         }
     }
@@ -1556,7 +1556,7 @@ class SettingsFragment : Fragment() {
         container?.removeAllViews()
         values.forEach { value ->
             // Use shared filter chip function for consistent styling
-            val chip = WidgetColorUtils.createFilterChip(requireContext(), value, tintColor)
+            val chip = WidgetColorUtils.createFilterTabChip(requireContext(), value, tintColor)
             container?.addView(chip)
         }
     }
@@ -2384,7 +2384,7 @@ class FilterWidgetAdapter(
             
             widget.options.forEach { option ->
                 // Use shared filter chip function for consistent styling
-                val chip = WidgetColorUtils.createFilterChip(itemView.context, option.label, tintColor)
+                val chip = WidgetColorUtils.createFilterTabChip(itemView.context, option.label, tintColor)
                 valuesContainer.addView(chip)
             }
         }
