@@ -152,7 +152,10 @@ class EventPreviewDialog : DialogFragment() {
     
     /**
      * (#76) Setup Clover default pill (payment status) above order level pills.
-     * Uses the same colors and styling as Order Detail page (Yellow for Payment Status).
+     * Uses the same styling as Order Detail page payment status badge:
+     * - Yellow color (COLOR_PAYMENT_STATUS)
+     * - No icon (just text, matching the paymentStatusBadge on Order Detail)
+     * - Same pill background styling
      */
     private fun setupCloverDefaultPill(view: View, event: ScheduledEvent) {
         val container = view.findViewById<FlexboxLayout>(R.id.cloverDefaultPillContainer)
@@ -173,10 +176,12 @@ class EventPreviewDialog : DialogFragment() {
         // Use same color as Order Detail page: Yellow for Payment Status
         val pillColor = WidgetColorUtils.COLOR_PAYMENT_STATUS
         
-        // Create the pill view
-        val pillView = android.widget.LinearLayout(requireContext()).apply {
-            orientation = android.widget.LinearLayout.HORIZONTAL
-            gravity = android.view.Gravity.CENTER_VERTICAL
+        // Create text-only pill (no icon) to match Order Detail page paymentStatusBadge
+        val textView = TextView(requireContext()).apply {
+            text = displayText
+            setTextColor(pillColor)
+            textSize = 10f
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
             setPadding(
                 (10 * density).toInt(),
                 (4 * density).toInt(),
@@ -186,34 +191,14 @@ class EventPreviewDialog : DialogFragment() {
             background = WidgetColorUtils.createPillBackground(pillColor, 10f, density)
         }
         
-        // Add icon (dollar sign for payment status)
-        val icon = ImageView(requireContext()).apply {
-            val size = (12 * density).toInt()
-            layoutParams = android.widget.LinearLayout.LayoutParams(size, size).apply {
-                marginEnd = (4 * density).toInt()
-            }
-            setImageResource(R.drawable.ic_dollar)
-            setColorFilter(pillColor)
-        }
-        pillView.addView(icon)
-        
-        // Add text
-        val textView = TextView(requireContext()).apply {
-            text = displayText
-            setTextColor(pillColor)
-            textSize = 10f
-            typeface = android.graphics.Typeface.DEFAULT_BOLD
-        }
-        pillView.addView(textView)
-        
         val lp = FlexboxLayout.LayoutParams(
             FlexboxLayout.LayoutParams.WRAP_CONTENT,
             FlexboxLayout.LayoutParams.WRAP_CONTENT
         )
         lp.setMargins(0, 0, dpToPx(6), dpToPx(4))
-        pillView.layoutParams = lp
+        textView.layoutParams = lp
         
-        container.addView(pillView)
+        container.addView(textView)
     }
     
     /**
