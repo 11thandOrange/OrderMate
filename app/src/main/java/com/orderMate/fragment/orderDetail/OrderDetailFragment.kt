@@ -798,7 +798,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     /**
      * #78: Display order amounts using Clover OrderCalc
      * - Subtotal: line items before discounts
-     * - Tax: tax + service charge + fees (combined as "Taxes & Fees")
+     * - Tax: tax amount only
+     * - Fees: service charge + order fees (shown separately)
      * - Discount: total discount amount
      */
     private fun showTheDiscountAndTaxData() {
@@ -806,19 +807,29 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         val tax = myApp.orderTax(orderArguments)
         val serviceCharge = myApp.orderServiceCharge(orderArguments)
         val fees = myApp.orderFees(orderArguments)
-        val taxesAndFees = tax + serviceCharge + fees
+        val totalFees = serviceCharge + fees
         
         val subtotal = myApp.orderLineItemTotal(orderArguments)
         val discount = myApp.orderDiscount(orderArguments)
 
-        // Display taxes & fees (tax + service charge + order fees)
-        "${currencyName.convertToSymbol()}${taxesAndFees.toDoubleFloatPoint()}".also {
-            binding.taxValue.text = it
-        }
-        
         // Display subtotal (before discounts)
         "${currencyName.convertToSymbol()}${subtotal.toDoubleFloatPoint()}".also {
             binding.subtotalValue.text = it
+        }
+        
+        // Display tax (only tax, not fees)
+        "${currencyName.convertToSymbol()}${tax.toDoubleFloatPoint()}".also {
+            binding.taxValue.text = it
+        }
+        
+        // #78: Show fees row only if there are fees (service charge + order fees)
+        if (totalFees > 0) {
+            binding.feesRow.showView()
+            "${currencyName.convertToSymbol()}${totalFees.toDoubleFloatPoint()}".also {
+                binding.feesValue.text = it
+            }
+        } else {
+            binding.feesRow.hideView()
         }
         
         // #78: Show discount row only if there's a discount amount

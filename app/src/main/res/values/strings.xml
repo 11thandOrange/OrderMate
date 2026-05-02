@@ -38,7 +38,8 @@
     <string name="no_transaction">There is no transaction made for this order.</string>
     <string name="total">Total</string>
     <string name="subtotal">Subtotal</string>
-    <string name="tax">Taxes and fees</string>
+    <string name="tax">Tax</string>
+    <string name="fees">Fees</string>
     <string name="bullet_symbol">\u2022</string>
     <string name="no_order_match">No order match the current filter and/or search item.</string>
     <string name="order_more_than_100">Order more than 100 days old will be viewed on the Web Dashboard or by search the full order id in the search.</string>
