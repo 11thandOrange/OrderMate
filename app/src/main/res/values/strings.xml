@@ -129,7 +129,7 @@
     <string name="enter_the_customer_email_address">Enter customer email address</string>
     <string name="enter_the_customer_number">Enter customer phone number</string>
     <string name="enter_the_subject">Enter subject line for the email</string>
-    <string name="send">send</string>
+    <string name="send">Send</string>
     <string name="choose_item_progress">Status</string>
     <string name="choose_item_type">Type</string>
     <string name="choose_item_category">Category</string>
@@ -194,7 +194,7 @@
     <string name="order_details">Order Details</string>
     <string name="order_date">Order Date</string>
     <string name="due_date">Due Date</string>
-    <string name="order_tags">Order Tags</string>
+    <string name="order_tags">Order Level Notes</string>
     <string name="description">Description</string>
     <string name="view_customer">View customer details</string>
     <string name="order_history">Order History</string>

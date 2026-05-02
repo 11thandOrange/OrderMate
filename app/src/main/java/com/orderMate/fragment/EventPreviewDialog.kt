@@ -24,6 +24,7 @@ import com.orderMate.modals.NoteLevel
 import com.orderMate.utils.OrderNoteParser
 import com.orderMate.utils.WidgetColorUtils
 import com.orderMate.utils.WidgetManager
+import com.orderMate.utils.formatPaymentState
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -72,6 +73,9 @@ class EventPreviewDialog : DialogFragment() {
         val shortId = currentEvent.orderId.takeLast(4).uppercase()
         orderTitle.text = "Order #$shortId"
 
+        // (#76) Setup Clover default pill (payment status) above order level pills
+        setupCloverDefaultPill(view, currentEvent)
+        
         // Setup order-level notes pills (#93)
         setupOrderNotesPills(view, currentEvent)
 
@@ -144,6 +148,72 @@ class EventPreviewDialog : DialogFragment() {
 
     fun setOnEventClickListener(listener: (ScheduledEvent) -> Unit) {
         this.onFullDetailsClick = listener
+    }
+    
+    /**
+     * (#76) Setup Clover default pill (payment status) above order level pills.
+     * Uses the same pill styling as order-level widgets but positioned above them.
+     */
+    private fun setupCloverDefaultPill(view: View, event: ScheduledEvent) {
+        val container = view.findViewById<FlexboxLayout>(R.id.cloverDefaultPillContainer)
+        container.removeAllViews()
+        
+        // Only show if there's a payment state
+        if (event.paymentState.isNullOrBlank()) {
+            container.visibility = View.GONE
+            return
+        }
+        
+        container.visibility = View.VISIBLE
+        val density = resources.displayMetrics.density
+        
+        // Format the payment state using the common formatter
+        val displayText = formatPaymentState(event.paymentState)
+        
+        // Use Clover's brand color (blue) for the payment status pill
+        val cloverColor = 0xFF4CAF50.toInt()  // Green - matches Clover brand
+        
+        // Create the pill view
+        val pillView = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            setPadding(
+                (10 * density).toInt(),
+                (4 * density).toInt(),
+                (10 * density).toInt(),
+                (4 * density).toInt()
+            )
+            background = WidgetColorUtils.createPillBackground(cloverColor, 10f, density)
+        }
+        
+        // Add icon
+        val icon = ImageView(requireContext()).apply {
+            val size = (12 * density).toInt()
+            layoutParams = android.widget.LinearLayout.LayoutParams(size, size).apply {
+                marginEnd = (4 * density).toInt()
+            }
+            setImageResource(R.drawable.ic_dollar)
+            setColorFilter(cloverColor)
+        }
+        pillView.addView(icon)
+        
+        // Add text
+        val textView = TextView(requireContext()).apply {
+            text = displayText
+            setTextColor(cloverColor)
+            textSize = 10f
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+        }
+        pillView.addView(textView)
+        
+        val lp = FlexboxLayout.LayoutParams(
+            FlexboxLayout.LayoutParams.WRAP_CONTENT,
+            FlexboxLayout.LayoutParams.WRAP_CONTENT
+        )
+        lp.setMargins(0, 0, dpToPx(6), dpToPx(4))
+        pillView.layoutParams = lp
+        
+        container.addView(pillView)
     }
     
     /**

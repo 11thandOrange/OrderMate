@@ -70,7 +70,7 @@
                 android:background="@drawable/bg_settings_subtab"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="10dp"
-                android:text="Filter"
+                android:text="Search Filters"
                 android:textColor="@color/text_muted"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -83,7 +83,7 @@
                 android:background="@drawable/bg_settings_subtab"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="10dp"
-                android:text="Notification"
+                android:text="Templates"
                 android:textColor="@color/text_muted"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -160,13 +160,28 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <TextView
+                        <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Use OrderMate In Clover's Register"
-                            android:textColor="@color/text_light"
-                            android:textSize="13sp" />
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Use OrderMate In Clover's Register"
+                                android:textColor="@color/text_light"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Display the OrderMate pop up by clicking a button"
+                                android:textColor="@color/text_muted"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
 
                         <Switch
                             android:id="@+id/switchUseInCloverRegister"
@@ -206,7 +221,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:text="Replaces Clover's item list with OrderMate item list"
+                                android:text="Always display the OrderMate pop up automatically"
                                 android:textColor="@color/text_muted"
                                 android:textSize="11sp" />
 
@@ -1273,7 +1288,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="Create text templates for notification popups. Used for email or SMS. Available in notification popup dropdown."
+                        android:text="Create text templates for SMS &amp; E-mail notifications. Available in the \"Send Notification\" pop up"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
 
@@ -1282,7 +1297,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:layout_marginBottom="16dp"
-                        android:text="Available data: {{merchant_name}}, {{order_id}}, {{customer_name}}, {{order_total}}, {{due_date}}, {{due_time}}, {{item_count}}, {{order_notes}}"
+                        android:text="Available data: {{customer_name}}, {{merchant_name}}, {{due_date}}, {{due_time}}, {{order_total}}, {{item_count}}, {{order_notes}}, {{order_id}}"
                         android:textColor="@color/text_muted"
                         android:textSize="11sp"
                         android:fontFamily="monospace" />
