@@ -515,36 +515,21 @@ class SendNotificationDialog(
     }
 
     /**
-     * #78: Updated to fetch full customer data from Clover if phone/email is missing
+     * #78: Always fetch full customer data from Clover on every refresh
      * 
      * Clover's getOrders() returns partial customer data that may not include
-     * phoneNumbers or emailAddresses. We need to fetch the full customer using
-     * CustomerConnector.getCustomer() to get complete contact information.
+     * phoneNumbers or emailAddresses. We always fetch the full customer using
+     * CustomerConnector.getCustomer() to get the latest contact information.
      */
     private fun updateTheCustomerData() {
-        order?.customers?.forEach { customer ->
-            // First, try to get data from the order's customer object
-            customer?.emailAddresses?.forEach { emailAddress ->
-                customerEmailArray.add(emailAddress?.emailAddress)
-            }
-            customer?.phoneNumbers?.forEach { phoneNumber ->
-                customerPhoneArray.add(phoneNumber?.phoneNumber)
-            }
-            
-            // #78: If no phone/email found but customer has an ID, fetch full customer data
-            val hasNoContactInfo = customerPhoneArray.isEmpty() && customerEmailArray.isEmpty()
-            val customerId = customer?.id
-            
-            if (hasNoContactInfo && !customerId.isNullOrEmpty()) {
-                android.util.Log.d("SendNotificationDialog", "#78: No contact info in order, fetching full customer data for ID: $customerId")
-                fetchFullCustomerData(customerId)
-            } else {
-                updateThePassedArray(customerPhoneArray)
-            }
-        }
+        val customerId = order?.customers?.firstOrNull()?.id
         
-        // If no customers at all, just update with empty array
-        if (order?.customers.isNullOrEmpty()) {
+        if (!customerId.isNullOrEmpty()) {
+            // Always fetch full customer data from Clover
+            android.util.Log.d("SendNotificationDialog", "#78: Fetching full customer data for ID: $customerId")
+            fetchFullCustomerData(customerId)
+        } else {
+            // No customer on order, update with empty array
             updateThePassedArray(customerPhoneArray)
         }
     }
