@@ -323,7 +323,6 @@
 
                         <!-- Tax Row -->
                         <LinearLayout
-                            android:id="@+id/taxRow"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
@@ -337,31 +336,6 @@
                                 android:textSize="14sp" />
                             <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/taxValue"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="$0.00"
-                                android:textColor="@color/text_light"
-                                android:textSize="14sp" />
-                        </LinearLayout>
-
-                        <!-- Fees Row (Service Charge + Order Fees) -->
-                        <LinearLayout
-                            android:id="@+id/feesRow"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:paddingVertical="8dp"
-                            android:visibility="gone">
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/feesLabel"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/fees"
-                                android:textColor="@color/text_muted"
-                                android:textSize="14sp" />
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/feesValue"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="$0.00"

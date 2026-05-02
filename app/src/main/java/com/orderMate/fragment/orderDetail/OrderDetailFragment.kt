@@ -795,65 +795,32 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
 
-    /**
-     * #78: Display order amounts using Clover OrderCalc
-     * - Subtotal: line items before discounts
-     * - Tax: tax amount only
-     * - Fees: service charge + order fees (shown separately)
-     * - Discount: total discount amount
-     */
     private fun showTheDiscountAndTaxData() {
-        // #78: Get all amounts from Clover OrderCalc
-        val tax = myApp.orderTax(orderArguments)
-        val serviceCharge = myApp.orderServiceCharge(orderArguments)
-        val fees = myApp.orderFees(orderArguments)
-        val totalFees = serviceCharge + fees
-        
-        val subtotal = myApp.orderLineItemTotal(orderArguments)
-        val discount = myApp.orderDiscount(orderArguments)
-
-        // Display subtotal (before discounts)
-        "${currencyName.convertToSymbol()}${subtotal.toDoubleFloatPoint()}".also {
-            binding.subtotalValue.text = it
-        }
-        
-        // Display tax (only tax, not fees)
-        "${currencyName.convertToSymbol()}${tax.toDoubleFloatPoint()}".also {
-            binding.taxValue.text = it
-        }
-        
-        // #78: Show fees row only if there are fees (service charge + order fees)
-        if (totalFees > 0) {
-            binding.feesRow.showView()
-            "${currencyName.convertToSymbol()}${totalFees.toDoubleFloatPoint()}".also {
-                binding.feesValue.text = it
-            }
-        } else {
-            binding.feesRow.hideView()
-        }
-        
-        // #78: Show discount row only if there's a discount amount
-        if (discount > 0) {
-            binding.discount.showView()
-            binding.discountValue.showView()
-            
-            // Display discount amount with negative sign
-            "-${currencyName.convertToSymbol()}${discount.toDoubleFloatPoint()}".also {
-                binding.discountValue.text = it
-            }
-            
-            // Display discount name if available
-            exceptionHandler {
-                val discountName = orderArguments?.discounts?.firstOrNull()?.jsonObject?.get(Constants.name)
-                if (discountName != null) {
-                    binding.discount.text = discountName.toString()
-                } else {
-                    binding.discount.text = getString(R.string.discount)
-                }
-            }
-        } else {
+        // Hide discount row if no discounts applied
+        if (orderArguments?.discounts == null || orderArguments?.discounts?.isEmpty() == true) {
             binding.discount.hideView()
             binding.discountValue.hideView()
+        }
+
+        "${currencyName.convertToSymbol()}${
+            myApp.orderTax(orderArguments).toDoubleFloatPoint()
+        }".also {
+            binding.taxValue.text = it
+        }
+        "${currencyName.convertToSymbol()}${
+            myApp.orderLineItemTotal(orderArguments).toDoubleFloatPoint()
+        }".also {
+            binding.subtotalValue.text = it
+        }
+        "${currencyName.convertToSymbol()}${
+            myApp.orderDiscount(orderArguments).toDoubleFloatPoint()
+        }".also {
+            binding.discountValue.text = it
+        }
+        exceptionHandler {
+            val discountName =
+                orderArguments?.discounts?.get(0)?.jsonObject?.get(Constants.name)
+            binding.discount.text = discountName.toString()
         }
     }
 
