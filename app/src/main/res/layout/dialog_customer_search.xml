@@ -128,15 +128,20 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- (#77) Footer styled like Add Widget modal - Cancel button centered -->
+    <!-- (#77) Footer divider - same as Add Widget modal -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#1AFFFFFF" />
+
+    <!-- Footer - Cancel button centered -->
     <TextView
         android:id="@+id/btnCancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:gravity="center"
         android:text="@string/cancel"
         android:textColor="@color/text_muted"
         android:textSize="14sp"
-        android:paddingVertical="12dp"/>
+        android:paddingVertical="16dp"/>
 </LinearLayout>
