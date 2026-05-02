@@ -554,18 +554,14 @@ class SendNotificationDialog(
      * This retrieves phone numbers and email addresses that may be missing from order data
      */
     private fun fetchFullCustomerData(customerId: String) {
-        val app = try {
-            requireContext().applicationContext as? MyApp
+        val context = try {
+            requireContext()
         } catch (e: Exception) {
-            null
-        }
-        
-        if (app == null) {
             updateThePassedArray(customerPhoneArray)
             return
         }
         
-        val repository = CloverRepository(app)
+        val repository = CloverRepository.getInstance(context)
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val fullCustomer = repository.getCustomerById(customerId)
