@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -135,90 +136,6 @@ object WidgetColorUtils {
     }
     
     /**
-     * Create a styled widget icon view with colored background container.
-     * Used in Register drawer for TEXT_BOX widgets and Settings tabs.
-     * 
-     * @param context Context
-     * @param widgetType The widget type
-     * @param sizeDp Size of the icon container in dp (default 24dp)
-     * @return LinearLayout containing the styled icon
-     */
-    fun createStyledWidgetIcon(
-        context: Context,
-        widgetType: WidgetType,
-        sizeDp: Int = 24
-    ): LinearLayout {
-        val density = context.resources.displayMetrics.density
-        val sizePx = (sizeDp * density).toInt()
-        val iconSizePx = (sizeDp * 0.6 * density).toInt() // Icon is 60% of container
-        val marginEnd = (4 * density).toInt()
-        
-        val iconRes = getIconForWidgetType(widgetType)
-        val tintColor = getColorForWidgetType(widgetType)
-        val bgRes = getIconBackgroundForWidgetType(widgetType)
-        
-        val container = LinearLayout(context)
-        container.minimumWidth = sizePx
-        container.minimumHeight = sizePx
-        container.gravity = android.view.Gravity.CENTER
-        container.setBackgroundResource(bgRes)
-        
-        val icon = ImageView(context)
-        icon.layoutParams = LinearLayout.LayoutParams(iconSizePx, iconSizePx)
-        icon.setImageResource(iconRes)
-        icon.setColorFilter(tintColor)
-        container.addView(icon)
-        
-        // Set layout params with margins
-        container.layoutParams = LinearLayout.LayoutParams(sizePx, sizePx).apply {
-            setMargins(0, 0, marginEnd, 0)
-        }
-        
-        return container
-    }
-    
-    /**
-     * Create a TEXT_BOX row with styled widget icon + text.
-     * Used in Register drawer to differentiate TEXT_BOX from other pill types.
-     * 
-     * @param context Context
-     * @param text The text box content
-     * @return LinearLayout with icon + text
-     */
-    fun createTextBoxRow(
-        context: Context,
-        text: String
-    ): LinearLayout {
-        val density = context.resources.displayMetrics.density
-        val tintColor = COLOR_TEXT_BOX
-        
-        return LinearLayout(context).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = android.view.Gravity.CENTER_VERTICAL
-            layoutParams = ViewGroup.MarginLayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply {
-                setMargins(0, 0, 0, (4 * density).toInt())
-            }
-            
-            // Add styled widget icon
-            addView(createStyledWidgetIcon(context, WidgetType.TEXT_BOX, 20))
-            
-            // Add text
-            addView(TextView(context).apply {
-                this.text = truncateForPill(text)
-                setTextColor(tintColor)
-                textSize = 12f
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            })
-        }
-    }
-    
-    /**
      * Get color for Clover filter type
      */
     fun getColorForCloverFilter(filterType: String): Int {
@@ -329,10 +246,12 @@ object WidgetColorUtils {
         val density = context.resources.displayMetrics.density
         val color = getColorForWidgetType(widgetType)
         val iconRes = getIconForWidgetType(widgetType)
+        val iconBgRes = getIconBackgroundForWidgetType(widgetType)
         
         val pillView = LayoutInflater.from(context)
             .inflate(R.layout.item_note_pill, container, false) as LinearLayout
         
+        val pillIconContainer = pillView.findViewById<View>(R.id.pillIconContainer)
         val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
         val pillText = pillView.findViewById<TextView>(R.id.pillText)
         
@@ -340,6 +259,8 @@ object WidgetColorUtils {
         pillText.maxLines = 1
         pillText.setTextColor(color)
         
+        // (#77) Set icon container background to match Settings tab
+        pillIconContainer.setBackgroundResource(iconBgRes)
         pillIcon.setImageResource(iconRes)
         pillIcon.setColorFilter(color)
         
