@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.orderMate.R
 import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.databinding.ItemDrawerLineItemBinding
 import com.orderMate.fragment.orderDetail.OrderDetailFragment
