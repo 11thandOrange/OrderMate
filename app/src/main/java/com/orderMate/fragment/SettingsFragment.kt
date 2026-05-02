@@ -894,7 +894,6 @@ class SettingsFragment : Fragment() {
         )
     }
     
-    // Legacy support for old SettingsManager widgets - TODO: Remove after migration
     private fun showDeleteWidgetDialog(widget: PopUpWidget) {
         showDeleteConfirmationDialog(
             title = "Delete Widget?",
@@ -988,8 +987,9 @@ class SettingsFragment : Fragment() {
             adapter = templateAdapter
         }
         
-        // Load templates from Firebase
-        loadTemplatesFromFirebase()
+        // #78: Removed duplicate loadTemplatesFromFirebase() call here
+        // Templates are loaded in onViewCreated after merchantId is retrieved (line 181)
+        // Having it here caused race condition creating duplicate default templates
         
         // Add template button
         btnAddTemplate?.setOnClickListener {

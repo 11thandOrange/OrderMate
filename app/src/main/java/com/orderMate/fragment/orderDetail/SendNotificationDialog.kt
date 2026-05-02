@@ -32,6 +32,7 @@ import com.orderMate.modals.ShareSmsModal
 import com.orderMate.modals.SmsBody
 import com.orderMate.modals.Text
 import com.orderMate.services.TemplateProcessor
+import com.orderMate.repository.CloverRepository
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FirebaseConfigManager
 import com.orderMate.utils.NotificationTemplate
@@ -41,6 +42,9 @@ import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
 import com.orderMate.utils.showView
 import com.orderMate.utils.MyApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -510,15 +514,89 @@ class SendNotificationDialog(
         updateTheAdapter(result)
     }
 
+    /**
+     * #78: Updated to fetch full customer data from Clover if phone/email is missing
+     * 
+     * Clover's getOrders() returns partial customer data that may not include
+     * phoneNumbers or emailAddresses. We need to fetch the full customer using
+     * CustomerConnector.getCustomer() to get complete contact information.
+     */
     private fun updateTheCustomerData() {
-        order?.customers?.forEach {
-            it?.emailAddresses?.forEach { emailAddress ->
+        order?.customers?.forEach { customer ->
+            // First, try to get data from the order's customer object
+            customer?.emailAddresses?.forEach { emailAddress ->
                 customerEmailArray.add(emailAddress?.emailAddress)
             }
-            it?.phoneNumbers?.forEach { phoneNumber ->
+            customer?.phoneNumbers?.forEach { phoneNumber ->
                 customerPhoneArray.add(phoneNumber?.phoneNumber)
             }
+            
+            // #78: If no phone/email found but customer has an ID, fetch full customer data
+            val hasNoContactInfo = customerPhoneArray.isEmpty() && customerEmailArray.isEmpty()
+            val customerId = customer?.id
+            
+            if (hasNoContactInfo && !customerId.isNullOrEmpty()) {
+                android.util.Log.d("SendNotificationDialog", "#78: No contact info in order, fetching full customer data for ID: $customerId")
+                fetchFullCustomerData(customerId)
+            } else {
+                updateThePassedArray(customerPhoneArray)
+            }
+        }
+        
+        // If no customers at all, just update with empty array
+        if (order?.customers.isNullOrEmpty()) {
             updateThePassedArray(customerPhoneArray)
+        }
+    }
+    
+    /**
+     * #78: Fetch complete customer data from Clover using CustomerConnector
+     * This retrieves phone numbers and email addresses that may be missing from order data
+     */
+    private fun fetchFullCustomerData(customerId: String) {
+        val app = try {
+            requireContext().applicationContext as? MyApp
+        } catch (e: Exception) {
+            null
+        }
+        
+        if (app == null) {
+            updateThePassedArray(customerPhoneArray)
+            return
+        }
+        
+        val repository = CloverRepository(app)
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val fullCustomer = repository.getCustomerById(customerId)
+                
+                if (fullCustomer != null) {
+                    android.util.Log.d("SendNotificationDialog", "#78: Full customer fetched - phones: ${fullCustomer.phoneNumbers?.size ?: 0}, emails: ${fullCustomer.emailAddresses?.size ?: 0}")
+                    
+                    fullCustomer.emailAddresses?.forEach { emailAddress ->
+                        if (!customerEmailArray.contains(emailAddress?.emailAddress)) {
+                            customerEmailArray.add(emailAddress?.emailAddress)
+                        }
+                    }
+                    fullCustomer.phoneNumbers?.forEach { phoneNumber ->
+                        if (!customerPhoneArray.contains(phoneNumber?.phoneNumber)) {
+                            customerPhoneArray.add(phoneNumber?.phoneNumber)
+                        }
+                    }
+                } else {
+                    android.util.Log.d("SendNotificationDialog", "#78: Could not fetch full customer for ID: $customerId")
+                }
+                
+                runOnMainThread {
+                    updateThePassedArray(customerPhoneArray)
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("SendNotificationDialog", "#78: Error fetching customer: ${e.message}")
+                e.printStackTrace()
+                runOnMainThread {
+                    updateThePassedArray(customerPhoneArray)
+                }
+            }
         }
     }
 

@@ -46,9 +46,7 @@ object FirebasePaths {
     const val TEMPLATES = "templates"
     const val PROFILE_SETTINGS = "profileSettings"
     
-    // Legacy (for migration)
-    const val LEGACY_ROOT = "customData"
-    const val LEGACY_DATA = "data"
+    // #78: Removed legacy constants - migration no longer needed
     
     // Meta fields
     const val SCHEMA_VERSION = "schemaVersion"
@@ -78,8 +76,5 @@ object FirebasePaths {
     
     fun profileSettings(merchantId: String) = "${merchant(merchantId)}/$PROFILE_SETTINGS"
     
-    // Legacy paths
-    fun legacyData(merchantId: String) = "$LEGACY_ROOT/$merchantId/$LEGACY_DATA"
-    
-    fun legacyRoot(merchantId: String) = "$LEGACY_ROOT/$merchantId"
+    // #78: Removed legacy path functions - migration no longer needed
 }

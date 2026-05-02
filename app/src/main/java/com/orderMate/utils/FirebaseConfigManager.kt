@@ -4,7 +4,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
 import com.google.gson.Gson
-import com.orderMate.modals.LegacyCustomItemJson
 import com.orderMate.modals.MerchantMeta
 import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.PopupSettings
@@ -399,37 +398,7 @@ class FirebaseConfigManager private constructor() {
             .addOnFailureListener { callback(false) }
     }
     
-    // ==================== Legacy Data ====================
-    
-    fun getLegacyData(merchantId: String, callback: (LegacyCustomItemJson?) -> Unit) {
-        db.getReference(FirebasePaths.legacyData(merchantId))
-            .get()
-            .addOnSuccessListener { snapshot ->
-                try {
-                    val jsonStr = snapshot.getValue(String::class.java)
-                    if (jsonStr != null) {
-                        val legacy = gson.fromJson(jsonStr, LegacyCustomItemJson::class.java)
-                        callback(legacy)
-                    } else {
-                        callback(null)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    callback(null)
-                }
-            }
-            .addOnFailureListener { 
-                it.printStackTrace()
-                callback(null) 
-            }
-    }
-    
-    fun legacyDataExists(merchantId: String, callback: (Boolean) -> Unit) {
-        db.getReference(FirebasePaths.legacyData(merchantId))
-            .get()
-            .addOnSuccessListener { callback(it.exists()) }
-            .addOnFailureListener { callback(false) }
-    }
+    // #78: Removed Legacy Data section - migration no longer needed
     
     // ==================== Initialization ====================
     
@@ -649,17 +618,18 @@ data class NotificationTemplate(
 
 /**
  * Advanced settings data class
+ * #78: Updated defaults - scheduledNotificationsEnabled=true, printNotesOnCustomerReceipts=true
  */
 data class AdvancedSettings(
     val useOrderMateInRegister: Boolean = false,
     val useOrderMateRegisterInstead: Boolean = true,
-    val scheduledNotificationsEnabled: Boolean = false,
-    val notificationDays: Int = 3,
+    val scheduledNotificationsEnabled: Boolean = true,  // #78: Enable by default
+    val notificationDays: Int = 3,  // #78: 3 days before due date
     val notificationMinutes: Int = 0,
     val scheduledReceiptEnabled: Boolean = false,
     val receiptDays: Int = 0,
     val receiptMinutes: Int = 60,
-    val printNotesOnCustomerReceipts: Boolean = false,
+    val printNotesOnCustomerReceipts: Boolean = true,  // #78: Enable by default
     val printNotesOnOrderReceipts: Boolean = true
 )
 

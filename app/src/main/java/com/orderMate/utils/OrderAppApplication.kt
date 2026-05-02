@@ -196,12 +196,23 @@ class MyApp : Application() {
         return OrderCalc(order).tax
     }
 
+    /**
+     * #78: Returns the line item subtotal BEFORE discounts are applied
+     * This is what should display as "Subtotal" in order details
+     */
     fun orderLineItemTotal(order: Order?): Long {
-        return OrderCalc(order).getLineSubtotal(order?.lineItems)
+        return OrderCalc(order).getLineSubtotalWithoutDiscounts(order?.lineItems)
     }
 
+    /**
+     * #78: Returns the actual discount amount (difference between before and after discount)
+     * Previously this incorrectly returned subtotal without discounts
+     */
     fun orderDiscount(order: Order?): Long {
-        return OrderCalc(order).getLineSubtotalWithoutDiscounts(order?.lineItems)
+        val calc = OrderCalc(order)
+        val beforeDiscount = calc.getLineSubtotalWithoutDiscounts(order?.lineItems)
+        val afterDiscount = calc.getLineSubtotal(order?.lineItems)
+        return beforeDiscount - afterDiscount
     }
 
     fun disconnectConnectors() {
