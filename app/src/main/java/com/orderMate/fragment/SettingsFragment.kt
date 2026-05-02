@@ -1465,7 +1465,7 @@ class SettingsFragment : Fragment() {
         
         widget.options.forEach { option ->
             val chip = TextView(context).apply {
-                text = option
+                text = option.label
                 setTextColor(tintColor)
                 textSize = 12f
                 setPadding((8 * density).toInt(), (4 * density).toInt(), (8 * density).toInt(), (4 * density).toInt())
