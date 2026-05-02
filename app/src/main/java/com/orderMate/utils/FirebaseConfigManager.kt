@@ -507,20 +507,23 @@ class FirebaseConfigManager private constructor() {
     // ==================== Advanced Settings ====================
     
     fun getAdvancedSettings(merchantId: String, callback: (AdvancedSettings) -> Unit) {
+        // #78: Use AdvancedSettings defaults for consistency
+        val defaults = AdvancedSettings()
+        
         db.getReference(FirebasePaths.settings(merchantId))
             .get()
             .addOnSuccessListener { snapshot ->
                 val settings = AdvancedSettings(
-                    useOrderMateInRegister = snapshot.child("useOrderMateInRegister").getValue(Boolean::class.java) ?: false,
-                    useOrderMateRegisterInstead = snapshot.child("useOrderMateRegisterInstead").getValue(Boolean::class.java) ?: true,
-                    scheduledNotificationsEnabled = snapshot.child("scheduledNotificationsEnabled").getValue(Boolean::class.java) ?: false,
-                    notificationDays = snapshot.child("notificationDays").getValue(Int::class.java) ?: 3,
-                    notificationMinutes = snapshot.child("notificationMinutes").getValue(Int::class.java) ?: 0,
-                    scheduledReceiptEnabled = snapshot.child("scheduledReceiptEnabled").getValue(Boolean::class.java) ?: false,
-                    receiptDays = snapshot.child("receiptDays").getValue(Int::class.java) ?: 0,
-                    receiptMinutes = snapshot.child("receiptMinutes").getValue(Int::class.java) ?: 60,
-                    printNotesOnCustomerReceipts = snapshot.child("printNotesOnCustomerReceipts").getValue(Boolean::class.java) ?: false,
-                    printNotesOnOrderReceipts = snapshot.child("printNotesOnOrderReceipts").getValue(Boolean::class.java) ?: true
+                    useOrderMateInRegister = snapshot.child("useOrderMateInRegister").getValue(Boolean::class.java) ?: defaults.useOrderMateInRegister,
+                    useOrderMateRegisterInstead = snapshot.child("useOrderMateRegisterInstead").getValue(Boolean::class.java) ?: defaults.useOrderMateRegisterInstead,
+                    scheduledNotificationsEnabled = snapshot.child("scheduledNotificationsEnabled").getValue(Boolean::class.java) ?: defaults.scheduledNotificationsEnabled,
+                    notificationDays = snapshot.child("notificationDays").getValue(Int::class.java) ?: defaults.notificationDays,
+                    notificationMinutes = snapshot.child("notificationMinutes").getValue(Int::class.java) ?: defaults.notificationMinutes,
+                    scheduledReceiptEnabled = snapshot.child("scheduledReceiptEnabled").getValue(Boolean::class.java) ?: defaults.scheduledReceiptEnabled,
+                    receiptDays = snapshot.child("receiptDays").getValue(Int::class.java) ?: defaults.receiptDays,
+                    receiptMinutes = snapshot.child("receiptMinutes").getValue(Int::class.java) ?: defaults.receiptMinutes,
+                    printNotesOnCustomerReceipts = snapshot.child("printNotesOnCustomerReceipts").getValue(Boolean::class.java) ?: defaults.printNotesOnCustomerReceipts,
+                    printNotesOnOrderReceipts = snapshot.child("printNotesOnOrderReceipts").getValue(Boolean::class.java) ?: defaults.printNotesOnOrderReceipts
                 )
                 callback(settings)
             }
