@@ -122,6 +122,19 @@ object WidgetColorUtils {
     }
     
     /**
+     * Get background drawable resource for widget icon container.
+     * Overload for compatibility with com.orderMate.utils.WidgetType
+     */
+    fun getIconBackgroundForWidgetType(type: com.orderMate.utils.WidgetType): Int {
+        return when (type) {
+            com.orderMate.utils.WidgetType.CALENDAR -> R.drawable.bg_widget_icon_calendar
+            com.orderMate.utils.WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
+            com.orderMate.utils.WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
+            com.orderMate.utils.WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
+        }
+    }
+    
+    /**
      * Get color for Clover filter type
      */
     fun getColorForCloverFilter(filterType: String): Int {
