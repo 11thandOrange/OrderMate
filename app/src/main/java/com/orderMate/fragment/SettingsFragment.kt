@@ -1460,24 +1460,10 @@ class SettingsFragment : Fragment() {
     
     private fun setupOrderFilterOptionsDisplay(container: FlexboxLayout, widget: WidgetConfig, tintColor: Int) {
         container.removeAllViews()
-        val context = requireContext()
-        val density = resources.displayMetrics.density
         
         widget.options.forEach { option ->
-            val chip = TextView(context).apply {
-                text = option.label
-                setTextColor(tintColor)
-                textSize = 12f
-                setPadding((8 * density).toInt(), (4 * density).toInt(), (8 * density).toInt(), (4 * density).toInt())
-                background = WidgetColorUtils.createPillBackground(tintColor, 8f, density)
-                
-                val lp = FlexboxLayout.LayoutParams(
-                    FlexboxLayout.LayoutParams.WRAP_CONTENT,
-                    FlexboxLayout.LayoutParams.WRAP_CONTENT
-                )
-                lp.setMargins(0, 0, (6 * density).toInt(), (6 * density).toInt())
-                layoutParams = lp
-            }
+            // Use shared filter chip function for consistent styling
+            val chip = WidgetColorUtils.createFilterChip(requireContext(), option.label, tintColor)
             container.addView(chip)
         }
     }
@@ -1560,7 +1546,7 @@ class SettingsFragment : Fragment() {
     }
     
     /**
-     * Populate a FlexboxLayout with option tags
+     * Populate a FlexboxLayout with option tags using shared filter chip styling
      */
     private fun populateOptionsContainer(
         container: com.google.android.flexbox.FlexboxLayout?, 
@@ -1569,22 +1555,9 @@ class SettingsFragment : Fragment() {
     ) {
         container?.removeAllViews()
         values.forEach { value ->
-            val tag = TextView(requireContext()).apply {
-                text = value
-                setTextColor(tintColor)
-                textSize = 12f
-                setPadding(dpToPx(10), dpToPx(4), dpToPx(10), dpToPx(4))
-                setBackgroundResource(R.drawable.bg_value_tag)
-                background.setTint(tintColor and 0x33FFFFFF.toInt() or 0x33000000)
-                
-                val lp = com.google.android.flexbox.FlexboxLayout.LayoutParams(
-                    com.google.android.flexbox.FlexboxLayout.LayoutParams.WRAP_CONTENT,
-                    com.google.android.flexbox.FlexboxLayout.LayoutParams.WRAP_CONTENT
-                )
-                lp.setMargins(0, 0, dpToPx(6), dpToPx(6))
-                layoutParams = lp
-            }
-            container?.addView(tag)
+            // Use shared filter chip function for consistent styling
+            val chip = WidgetColorUtils.createFilterChip(requireContext(), value, tintColor)
+            container?.addView(chip)
         }
     }
     
@@ -1859,43 +1832,10 @@ class WidgetEditorAdapter(
         }
 
         private fun createValueTag(text: String, onRemove: () -> Unit): View {
-            val context = itemView.context
-            val density = context.resources.displayMetrics.density
-            
-            return LinearLayout(context).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = android.view.Gravity.CENTER_VERTICAL
-                setPadding((10 * density).toInt(), (6 * density).toInt(), (10 * density).toInt(), (6 * density).toInt())
-                
-                // Create pill background with widget-specific border color
-                val pillBg = GradientDrawable().apply {
-                    setColor(0x33000000) // Dark semi-transparent background
-                    cornerRadius = 16 * density
-                    setStroke((1 * density).toInt(), currentWidgetTintColor)
-                }
-                background = pillBg
-                
-                val params = ViewGroup.MarginLayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-                params.setMargins(0, 0, (8 * density).toInt(), (8 * density).toInt())
-                layoutParams = params
-
-                addView(TextView(context).apply {
-                    this.text = text
-                    setTextColor(ContextCompat.getColor(context, R.color.text_light))
-                    textSize = 12f
-                })
-
-                addView(TextView(context).apply {
-                    this.text = "×"
-                    setTextColor(currentWidgetTintColor)
-                    textSize = 14f
-                    setPadding((8 * density).toInt(), 0, (2 * density).toInt(), 0)
-                    setOnClickListener { onRemove() }
-                })
-            }
+            // Use shared editable pill function for consistent styling
+            return WidgetColorUtils.createEditableValuePill(
+                itemView.context, text, currentWidgetTintColor, onRemove
+            )
         }
         
         private fun animateExpand(expanding: Boolean) {
@@ -2127,33 +2067,10 @@ class FirebaseWidgetEditorAdapter(
         }
 
         private fun createValuePill(text: String, density: Float, onRemove: () -> Unit): LinearLayout {
-            return LinearLayout(itemView.context).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = android.view.Gravity.CENTER_VERTICAL
-                setBackgroundResource(R.drawable.bg_value_pill)
-                setPadding((8 * density).toInt(), (4 * density).toInt(), (6 * density).toInt(), (4 * density).toInt())
-                
-                val params = ViewGroup.MarginLayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-                params.setMargins(0, 0, (8 * density).toInt(), (8 * density).toInt())
-                layoutParams = params
-
-                addView(TextView(context).apply {
-                    this.text = text
-                    setTextColor(ContextCompat.getColor(context, R.color.text_light))
-                    textSize = 12f
-                })
-
-                addView(TextView(context).apply {
-                    this.text = "×"
-                    setTextColor(currentWidgetTintColor)
-                    textSize = 14f
-                    setPadding((8 * density).toInt(), 0, (2 * density).toInt(), 0)
-                    setOnClickListener { onRemove() }
-                })
-            }
+            // Use shared editable pill function for consistent styling
+            return WidgetColorUtils.createEditableValuePill(
+                itemView.context, text, currentWidgetTintColor, onRemove
+            )
         }
         
         private fun animateExpand(expanding: Boolean) {
@@ -2464,32 +2381,10 @@ class FilterWidgetAdapter(
 
         private fun setupOptionsDisplay(widget: WidgetConfig, tintColor: Int) {
             valuesContainer.removeAllViews()
-            val context = itemView.context
-            val density = context.resources.displayMetrics.density
-
+            
             widget.options.forEach { option ->
-                val chip = TextView(context).apply {
-                    text = option.label
-                    setTextColor(tintColor)
-                    textSize = 12f
-                    setPadding((10 * density).toInt(), (6 * density).toInt(), (10 * density).toInt(), (6 * density).toInt())
-                    
-                    // Create chip background
-                    val bgDrawable = android.graphics.drawable.GradientDrawable().apply {
-                        shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                        cornerRadius = 8f * density
-                        setColor((tintColor and 0x00FFFFFF) or 0x26000000) // 15% opacity
-                        setStroke((1 * density).toInt(), (tintColor and 0x00FFFFFF) or 0x40000000) // 25% opacity border
-                    }
-                    background = bgDrawable
-                    
-                    layoutParams = com.google.android.flexbox.FlexboxLayout.LayoutParams(
-                        com.google.android.flexbox.FlexboxLayout.LayoutParams.WRAP_CONTENT,
-                        com.google.android.flexbox.FlexboxLayout.LayoutParams.WRAP_CONTENT
-                    ).apply {
-                        setMargins(0, 0, (6 * density).toInt(), (6 * density).toInt())
-                    }
-                }
+                // Use shared filter chip function for consistent styling
+                val chip = WidgetColorUtils.createFilterChip(itemView.context, option.label, tintColor)
                 valuesContainer.addView(chip)
             }
         }

@@ -253,4 +253,91 @@ object WidgetColorUtils {
         val pillView = createPillView(context, container, text, widgetType, cornerRadiusDp, truncate)
         container.addView(pillView)
     }
+    
+    /**
+     * Create an editable value pill for popup tabs (Item Level & Order Level).
+     * Shows text + colored "×" remove button.
+     * Uses consistent styling: dark container + colored border.
+     * 
+     * @param context Context
+     * @param text The value text to display
+     * @param tintColor Widget color for border and remove button
+     * @param onRemove Callback when remove button is clicked
+     * @return LinearLayout pill with text and remove button
+     */
+    fun createEditableValuePill(
+        context: Context,
+        text: String,
+        tintColor: Int,
+        onRemove: () -> Unit
+    ): LinearLayout {
+        val density = context.resources.displayMetrics.density
+        
+        return LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            setPadding((10 * density).toInt(), (6 * density).toInt(), (6 * density).toInt(), (6 * density).toInt())
+            
+            // Use consistent pill background styling
+            background = createPillBackground(tintColor, 12f, density)
+            
+            val params = android.view.ViewGroup.MarginLayoutParams(
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            params.setMargins(0, 0, (8 * density).toInt(), (8 * density).toInt())
+            layoutParams = params
+
+            // Value text
+            addView(TextView(context).apply {
+                this.text = text
+                setTextColor(0xFFE0E0E0.toInt()) // text_light equivalent
+                textSize = 12f
+            })
+
+            // Remove button "×"
+            addView(TextView(context).apply {
+                this.text = "×"
+                setTextColor(tintColor)
+                textSize = 14f
+                setPadding((8 * density).toInt(), 0, (2 * density).toInt(), 0)
+                setOnClickListener { onRemove() }
+            })
+        }
+    }
+    
+    /**
+     * Create a read-only filter chip for the Filter tab.
+     * Displays option text with widget color styling.
+     * Uses consistent styling: dark container + 15% color overlay + 25% color border.
+     * 
+     * @param context Context
+     * @param text The option text to display
+     * @param tintColor Widget/filter color
+     * @return TextView styled as a filter chip
+     */
+    fun createFilterChip(
+        context: Context,
+        text: String,
+        tintColor: Int
+    ): TextView {
+        val density = context.resources.displayMetrics.density
+        
+        return TextView(context).apply {
+            this.text = text
+            setTextColor(tintColor)
+            textSize = 12f
+            setPadding((10 * density).toInt(), (6 * density).toInt(), (10 * density).toInt(), (6 * density).toInt())
+            
+            // Use consistent pill background styling
+            background = createPillBackground(tintColor, 8f, density)
+            
+            layoutParams = android.view.ViewGroup.MarginLayoutParams(
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 0, (6 * density).toInt(), (6 * density).toInt())
+            }
+        }
+    }
 }
