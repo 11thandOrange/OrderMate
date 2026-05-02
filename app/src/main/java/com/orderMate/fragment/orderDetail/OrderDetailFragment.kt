@@ -802,12 +802,6 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
      * - Discount: total discount amount
      */
     private fun showTheDiscountAndTaxData() {
-        // Hide discount row if no discounts applied
-        if (orderArguments?.discounts == null || orderArguments?.discounts?.isEmpty() == true) {
-            binding.discount.hideView()
-            binding.discountValue.hideView()
-        }
-
         // #78: Get all amounts from Clover OrderCalc
         val tax = myApp.orderTax(orderArguments)
         val serviceCharge = myApp.orderServiceCharge(orderArguments)
@@ -827,16 +821,28 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             binding.subtotalValue.text = it
         }
         
-        // Display discount amount
-        "${currencyName.convertToSymbol()}${discount.toDoubleFloatPoint()}".also {
-            binding.discountValue.text = it
-        }
-        
-        // Display discount name if available
-        exceptionHandler {
-            val discountName =
-                orderArguments?.discounts?.get(0)?.jsonObject?.get(Constants.name)
-            binding.discount.text = discountName.toString()
+        // #78: Show discount row only if there's a discount amount
+        if (discount > 0) {
+            binding.discount.showView()
+            binding.discountValue.showView()
+            
+            // Display discount amount with negative sign
+            "-${currencyName.convertToSymbol()}${discount.toDoubleFloatPoint()}".also {
+                binding.discountValue.text = it
+            }
+            
+            // Display discount name if available
+            exceptionHandler {
+                val discountName = orderArguments?.discounts?.firstOrNull()?.jsonObject?.get(Constants.name)
+                if (discountName != null) {
+                    binding.discount.text = discountName.toString()
+                } else {
+                    binding.discount.text = getString(R.string.discount)
+                }
+            }
+        } else {
+            binding.discount.hideView()
+            binding.discountValue.hideView()
         }
     }
 
