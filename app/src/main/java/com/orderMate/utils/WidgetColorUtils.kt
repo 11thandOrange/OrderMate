@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -111,7 +110,7 @@ object WidgetColorUtils {
     
     /**
      * Get background drawable resource for widget icon container.
-     * Used in Settings tabs and Register drawer for styled widget icons.
+     * Used in Settings tabs and Register popup for styled widget icons.
      */
     fun getIconBackgroundForWidgetType(type: WidgetType): Int {
         return when (type) {
@@ -119,19 +118,6 @@ object WidgetColorUtils {
             WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
             WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
             WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
-        }
-    }
-    
-    /**
-     * Get background drawable resource for widget icon container.
-     * Overload for compatibility with com.orderMate.utils.WidgetType
-     */
-    fun getIconBackgroundForWidgetType(type: com.orderMate.utils.WidgetType): Int {
-        return when (type) {
-            com.orderMate.utils.WidgetType.CALENDAR -> R.drawable.bg_widget_icon_calendar
-            com.orderMate.utils.WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
-            com.orderMate.utils.WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
-            com.orderMate.utils.WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
         }
     }
     
@@ -250,7 +236,6 @@ object WidgetColorUtils {
         val pillView = LayoutInflater.from(context)
             .inflate(R.layout.item_note_pill, container, false) as LinearLayout
         
-        val pillIconContainer = pillView.findViewById<View>(R.id.pillIconContainer)
         val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
         val pillText = pillView.findViewById<TextView>(R.id.pillText)
         
@@ -258,13 +243,6 @@ object WidgetColorUtils {
         pillText.maxLines = 1
         pillText.setTextColor(color)
         
-        // (#77) Set icon container background programmatically to match Settings tab
-        val iconBgDrawable = GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            cornerRadius = 4 * density
-            setColor(getBackgroundColor(color)) // 15% opacity of widget color
-        }
-        pillIconContainer.background = iconBgDrawable
         pillIcon.setImageResource(iconRes)
         pillIcon.setColorFilter(color)
         

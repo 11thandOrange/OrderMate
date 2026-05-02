@@ -238,11 +238,13 @@ class EventPreviewDialog : DialogFragment() {
     }
     
     /**
-     * (#77) Add a dedicated row for TEXT_BOX widget (matches Register Drawer style)
+     * (#77) Add a dedicated row for TEXT_BOX widget (matches Settings tab style)
      */
     private fun addTextBoxRow(container: android.widget.LinearLayout, label: String, value: String, density: Float) {
         val context = requireContext()
         val iconRes = WidgetColorUtils.getIconForWidgetType(com.orderMate.modals.WidgetType.TEXT_BOX)
+        val iconColor = WidgetColorUtils.getColorForWidgetType(com.orderMate.modals.WidgetType.TEXT_BOX)
+        val iconBgRes = WidgetColorUtils.getIconBackgroundForWidgetType(com.orderMate.modals.WidgetType.TEXT_BOX)
         
         // Row container
         val rowLayout = android.widget.LinearLayout(context).apply {
@@ -251,11 +253,11 @@ class EventPreviewDialog : DialogFragment() {
             setPadding(0, dpToPx(8), 0, dpToPx(8))
         }
         
-        // Icon container
+        // Icon container - use widget-specific background color
         val iconFrame = android.widget.FrameLayout(context).apply {
             val size = dpToPx(32)
             layoutParams = android.widget.LinearLayout.LayoutParams(size, size)
-            setBackgroundResource(R.drawable.bg_detail_icon)
+            setBackgroundResource(iconBgRes)
         }
         
         val icon = android.widget.ImageView(context).apply {
@@ -264,7 +266,7 @@ class EventPreviewDialog : DialogFragment() {
                 gravity = android.view.Gravity.CENTER
             }
             setImageResource(iconRes)
-            setColorFilter(androidx.core.content.ContextCompat.getColor(context, R.color.text_muted))
+            setColorFilter(iconColor)
         }
         iconFrame.addView(icon)
         rowLayout.addView(iconFrame)
