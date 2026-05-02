@@ -1373,6 +1373,9 @@ class SettingsFragment : Fragment() {
         }
     }
     
+    // Track expanded state for order-level filter widgets
+    private val orderFilterExpandedIds = mutableSetOf<String>()
+    
     private fun bindFilterWidgetView(itemView: View, widget: WidgetConfig, onUpdate: (WidgetConfig) -> Unit) {
         val widgetIconContainer: View = itemView.findViewById(R.id.filterWidgetIconContainer)
         val widgetIcon: ImageView = itemView.findViewById(R.id.filterWidgetIcon)
@@ -1380,7 +1383,10 @@ class SettingsFragment : Fragment() {
         val widgetTypeView: TextView = itemView.findViewById(R.id.filterWidgetType)
         val widgetToggle: Switch = itemView.findViewById(R.id.filterWidgetToggle)
         val expandChevron: ImageView = itemView.findViewById(R.id.filterExpandChevron)
+        val widgetHeader: View = itemView.findViewById(R.id.filterWidgetHeader)
         val widgetBody: View = itemView.findViewById(R.id.filterWidgetBody)
+        val optionsLabel: TextView = itemView.findViewById(R.id.filterOptionsLabel)
+        val valuesContainer: FlexboxLayout = itemView.findViewById(R.id.filterValuesContainer)
         
         // Set title and type
         widgetTitle.text = widget.label
@@ -1406,9 +1412,74 @@ class SettingsFragment : Fragment() {
             onUpdate(widget)
         }
         
-        // Hide expand chevron and body (simplified version without expand/collapse)
-        expandChevron.visibility = View.GONE
-        widgetBody.visibility = View.GONE
+        // (#77) Show/hide options based on widget type - same logic as FilterWidgetAdapter
+        val hasDropdown = widget.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
+                          widget.type == com.orderMate.modals.WidgetType.MULTI_SELECT ||
+                          widget.type == com.orderMate.modals.WidgetType.TEXT_BOX
+        
+        if (hasDropdown && widget.type != com.orderMate.modals.WidgetType.TEXT_BOX && widget.options.isNotEmpty()) {
+            optionsLabel.visibility = View.VISIBLE
+            setupOrderFilterOptionsDisplay(valuesContainer, widget, tintColor)
+            expandChevron.visibility = View.VISIBLE
+        } else if (widget.type == com.orderMate.modals.WidgetType.TEXT_BOX) {
+            optionsLabel.text = "Type: Free Text"
+            optionsLabel.visibility = View.VISIBLE
+            valuesContainer.removeAllViews()
+            expandChevron.visibility = View.VISIBLE
+        } else {
+            // CALENDAR - no dropdown needed
+            optionsLabel.visibility = View.GONE
+            valuesContainer.removeAllViews()
+            expandChevron.visibility = View.GONE
+        }
+        
+        // Expand/collapse state - only for types with dropdown
+        if (hasDropdown) {
+            val isExpanded = orderFilterExpandedIds.contains(widget.id)
+            widgetBody.visibility = if (isExpanded) View.VISIBLE else View.GONE
+            expandChevron.rotation = if (isExpanded) 180f else 0f
+            
+            // Header click to expand/collapse
+            widgetHeader.setOnClickListener {
+                val expanding = !orderFilterExpandedIds.contains(widget.id)
+                if (expanding) {
+                    orderFilterExpandedIds.add(widget.id)
+                } else {
+                    orderFilterExpandedIds.remove(widget.id)
+                }
+                // Animate
+                widgetBody.visibility = if (expanding) View.VISIBLE else View.GONE
+                expandChevron.animate().rotation(if (expanding) 180f else 0f).setDuration(200).start()
+            }
+        } else {
+            // No dropdown - hide body, no click handler
+            widgetBody.visibility = View.GONE
+            widgetHeader.setOnClickListener(null)
+        }
+    }
+    
+    private fun setupOrderFilterOptionsDisplay(container: FlexboxLayout, widget: WidgetConfig, tintColor: Int) {
+        container.removeAllViews()
+        val context = requireContext()
+        val density = resources.displayMetrics.density
+        
+        widget.options.forEach { option ->
+            val chip = TextView(context).apply {
+                text = option
+                setTextColor(tintColor)
+                textSize = 12f
+                setPadding((8 * density).toInt(), (4 * density).toInt(), (8 * density).toInt(), (4 * density).toInt())
+                background = WidgetColorUtils.createPillBackground(tintColor, 8f, density)
+                
+                val lp = FlexboxLayout.LayoutParams(
+                    FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                    FlexboxLayout.LayoutParams.WRAP_CONTENT
+                )
+                lp.setMargins(0, 0, (6 * density).toInt(), (6 * density).toInt())
+                layoutParams = lp
+            }
+            container.addView(chip)
+        }
     }
     
     /**
