@@ -44,6 +44,7 @@ import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatMillisToDateTime
 import com.orderMate.utils.formatPaymentState
 import com.orderMate.utils.formatOrderState
+import com.orderMate.utils.getFormattedPaymentState
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.getThePaymentState
 import com.orderMate.utils.hideView
@@ -234,9 +235,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 )
                 binding.orderPlacedStatusValue.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_ORDER_STATUS)
                 
-                // Payment Status badge (Yellow)
-                val paymentState = orderArguments?.paymentState?.name ?: "OPEN"
-                binding.paymentStatusBadge.text = formatPaymentState(paymentState)
+                // Payment Status badge (Yellow) - using shared function
+                binding.paymentStatusBadge.text = getFormattedPaymentState(orderArguments)
                 binding.paymentStatusBadge.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
                     com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_STATUS, 20f, density
                 )

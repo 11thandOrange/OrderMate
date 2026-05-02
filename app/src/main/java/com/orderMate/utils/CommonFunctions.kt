@@ -130,6 +130,24 @@ fun formatPaymentState(state: String?): String {
 }
 
 /**
+ * (#76) Gets the payment state string from an Order with correct fallback.
+ * Single source of truth for extracting payment state from orders.
+ * Falls back to "OPEN" when paymentState is null.
+ */
+fun getPaymentStateFromOrder(order: Order?): String {
+    return order?.paymentState?.name ?: "OPEN"
+}
+
+/**
+ * (#76) Gets the formatted payment state from an Order.
+ * Combines getPaymentStateFromOrder() and formatPaymentState() for convenience.
+ * Use this when you need the display text directly.
+ */
+fun getFormattedPaymentState(order: Order?): String {
+    return formatPaymentState(getPaymentStateFromOrder(order))
+}
+
+/**
  * Formats Clover order state to display text (UPPERCASE).
  * Single source of truth for order status formatting.
  * 
