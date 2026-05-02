@@ -248,9 +248,8 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     @Synchronized
     private fun setupRecyclerView(result: List<ItemModal>?, order: Order? ) {
         binding?.apply {
-            // Update order title (#42, #76 - show full order ID)
-            val orderId = order?.id?.uppercase() ?: ""
-            orderTitle.text = "#$orderId"
+            // (#76) Hide order title - order ID removed from register drawer
+            orderTitle.visibility = View.GONE
             
             // Update customer name (#42)
             val customerNameStr = order?.customers?.firstOrNull()?.let { customer ->
