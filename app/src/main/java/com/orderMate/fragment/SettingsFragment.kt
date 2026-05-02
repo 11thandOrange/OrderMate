@@ -1386,12 +1386,14 @@ class SettingsFragment : Fragment() {
         widgetTitle.text = widget.label
         widgetTypeView.text = widget.type.displayName
         
-        // Set icon and colors based on type - matches FilterWidgetAdapter pattern
-        val (iconRes, bgRes, tintColor) = when (widget.type) {
-            com.orderMate.modals.WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, WidgetColorUtils.COLOR_CALENDAR)
-            com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
-            com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
-            com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
+        // Set icon and colors based on type - uses centralized WidgetColorUtils
+        val iconRes = WidgetColorUtils.getIconForWidgetType(widget.type)
+        val tintColor = WidgetColorUtils.getColorForWidgetType(widget.type)
+        val bgRes = when (widget.type) {
+            com.orderMate.modals.WidgetType.CALENDAR -> R.drawable.bg_widget_icon_calendar
+            com.orderMate.modals.WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
+            com.orderMate.modals.WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
+            com.orderMate.modals.WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
         }
         widgetIcon.setImageResource(iconRes)
         widgetIcon.setColorFilter(tintColor)
@@ -1687,12 +1689,14 @@ class WidgetEditorAdapter(
             widgetToggle.isChecked = widget.enabled
             inputWidgetLabel.setText(widget.label)
 
-            // Set icon and colors based on type - uses WidgetColorUtils for consistency
-            val (iconRes, bgRes, tintColor) = when (widget.type) {
-                WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, WidgetColorUtils.COLOR_CALENDAR)
-                WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
-                WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
-                WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
+            // Set icon and colors based on type - uses centralized WidgetColorUtils
+            val iconRes = WidgetColorUtils.getIconForWidgetType(widget.type)
+            val tintColor = WidgetColorUtils.getColorForWidgetType(widget.type)
+            val bgRes = when (widget.type) {
+                WidgetType.CALENDAR -> R.drawable.bg_widget_icon_calendar
+                WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
+                WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
+                WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
             }
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
@@ -1937,12 +1941,14 @@ class FirebaseWidgetEditorAdapter(
             widgetToggle.isChecked = widget.isEnabled
             inputWidgetLabel.setText(widget.label)
 
-            // Set icon and colors based on type - uses WidgetColorUtils for consistency
-            val (iconRes, bgRes, tintColor) = when (widget.type) {
-                com.orderMate.modals.WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, WidgetColorUtils.COLOR_CALENDAR)
-                com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
-                com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
-                com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
+            // Set icon and colors based on type - uses centralized WidgetColorUtils
+            val iconRes = WidgetColorUtils.getIconForWidgetType(widget.type)
+            val tintColor = WidgetColorUtils.getColorForWidgetType(widget.type)
+            val bgRes = when (widget.type) {
+                com.orderMate.modals.WidgetType.CALENDAR -> R.drawable.bg_widget_icon_calendar
+                com.orderMate.modals.WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
+                com.orderMate.modals.WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
+                com.orderMate.modals.WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
             }
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
@@ -2320,12 +2326,14 @@ class FilterWidgetAdapter(
             widgetType.text = widget.type.displayName
             widgetToggle.isChecked = widget.showInFilter
 
-            // Set icon and colors based on type - uses WidgetColorUtils for consistency
-            val (iconRes, bgRes, tintColor) = when (widget.type) {
-                com.orderMate.modals.WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, WidgetColorUtils.COLOR_CALENDAR)
-                com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
-                com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
-                com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
+            // Set icon and colors based on type - uses centralized WidgetColorUtils
+            val iconRes = WidgetColorUtils.getIconForWidgetType(widget.type)
+            val tintColor = WidgetColorUtils.getColorForWidgetType(widget.type)
+            val bgRes = when (widget.type) {
+                com.orderMate.modals.WidgetType.CALENDAR -> R.drawable.bg_widget_icon_calendar
+                com.orderMate.modals.WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
+                com.orderMate.modals.WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
+                com.orderMate.modals.WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
             }
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)

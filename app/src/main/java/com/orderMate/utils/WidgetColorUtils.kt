@@ -83,6 +83,32 @@ object WidgetColorUtils {
     }
     
     /**
+     * Get icon resource for utils WidgetType (used in SettingsFragment)
+     * Overload for compatibility with com.orderMate.utils.WidgetType
+     */
+    fun getIconForWidgetType(type: com.orderMate.utils.WidgetType): Int {
+        return when (type) {
+            com.orderMate.utils.WidgetType.CALENDAR -> R.drawable.ic_calendar
+            com.orderMate.utils.WidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
+            com.orderMate.utils.WidgetType.MULTI_SELECT -> R.drawable.ic_check_double
+            com.orderMate.utils.WidgetType.TEXT_BOX -> R.drawable.ic_text_format
+        }
+    }
+    
+    /**
+     * Get color for utils WidgetType (used in SettingsFragment)
+     * Overload for compatibility with com.orderMate.utils.WidgetType
+     */
+    fun getColorForWidgetType(type: com.orderMate.utils.WidgetType): Int {
+        return when (type) {
+            com.orderMate.utils.WidgetType.CALENDAR -> COLOR_CALENDAR
+            com.orderMate.utils.WidgetType.SINGLE_SELECT -> COLOR_SINGLE_SELECT
+            com.orderMate.utils.WidgetType.MULTI_SELECT -> COLOR_MULTI_SELECT
+            com.orderMate.utils.WidgetType.TEXT_BOX -> COLOR_TEXT_BOX
+        }
+    }
+    
+    /**
      * Get color for Clover filter type
      */
     fun getColorForCloverFilter(filterType: String): Int {
