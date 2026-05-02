@@ -151,24 +151,30 @@ object WidgetColorUtils {
         val density = context.resources.displayMetrics.density
         val sizePx = (sizeDp * density).toInt()
         val iconSizePx = (sizeDp * 0.6 * density).toInt() // Icon is 60% of container
+        val marginEnd = (4 * density).toInt()
         
         val iconRes = getIconForWidgetType(widgetType)
         val tintColor = getColorForWidgetType(widgetType)
         val bgRes = getIconBackgroundForWidgetType(widgetType)
         
-        return LinearLayout(context).apply {
-            layoutParams = ViewGroup.MarginLayoutParams(sizePx, sizePx).apply {
-                setMargins(0, 0, (4 * density).toInt(), 0)
-            }
-            gravity = android.view.Gravity.CENTER
-            setBackgroundResource(bgRes)
-            
-            addView(ImageView(context).apply {
-                layoutParams = ViewGroup.LayoutParams(iconSizePx, iconSizePx)
-                setImageResource(iconRes)
-                setColorFilter(tintColor)
-            })
+        val container = LinearLayout(context)
+        container.minimumWidth = sizePx
+        container.minimumHeight = sizePx
+        container.gravity = android.view.Gravity.CENTER
+        container.setBackgroundResource(bgRes)
+        
+        val icon = ImageView(context)
+        icon.layoutParams = LinearLayout.LayoutParams(iconSizePx, iconSizePx)
+        icon.setImageResource(iconRes)
+        icon.setColorFilter(tintColor)
+        container.addView(icon)
+        
+        // Set layout params with margins
+        container.layoutParams = LinearLayout.LayoutParams(sizePx, sizePx).apply {
+            setMargins(0, 0, marginEnd, 0)
         }
+        
+        return container
     }
     
     /**
