@@ -147,6 +147,38 @@ fun formatOrderState(state: String?): String {
     }
 }
 
+/**
+ * (#76) Formats Clover payment state to title case (only first letter capitalized).
+ * Used specifically for Settings filters tab display.
+ */
+fun formatPaymentStateTitleCase(state: String?): String {
+    if (state.isNullOrEmpty()) return "Unpaid"
+    
+    return when (state.uppercase()) {
+        "OPEN" -> "Unpaid"
+        "PAID" -> "Paid"
+        "PARTIALLY_PAID" -> "Partially paid"
+        "PARTIALLY_REFUNDED" -> "Partially refunded"
+        "REFUNDED" -> "Refunded"
+        "CREDITED" -> "Credited"
+        else -> state.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
+    }
+}
+
+/**
+ * (#76) Formats Clover order state to title case (only first letter capitalized).
+ * Used specifically for Settings filters tab display.
+ */
+fun formatOrderStateTitleCase(state: String?): String {
+    if (state.isNullOrEmpty()) return "Open"
+    
+    return when (state.lowercase()) {
+        "open" -> "Open"
+        "locked" -> "Closed"
+        else -> state.lowercase().replaceFirstChar { it.uppercase() }
+    }
+}
+
 fun Context.getThePaymentState(order: Order?): String {
     val state = order?.paymentState?.name ?: order?.state
     return if (state != null) formatPaymentState(state) else getString(R.string.dash)

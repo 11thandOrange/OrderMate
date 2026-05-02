@@ -550,6 +550,9 @@ class CalendarFragment : Fragment() {
             // (#30) Extract order-level tags for event preview (ORDER level widgets only)
             val customTags = extractOrderLevelTags(order.note, orderLevelWidgets)
             
+            // (#76) Get payment state from order
+            val paymentState = order.paymentState?.name ?: order.state
+            
             ScheduledEvent(
                 id = order.id?.hashCode()?.toLong() ?: System.currentTimeMillis(),
                 orderId = order.id ?: "",
@@ -561,7 +564,8 @@ class CalendarFragment : Fragment() {
                 note = null,
                 lineItems = lineItems,
                 orderNote = order.note,
-                customTags = customTags  // (#30) Add custom tags for event preview
+                customTags = customTags,  // (#30) Add custom tags for event preview
+                paymentState = paymentState  // (#76) Clover payment state for event preview
             )
         }
     }

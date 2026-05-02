@@ -66,12 +66,26 @@
                 app:tint="@color/text_light"
                 android:layout_marginEnd="12dp"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Calendar"
-                android:textColor="@color/text_light"
-                android:textSize="15sp"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Calendar"
+                    android:textColor="@color/text_light"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Due Dates, pick-up dates, deadlines"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -94,12 +108,26 @@
                 app:tint="@color/text_light"
                 android:layout_marginEnd="12dp"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Single Select"
-                android:textColor="@color/text_light"
-                android:textSize="15sp"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Single Select"
+                    android:textColor="@color/text_light"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select one note per item"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -122,12 +150,26 @@
                 app:tint="@color/text_light"
                 android:layout_marginEnd="12dp"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Multi Select"
-                android:textColor="@color/text_light"
-                android:textSize="15sp"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Multi Select"
+                    android:textColor="@color/text_light"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select multiple notes per item"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -149,12 +191,26 @@
                 app:tint="@color/text_light"
                 android:layout_marginEnd="12dp"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Text Box"
-                android:textColor="@color/text_light"
-                android:textSize="15sp"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Text Box"
+                    android:textColor="@color/text_light"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Descriptions, details, reminders"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
