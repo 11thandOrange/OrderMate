@@ -349,11 +349,7 @@ class DateTimePickerDialog : DialogFragment() {
             }
         }
 
-        // Also allow clicking on individual numbers to jump to that value
-        setupHourClickListeners()
-        setupMinuteClickListeners()
-
-        // AM/PM toggle (simple text buttons, no background)
+        // AM/PM toggle (full rows with background)
         binding.btnAM.setOnClickListener {
             if (calendar.get(Calendar.AM_PM) == Calendar.PM) {
                 calendar.add(Calendar.HOUR_OF_DAY, -12)
@@ -368,66 +364,6 @@ class DateTimePickerDialog : DialogFragment() {
                 updateTimeDisplay()
                 updateAmPmButtons()
             }
-        }
-    }
-
-    private fun setupHourClickListeners() {
-        binding.hourPrev3Text.setOnClickListener {
-            calendar.add(Calendar.HOUR_OF_DAY, -3)
-            updateTimeDisplay()
-            updateAmPmButtons()
-        }
-        binding.hourPrev2Text.setOnClickListener {
-            calendar.add(Calendar.HOUR_OF_DAY, -2)
-            updateTimeDisplay()
-            updateAmPmButtons()
-        }
-        binding.hourPrev1Text.setOnClickListener {
-            calendar.add(Calendar.HOUR_OF_DAY, -1)
-            updateTimeDisplay()
-            updateAmPmButtons()
-        }
-        binding.hourNext1Text.setOnClickListener {
-            calendar.add(Calendar.HOUR_OF_DAY, 1)
-            updateTimeDisplay()
-            updateAmPmButtons()
-        }
-        binding.hourNext2Text.setOnClickListener {
-            calendar.add(Calendar.HOUR_OF_DAY, 2)
-            updateTimeDisplay()
-            updateAmPmButtons()
-        }
-        binding.hourNext3Text.setOnClickListener {
-            calendar.add(Calendar.HOUR_OF_DAY, 3)
-            updateTimeDisplay()
-            updateAmPmButtons()
-        }
-    }
-
-    private fun setupMinuteClickListeners() {
-        binding.minutePrev3Text.setOnClickListener {
-            calendar.add(Calendar.MINUTE, -3)
-            updateTimeDisplay()
-        }
-        binding.minutePrev2Text.setOnClickListener {
-            calendar.add(Calendar.MINUTE, -2)
-            updateTimeDisplay()
-        }
-        binding.minutePrev1Text.setOnClickListener {
-            calendar.add(Calendar.MINUTE, -1)
-            updateTimeDisplay()
-        }
-        binding.minuteNext1Text.setOnClickListener {
-            calendar.add(Calendar.MINUTE, 1)
-            updateTimeDisplay()
-        }
-        binding.minuteNext2Text.setOnClickListener {
-            calendar.add(Calendar.MINUTE, 2)
-            updateTimeDisplay()
-        }
-        binding.minuteNext3Text.setOnClickListener {
-            calendar.add(Calendar.MINUTE, 3)
-            updateTimeDisplay()
         }
     }
 
@@ -475,13 +411,17 @@ class DateTimePickerDialog : DialogFragment() {
         val isAM = calendar.get(Calendar.AM_PM) == Calendar.AM
         val context = requireContext()
 
-        // (#77) Simple text styling - no background, just color change
+        // (#77) Full row styling with background colors
         if (isAM) {
-            binding.btnAM.setTextColor(ContextCompat.getColor(context, R.color.orange_accent))
-            binding.btnPM.setTextColor(ContextCompat.getColor(context, R.color.text_muted))
+            binding.btnAM.setBackgroundResource(R.drawable.bg_period_button_selected)
+            binding.btnAM.setTextColor(Color.WHITE)
+            binding.btnPM.setBackgroundResource(R.drawable.bg_period_button)
+            binding.btnPM.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
         } else {
-            binding.btnPM.setTextColor(ContextCompat.getColor(context, R.color.orange_accent))
-            binding.btnAM.setTextColor(ContextCompat.getColor(context, R.color.text_muted))
+            binding.btnPM.setBackgroundResource(R.drawable.bg_period_button_selected)
+            binding.btnPM.setTextColor(Color.WHITE)
+            binding.btnAM.setBackgroundResource(R.drawable.bg_period_button)
+            binding.btnAM.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
         }
     }
 
