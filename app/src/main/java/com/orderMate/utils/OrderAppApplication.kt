@@ -240,10 +240,15 @@ class MyApp : Application() {
 
     /**
      * #78: Get order fees from Clover OrderCalc
+     * Uses getTotalOrderFeeFromLineItems if available, otherwise returns 0
      */
     fun orderFees(order: Order?): Long {
         if (order == null) return 0L
-        return OrderCalc(order).totalOrderFee
+        return try {
+            OrderCalc(order).getTotalOrderFeeFromLineItems(order.lineItems)
+        } catch (e: Exception) {
+            0L
+        }
     }
 
     /**
