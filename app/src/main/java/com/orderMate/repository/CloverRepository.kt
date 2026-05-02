@@ -303,6 +303,41 @@ class CloverRepository private constructor(private val context: Context) {
             null
         }
     }
+
+    /**
+     * #78: Enrich order with full customer data from Clover
+     * Orders from getOrder/getOrders have partial customer data.
+     * This fetches complete customer info including phone/email.
+     */
+    suspend fun enrichOrderWithFullCustomer(order: Order?): Order? {
+        if (order == null) return null
+        
+        val customerId = order.customers?.firstOrNull()?.id
+        if (customerId.isNullOrEmpty()) return order
+        
+        try {
+            val fullCustomer = getCustomerById(customerId)
+            if (fullCustomer != null) {
+                // Replace the partial customer with full customer data
+                order.customers = mutableListOf(fullCustomer)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        
+        return order
+    }
+
+    /**
+     * #78: Enrich multiple orders with full customer data
+     */
+    suspend fun enrichOrdersWithFullCustomers(orders: List<Order>?): List<Order>? {
+        if (orders.isNullOrEmpty()) return orders
+        
+        return orders.map { order ->
+            enrichOrderWithFullCustomer(order) ?: order
+        }
+    }
     
     /**
      * #48: Update an existing customer in Clover

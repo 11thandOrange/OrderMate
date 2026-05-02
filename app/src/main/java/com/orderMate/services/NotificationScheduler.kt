@@ -201,10 +201,13 @@ class OrderNotificationReceiver : BroadcastReceiver() {
             // 2. Get order details from Clover
             val orderConnector = OrderConnector(context, cloverAccount, null)
             orderConnector.connect()
-            val order = orderConnector.getOrder(orderId)
+            var order = orderConnector.getOrder(orderId)
             orderConnector.disconnect()
             
             if (order == null) return
+            
+            // #78: Enrich order with full customer data (phone/email)
+            order = CloverRepository.getInstance(context).enrichOrderWithFullCustomer(order)
             
             // 3. Build email content
             val customerName = order.customers?.firstOrNull()?.let { customer ->

@@ -864,9 +864,14 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     suspend fun updateTheTransaction(){
         exceptionHandler {
             // update the dashboard after the order is delay
-            val orderData = myApp.getOrderConnector().getOrder(orderArguments?.id)
+            var orderData = myApp.getOrderConnector().getOrder(orderArguments?.id)
+            
+            // #78: Enrich order with full customer data (phone/email)
+            context?.let { ctx ->
+                orderData = CloverRepository.getInstance(ctx).enrichOrderWithFullCustomer(orderData)
+            }
+            
             orderArguments = orderData
-
         }
         CoroutineScope(Dispatchers.Main).launch {
             showThePaymentData()
@@ -1066,6 +1071,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         }
         val data = myApp.getOrderConnector().getOrders(mutableListOf())
         orderArguments = getTheRequiredData(data)
+        
+        // #78: Enrich order with full customer data (phone/email)
+        context?.let { ctx ->
+            orderArguments = CloverRepository.getInstance(ctx).enrichOrderWithFullCustomer(orderArguments)
+        }
+        
         runOnMainThread {
             binding.syncingText.hideView()
             data?.let {
