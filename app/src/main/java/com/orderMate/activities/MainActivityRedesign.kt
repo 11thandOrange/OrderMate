@@ -18,6 +18,7 @@ import com.orderMate.fragment.orderHistory.OrderHistoryFragment
 import com.orderMate.modals.PopupSettings
 import com.orderMate.utils.Constants
 import com.orderMate.utils.DefaultWidgetFactory
+import com.orderMate.utils.EmployeeRoleUtils
 import com.orderMate.utils.FirebaseConfigManager
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.PermissionUtils
@@ -280,6 +281,8 @@ class MainActivityRedesign : AppCompatActivity() {
         val merchantId = MyApp.getInstance().getMerchantId()
         if (merchantId != null) {
             loadWidgetData(merchantId)
+            // #79: Check permission settings for nav visibility
+            checkSettingsNavVisibility(merchantId)
         }
 
         // this permission is required for the Devices above api level 23
@@ -298,6 +301,43 @@ class MainActivityRedesign : AppCompatActivity() {
                 getString(R.string.cancel)
             ) {
                 permissionUtils.gotoSettings(this)
+            }
+        }
+    }
+    
+    /**
+     * #79: Check if current employee can access settings based on their role
+     * and the permission settings from Firebase.
+     * Owner always sees settings. Other roles check their respective toggles.
+     */
+    private fun checkSettingsNavVisibility(merchantId: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Get current employee from Clover
+                val employee = myApplication.getEmployeeConnector()?.employee
+                
+                // Fetch permission settings from Firebase
+                firebaseConfigManager.getAdvancedSettings(merchantId) { settings ->
+                    val canAccess = EmployeeRoleUtils.canAccessSettings(employee, settings)
+                    
+                    runOnUiThread {
+                        // Show or hide settings nav based on permission
+                        navSettings.visibility = if (canAccess) View.VISIBLE else View.GONE
+                        navSettingsIndicator.visibility = if (canAccess) View.VISIBLE else View.GONE
+                        
+                        // If currently on settings and no longer has access, navigate away
+                        if (!canAccess && currentNavItem == R.id.navSettings) {
+                            onNavItemClicked(R.id.navList)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // On error, default to showing settings (fail-open for owner/admin)
+                runOnUiThread {
+                    navSettings.visibility = View.VISIBLE
+                    navSettingsIndicator.visibility = View.VISIBLE
+                }
             }
         }
     }

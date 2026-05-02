@@ -427,6 +427,11 @@ class FirebaseConfigManager private constructor() {
         updates["${FirebasePaths.settings(merchantId)}/printNotesOnCustomerReceipts"] = advancedDefaults.printNotesOnCustomerReceipts
         updates["${FirebasePaths.settings(merchantId)}/printNotesOnOrderReceipts"] = advancedDefaults.printNotesOnOrderReceipts
         
+        // #79: Permission Settings defaults
+        updates["${FirebasePaths.settings(merchantId)}/allowAdminUpdateSettings"] = advancedDefaults.allowAdminUpdateSettings
+        updates["${FirebasePaths.settings(merchantId)}/allowManagersUpdateSettings"] = advancedDefaults.allowManagersUpdateSettings
+        updates["${FirebasePaths.settings(merchantId)}/allowEmployeesUpdateSettings"] = advancedDefaults.allowEmployeesUpdateSettings
+        
         // Widgets
         widgets.forEach { widget ->
             val path = "${FirebasePaths.widgets(merchantId)}/${widget.id}"
@@ -536,7 +541,11 @@ class FirebaseConfigManager private constructor() {
                     receiptDays = snapshot.child("receiptDays").getValue(Int::class.java) ?: defaults.receiptDays,
                     receiptMinutes = snapshot.child("receiptMinutes").getValue(Int::class.java) ?: defaults.receiptMinutes,
                     printNotesOnCustomerReceipts = snapshot.child("printNotesOnCustomerReceipts").getValue(Boolean::class.java) ?: defaults.printNotesOnCustomerReceipts,
-                    printNotesOnOrderReceipts = snapshot.child("printNotesOnOrderReceipts").getValue(Boolean::class.java) ?: defaults.printNotesOnOrderReceipts
+                    printNotesOnOrderReceipts = snapshot.child("printNotesOnOrderReceipts").getValue(Boolean::class.java) ?: defaults.printNotesOnOrderReceipts,
+                    // #79: Permission Settings
+                    allowAdminUpdateSettings = snapshot.child("allowAdminUpdateSettings").getValue(Boolean::class.java) ?: defaults.allowAdminUpdateSettings,
+                    allowManagersUpdateSettings = snapshot.child("allowManagersUpdateSettings").getValue(Boolean::class.java) ?: defaults.allowManagersUpdateSettings,
+                    allowEmployeesUpdateSettings = snapshot.child("allowEmployeesUpdateSettings").getValue(Boolean::class.java) ?: defaults.allowEmployeesUpdateSettings
                 )
                 callback(settings)
             }
@@ -556,7 +565,11 @@ class FirebaseConfigManager private constructor() {
             "receiptDays" to settings.receiptDays,
             "receiptMinutes" to settings.receiptMinutes,
             "printNotesOnCustomerReceipts" to settings.printNotesOnCustomerReceipts,
-            "printNotesOnOrderReceipts" to settings.printNotesOnOrderReceipts
+            "printNotesOnOrderReceipts" to settings.printNotesOnOrderReceipts,
+            // #79: Permission Settings
+            "allowAdminUpdateSettings" to settings.allowAdminUpdateSettings,
+            "allowManagersUpdateSettings" to settings.allowManagersUpdateSettings,
+            "allowEmployeesUpdateSettings" to settings.allowEmployeesUpdateSettings
         )
         db.getReference(FirebasePaths.settings(merchantId))
             .updateChildren(updates)
@@ -646,7 +659,11 @@ data class AdvancedSettings(
     val receiptDays: Int = 0,
     val receiptMinutes: Int = 60,
     val printNotesOnCustomerReceipts: Boolean = true,  // #78: Enable by default
-    val printNotesOnOrderReceipts: Boolean = true
+    val printNotesOnOrderReceipts: Boolean = true,
+    // #79: Permission Settings - control who can access settings
+    val allowAdminUpdateSettings: Boolean = true,
+    val allowManagersUpdateSettings: Boolean = true,
+    val allowEmployeesUpdateSettings: Boolean = true
 )
 
 /**

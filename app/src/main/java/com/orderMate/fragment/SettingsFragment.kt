@@ -143,6 +143,11 @@ class SettingsFragment : Fragment() {
     private var switchPrintNotesCustomer: Switch? = null
     private var switchPrintNotesOrder: Switch? = null
     
+    // #79: Permission Settings
+    private var switchAllowAdminSettings: Switch? = null
+    private var switchAllowManagersSettings: Switch? = null
+    private var switchAllowEmployeesSettings: Switch? = null
+    
     // Loading
     private var loadingOverlay: View? = null
     
@@ -298,6 +303,11 @@ class SettingsFragment : Fragment() {
         // Receipt Settings
         switchPrintNotesCustomer = view.findViewById(R.id.switchPrintNotesCustomer)
         switchPrintNotesOrder = view.findViewById(R.id.switchPrintNotesOrder)
+        
+        // #79: Permission Settings
+        switchAllowAdminSettings = view.findViewById(R.id.switchAllowAdminSettings)
+        switchAllowManagersSettings = view.findViewById(R.id.switchAllowManagersSettings)
+        switchAllowEmployeesSettings = view.findViewById(R.id.switchAllowEmployeesSettings)
     }
 
     private fun setupSubTabs() {
@@ -1101,6 +1111,19 @@ class SettingsFragment : Fragment() {
             scheduleAdvancedSettingsSave()
         }
         
+        // #79: Permission Settings toggles
+        switchAllowAdminSettings?.setOnCheckedChangeListener { _, _ ->
+            scheduleAdvancedSettingsSave()
+        }
+        
+        switchAllowManagersSettings?.setOnCheckedChangeListener { _, _ ->
+            scheduleAdvancedSettingsSave()
+        }
+        
+        switchAllowEmployeesSettings?.setOnCheckedChangeListener { _, _ ->
+            scheduleAdvancedSettingsSave()
+        }
+        
         // Initial visibility state
         updateInputsVisibility()
         
@@ -1187,7 +1210,11 @@ class SettingsFragment : Fragment() {
                 receiptDays = settingsManager.getReceiptDays(),
                 receiptMinutes = settingsManager.getReceiptMinutes(),
                 printNotesOnCustomerReceipts = switchPrintNotesCustomer?.isChecked ?: true,
-                printNotesOnOrderReceipts = switchPrintNotesOrder?.isChecked ?: true
+                printNotesOnOrderReceipts = switchPrintNotesOrder?.isChecked ?: true,
+                // #79: Permission Settings
+                allowAdminUpdateSettings = switchAllowAdminSettings?.isChecked ?: true,
+                allowManagersUpdateSettings = switchAllowManagersSettings?.isChecked ?: true,
+                allowEmployeesUpdateSettings = switchAllowEmployeesSettings?.isChecked ?: true
             )
             firebase.saveAdvancedSettings(mid, settings) { success ->
                 // Silent save - no toast on success
@@ -1285,6 +1312,11 @@ class SettingsFragment : Fragment() {
                     // Update Receipt Settings toggles
                     switchPrintNotesCustomer?.isChecked = settings.printNotesOnCustomerReceipts
                     switchPrintNotesOrder?.isChecked = settings.printNotesOnOrderReceipts
+                    
+                    // #79: Update Permission Settings toggles
+                    switchAllowAdminSettings?.isChecked = settings.allowAdminUpdateSettings
+                    switchAllowManagersSettings?.isChecked = settings.allowManagersUpdateSettings
+                    switchAllowEmployeesSettings?.isChecked = settings.allowEmployeesUpdateSettings
                 }
             }
         }
