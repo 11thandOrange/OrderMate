@@ -78,9 +78,21 @@ class EventPreviewDialog : DialogFragment() {
         
         // Setup order-level notes pills (#93)
         setupOrderNotesPills(view, currentEvent)
+        
+        // (#77) Setup text box rows (rendered as rows, not pills)
+        setupTextBoxRows(view, currentEvent)
 
-        // Set details
-        customerName.text = if (currentEvent.customerName.isBlank()) "-" else currentEvent.customerName
+        // (#77) Conditionally render customer row - only show if customer exists
+        val customerRow = view.findViewById<View>(R.id.customerRow)
+        val customerRowDivider = view.findViewById<View>(R.id.customerRowDivider)
+        if (currentEvent.customerName.isBlank()) {
+            customerRow.visibility = View.GONE
+            customerRowDivider.visibility = View.GONE
+        } else {
+            customerRow.visibility = View.VISIBLE
+            customerRowDivider.visibility = View.VISIBLE
+            customerName.text = currentEvent.customerName
+        }
         
         val dateTimeFormat = SimpleDateFormat("MMMM d, yyyy 'at' h:mm a", Locale.getDefault())
         dueDate.text = dateTimeFormat.format(currentEvent.dueDate)
@@ -202,17 +214,116 @@ class EventPreviewDialog : DialogFragment() {
     }
     
     /**
+     * (#77) Setup text box rows (rendered as dedicated rows, not pills)
+     * Matches Register Drawer styling
+     */
+    private fun setupTextBoxRows(view: View, event: ScheduledEvent) {
+        val container = view.findViewById<android.widget.LinearLayout>(R.id.textBoxRowsContainer)
+        container.removeAllViews()
+        
+        val textBoxTags = event.customTags.filter { it.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX }
+        
+        if (textBoxTags.isEmpty()) {
+            container.visibility = View.GONE
+            return
+        }
+        
+        container.visibility = View.VISIBLE
+        val density = resources.displayMetrics.density
+        
+        textBoxTags.forEach { tag ->
+            addTextBoxRow(container, tag.label, tag.text, density)
+        }
+    }
+    
+    /**
+     * (#77) Add a dedicated row for TEXT_BOX widget (matches Register Drawer style)
+     */
+    private fun addTextBoxRow(container: android.widget.LinearLayout, label: String, value: String, density: Float) {
+        val context = requireContext()
+        val color = WidgetColorUtils.getColorForWidgetType(com.orderMate.modals.WidgetType.TEXT_BOX)
+        val iconRes = WidgetColorUtils.getIconForWidgetType(com.orderMate.modals.WidgetType.TEXT_BOX)
+        
+        // Row container
+        val rowLayout = android.widget.LinearLayout(context).apply {
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.TOP
+            setPadding(0, dpToPx(8), 0, dpToPx(8))
+        }
+        
+        // Icon container
+        val iconFrame = android.widget.FrameLayout(context).apply {
+            val size = dpToPx(32)
+            layoutParams = android.widget.LinearLayout.LayoutParams(size, size)
+            setBackgroundResource(R.drawable.bg_detail_icon)
+        }
+        
+        val icon = android.widget.ImageView(context).apply {
+            val iconSize = dpToPx(16)
+            layoutParams = android.widget.FrameLayout.LayoutParams(iconSize, iconSize).apply {
+                gravity = android.view.Gravity.CENTER
+            }
+            setImageResource(iconRes)
+            setColorFilter(androidx.core.content.ContextCompat.getColor(context, R.color.text_muted))
+        }
+        iconFrame.addView(icon)
+        rowLayout.addView(iconFrame)
+        
+        // Text container
+        val textLayout = android.widget.LinearLayout(context).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            layoutParams = android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                marginStart = dpToPx(12)
+            }
+        }
+        
+        // Label
+        val labelView = TextView(context).apply {
+            text = label.uppercase()
+            setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.text_muted))
+            textSize = 11f
+        }
+        textLayout.addView(labelView)
+        
+        // Value
+        val valueView = TextView(context).apply {
+            text = value
+            setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.text_light))
+            textSize = 14f
+            maxLines = 3
+        }
+        textLayout.addView(valueView)
+        
+        rowLayout.addView(textLayout)
+        
+        // Add divider
+        val divider = View(context).apply {
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 
+                dpToPx(1)
+            )
+            setBackgroundColor(0x1AFFFFFF.toInt())
+        }
+        
+        container.addView(rowLayout)
+        container.addView(divider)
+    }
+    
+    /**
      * (#30) Setup order-level notes pills display.
      * Uses pre-parsed customTags from ScheduledEvent (widget-based parsing done in CalendarFragment).
-     * All 4 widget types supported: SINGLE_SELECT, MULTI_SELECT, CALENDAR, TEXT_BOX (truncated).
+     * (#77) TEXT_BOX rendered as rows, not pills - only SINGLE_SELECT, MULTI_SELECT, CALENDAR as pills.
      * Uses item_note_pill layout with icons matching item-level pills.
      */
     private fun setupOrderNotesPills(view: View, event: ScheduledEvent) {
         val container = view.findViewById<FlexboxLayout>(R.id.orderNotesPillsContainer)
         container.removeAllViews()
         
+        // (#77) Filter out TEXT_BOX - those are rendered as rows
+        val pillTags = event.customTags.filter { it.widgetType != com.orderMate.modals.WidgetType.TEXT_BOX }
+        
         // Only show pills if there are widget values on the order
-        if (event.customTags.isEmpty()) {
+        if (pillTags.isEmpty()) {
             container.visibility = View.GONE
             return
         }
@@ -221,18 +332,13 @@ class EventPreviewDialog : DialogFragment() {
         val density = resources.displayMetrics.density
         val inflater = LayoutInflater.from(requireContext())
         
-        // Add order-level widget pills (all 4 types: CALENDAR, SINGLE_SELECT, MULTI_SELECT, TEXT_BOX)
-        // All use WidgetColorUtils for consistent color coding and icons
-        event.customTags.forEach { tag ->
+        // Add order-level widget pills (CALENDAR, SINGLE_SELECT, MULTI_SELECT - not TEXT_BOX)
+        pillTags.forEach { tag ->
             val color = WidgetColorUtils.getColorForWidgetType(tag.widgetType)
             val iconRes = WidgetColorUtils.getIconForWidgetType(tag.widgetType)
             
-            // Truncate TEXT_BOX values to 30 chars for event preview
-            val displayText = if (tag.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX && tag.text.length > 30) {
-                tag.text.take(30) + "..."
-            } else {
-                tag.text
-            }
+            // (#77) Use consistent pill truncation
+            val displayText = WidgetColorUtils.truncateForPill(tag.text)
             
             // Inflate the same pill layout used by item-level widgets
             val pillView = inflater.inflate(R.layout.item_note_pill, container, false) as android.widget.LinearLayout
@@ -333,12 +439,8 @@ class EventPreviewDialog : DialogFragment() {
                     val color = WidgetColorUtils.getColorForWidgetType(tag.widgetType)
                     val iconRes = WidgetColorUtils.getIconForWidgetType(tag.widgetType)
                     
-                    // Truncate TEXT_BOX values to 30 chars
-                    val displayText = if (tag.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX && tag.value.length > 30) {
-                        tag.value.take(30) + "..."
-                    } else {
-                        tag.value
-                    }
+                    // (#77) Use consistent pill truncation
+                    val displayText = WidgetColorUtils.truncateForPill(tag.value)
                     
                     addWidgetPill(displayText, color, iconRes, density)
                 }

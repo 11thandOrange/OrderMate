@@ -32,6 +32,9 @@ import com.orderMate.modals.WidgetType
  */
 object WidgetColorUtils {
     
+    // Consistent pill text truncation length (#77)
+    const val PILL_TRUNCATE_LENGTH = 20
+    
     // Dark container background color (matches filter modal bg_dialog.xml)
     const val COLOR_PILL_CONTAINER = 0xCC292D3E.toInt()
     
@@ -62,13 +65,14 @@ object WidgetColorUtils {
     
     /**
      * Get icon resource for a widget type - centralized to avoid duplicate functions
+     * (#77) Single Select = checkmark, Multi Select = double checkmark, Text Box = 'A' icon
      */
     fun getIconForWidgetType(type: WidgetType): Int {
         return when (type) {
             WidgetType.CALENDAR -> R.drawable.ic_calendar
             WidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
-            WidgetType.MULTI_SELECT -> R.drawable.ic_label
-            WidgetType.TEXT_BOX -> R.drawable.ic_edit
+            WidgetType.MULTI_SELECT -> R.drawable.ic_check_double
+            WidgetType.TEXT_BOX -> R.drawable.ic_text_format
         }
     }
     
@@ -144,6 +148,19 @@ object WidgetColorUtils {
                 setColor(0x1AFFFFFF) // 10% white
                 setStroke((1 * density).toInt(), 0x33FFFFFF) // 20% white border
             }
+        }
+    }
+    
+    /**
+     * Truncate text for pill display with consistent length (#77)
+     * Removes newlines and truncates to PILL_TRUNCATE_LENGTH chars with ellipsis
+     */
+    fun truncateForPill(text: String, maxLength: Int = PILL_TRUNCATE_LENGTH): String {
+        val cleaned = text.replace("\n", " ")
+        return if (cleaned.length > maxLength) {
+            cleaned.take(maxLength) + "..."
+        } else {
+            cleaned
         }
     }
 }

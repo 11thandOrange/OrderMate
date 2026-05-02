@@ -150,9 +150,9 @@
 
         </LinearLayout>
 
-        <!-- Time Section -->
+        <!-- Time Section (#77: Combination lock style scroll) -->
         <LinearLayout
-            android:layout_width="120dp"
+            android:layout_width="140dp"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
@@ -182,30 +182,33 @@
                     android:gravity="center"
                     android:padding="8dp">
 
-                    <!-- Hour and Minute with separate controls -->
+                    <!-- Hour and Minute with combination lock style scroll -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center">
 
-                        <!-- Hour Column -->
+                        <!-- Hour Column - Combination Lock Style -->
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:id="@+id/hourScrollContainer"
+                            android:layout_width="44dp"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:gravity="center">
 
-                            <ImageView
-                                android:id="@+id/btnHourUp"
-                                android:layout_width="32dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_chevron_up"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:contentDescription="Increase hour"
-                                app:tint="@color/text_muted"
-                                xmlns:app="http://schemas.android.com/apk/res-auto" />
+                            <!-- Previous hour (faded) -->
+                            <TextView
+                                android:id="@+id/hourPrevText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:textColor="@color/text_muted"
+                                android:alpha="0.4"
+                                android:gravity="center"
+                                tools:text="01" />
 
+                            <!-- Current hour (highlighted) -->
                             <TextView
                                 android:id="@+id/hourText"
                                 android:layout_width="wrap_content"
@@ -213,20 +216,20 @@
                                 android:textSize="28sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/text_light"
-                                android:minWidth="40dp"
                                 android:gravity="center"
-                                android:layout_marginVertical="4dp"
+                                android:paddingVertical="4dp"
                                 tools:text="02" />
 
-                            <ImageView
-                                android:id="@+id/btnHourDown"
-                                android:layout_width="32dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_chevron_down"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:contentDescription="Decrease hour"
-                                app:tint="@color/text_muted"
-                                xmlns:app="http://schemas.android.com/apk/res-auto" />
+                            <!-- Next hour (faded) -->
+                            <TextView
+                                android:id="@+id/hourNextText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:textColor="@color/text_muted"
+                                android:alpha="0.4"
+                                android:gravity="center"
+                                tools:text="03" />
 
                         </LinearLayout>
 
@@ -238,25 +241,28 @@
                             android:textSize="24sp"
                             android:textStyle="bold"
                             android:textColor="@color/text_muted"
-                            android:layout_marginHorizontal="2dp" />
+                            android:layout_marginHorizontal="4dp" />
 
-                        <!-- Minute Column -->
+                        <!-- Minute Column - Combination Lock Style -->
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:id="@+id/minuteScrollContainer"
+                            android:layout_width="44dp"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:gravity="center">
 
-                            <ImageView
-                                android:id="@+id/btnMinuteUp"
-                                android:layout_width="32dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_chevron_up"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:contentDescription="Increase minute"
-                                app:tint="@color/text_muted"
-                                xmlns:app="http://schemas.android.com/apk/res-auto" />
+                            <!-- Previous minute (faded) -->
+                            <TextView
+                                android:id="@+id/minutePrevText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:textColor="@color/text_muted"
+                                android:alpha="0.4"
+                                android:gravity="center"
+                                tools:text="29" />
 
+                            <!-- Current minute (highlighted) -->
                             <TextView
                                 android:id="@+id/minuteText"
                                 android:layout_width="wrap_content"
@@ -264,54 +270,54 @@
                                 android:textSize="28sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/text_light"
-                                android:minWidth="40dp"
                                 android:gravity="center"
-                                android:layout_marginVertical="4dp"
+                                android:paddingVertical="4dp"
                                 tools:text="30" />
 
-                            <ImageView
-                                android:id="@+id/btnMinuteDown"
-                                android:layout_width="32dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_chevron_down"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:contentDescription="Decrease minute"
-                                app:tint="@color/text_muted"
-                                xmlns:app="http://schemas.android.com/apk/res-auto" />
+                            <!-- Next minute (faded) -->
+                            <TextView
+                                android:id="@+id/minuteNextText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:textColor="@color/text_muted"
+                                android:alpha="0.4"
+                                android:gravity="center"
+                                tools:text="31" />
 
                         </LinearLayout>
 
                     </LinearLayout>
 
-                    <!-- AM/PM Toggle -->
+                    <!-- (#77) AM/PM as separate rows -->
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:orientation="vertical"
                         android:layout_marginTop="12dp">
 
                         <TextView
                             android:id="@+id/btnAM"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="AM"
-                            android:textSize="12sp"
+                            android:textSize="14sp"
                             android:textStyle="bold"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="6dp"
+                            android:paddingVertical="10dp"
+                            android:gravity="center"
                             android:background="@drawable/bg_period_button"
                             android:textColor="@color/text_muted" />
 
                         <TextView
                             android:id="@+id/btnPM"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="PM"
-                            android:textSize="12sp"
+                            android:textSize="14sp"
                             android:textStyle="bold"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="6dp"
-                            android:layout_marginStart="4dp"
+                            android:paddingVertical="10dp"
+                            android:gravity="center"
+                            android:layout_marginTop="6dp"
                             android:background="@drawable/bg_period_button_selected"
                             android:textColor="@color/white" />
 

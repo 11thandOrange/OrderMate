@@ -122,15 +122,19 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <!-- Theme Color Section -->
+                <!-- Theme Color Section (#77: Entire section clickable) -->
                 <LinearLayout
+                    android:id="@+id/colorSection"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
                     android:background="@drawable/bg_settings_card_glass"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <!-- Section Title -->
                     <LinearLayout
@@ -182,29 +186,22 @@
                             android:textColor="@color/text_muted"
                             android:textSize="11sp" />
 
-                        <!-- Change Button -->
-                        <TextView
-                            android:id="@+id/btnChangeColor"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_button_pill"
-                            android:paddingHorizontal="14dp"
-                            android:paddingVertical="6dp"
-                            android:text="Change"
-                            android:textColor="@color/text_light"
-                            android:textSize="11sp" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Avatar Section -->
+                <!-- Avatar Section (#77: Entire section clickable) -->
                 <LinearLayout
+                    android:id="@+id/avatarSection"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
                     android:background="@drawable/bg_settings_card_glass"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <!-- Section Title -->
                     <LinearLayout
@@ -284,17 +281,6 @@
                             android:textColor="@color/text_muted"
                             android:textSize="11sp" />
 
-                        <!-- Change Button -->
-                        <TextView
-                            android:id="@+id/btnChangeAvatar"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_button_pill"
-                            android:paddingHorizontal="14dp"
-                            android:paddingVertical="6dp"
-                            android:text="Change"
-                            android:textColor="@color/text_light"
-                            android:textSize="11sp" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>

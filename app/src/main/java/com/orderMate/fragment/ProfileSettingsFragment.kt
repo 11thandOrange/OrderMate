@@ -123,13 +123,13 @@ class ProfileSettingsFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // Color picker - click on preview or Change button
+        // (#77) Color picker - entire section is clickable
+        binding.colorSection.setOnClickListener { showColorPickerDialog() }
         binding.colorPreview.setOnClickListener { showColorPickerDialog() }
-        binding.btnChangeColor.setOnClickListener { showColorPickerDialog() }
         
-        // Emoji picker - click on preview or Change button
+        // (#77) Emoji picker - entire section is clickable
+        binding.avatarSection.setOnClickListener { showEmojiPickerDialog() }
         binding.avatarPreview.setOnClickListener { showEmojiPickerDialog() }
-        binding.btnChangeAvatar.setOnClickListener { showEmojiPickerDialog() }
         
         // Header avatar also opens emoji picker
         binding.headerAvatarContainer.setOnClickListener { showEmojiPickerDialog() }

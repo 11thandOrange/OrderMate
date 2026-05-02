@@ -88,8 +88,17 @@
             android:layout_marginTop="20dp"
             android:orientation="vertical">
 
-            <!-- Customer Row -->
+            <!-- (#77) Dynamic Text Box Rows Container (rendered before customer) -->
             <LinearLayout
+                android:id="@+id/textBoxRowsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"/>
+
+            <!-- Customer Row (#77: Conditionally rendered) -->
+            <LinearLayout
+                android:id="@+id/customerRow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -135,6 +144,7 @@
             </LinearLayout>
 
             <View
+                android:id="@+id/customerRowDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/divider_color"/>

@@ -181,8 +181,9 @@
             android:orientation="vertical"
             android:layout_marginBottom="16dp">
 
-            <!-- Customer Row -->
+            <!-- Customer Row (#77: Conditionally rendered) -->
             <LinearLayout
+                android:id="@+id/customerRow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -228,6 +229,7 @@
             </LinearLayout>
 
             <View
+                android:id="@+id/customerRowDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#1AFFFFFF"/>

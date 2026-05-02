@@ -119,10 +119,7 @@ class CustomerSearchDialog(
     }
 
     private fun setupClickListeners() {
-        binding.closeButton.setOnClickListener {
-            dismiss()
-        }
-        
+        // (#77) X button removed from layout - only Cancel button in footer
         binding.btnCancel.setOnClickListener {
             dismiss()
         }

@@ -2331,36 +2331,49 @@ class FilterWidgetAdapter(
             widgetIcon.setColorFilter(tintColor)
             widgetIconContainer.setBackgroundResource(bgRes)
 
-            // Show/hide options based on widget type
-            val hasOptions = widget.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
-                            widget.type == com.orderMate.modals.WidgetType.MULTI_SELECT
+            // (#77) Show/hide options based on widget type
+            // Types that need dropdown: SINGLE_SELECT, MULTI_SELECT, TEXT_BOX
+            // Types that DON'T need dropdown: CALENDAR (and Employee for Clover filters)
+            val hasDropdown = widget.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
+                              widget.type == com.orderMate.modals.WidgetType.MULTI_SELECT ||
+                              widget.type == com.orderMate.modals.WidgetType.TEXT_BOX
             
-            if (hasOptions && widget.options.isNotEmpty()) {
+            if (hasDropdown && widget.type != com.orderMate.modals.WidgetType.TEXT_BOX && widget.options.isNotEmpty()) {
                 optionsLabel.visibility = View.VISIBLE
                 setupOptionsDisplay(widget, tintColor)
-            } else if (widget.type == com.orderMate.modals.WidgetType.CALENDAR) {
-                optionsLabel.text = "Type: Date Picker"
+                expandChevron.visibility = View.VISIBLE
+            } else if (widget.type == com.orderMate.modals.WidgetType.TEXT_BOX) {
+                optionsLabel.text = "Type: Free Text"
                 optionsLabel.visibility = View.VISIBLE
                 valuesContainer.removeAllViews()
+                expandChevron.visibility = View.VISIBLE
             } else {
+                // CALENDAR - no dropdown needed
                 optionsLabel.visibility = View.GONE
                 valuesContainer.removeAllViews()
+                expandChevron.visibility = View.GONE
             }
 
-            // Expand/collapse state
-            val isExpanded = expandedIds.contains(widget.id)
-            widgetBody.visibility = if (isExpanded) View.VISIBLE else View.GONE
-            expandChevron.rotation = if (isExpanded) 180f else 0f
+            // Expand/collapse state - only for types with dropdown
+            if (hasDropdown) {
+                val isExpanded = expandedIds.contains(widget.id)
+                widgetBody.visibility = if (isExpanded) View.VISIBLE else View.GONE
+                expandChevron.rotation = if (isExpanded) 180f else 0f
 
-            // Header click to expand/collapse
-            widgetHeader.setOnClickListener {
-                val expanding = !expandedIds.contains(widget.id)
-                if (expanding) {
-                    expandedIds.add(widget.id)
-                } else {
-                    expandedIds.remove(widget.id)
+                // Header click to expand/collapse
+                widgetHeader.setOnClickListener {
+                    val expanding = !expandedIds.contains(widget.id)
+                    if (expanding) {
+                        expandedIds.add(widget.id)
+                    } else {
+                        expandedIds.remove(widget.id)
+                    }
+                    animateExpand(expanding)
                 }
-                animateExpand(expanding)
+            } else {
+                // No dropdown - hide body, no click handler
+                widgetBody.visibility = View.GONE
+                widgetHeader.setOnClickListener(null)
             }
 
             // Toggle showInFilter

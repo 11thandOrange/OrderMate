@@ -1311,7 +1311,7 @@
                         tools:itemCount="2"
                         tools:listitem="@layout/item_notification_template" />
 
-                    <!-- Add Template Button -->
+                    <!-- Add Template Button (#77: Removed circle icon) -->
                     <LinearLayout
                         android:id="@+id/btnAddTemplate"
                         android:layout_width="match_parent"
@@ -1321,16 +1321,9 @@
                         android:gravity="center"
                         android:orientation="horizontal">
 
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_add"
-                            app:tint="@color/text_muted" />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
                             android:text="Add Template"
                             android:textColor="@color/text_muted"
                             android:textSize="13sp" />

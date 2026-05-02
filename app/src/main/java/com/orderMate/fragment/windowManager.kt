@@ -252,14 +252,24 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             // Keep view visible (with empty text) to maintain layout spacing for button on right
             orderTitle.text = ""
             
-            // Update customer name (#42)
-            val customerNameStr = order?.customers?.firstOrNull()?.let { customer ->
-                listOfNotNull(customer.firstName, customer.lastName)
+            // (#77) Update customer name - conditionally render row only if customer exists
+            val customer = order?.customers?.firstOrNull()
+            val customerNameStr = customer?.let { cust ->
+                listOfNotNull(cust.firstName, cust.lastName)
                     .filter { it.isNotBlank() }
                     .joinToString(" ")
                     .ifBlank { null }
-            } ?: "-"
-            customerName.text = customerNameStr
+            }
+            
+            // (#77) Only show customer row if customer is attached to order
+            if (customerNameStr.isNullOrBlank()) {
+                customerRow.hideView()
+                customerRowDivider.hideView()
+            } else {
+                customerRow.showView()
+                customerRowDivider.showView()
+                customerName.text = customerNameStr
+            }
             
             // Update order total (#42)
             val totalCents = order?.total ?: 0L

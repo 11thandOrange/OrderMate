@@ -131,12 +131,8 @@ class OrderDetailItemAdapter(
                 val color = WidgetColorUtils.getColorForWidgetType(tag.widgetType)
                 val iconRes = WidgetColorUtils.getIconForWidgetType(tag.widgetType)
                 
-                // Truncate TEXT_BOX values to 12 chars for compact display
-                val displayText = tag.value.replace("\n", " ").take(12).let {
-                    if (tag.value.length > 12) "$it..." else it
-                }
-                
-                pillText.text = displayText
+                // (#77) Use consistent pill truncation
+                pillText.text = WidgetColorUtils.truncateForPill(tag.value)
                 pillText.maxLines = 1
                 pillText.setTextColor(color)
                 pillIcon.setImageResource(iconRes)

@@ -246,12 +246,8 @@ class OrderCardRedesignAdapter(
                 val uniqueKey = "${tag.label.lowercase()}:${tag.value}"
                 if (!seenValues.contains(uniqueKey)) {
                     seenValues.add(uniqueKey)
-                    // Truncate TEXT_BOX values to 20 chars for list page
-                    val displayValue = if (tag.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX && tag.value.length > 20) {
-                        tag.value.take(20) + "..."
-                    } else {
-                        tag.value
-                    }
+                    // (#77) Truncate all pill values consistently
+                    val displayValue = WidgetColorUtils.truncateForPill(tag.value)
                     tags.add(CustomTag(tag.label.lowercase(), displayValue, tag.widgetType))
                 }
             }
@@ -402,12 +398,8 @@ class OrderCardRedesignAdapter(
                             val pillKey = "${tag.label.lowercase()}:${tag.value}"
                             if (pillKey !in seenPills) {
                                 seenPills.add(pillKey)
-                                // Truncate TEXT_BOX values for list page item pills
-                                val displayValue = if (tag.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX && tag.value.length > 20) {
-                                    tag.value.take(20) + "..."
-                                } else {
-                                    tag.value
-                                }
+                                // (#77) Truncate all pill values consistently
+                                val displayValue = WidgetColorUtils.truncateForPill(tag.value)
                                 notes.add(NoteItem(tag.label.lowercase(), displayValue, tag.widgetType))
                             }
                         }
@@ -441,11 +433,8 @@ class OrderCardRedesignAdapter(
                 
                 val iconRes = WidgetColorUtils.getIconForWidgetType(noteItem.widgetType)
                 
-                // Truncate to 12 chars, single line, no newlines
-                val displayText = noteItem.text.replace("\n", " ").take(12).let {
-                    if (noteItem.text.length > 12) "$it..." else it
-                }
-                pillText.text = displayText
+                // (#77) Text already truncated in extraction, just display
+                pillText.text = noteItem.text
                 pillText.maxLines = 1
                 
                 // Use widget color for text and icon (same as order details page)

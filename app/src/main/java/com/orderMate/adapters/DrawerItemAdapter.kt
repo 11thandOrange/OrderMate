@@ -125,10 +125,8 @@ class DrawerItemAdapter(
             val color = WidgetColorUtils.getColorForWidgetType(widgetType)
             val iconRes = WidgetColorUtils.getIconForWidgetType(widgetType)
             
-            val displayText = value.replace("\n", " ").take(12).let {
-                if (value.length > 12) "$it..." else it
-            }
-            pillText.text = displayText
+            // (#77) Use consistent pill truncation
+            pillText.text = WidgetColorUtils.truncateForPill(value)
             pillText.maxLines = 1
             pillText.setTextColor(color)
             pillIcon.setImageResource(iconRes)

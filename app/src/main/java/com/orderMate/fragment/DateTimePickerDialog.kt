@@ -284,31 +284,42 @@ class DateTimePickerDialog : DialogFragment() {
         updateTimeDisplay()
         updateAmPmButtons()
 
-        // Hour controls
-        binding.btnHourUp.setOnClickListener {
+        // (#77) Combination lock style - scroll containers are clickable to change values
+        binding.hourScrollContainer.setOnClickListener {
+            calendar.add(Calendar.HOUR_OF_DAY, 1)
+            updateTimeDisplay()
+            updateAmPmButtons()
+        }
+        
+        // Also allow clicking on prev/next to scroll
+        binding.hourPrevText.setOnClickListener {
+            calendar.add(Calendar.HOUR_OF_DAY, -1)
+            updateTimeDisplay()
+            updateAmPmButtons()
+        }
+        
+        binding.hourNextText.setOnClickListener {
             calendar.add(Calendar.HOUR_OF_DAY, 1)
             updateTimeDisplay()
             updateAmPmButtons()
         }
 
-        binding.btnHourDown.setOnClickListener {
-            calendar.add(Calendar.HOUR_OF_DAY, -1)
+        binding.minuteScrollContainer.setOnClickListener {
+            calendar.add(Calendar.MINUTE, 1)
             updateTimeDisplay()
-            updateAmPmButtons()
         }
-
-        // Minute controls
-        binding.btnMinuteUp.setOnClickListener {
+        
+        binding.minutePrevText.setOnClickListener {
+            calendar.add(Calendar.MINUTE, -1)
+            updateTimeDisplay()
+        }
+        
+        binding.minuteNextText.setOnClickListener {
             calendar.add(Calendar.MINUTE, 1)
             updateTimeDisplay()
         }
 
-        binding.btnMinuteDown.setOnClickListener {
-            calendar.add(Calendar.MINUTE, -1)
-            updateTimeDisplay()
-        }
-
-        // AM/PM toggle
+        // AM/PM toggle (now separate rows)
         binding.btnAM.setOnClickListener {
             if (calendar.get(Calendar.AM_PM) == Calendar.PM) {
                 calendar.add(Calendar.HOUR_OF_DAY, -12)
@@ -331,8 +342,28 @@ class DateTimePickerDialog : DialogFragment() {
         if (hour == 0) hour = 12
         val minute = calendar.get(Calendar.MINUTE)
 
+        // Current values
         binding.hourText.text = String.format("%02d", hour)
         binding.minuteText.text = String.format("%02d", minute)
+        
+        // (#77) Combination lock - show prev/next values
+        // Previous hour
+        var prevHour = hour - 1
+        if (prevHour <= 0) prevHour = 12
+        binding.hourPrevText.text = String.format("%02d", prevHour)
+        
+        // Next hour
+        var nextHour = hour + 1
+        if (nextHour > 12) nextHour = 1
+        binding.hourNextText.text = String.format("%02d", nextHour)
+        
+        // Previous minute (wrapping 0-59)
+        val prevMinute = if (minute == 0) 59 else minute - 1
+        binding.minutePrevText.text = String.format("%02d", prevMinute)
+        
+        // Next minute (wrapping 0-59)
+        val nextMinute = if (minute == 59) 0 else minute + 1
+        binding.minuteNextText.text = String.format("%02d", nextMinute)
     }
 
     private fun updateAmPmButtons() {
