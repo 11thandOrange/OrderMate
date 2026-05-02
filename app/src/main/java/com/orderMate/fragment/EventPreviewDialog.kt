@@ -337,8 +337,12 @@ class EventPreviewDialog : DialogFragment() {
         
         // Add order-level widget pills (CALENDAR, SINGLE_SELECT, MULTI_SELECT - not TEXT_BOX)
         pillTags.forEach { tag ->
+            // EventTag text is "Label: Value" format, extract just the value for pills
+            val parts = tag.text.split(": ", limit = 2)
+            val value = if (parts.size > 1) parts[1] else tag.text
+            
             val pillView = WidgetColorUtils.createPillView(
-                requireContext(), container, tag.text, tag.widgetType
+                requireContext(), container, value, tag.widgetType
             )
             
             val lp = FlexboxLayout.LayoutParams(
