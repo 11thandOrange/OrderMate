@@ -192,27 +192,83 @@ class MyApp : Application() {
         }
     }
 
+    // ==================== Order Calculations (using Clover OrderCalc) ====================
+    
+    /**
+     * #78: Get tax amount from Clover OrderCalc
+     */
     fun orderTax(order: Order?): Long {
-        return OrderCalc(order).tax
+        if (order == null) return 0L
+        return OrderCalc(order).getTax(order.lineItems)
     }
 
     /**
-     * #78: Returns the line item subtotal BEFORE discounts are applied
-     * This is what should display as "Subtotal" in order details
+     * #78: Get subtotal BEFORE discounts from Clover OrderCalc
      */
     fun orderLineItemTotal(order: Order?): Long {
-        return OrderCalc(order).getLineSubtotalWithoutDiscounts(order?.lineItems)
+        if (order == null) return 0L
+        return OrderCalc(order).getLineSubtotalWithoutDiscounts(order.lineItems)
     }
 
     /**
-     * #78: Returns the actual discount amount (difference between before and after discount)
-     * Previously this incorrectly returned subtotal without discounts
+     * #78: Get subtotal AFTER discounts from Clover OrderCalc
+     */
+    fun orderSubtotalAfterDiscounts(order: Order?): Long {
+        if (order == null) return 0L
+        return OrderCalc(order).getLineSubtotal(order.lineItems)
+    }
+
+    /**
+     * #78: Get discount amount from Clover OrderCalc
+     * Calculated as: subtotal before discounts - subtotal after discounts
      */
     fun orderDiscount(order: Order?): Long {
+        if (order == null) return 0L
         val calc = OrderCalc(order)
-        val beforeDiscount = calc.getLineSubtotalWithoutDiscounts(order?.lineItems)
-        val afterDiscount = calc.getLineSubtotal(order?.lineItems)
+        val beforeDiscount = calc.getLineSubtotalWithoutDiscounts(order.lineItems)
+        val afterDiscount = calc.getLineSubtotal(order.lineItems)
         return beforeDiscount - afterDiscount
+    }
+
+    /**
+     * #78: Get service charge from Clover OrderCalc
+     */
+    fun orderServiceCharge(order: Order?): Long {
+        if (order == null) return 0L
+        return OrderCalc(order).getServiceCharge(order.lineItems)
+    }
+
+    /**
+     * #78: Get order fees from Clover OrderCalc
+     */
+    fun orderFees(order: Order?): Long {
+        if (order == null) return 0L
+        return OrderCalc(order).totalOrderFee
+    }
+
+    /**
+     * #78: Get total (subtotal + tax + service charge) from Clover OrderCalc
+     * Note: Does NOT include tip
+     */
+    fun orderTotal(order: Order?): Long {
+        if (order == null) return 0L
+        return OrderCalc(order).getTotal(order.lineItems)
+    }
+
+    /**
+     * #78: Get total with tip from Clover OrderCalc
+     */
+    fun orderTotalWithTip(order: Order?): Long {
+        if (order == null) return 0L
+        return OrderCalc(order).getTotalWithTip(order.lineItems)
+    }
+
+    /**
+     * #78: Get tip amount from Clover OrderCalc
+     */
+    fun orderTip(order: Order?): Long {
+        if (order == null) return 0L
+        return OrderCalc(order).tip
     }
 
     fun disconnectConnectors() {

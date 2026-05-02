@@ -795,32 +795,44 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
 
-    /*
-    * For discount some time clover directly provide the value in the amount key sometime it will
-    * provide us the percentage so we need to check this also.
-    * */
+    /**
+     * #78: Display order amounts using Clover OrderCalc
+     * - Subtotal: line items before discounts
+     * - Tax: tax + service charge + fees (combined as "Taxes & Fees")
+     * - Discount: total discount amount
+     */
     private fun showTheDiscountAndTaxData() {
-        // case 1 if no discount is applied then there will be tax applied only.
+        // Hide discount row if no discounts applied
         if (orderArguments?.discounts == null || orderArguments?.discounts?.isEmpty() == true) {
             binding.discount.hideView()
             binding.discountValue.hideView()
         }
 
-        "${currencyName.convertToSymbol()}${
-            myApp.orderTax(orderArguments).toDoubleFloatPoint()
-        }".also {
+        // #78: Get all amounts from Clover OrderCalc
+        val tax = myApp.orderTax(orderArguments)
+        val serviceCharge = myApp.orderServiceCharge(orderArguments)
+        val fees = myApp.orderFees(orderArguments)
+        val taxesAndFees = tax + serviceCharge + fees
+        
+        val subtotal = myApp.orderLineItemTotal(orderArguments)
+        val discount = myApp.orderDiscount(orderArguments)
+
+        // Display taxes & fees (tax + service charge + order fees)
+        "${currencyName.convertToSymbol()}${taxesAndFees.toDoubleFloatPoint()}".also {
             binding.taxValue.text = it
         }
-        "${currencyName.convertToSymbol()}${
-            myApp.orderLineItemTotal(orderArguments).toDoubleFloatPoint()
-        }".also {
+        
+        // Display subtotal (before discounts)
+        "${currencyName.convertToSymbol()}${subtotal.toDoubleFloatPoint()}".also {
             binding.subtotalValue.text = it
         }
-        "${currencyName.convertToSymbol()}${
-            myApp.orderDiscount(orderArguments).toDoubleFloatPoint()
-        }".also {
+        
+        // Display discount amount
+        "${currencyName.convertToSymbol()}${discount.toDoubleFloatPoint()}".also {
             binding.discountValue.text = it
         }
+        
+        // Display discount name if available
         exceptionHandler {
             val discountName =
                 orderArguments?.discounts?.get(0)?.jsonObject?.get(Constants.name)
