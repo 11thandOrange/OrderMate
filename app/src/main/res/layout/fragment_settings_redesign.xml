@@ -1288,7 +1288,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="Create text templates for SMS &amp; E-mail notifications. Available in the Send Notification pop up"
+                        android:text="Create text templates for SMS &amp; E-mail notifications. Available in the &quot;Send Notification pop up&quot;"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
 
