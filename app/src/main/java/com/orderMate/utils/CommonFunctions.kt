@@ -7,7 +7,7 @@ import com.clover.sdk.v3.order.LineItem
 import com.clover.sdk.v3.order.Order
 import com.google.android.material.textview.MaterialTextView
 import com.orderMate.R
-import com.orderMate.adapters.OrderAdapter
+
 import com.orderMate.modals.CustomItemJson
 import com.orderMate.modals.ItemModal
 import com.orderMate.modals.ModalData
@@ -232,6 +232,9 @@ fun createAndShowDialog(
 
 }
 
+// Holder for pickup date during parsing
+private var resultantPickupDate = ""
+
 //isTextRequired if true means from the order history screen
 // else false means order detail screen
 fun generateString(
@@ -241,7 +244,7 @@ fun generateString(
 ): String {
     var hashmap: HashMap<String, Int> = hashMapOf()
     var pickUpDate = ""
-    OrderAdapter.resultantPickupDate = ""
+    resultantPickupDate = ""
 
 
     lineItems.forEach {
@@ -386,15 +389,15 @@ private fun addTheDataToDialog(
                 hashMap[splitItem[1]] = doesHashMapHasValue(hashMap, splitItem[1])
             } else {
                 if (isPickup) {
-                    OrderAdapter.resultantPickupDate =
-                        compareDates(OrderAdapter.resultantPickupDate, splitItem[1])
-                            ?: OrderAdapter.resultantPickupDate
+                    resultantPickupDate =
+                        compareDates(resultantPickupDate, splitItem[1])
+                            ?: resultantPickupDate
                 }
             }
         }
     }
 
-    return Pair(hashMap, OrderAdapter.resultantPickupDate)
+    return Pair(hashMap, resultantPickupDate)
 }
 
 private fun compareDates(dateString1: String, dateString2: String): String? {

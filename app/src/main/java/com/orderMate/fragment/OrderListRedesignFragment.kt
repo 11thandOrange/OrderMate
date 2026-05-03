@@ -61,8 +61,6 @@ import java.util.Locale
  * - Modern search with date picker
  * - Filter pills instead of spinners
  * - Sync button with animation
- * 
- * Reuses backend logic from OrderHistoryFragment.
  */
 class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 

@@ -78,6 +78,54 @@ OrderMate/
 3. Use **Preview in App Market** → **Connect the App**
 4. Data will sync from Clover to the app
 
+## Permission Guardrails
+
+OrderMate implements role-based permission controls for Settings access.
+
+### How It Works
+
+| Check Point | Trigger | Action |
+|-------------|---------|--------|
+| **MainActivity.onResume()** | App launch, background→foreground, screen unlock | Hide/show Settings nav icon based on permissions |
+| **SettingsFragment.onViewCreated()** | Entering Settings page | Redirect non-permitted users to Order List |
+| **Advanced Tab** | Viewing Advanced settings | Hide permission settings card for non-owners |
+
+### Permission Flow
+
+```
+App Launch / Resume / Screen Unlock
+         │
+         ▼
+checkSettingsNavVisibility()
+         │
+         ▼
+EmployeeRoleUtils.canAccessSettings(employee, advancedSettings)
+         │
+         ├─ Owner → Always has access
+         ├─ Admin → Check advancedSettings.adminCanAccessSettings
+         └─ Employee → Check advancedSettings.employeeCanAccessSettings
+         │
+         ▼
+Settings nav icon visible/hidden accordingly
+```
+
+### Covered Scenarios
+
+- ✅ App launch with different employee roles
+- ✅ Lock screen → different user logs in (Clover device)
+- ✅ App backgrounded → resumed
+- ✅ Direct navigation attempts to Settings (failsafe redirect)
+- ✅ Non-owners viewing Advanced tab (permission card hidden)
+
+### Known Limitation
+
+If an Owner revokes permissions while an employee is actively using the app (without backgrounding), the nav visibility updates only when:
+- App is backgrounded and resumed
+- Device screen is locked/unlocked
+- App is restarted
+
+Switching between pages within the app (e.g., Calendar → Order List) does **not** trigger a permission re-check since all pages are fragments within the same Activity.
+
 ## Cloud Functions
 
 The `functions/` directory contains Firebase Cloud Functions for:

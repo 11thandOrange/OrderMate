@@ -14,18 +14,21 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.orderMate.R
-import com.orderMate.fragment.orderHistory.OrderHistoryFragment
+
 import com.orderMate.modals.PopupSettings
 import com.orderMate.utils.Constants
 import com.orderMate.utils.DefaultWidgetFactory
 import com.orderMate.utils.FirebaseConfigManager
 import com.orderMate.utils.MyApp
+import com.orderMate.utils.EmployeeRoleUtils
 import com.orderMate.utils.PermissionUtils
 import com.orderMate.utils.PreferenceManager
 import com.orderMate.utils.ProfileSettingsManager
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.createAndShowDialog
 import com.orderMate.utils.exceptionHandler
+import com.orderMate.utils.runOnBackgroundThread
+import com.orderMate.utils.runOnMainThread
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -169,7 +172,7 @@ class MainActivity : AppCompatActivity() {
         // Listen for navigation changes to update side nav state
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.orderListRedesignFragment, R.id.orderHistoryFragment -> updateNavState(R.id.navList)
+                R.id.orderListRedesignFragment -> updateNavState(R.id.navList)
                 R.id.calendarFragment -> updateNavState(R.id.navCalendar)
                 R.id.settingsFragment -> updateNavState(R.id.navSettings)
                 R.id.profileSettingsFragment -> updateNavState(R.id.navProfile)
@@ -260,6 +263,9 @@ class MainActivity : AppCompatActivity() {
         // Refresh theme settings when returning from profile
         applyThemeSettings()
         
+        // #81: Check settings nav visibility based on role permissions
+        checkSettingsNavVisibility()
+        
         // V2: Sync widgets with Firebase if merchantId available
         // (Defaults are guaranteed by Application.onCreate)
         val merchantId = MyApp.getInstance().getMerchantId()
@@ -283,6 +289,33 @@ class MainActivity : AppCompatActivity() {
                 getString(R.string.cancel)
             ) {
                 permissionUtils.gotoSettings(this)
+            }
+        }
+    }
+    
+    /**
+     * #81: Check if current user can access settings based on role permissions
+     * If user doesn't have access, hide the settings nav icon
+     */
+    private fun checkSettingsNavVisibility() {
+        runOnBackgroundThread {
+            try {
+                val employee = myApplication.getCurrentEmployee()
+                val merchantId = myApplication.getMerchantId()
+                
+                if (!merchantId.isNullOrEmpty()) {
+                    firebaseConfigManager.getAdvancedSettings(merchantId) { settings ->
+                        val canAccess = EmployeeRoleUtils.canAccessSettings(employee, settings)
+                        
+                        runOnMainThread {
+                            // Hide/show settings nav based on permission
+                            navSettings?.visibility = if (canAccess) View.VISIBLE else View.GONE
+                            navSettingsIndicator?.visibility = if (canAccess) View.VISIBLE else View.GONE
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Error checking settings permissions", e)
             }
         }
     }
@@ -328,6 +361,5 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         exceptionHandler { MyApp.getInstance().disconnectConnectors() }
-        exceptionHandler { OrderHistoryFragment.isClicked = true }
     }
 }

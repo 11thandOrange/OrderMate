@@ -1633,8 +1633,9 @@
 
                 </LinearLayout>
 
-                <!-- #79: Permission Settings Card -->
+                <!-- #79: Permission Settings Card - Only visible to Owners -->
                 <LinearLayout
+                    android:id="@+id/permissionSettingsCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"

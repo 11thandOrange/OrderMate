@@ -36,9 +36,11 @@ import java.util.Collections
 import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.modals.WidgetType as FirebaseWidgetType
+import com.orderMate.utils.EmployeeRoleUtils
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
+import androidx.navigation.fragment.findNavController
 
 /**
  * Settings Fragment with Sub-tabs (#83 requirement)
@@ -148,6 +150,10 @@ class SettingsFragment : Fragment() {
     private var switchAllowManagersSettings: Switch? = null
     private var switchAllowEmployeesSettings: Switch? = null
     
+    // #81: Permission Settings Card container (owner-only visibility)
+    private var permissionSettingsCard: View? = null
+    private var isOwner: Boolean = false
+    
     // Loading
     private var loadingOverlay: View? = null
     
@@ -170,20 +176,47 @@ class SettingsFragment : Fragment() {
         
         settingsManager = SettingsManager(requireContext())
         
-        // Get merchantId from MyApp (Clover SDK) on background thread
+        // Get merchantId and employee info from MyApp (Clover SDK) on background thread
         runOnBackgroundThread {
             try {
                 val app = requireContext().applicationContext as? MyApp
                 val mid = app?.getMerchantId()
+                val employee = app?.getCurrentEmployee()
+                
+                // #81: Check if current user is owner for permission settings visibility
+                isOwner = EmployeeRoleUtils.isOwner(employee)
+                
                 if (!mid.isNullOrEmpty()) {
                     merchantId = mid
-                    runOnMainThread {
-                        if (isAdded) {
-                            widgetManager.setMerchantId(mid)
-                            // Now that we have merchantId, reload widgets from Firebase (not cache)
-                            loadAllWidgetsFromFirebase()
-                            // Also load templates
-                            loadTemplatesFromFirebase()
+                    
+                    // #81: Verify user has settings access (entry guard/failsafe)
+                    // If a non-permitted user somehow navigates here, redirect them
+                    firebase.getAdvancedSettings(mid) { settings ->
+                        val canAccess = EmployeeRoleUtils.canAccessSettings(employee, settings)
+                        
+                        runOnMainThread {
+                            if (isAdded) {
+                                if (!canAccess) {
+                                    // User doesn't have settings access - navigate back to order list
+                                    try {
+                                        findNavController().navigate(R.id.orderListRedesignFragment)
+                                    } catch (e: Exception) {
+                                        // Fallback: pop back if navigate fails
+                                        findNavController().popBackStack()
+                                    }
+                                    return@runOnMainThread
+                                }
+                                
+                                widgetManager.setMerchantId(mid)
+                                // Now that we have merchantId, reload widgets from Firebase (not cache)
+                                loadAllWidgetsFromFirebase()
+                                // Also load templates
+                                loadTemplatesFromFirebase()
+                                
+                                // #81: Hide permission settings card if not owner
+                                // Only owners should see and modify permission settings
+                                updatePermissionSettingsVisibility()
+                            }
                         }
                     }
                 }
@@ -203,6 +236,15 @@ class SettingsFragment : Fragment() {
         
         // Show general panel by default
         switchToTab("general")
+    }
+    
+    /**
+     * #81: Update permission settings card visibility based on user role.
+     * Only owners should see the Permission Settings card in Advanced tab.
+     * This prevents non-owners from changing their own or others' permissions.
+     */
+    private fun updatePermissionSettingsVisibility() {
+        permissionSettingsCard?.visibility = if (isOwner) View.VISIBLE else View.GONE
     }
     
     override fun onResume() {
@@ -308,6 +350,9 @@ class SettingsFragment : Fragment() {
         switchAllowAdminSettings = view.findViewById(R.id.switchAllowAdminSettings)
         switchAllowManagersSettings = view.findViewById(R.id.switchAllowManagersSettings)
         switchAllowEmployeesSettings = view.findViewById(R.id.switchAllowEmployeesSettings)
+        
+        // #81: Permission Settings Card container (owner-only visibility)
+        permissionSettingsCard = view.findViewById(R.id.permissionSettingsCard)
     }
 
     private fun setupSubTabs() {
