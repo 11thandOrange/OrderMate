@@ -34,9 +34,17 @@ export const cloverWebhook = functions.https.onRequest(async (req, res) => {
 
   // Handle Clover's verification request (POST with verificationCode)
   if (req.body.verificationCode) {
-    console.log("Webhook verification request received");
+    const code = req.body.verificationCode;
+    console.log(`VERIFICATION CODE: ${code}`);
+
+    // Save to Firebase so you can see it
+    await db.ref("webhookVerification").set({
+      code: code,
+      timestamp: Date.now(),
+    });
+
     res.set("Content-Type", "text/plain");
-    res.status(200).send(req.body.verificationCode);
+    res.status(200).send(code);
     return;
   }
 
