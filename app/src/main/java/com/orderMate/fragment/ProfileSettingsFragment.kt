@@ -45,7 +45,7 @@ import kotlinx.coroutines.withContext
  * - Per-employee profile storage (color, avatar)
  * - Referral button (Owner only) to enter partner who referred them
  * 
- * Default theme color: #3C4B80 (matches HTML)
+ * Default theme color: #1C3527 (matches HTML)
  */
 class ProfileSettingsFragment : Fragment() {
 
@@ -61,7 +61,7 @@ class ProfileSettingsFragment : Fragment() {
     private var isOwner: Boolean = false
     
     // Default theme color matching HTML
-    private val DEFAULT_THEME_COLOR = "#3C4B80"
+    private val DEFAULT_THEME_COLOR = "#1C3527"
     private val DEFAULT_AVATAR = ""  // Empty = show placeholder icon
 
     // Emoji categories matching HTML
@@ -478,7 +478,7 @@ class ProfileSettingsFragment : Fragment() {
     }
 
     private fun resetSettings() {
-        // Reset to default theme color (#3C4B80)
+        // Reset to default theme color (#1C3527)
         applyThemeColor(DEFAULT_THEME_COLOR)
         settingsManager.setThemeColor(DEFAULT_THEME_COLOR)
         

@@ -11,7 +11,7 @@ data class EmployeeProfile(
     val avatar: String = DEFAULT_AVATAR
 ) {
     companion object {
-        const val DEFAULT_COLOR = "#3C4B80"
+        const val DEFAULT_COLOR = "#1C3527"
         const val DEFAULT_AVATAR = "😊"
     }
     
