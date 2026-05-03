@@ -4,15 +4,23 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
 import com.google.gson.Gson
+import com.orderMate.modals.EmployeeProfile
+import com.orderMate.modals.MerchantDiscount
 import com.orderMate.modals.MerchantMeta
 import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.PopupSettings
+import com.orderMate.modals.ReferralInfo
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.modals.WidgetOption
 import com.orderMate.modals.WidgetType
 
 /**
- * Firebase CRUD operations for new schema structure
+ * Firebase CRUD operations for schema structure
+ * 
+ * #81: Added support for:
+ * - Per-employee profiles (color, avatar)
+ * - Referrals (partner tracking)
+ * - Discounts (admin-only, read in app)
  */
 class FirebaseConfigManager private constructor() {
     
@@ -583,12 +591,200 @@ class FirebaseConfigManager private constructor() {
             }
     }
     
-    // ==================== Profile Settings ====================
+    // ==================== #81: Employee Profiles (Per-Employee) ====================
     
     /**
-     * Get profile settings from Firebase
+     * Get employee profile from Firebase
+     * Each employee has their own color and avatar settings
      */
+    fun getEmployeeProfile(merchantId: String, employeeId: String, callback: (EmployeeProfile) -> Unit) {
+        db.getReference(FirebasePaths.employeeProfile(merchantId, employeeId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val profile = EmployeeProfile(
+                    color = snapshot.child("color").getValue(String::class.java) ?: EmployeeProfile.DEFAULT_COLOR,
+                    avatar = snapshot.child("avatar").getValue(String::class.java) ?: EmployeeProfile.DEFAULT_AVATAR
+                )
+                callback(profile)
+            }
+            .addOnFailureListener {
+                callback(EmployeeProfile())
+            }
+    }
+    
+    /**
+     * Save employee profile to Firebase
+     */
+    fun saveEmployeeProfile(merchantId: String, employeeId: String, profile: EmployeeProfile, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.employeeProfile(merchantId, employeeId))
+            .updateChildren(profile.toMap())
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
+    
+    // ==================== #81: Referrals ====================
+    
+    /**
+     * Get all referrals for a merchant
+     */
+    fun getReferrals(merchantId: String, callback: (List<ReferralInfo>) -> Unit) {
+        db.getReference(FirebasePaths.referrals(merchantId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val referrals = mutableListOf<ReferralInfo>()
+                snapshot.children.forEach { child ->
+                    val referral = parseReferral(child)
+                    if (referral != null) referrals.add(referral)
+                }
+                callback(referrals.sortedByDescending { it.submittedAt })
+            }
+            .addOnFailureListener {
+                callback(emptyList())
+            }
+    }
+    
+    /**
+     * Get a single referral by ID
+     */
+    fun getReferral(merchantId: String, referralId: String, callback: (ReferralInfo?) -> Unit) {
+        db.getReference(FirebasePaths.referral(merchantId, referralId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                callback(parseReferral(snapshot))
+            }
+            .addOnFailureListener {
+                callback(null)
+            }
+    }
+    
+    /**
+     * Save a new referral
+     */
+    fun saveReferral(merchantId: String, referral: ReferralInfo, callback: (Boolean) -> Unit) {
+        val referralWithId = if (referral.id.isEmpty()) {
+            referral.copy(id = ReferralInfo.generateId())
+        } else {
+            referral
+        }
+        
+        db.getReference(FirebasePaths.referral(merchantId, referralWithId.id))
+            .setValue(referralWithId.toMap())
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
+    
+    /**
+     * Check if merchant has any referrals
+     */
+    fun hasAnyReferral(merchantId: String, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.referrals(merchantId))
+            .limitToFirst(1)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                callback(snapshot.exists() && snapshot.childrenCount > 0)
+            }
+            .addOnFailureListener {
+                callback(false)
+            }
+    }
+    
+    private fun parseReferral(snapshot: DataSnapshot): ReferralInfo? {
+        if (!snapshot.exists()) return null
+        return ReferralInfo(
+            id = snapshot.child("id").getValue(String::class.java) ?: snapshot.key ?: "",
+            partnerName = snapshot.child("partnerName").getValue(String::class.java) ?: "",
+            submittedAt = snapshot.child("submittedAt").getValue(Long::class.java) ?: 0,
+            submittedBy = snapshot.child("submittedBy").getValue(String::class.java) ?: ""
+        )
+    }
+    
+    // ==================== #81: Discounts (Read-only in app) ====================
+    
+    /**
+     * Get all discounts for a merchant
+     */
+    fun getDiscounts(merchantId: String, callback: (List<MerchantDiscount>) -> Unit) {
+        db.getReference(FirebasePaths.discounts(merchantId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val discounts = mutableListOf<MerchantDiscount>()
+                snapshot.children.forEach { child ->
+                    val discount = parseDiscount(child)
+                    if (discount != null) discounts.add(discount)
+                }
+                callback(discounts.sortedByDescending { it.createdAt })
+            }
+            .addOnFailureListener {
+                callback(emptyList())
+            }
+    }
+    
+    /**
+     * Get only active (valid) discounts
+     */
+    fun getActiveDiscounts(merchantId: String, callback: (List<MerchantDiscount>) -> Unit) {
+        getDiscounts(merchantId) { discounts ->
+            callback(discounts.filter { it.isValid() })
+        }
+    }
+    
+    /**
+     * Get a single discount by ID
+     */
+    fun getDiscount(merchantId: String, discountId: String, callback: (MerchantDiscount?) -> Unit) {
+        db.getReference(FirebasePaths.discount(merchantId, discountId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                callback(parseDiscount(snapshot))
+            }
+            .addOnFailureListener {
+                callback(null)
+            }
+    }
+    
+    /**
+     * Get total active discount amount
+     */
+    fun getTotalActiveDiscount(merchantId: String, callback: (Double) -> Unit) {
+        getActiveDiscounts(merchantId) { discounts ->
+            callback(discounts.sumOf { it.amount })
+        }
+    }
+    
+    private fun parseDiscount(snapshot: DataSnapshot): MerchantDiscount? {
+        if (!snapshot.exists()) return null
+        return MerchantDiscount(
+            id = snapshot.child("id").getValue(String::class.java) ?: snapshot.key ?: "",
+            amount = snapshot.child("amount").getValue(Double::class.java) ?: 0.0,
+            startDate = snapshot.child("startDate").getValue(Long::class.java) ?: 0,
+            endDate = snapshot.child("endDate").getValue(Long::class.java) ?: 0,
+            discountCode = snapshot.child("discountCode").getValue(String::class.java),
+            createdAt = snapshot.child("createdAt").getValue(Long::class.java) ?: 0,
+            isActive = snapshot.child("isActive").getValue(Boolean::class.java) ?: true
+        )
+    }
+    
+    // ==================== Legacy Profile Settings (Deprecated) ====================
+    
+    /**
+     * @deprecated Use getEmployeeProfile() instead
+     */
+    @Deprecated("Use getEmployeeProfile() for per-employee profiles", 
+        ReplaceWith("getEmployeeProfile(merchantId, employeeId, callback)"))
     fun getProfileSettings(merchantId: String, callback: (ProfileSettings) -> Unit) {
+        @Suppress("DEPRECATION")
         db.getReference(FirebasePaths.profileSettings(merchantId))
             .get()
             .addOnSuccessListener { snapshot ->
@@ -604,13 +800,16 @@ class FirebaseConfigManager private constructor() {
     }
     
     /**
-     * Save profile settings to Firebase
+     * @deprecated Use saveEmployeeProfile() instead
      */
+    @Deprecated("Use saveEmployeeProfile() for per-employee profiles",
+        ReplaceWith("saveEmployeeProfile(merchantId, employeeId, profile, callback)"))
     fun saveProfileSettings(merchantId: String, settings: ProfileSettings, callback: (Boolean) -> Unit) {
         val updates = mapOf<String, Any>(
             "themeColor" to settings.themeColor,
             "avatar" to settings.avatar
         )
+        @Suppress("DEPRECATION")
         db.getReference(FirebasePaths.profileSettings(merchantId))
             .updateChildren(updates)
             .addOnSuccessListener {

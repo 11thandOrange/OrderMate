@@ -191,6 +191,28 @@ class MyApp : Application() {
             null
         }
     }
+    
+    /**
+     * Get the current employee's ID (#81)
+     */
+    fun getEmployeeId(): String? {
+        return try {
+            getEmployeeConnector()?.employee?.id
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+    
+    /**
+     * Get the current employee object (#81)
+     */
+    fun getCurrentEmployee() = try {
+        getEmployeeConnector()?.employee
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
 
     // All methods use OrderCalc to match Clover Register exactly
     

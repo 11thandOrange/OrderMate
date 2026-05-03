@@ -3,7 +3,7 @@ package com.orderMate.utils
 /**
  * Firebase Realtime Database path builders
  * 
- * New Structure:
+ * Structure:
  * merchants/{merchantId}/
  *   ├── meta/
  *   │   ├── schemaVersion
@@ -29,9 +29,25 @@ package com.orderMate.utils
  *   │       ├── value
  *   │       ├── isDefault
  *   │       └── color
- *   └── templates/{templateId}/
- *       ├── name
- *       └── content
+ *   ├── templates/{templateId}/
+ *   │   ├── name
+ *   │   └── content
+ *   ├── profiles/{employeeId}/           (#81)
+ *   │   ├── color
+ *   │   └── avatar
+ *   ├── referrals/{referralId}/          (#81)
+ *   │   ├── id
+ *   │   ├── partnerName
+ *   │   ├── submittedAt
+ *   │   └── submittedBy
+ *   └── discounts/{discountId}/          (#81 - admin only)
+ *       ├── id
+ *       ├── amount
+ *       ├── startDate
+ *       ├── endDate
+ *       ├── discountCode
+ *       ├── createdAt
+ *       └── isActive
  */
 object FirebasePaths {
     
@@ -44,9 +60,15 @@ object FirebasePaths {
     const val WIDGETS = "widgets"
     const val OPTIONS = "options"
     const val TEMPLATES = "templates"
-    const val PROFILE_SETTINGS = "profileSettings"
     
-    // #78: Removed legacy constants - migration no longer needed
+    // #81: Per-employee profiles, referrals, and discounts
+    const val PROFILES = "profiles"
+    const val REFERRALS = "referrals"
+    const val DISCOUNTS = "discounts"
+    
+    // Legacy - kept for backward compatibility
+    @Deprecated("Use PROFILES instead", ReplaceWith("PROFILES"))
+    const val PROFILE_SETTINGS = "profileSettings"
     
     // Meta fields
     const val SCHEMA_VERSION = "schemaVersion"
@@ -74,7 +96,29 @@ object FirebasePaths {
     
     fun template(merchantId: String, templateId: String) = "${templates(merchantId)}/$templateId"
     
-    fun profileSettings(merchantId: String) = "${merchant(merchantId)}/$PROFILE_SETTINGS"
+    // ==================== #81: Employee Profiles ====================
     
-    // #78: Removed legacy path functions - migration no longer needed
+    fun profiles(merchantId: String) = "${merchant(merchantId)}/$PROFILES"
+    
+    fun employeeProfile(merchantId: String, employeeId: String) = 
+        "${profiles(merchantId)}/$employeeId"
+    
+    // ==================== #81: Referrals ====================
+    
+    fun referrals(merchantId: String) = "${merchant(merchantId)}/$REFERRALS"
+    
+    fun referral(merchantId: String, referralId: String) = 
+        "${referrals(merchantId)}/$referralId"
+    
+    // ==================== #81: Discounts ====================
+    
+    fun discounts(merchantId: String) = "${merchant(merchantId)}/$DISCOUNTS"
+    
+    fun discount(merchantId: String, discountId: String) = 
+        "${discounts(merchantId)}/$discountId"
+    
+    // ==================== Legacy (Deprecated) ====================
+    
+    @Deprecated("Use employeeProfile() instead", ReplaceWith("employeeProfile(merchantId, employeeId)"))
+    fun profileSettings(merchantId: String) = "${merchant(merchantId)}/$PROFILE_SETTINGS"
 }

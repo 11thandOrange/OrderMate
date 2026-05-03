@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Referral Partner Dialog (#81) - Consistent style with other dialogs -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog"
+    android:padding="24dp">
+
+    <!-- Header with bottom border -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="24dp">
+
+        <TextView
+            android:id="@+id/dialogTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Who Referred You? 📣"
+            android:textColor="@color/text_light"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-medium"
+            android:paddingBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/dialogSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter the name of the partner or person who referred you to OrderMate"
+            android:textColor="@color/text_muted"
+            android:textSize="14sp"
+            android:paddingBottom="16dp"/>
+
+        <!-- Header bottom border -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#1AFFFFFF"/>
+    </LinearLayout>
+
+    <!-- Partner Name Input -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/partnerNameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Partner or Referrer Name"
+        app:boxBackgroundMode="outline"
+        app:boxBackgroundColor="@color/glass_background"
+        app:boxStrokeColor="@color/nav_border"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:hintTextColor="@color/text_muted">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/partnerNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_light"
+            android:textSize="16sp"
+            android:inputType="textPersonName"
+            android:maxLines="1"
+            android:imeOptions="actionDone"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Helper text -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Example: Stripe, Square, John Smith, etc."
+        android:textColor="@color/text_muted"
+        android:textSize="12sp"/>
+
+    <!-- Footer border -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="24dp"
+        android:background="@color/nav_border" />
+
+    <!-- Footer - styled same as other dialogs -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="16dp"
+        android:gravity="end">
+
+        <!-- Cancel button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginEnd="12dp"
+            android:backgroundTint="@color/glass_background"
+            android:text="@string/cancel"
+            android:textColor="@color/text_light"
+            android:textSize="14sp"
+            android:paddingHorizontal="16dp"
+            app:cornerRadius="12dp" />
+
+        <!-- Save button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:backgroundTint="@color/orange_accent"
+            android:text="@string/save"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:paddingHorizontal="20dp"
+            app:cornerRadius="12dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
