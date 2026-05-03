@@ -103,7 +103,7 @@ class MainActivityRedesign : AppCompatActivity() {
         if (!merchantId.isNullOrEmpty()) {
             firebaseConfigManager.getProfileSettings(merchantId) { settings ->
                 // Only update if Firebase has non-default values
-                if (settings.themeColor != "#1A2A4D" || settings.avatar.isNotEmpty()) {
+                if (settings.themeColor != "#3C4B80" || settings.avatar.isNotEmpty()) {
                     profileSettingsManager.setThemeColor(settings.themeColor)
                     if (settings.avatar.isNotEmpty()) {
                         profileSettingsManager.setAvatarEmoji(settings.avatar)

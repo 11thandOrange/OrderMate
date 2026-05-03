@@ -239,7 +239,7 @@ class ProfileSettingsManager private constructor(context: Context) {
         private const val KEY_THEME_TARGET_PREFIX = "theme_target_"
 
         // Defaults (matching HTML)
-        private const val DEFAULT_THEME_COLOR = "#1A2A4D"  // HTML default: rgb(60, 75, 128)
+        private const val DEFAULT_THEME_COLOR = "#3C4B80"  // HTML default: rgb(60, 75, 128)
         private const val DEFAULT_AVATAR = ""  // Empty = show placeholder icon
         private const val DEFAULT_COLOR_SCHEME = "purple"
 
