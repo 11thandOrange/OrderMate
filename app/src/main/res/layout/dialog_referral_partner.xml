@@ -19,7 +19,7 @@
             android:id="@+id/dialogTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Who Referred You? 📣"
+            android:text="📣 Who Referred You?"
             android:textColor="@color/text_light"
             android:textSize="20sp"
             android:fontFamily="sans-serif-medium"
@@ -29,7 +29,7 @@
             android:id="@+id/dialogSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enter the name of the partner or person who referred you to OrderMate"
+            android:text="Enter the name of the partner who referred you to OrderMate"
             android:textColor="@color/text_muted"
             android:textSize="14sp"
             android:paddingBottom="16dp"/>
@@ -46,7 +46,7 @@
         android:id="@+id/partnerNameLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Partner or Referrer Name"
+        android:hint="Partner Name"
         app:boxBackgroundMode="outline"
         app:boxBackgroundColor="@color/glass_background"
         app:boxStrokeColor="@color/nav_border"
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/text_light"
             android:textSize="16sp"
-            android:inputType="textPersonName"
+            android:inputType="text"
             android:maxLines="1"
             android:imeOptions="actionDone"/>
 
@@ -73,7 +73,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Example: Stripe, Square, John Smith, etc."
+        android:text="Example: Stripe, Plaid, Wise, etc."
         android:textColor="@color/text_muted"
         android:textSize="12sp"/>
 

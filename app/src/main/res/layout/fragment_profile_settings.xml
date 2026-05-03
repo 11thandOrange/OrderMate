@@ -285,7 +285,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- #81: Referral Button - Bottom Left (Owner only, hidden if referral exists) -->
+            <!-- #81: Referral Button - Bottom Right (Owner only, hidden if referral exists) -->
             <FrameLayout
                 android:id="@+id/referralButtonContainer"
                 android:layout_width="match_parent"
@@ -298,19 +298,15 @@
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="44dp"
-                    android:layout_gravity="start"
-                    android:text="Tell Us Who Referred You 📣"
+                    android:layout_gravity="end"
+                    android:text="📣 Tell Us Who Referred You"
                     android:textColor="@color/text_light"
                     android:textSize="14sp"
                     android:textAllCaps="false"
                     app:cornerRadius="12dp"
-                    app:strokeColor="@color/nav_border"
+                    app:strokeColor="@color/orange_accent"
                     app:strokeWidth="1dp"
-                    app:backgroundTint="@color/glass_background"
-                    app:icon="@drawable/ic_person"
-                    app:iconTint="@color/orange_accent"
-                    app:iconGravity="textStart"
-                    app:iconPadding="8dp" />
+                    app:backgroundTint="@color/glass_background" />
                     
             </FrameLayout>
 
