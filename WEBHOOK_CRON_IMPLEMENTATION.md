@@ -1,9 +1,22 @@
 # Webhooks, Cron Jobs & Database Implementation Plan
 
 This document outlines the implementation steps for GitHub issues:
-- [#94](https://github.com/11thandOrange/BusyBuddy_v2/issues/94) - Weekly Cron Jobs For Webhook Events
-- [#97](https://github.com/11thandOrange/BusyBuddy_v2/issues/97) - Update Database Storage
-- [#98](https://github.com/11thandOrange/BusyBuddy_v2/issues/98) - Webhooks For User Lifecycle Events
+- [#94](https://github.com/11thandOrange/OrderMate/issues/94) - Weekly Cron Jobs For Webhook Events
+- [#97](https://github.com/11thandOrange/OrderMate/issues/97) - Update Database Storage
+- [#98](https://github.com/11thandOrange/OrderMate/issues/98) - Webhooks For User Lifecycle Events
+
+## Status
+
+| Issue | Component | Status |
+|-------|-----------|--------|
+| #98 | Clover Webhooks | ✅ Implemented (`functions/src/webhooks/cloverWebhook.ts`) |
+| #97 | Database Schema | ✅ Implemented (Firebase paths defined) |
+| #94 | Cron Jobs | 🔲 Not started |
+
+## Related Documentation
+
+- [functions/README.md](./functions/README.md) - Cloud Functions setup
+- [functions/WEBHOOK_SETUP.md](./functions/WEBHOOK_SETUP.md) - Clover webhook registration guide
 
 ---
 
