@@ -298,7 +298,7 @@ class MainActivity : AppCompatActivity() {
      * If user doesn't have access, hide the settings nav icon
      */
     private fun checkSettingsNavVisibility() {
-        runOnBackgroundThread {
+        Thread {
             try {
                 val employee = myApplication.getCurrentEmployee()
                 val merchantId = myApplication.getMerchantId()
@@ -307,7 +307,7 @@ class MainActivity : AppCompatActivity() {
                     firebaseConfigManager.getAdvancedSettings(merchantId) { settings ->
                         val canAccess = EmployeeRoleUtils.canAccessSettings(employee, settings)
                         
-                        runOnMainThread {
+                        runOnUiThread {
                             // Hide/show settings nav based on permission
                             navSettings?.visibility = if (canAccess) View.VISIBLE else View.GONE
                             navSettingsIndicator?.visibility = if (canAccess) View.VISIBLE else View.GONE
@@ -317,7 +317,7 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e("MainActivity", "Error checking settings permissions", e)
             }
-        }
+        }.start()
     }
 
     /**
