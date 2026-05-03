@@ -117,7 +117,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             MyApp.getInstance().getOrderConnector().addOnOrderChangedListener { orderId, _ ->
                 Log.d("DrawerState", "OnOrderChangedListener triggered for order: $orderId")
                 if (isShowing) {
-                    getTheOrderData()
+                    getTheOrderData("OnOrderChangedListener")
                 }
             }
         } catch (e: Exception) {
@@ -141,7 +141,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             }
             binding?.container?.showView()
             binding?.transparentContainer?.visibility = View.GONE  // No dimming overlay needed
-            getTheOrderData()
+            getTheOrderData("permanentMode_onCreate")
         } else {
             // Normal mode: show floating button
             windowManager.addView(binding?.root, setTheWindowParams())
@@ -482,7 +482,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                 }
             } else {
                 // Always refresh the order data when data exists
-                getTheOrderData()
+                getTheOrderData("updateData")
             }
         }
 
@@ -494,7 +494,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             Constants.notImplementedLog
         }
         if (OrderDetailFragment.isReOpenBtnClicked) {
-            getTheOrderData()
+            getTheOrderData("isReOpenBtnClicked")
         }
 
         binding?.container1?.setOnClickListener {
@@ -509,7 +509,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                 binding?.emptyStateContainer?.showView()
             }
             if (prefManager.getString(Constants.isOrderSaved) == Constants.isFalse) {
-                getTheOrderData()
+                getTheOrderData("drawerButtonClick")
             }
             setupMinWidth(500)
 
@@ -631,17 +631,17 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         binding?.parentContainer?.minWidth = width
     }
 
-    fun getTheOrderData() {
+    fun getTheOrderData(source: String = "unknown") {
         // If already fetching, mark that a refresh is pending and return
         if (isFetchingData) {
-            Log.d("DrawerState", "getTheOrderData() called but fetch in progress, marking pendingRefresh")
+            Log.d("DrawerState", "getTheOrderData(source=$source) called but fetch in progress, marking pendingRefresh")
             pendingRefresh = true
             return
         }
         isFetchingData = true
         pendingRefresh = false  // Clear any pending flag since we're starting a fresh fetch
         
-        Log.d("DrawerState", "getTheOrderData() called")
+        Log.d("DrawerState", "getTheOrderData(source=$source) - starting fetch")
         Log.d("DrawerState", "Expected order (orderIdForReopen): ${OrderDetailFragment.orderIdForReopen}")
         
         binding?.progressLayout?.showView()
@@ -702,7 +702,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         if (pendingRefresh) {
             Log.d("DrawerState", "Pending refresh detected, fetching latest data")
             pendingRefresh = false
-            getTheOrderData()
+            getTheOrderData("pendingRefresh")
         }
     }
 
