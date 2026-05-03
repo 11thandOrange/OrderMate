@@ -9,6 +9,29 @@ package com.orderMate.utils
  *   │   ├── schemaVersion
  *   │   ├── createdAt
  *   │   └── updatedAt
+ *   ├── merchantInfo/                    (#97 - merchant data for analytics)
+ *   │   ├── merchantId
+ *   │   ├── name
+ *   │   ├── email
+ *   │   ├── storeName
+ *   │   ├── installDate
+ *   │   ├── uninstallDate
+ *   │   └── lastActiveDate
+ *   ├── subscription/                    (#97 - subscription & billing)
+ *   │   ├── plan
+ *   │   ├── status
+ *   │   ├── monthlyDueDate
+ *   │   └── billingHistory/{paymentId}/
+ *   │       ├── amount
+ *   │       ├── dueDate
+ *   │       ├── paidDate
+ *   │       ├── status
+ *   │       └── lateDays
+ *   ├── events/{eventId}/                (#97/#98 - lifecycle events)
+ *   │   ├── type
+ *   │   ├── timestamp
+ *   │   ├── details
+ *   │   └── processed
  *   ├── settings/
  *   │   ├── triggerOnItemAdd
  *   │   ├── triggerFromBasket
@@ -65,6 +88,12 @@ object FirebasePaths {
     const val PROFILES = "profiles"
     const val REFERRALS = "referrals"
     const val DISCOUNTS = "discounts"
+
+    // #97/#98: Merchant info, subscription, and events
+    const val MERCHANT_INFO = "merchantInfo"
+    const val SUBSCRIPTION = "subscription"
+    const val BILLING_HISTORY = "billingHistory"
+    const val EVENTS = "events"
     
     // Legacy - kept for backward compatibility
     @Deprecated("Use PROFILES instead", ReplaceWith("PROFILES"))
@@ -116,6 +145,25 @@ object FirebasePaths {
     
     fun discount(merchantId: String, discountId: String) = 
         "${discounts(merchantId)}/$discountId"
+
+    // ==================== #97/#98: Merchant Info ====================
+
+    fun merchantInfo(merchantId: String) = "${merchant(merchantId)}/$MERCHANT_INFO"
+
+    // ==================== #97/#98: Subscription & Billing ====================
+
+    fun subscription(merchantId: String) = "${merchant(merchantId)}/$SUBSCRIPTION"
+
+    fun billingHistory(merchantId: String) = "${subscription(merchantId)}/$BILLING_HISTORY"
+
+    fun billingRecord(merchantId: String, paymentId: String) =
+        "${billingHistory(merchantId)}/$paymentId"
+
+    // ==================== #97/#98: Lifecycle Events ====================
+
+    fun events(merchantId: String) = "${merchant(merchantId)}/$EVENTS"
+
+    fun event(merchantId: String, eventId: String) = "${events(merchantId)}/$eventId"
     
     // ==================== Legacy (Deprecated) ====================
     

@@ -4,12 +4,16 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
 import com.google.gson.Gson
+import com.orderMate.modals.BillingRecord
 import com.orderMate.modals.EmployeeProfile
 import com.orderMate.modals.MerchantDiscount
+import com.orderMate.modals.MerchantEvent
+import com.orderMate.modals.MerchantInfo
 import com.orderMate.modals.MerchantMeta
 import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.PopupSettings
 import com.orderMate.modals.ReferralInfo
+import com.orderMate.modals.SubscriptionInfo
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.modals.WidgetOption
 import com.orderMate.modals.WidgetType
@@ -21,6 +25,11 @@ import com.orderMate.modals.WidgetType
  * - Per-employee profiles (color, avatar)
  * - Referrals (partner tracking)
  * - Discounts (admin-only, read in app)
+ * 
+ * #97/#98: Added support for:
+ * - Merchant info (name, email, store, install date)
+ * - Subscription & billing tracking
+ * - Lifecycle events (install, uninstall, etc.)
  */
 class FirebaseConfigManager private constructor() {
     
@@ -819,6 +828,265 @@ class FirebaseConfigManager private constructor() {
             .addOnFailureListener {
                 it.printStackTrace()
                 callback(false)
+            }
+    }
+
+    // ==================== #97/#98: Merchant Info ====================
+
+    /**
+     * Get merchant info
+     */
+    fun getMerchantInfo(merchantId: String, callback: (MerchantInfo?) -> Unit) {
+        db.getReference(FirebasePaths.merchantInfo(merchantId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val map = snapshot.value as? Map<String, Any?>
+                callback(MerchantInfo.fromMap(map))
+            }
+            .addOnFailureListener {
+                callback(null)
+            }
+    }
+
+    /**
+     * Save merchant info
+     */
+    fun saveMerchantInfo(merchantId: String, info: MerchantInfo, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.merchantInfo(merchantId))
+            .setValue(info.toMap())
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
+
+    /**
+     * Update merchant's last active date
+     */
+    fun updateLastActiveDate(merchantId: String, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.merchantInfo(merchantId))
+            .child("lastActiveDate")
+            .setValue(ServerValue.TIMESTAMP)
+            .addOnSuccessListener { callback(true) }
+            .addOnFailureListener { callback(false) }
+    }
+
+    /**
+     * Set uninstall date for merchant
+     */
+    fun setUninstallDate(merchantId: String, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.merchantInfo(merchantId))
+            .child("uninstallDate")
+            .setValue(ServerValue.TIMESTAMP)
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener { callback(false) }
+    }
+
+    // ==================== #97/#98: Subscription ====================
+
+    /**
+     * Get subscription info
+     */
+    fun getSubscription(merchantId: String, callback: (SubscriptionInfo) -> Unit) {
+        db.getReference(FirebasePaths.subscription(merchantId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val map = snapshot.value as? Map<String, Any?>
+                callback(SubscriptionInfo.fromMap(map))
+            }
+            .addOnFailureListener {
+                callback(SubscriptionInfo())
+            }
+    }
+
+    /**
+     * Save subscription info
+     */
+    fun saveSubscription(merchantId: String, subscription: SubscriptionInfo, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.subscription(merchantId))
+            .updateChildren(subscription.toMap())
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
+
+    /**
+     * Update subscription plan
+     */
+    fun updateSubscriptionPlan(merchantId: String, plan: String, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.subscription(merchantId))
+            .child("plan")
+            .setValue(plan)
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener { callback(false) }
+    }
+
+    // ==================== #97/#98: Billing History ====================
+
+    /**
+     * Get billing history
+     */
+    fun getBillingHistory(merchantId: String, callback: (List<BillingRecord>) -> Unit) {
+        db.getReference(FirebasePaths.billingHistory(merchantId))
+            .orderByChild("dueDate")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val records = mutableListOf<BillingRecord>()
+                snapshot.children.forEach { child ->
+                    val map = child.value as? Map<String, Any?>
+                    BillingRecord.fromMap(map)?.let { records.add(it) }
+                }
+                callback(records.sortedByDescending { it.dueDate })
+            }
+            .addOnFailureListener {
+                callback(emptyList())
+            }
+    }
+
+    /**
+     * Add billing record
+     */
+    fun addBillingRecord(merchantId: String, record: BillingRecord, callback: (Boolean) -> Unit) {
+        val recordWithId = if (record.id.isEmpty()) {
+            record.copy(id = BillingRecord.generateId())
+        } else {
+            record
+        }
+
+        db.getReference(FirebasePaths.billingRecord(merchantId, recordWithId.id))
+            .setValue(recordWithId.toMap())
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
+
+    /**
+     * Update billing record (e.g., mark as paid)
+     */
+    fun updateBillingRecord(merchantId: String, record: BillingRecord, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.billingRecord(merchantId, record.id))
+            .setValue(record.toMap())
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener { callback(false) }
+    }
+
+    // ==================== #97/#98: Lifecycle Events ====================
+
+    /**
+     * Get all events for a merchant
+     */
+    fun getEvents(merchantId: String, callback: (List<MerchantEvent>) -> Unit) {
+        db.getReference(FirebasePaths.events(merchantId))
+            .orderByChild("timestamp")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val events = mutableListOf<MerchantEvent>()
+                snapshot.children.forEach { child ->
+                    val map = child.value as? Map<String, Any?>
+                    MerchantEvent.fromMap(map)?.let { events.add(it) }
+                }
+                callback(events.sortedByDescending { it.timestamp })
+            }
+            .addOnFailureListener {
+                callback(emptyList())
+            }
+    }
+
+    /**
+     * Get events since a specific timestamp (for weekly reports)
+     */
+    fun getEventsSince(merchantId: String, sinceTimestamp: Long, callback: (List<MerchantEvent>) -> Unit) {
+        db.getReference(FirebasePaths.events(merchantId))
+            .orderByChild("timestamp")
+            .startAt(sinceTimestamp.toDouble())
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val events = mutableListOf<MerchantEvent>()
+                snapshot.children.forEach { child ->
+                    val map = child.value as? Map<String, Any?>
+                    MerchantEvent.fromMap(map)?.let { events.add(it) }
+                }
+                callback(events.sortedByDescending { it.timestamp })
+            }
+            .addOnFailureListener {
+                callback(emptyList())
+            }
+    }
+
+    /**
+     * Record a new event
+     */
+    fun recordEvent(merchantId: String, event: MerchantEvent, callback: (Boolean) -> Unit) {
+        val eventWithId = if (event.id.isEmpty()) {
+            event.copy(id = MerchantEvent.generateId())
+        } else {
+            event
+        }
+
+        db.getReference(FirebasePaths.event(merchantId, eventWithId.id))
+            .setValue(eventWithId.toMap())
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
+
+    /**
+     * Mark event as processed (email sent)
+     */
+    fun markEventProcessed(merchantId: String, eventId: String, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.event(merchantId, eventId))
+            .child("processed")
+            .setValue(true)
+            .addOnSuccessListener { callback(true) }
+            .addOnFailureListener { callback(false) }
+    }
+
+    /**
+     * Get unprocessed events (for email sending)
+     */
+    fun getUnprocessedEvents(merchantId: String, callback: (List<MerchantEvent>) -> Unit) {
+        db.getReference(FirebasePaths.events(merchantId))
+            .orderByChild("processed")
+            .equalTo(false)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val events = mutableListOf<MerchantEvent>()
+                snapshot.children.forEach { child ->
+                    val map = child.value as? Map<String, Any?>
+                    MerchantEvent.fromMap(map)?.let { events.add(it) }
+                }
+                callback(events.sortedByDescending { it.timestamp })
+            }
+            .addOnFailureListener {
+                callback(emptyList())
             }
     }
 }
