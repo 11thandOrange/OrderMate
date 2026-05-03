@@ -102,8 +102,9 @@ checkSettingsNavVisibility()
 EmployeeRoleUtils.canAccessSettings(employee, advancedSettings)
          │
          ├─ Owner → Always has access
-         ├─ Admin → Check advancedSettings.adminCanAccessSettings
-         └─ Employee → Check advancedSettings.employeeCanAccessSettings
+         ├─ Admin → Check advancedSettings.allowAdminUpdateSettings
+         ├─ Manager → Check advancedSettings.allowManagersUpdateSettings
+         └─ Employee → Check advancedSettings.allowEmployeesUpdateSettings
          │
          ▼
 Settings nav icon visible/hidden accordingly
