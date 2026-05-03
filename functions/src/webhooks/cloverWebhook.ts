@@ -20,30 +20,42 @@ const db = admin.database();
  * URL: https://{project}.cloudfunctions.net/cloverWebhook
  */
 export const cloverWebhook = functions.https.onRequest(async (req, res) => {
-  // Handle Clover's verification request (GET with verificationCode)
+  // Handle GET requests (health check)
   if (req.method === "GET") {
-    const verificationCode = req.query.verificationCode;
-    if (verificationCode) {
-      console.log("Webhook verification request received");
-      res.set("Content-Type", "text/plain");
-      res.status(200).send(String(verificationCode));
-      return;
-    }
-    // GET without verificationCode - return OK for health checks
     res.status(200).send("OK");
     return;
   }
 
-  // Handle actual webhook events (POST)
+  // Handle POST requests
   if (req.method !== "POST") {
     res.status(405).send("Method Not Allowed");
     return;
   }
 
+  // Handle Clover's verification request (POST with verificationCode)
+  if (req.body.verificationCode) {
+    console.log("Webhook verification request received");
+    res.set("Content-Type", "text/plain");
+    res.status(200).send(req.body.verificationCode);
+    return;
+  }
+
+  // Handle actual webhook events
+  const {appId, merchants} = req.body;
+
+  // If it's a Clover webhook event format
+  if (appId && merchants) {
+    console.log(`Received Clover webhook for app ${appId}`);
+    await handleCloverWebhookEvent(req.body);
+    res.status(200).send("OK");
+    return;
+  }
+
+  // Legacy format support (merchantId, type)
   const {merchantId, type} = req.body;
   if (!merchantId || !type) {
-    console.error("Missing merchantId or type in webhook payload");
-    res.status(400).send("Bad Request: Missing merchantId or type");
+    console.error("Unknown webhook payload format");
+    res.status(400).send("Bad Request: Unknown payload format");
     return;
   }
 
@@ -77,6 +89,49 @@ export const cloverWebhook = functions.https.onRequest(async (req, res) => {
 interface MerchantData {
   name?: string;
   owner?: {name?: string; email?: string};
+}
+
+interface CloverUpdate {
+  objectId: string;
+  type: "CREATE" | "UPDATE" | "DELETE";
+  ts: number;
+}
+
+interface CloverWebhookPayload {
+  appId: string;
+  merchants: Record<string, CloverUpdate[]>;
+}
+
+/**
+ * Handle Clover webhook event in standard format
+ * @param {CloverWebhookPayload} payload - The Clover webhook payload
+ */
+async function handleCloverWebhookEvent(
+  payload: CloverWebhookPayload
+): Promise<void> {
+  const {appId, merchants} = payload;
+
+  for (const [merchantId, updates] of Object.entries(merchants)) {
+    for (const update of updates) {
+      const eventKey = update.objectId.split(":")[0];
+
+      // A = App events (install, uninstall, subscription change)
+      if (eventKey === "A") {
+        if (update.type === "CREATE") {
+          await handleInstall(merchantId, {appId});
+        } else if (update.type === "DELETE") {
+          await handleUninstall(merchantId, {});
+        } else if (update.type === "UPDATE") {
+          // Subscription change
+          await handleSubscriptionChange(merchantId, {});
+        }
+      }
+
+      // Log other event types for now
+      console.log(`Event: ${eventKey}, Type: ${update.type}, ` +
+        `Merchant: ${merchantId}, Object: ${update.objectId}`);
+    }
+  }
 }
 
 /**
