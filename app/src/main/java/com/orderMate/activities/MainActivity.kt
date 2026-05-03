@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
         val merchantId = myApplication.getMerchantId()
         if (!merchantId.isNullOrEmpty()) {
             firebaseConfigManager.getProfileSettings(merchantId) { settings ->
-                if (settings.themeColor != "#1C3527" || settings.avatar.isNotEmpty()) {
+                if (settings.themeColor != "#1A2A4D" || settings.avatar.isNotEmpty()) {
                     profileSettingsManager.setThemeColor(settings.themeColor)
                     if (settings.avatar.isNotEmpty()) {
                         profileSettingsManager.setAvatarEmoji(settings.avatar)

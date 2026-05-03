@@ -873,7 +873,7 @@ data class ProfileSettings(
     val avatar: String = DEFAULT_AVATAR
 ) {
     companion object {
-        const val DEFAULT_THEME_COLOR = "#1C3527"  // HTML default: rgb(60, 75, 128)
+        const val DEFAULT_THEME_COLOR = "#1A2A4D"  // HTML default: rgb(60, 75, 128)
         const val DEFAULT_AVATAR = "😊"
     }
 }
