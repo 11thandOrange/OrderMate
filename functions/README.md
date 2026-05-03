@@ -1,22 +1,15 @@
 # OrderMate Cloud Functions
 
-Firebase Cloud Functions for OrderMate webhooks and scheduled tasks.
+Firebase Cloud Functions for OrderMate webhooks.
 
 ## Features
 
 ### Issue #98: Webhooks for User Lifecycle Events
 - **cloverWebhook**: HTTPS endpoint that handles Clover webhook events
-  - `APP_INSTALLED`: Stores merchant info, sends welcome email
-  - `APP_UNINSTALLED`: Updates uninstall date, sends farewell email  
-  - `SUBSCRIPTION_CHANGED`: Updates subscription, sends upgrade/downgrade email
-  - `METERED_EVENT`: Tracks usage tier breaks, sends usage alerts
-  - `MERCHANT_UPDATED`: Syncs merchant info changes
-
-### Issue #94: Weekly Cron Jobs
-- **weeklyReport**: Runs every Monday at 9:00 AM EST
-  - Aggregates install/uninstall data for the past week
-  - Includes refunds and discount usage
-  - Sends formatted HTML email to admin
+  - `GET ?verificationCode=xxx`: Returns verification code for Clover webhook registration
+  - `APP_INSTALLED`: Stores merchant info in Firebase
+  - `APP_UNINSTALLED`: Updates uninstall date
+  - `SUBSCRIPTION_CHANGED`: Updates subscription plan
 
 ## Setup
 
@@ -27,19 +20,18 @@ cd functions
 npm install
 ```
 
-### 2. Configure Firebase
+### 2. Configure Environment
+
+Create a `.env` file in the `functions/` directory:
 
 ```bash
-# Set Clover API credentials
-firebase functions:config:set clover.api_token="YOUR_CLOVER_API_TOKEN"
-firebase functions:config:set clover.webhook_secret="YOUR_WEBHOOK_SECRET"
-firebase functions:config:set clover.base_url="https://api.clover.com"
+CLOVER_API_TOKEN=your-clover-api-token
+CLOVER_BASE_URL=https://api.clover.com
+```
 
-# Set Mailchimp API key
-firebase functions:config:set mailchimp.api_key="YOUR_MAILCHIMP_API_KEY"
-
-# Set admin email for weekly reports
-firebase functions:config:set admin.email="your-email@example.com"
+For sandbox testing:
+```bash
+CLOVER_BASE_URL=https://sandbox.dev.clover.com
 ```
 
 ### 3. Build
@@ -51,65 +43,30 @@ npm run build
 ### 4. Deploy
 
 ```bash
-npm run deploy
-# or
 firebase deploy --only functions
 ```
 
 ## Register Webhook with Clover
 
 1. Go to [Clover Developer Dashboard](https://www.clover.com/developer-home)
-2. Select your app
-3. Navigate to **Webhooks**
-4. Add webhook URL: `https://{your-project}.cloudfunctions.net/cloverWebhook`
-5. Enable these events:
-   - `APP_INSTALLED`
-   - `APP_UNINSTALLED`
-   - `SUBSCRIPTION_CHANGED`
-   - `METERED_EVENT`
-
-## Create Mailchimp Templates
-
-Create these templates in Mailchimp:
-
-| Template Name | Purpose |
-|--------------|---------|
-| `ordermate-welcome` | Welcome email on app install |
-| `ordermate-farewell` | Goodbye email on app uninstall |
-| `ordermate-upgrade` | Subscription upgrade notification |
-| `ordermate-downgrade` | Subscription downgrade notification |
-| `ordermate-usage-alert` | Usage tier break warning |
-
-### Merge Variables
-
-Templates can use these merge variables:
-- `*|STORE_NAME|*` - Merchant's store name
-- `*|OWNER_NAME|*` - Merchant owner's name
-- `*|OLD_PLAN|*` - Previous subscription plan
-- `*|NEW_PLAN|*` - New subscription plan
-- `*|USAGE_COUNT|*` - Current usage count
-- `*|USAGE_TIER|*` - Current usage tier
-
-## Local Development
-
-```bash
-# Start emulators
-npm run serve
-
-# View logs
-npm run logs
-```
+2. Select your app → **Webhooks**
+3. Add webhook URL: `https://{your-project}.cloudfunctions.net/cloverWebhook`
+4. Clover will send a verification code - the function will return it automatically
+5. Enable events: `APP_INSTALLED`, `APP_UNINSTALLED`, `SUBSCRIPTION_CHANGED`
 
 ## Testing
 
-### Test Webhook Locally
+### Test Verification
 
 ```bash
-# Start emulator
-firebase emulators:start --only functions
+curl "https://{your-project}.cloudfunctions.net/cloverWebhook?verificationCode=test123"
+# Should return: test123
+```
 
-# Send test webhook
-curl -X POST http://localhost:5001/{project}/us-central1/cloverWebhook \
+### Test Webhook Event
+
+```bash
+curl -X POST https://{your-project}.cloudfunctions.net/cloverWebhook \
   -H "Content-Type: application/json" \
   -d '{
     "merchantId": "TEST123",
@@ -117,34 +74,23 @@ curl -X POST http://localhost:5001/{project}/us-central1/cloverWebhook \
   }'
 ```
 
-### Trigger Weekly Report Manually
-
-```bash
-firebase functions:call weeklyReport
-```
-
 ## Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `clover.api_token` | Clover API access token |
-| `clover.webhook_secret` | Clover webhook signing secret |
-| `clover.base_url` | Clover API base URL |
-| `mailchimp.api_key` | Mailchimp Transactional API key |
-| `admin.email` | Email address for weekly reports |
+| `CLOVER_API_TOKEN` | Clover API access token |
+| `CLOVER_BASE_URL` | Clover API base URL |
 
 ## File Structure
 
 ```
 functions/
 ├── src/
-│   ├── index.ts           # Main entry point
-│   ├── webhooks/
-│   │   └── cloverWebhook.ts   # Clover webhook handler
-│   ├── cron/
-│   │   └── weeklyReport.ts    # Weekly report generator
-│   └── email/
-│       └── mailchimp.ts       # Email service
+│   ├── index.ts              # Main entry point
+│   └── webhooks/
+│       └── cloverWebhook.ts  # Clover webhook handler
+├── .env                      # Environment variables (not in git)
+├── .env.example              # Example env file
 ├── package.json
 ├── tsconfig.json
 └── README.md
