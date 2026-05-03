@@ -303,9 +303,36 @@ class OrderCardRedesignAdapter(
             }
         }
 
+        /**
+         * (#81 QA) Get employee name from order with fallback.
+         * 
+         * Clover's getOrders() may return partial employee data (only ID, no name).
+         * This method tries:
+         * 1. Direct access to employee.jsonObject.name
+         * 2. Fallback to MyApp.getEmployeeName(employeeId) which queries the EmployeeConnector
+         * 
+         * Note: The fallback is synchronous here but uses cached data from MyApp.
+         */
         private fun getEmployeeName(order: Order): String {
             return try {
-                order.employee?.jsonObject?.get(Constants.name)?.toString() ?: "-"
+                // Try direct access first
+                val directName = order.employee?.jsonObject?.get(Constants.name)?.toString()
+                if (!directName.isNullOrBlank() && directName != "null") {
+                    return directName
+                }
+                
+                // Fallback: Use MyApp's EmployeeConnector to get name by ID
+                val employeeId = order.employee?.id
+                if (!employeeId.isNullOrBlank()) {
+                    val context = binding.root.context
+                    val myApp = context.applicationContext as? com.orderMate.utils.MyApp
+                    val cachedName = myApp?.getEmployeeName(employeeId)
+                    if (!cachedName.isNullOrBlank()) {
+                        return cachedName
+                    }
+                }
+                
+                "-"
             } catch (e: Exception) {
                 "-"
             }

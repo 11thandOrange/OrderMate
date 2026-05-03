@@ -844,6 +844,8 @@ class SettingsFragment : Fragment() {
             .create()
         
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        // (#81 QA) Apply smooth fade animation to prevent blink
+        dialog.window?.setWindowAnimations(R.style.Animation_OrderMate_Dialog)
         
         // Set title based on level
         val title = if (level == NoteLevel.ITEM) "Add Item Widget" else "Add Order Widget"
@@ -1652,6 +1654,8 @@ class SettingsFragment : Fragment() {
             .create()
         
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        // (#81 QA) Apply smooth fade animation to prevent blink
+        dialog.window?.setWindowAnimations(R.style.Animation_OrderMate_Dialog)
         
         dialogView.findViewById<TextView>(R.id.dialogTitle)?.text = title
         dialogView.findViewById<TextView>(R.id.dialogMessage)?.text = message

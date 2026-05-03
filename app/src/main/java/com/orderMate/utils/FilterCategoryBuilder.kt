@@ -157,12 +157,13 @@ object FilterCategoryBuilder {
     
     /**
      * Build Payment Status filter using Clover's known values
+     * (#81 QA) Uses title case for filter popup and pills
      */
     private fun buildPaymentStatusFilter(): FilterCategory {
         val options = CLOVER_PAYMENT_STATUS_VALUES.map { status ->
             FilterOption(
                 id = status.lowercase(),
-                label = formatPaymentState(status),
+                label = formatPaymentStateTitleCase(status),
                 value = status
             )
         }
@@ -178,12 +179,13 @@ object FilterCategoryBuilder {
     
     /**
      * Build Order Status filter using Clover's known values
+     * (#81 QA) Uses title case for filter popup and pills
      */
     private fun buildOrderStatusFilter(): FilterCategory {
         val options = CLOVER_ORDER_STATUS_VALUES.map { status ->
             FilterOption(
                 id = status.lowercase(),
-                label = formatOrderState(status),
+                label = formatOrderStateTitleCase(status),
                 value = status
             )
         }

@@ -11,7 +11,7 @@
     <string name="dummy_id">1234567DDFKHVDFJK</string>
     <string name="dummy_date">5/8/24</string>
     <string name="dummy_name">Tester</string>
-    <string name="orders_text">Order %1$s</string>
+    <string name="orders_text">Order #%1$s</string>
     <string name="dummy_heading_dashboard">Orders (DEV)</string>
     <string name="search_orders">Search Orders</string>
     <string name="syncing">SYNCING</string>

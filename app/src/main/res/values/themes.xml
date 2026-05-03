@@ -9,7 +9,7 @@
     </style>
     <style name="Theme.OrderAppClover" parent="Base.Theme.OrderAppClover" />
     
-    <!-- Dialog theme for iOS-style dialogs -->
+    <!-- Dialog theme for iOS-style dialogs (#81 QA - added windowAnimationStyle to prevent blink) -->
     <style name="Theme.OrderMate.Dialog" parent="Theme.Material3.DayNight.Dialog">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsFloating">true</item>
@@ -17,6 +17,13 @@
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.6</item>
         <item name="android:windowSoftInputMode">stateUnchanged|adjustResize</item>
+        <item name="android:windowAnimationStyle">@style/Animation.OrderMate.Dialog</item>
+    </style>
+    
+    <!-- (#81 QA) Dialog animation style with fade only (no scale) to prevent blink -->
+    <style name="Animation.OrderMate.Dialog" parent="@android:style/Animation.Dialog">
+        <item name="android:windowEnterAnimation">@anim/dialog_fade_in</item>
+        <item name="android:windowExitAnimation">@anim/dialog_fade_out</item>
     </style>
     
     <!-- DatePicker dialog theme -->

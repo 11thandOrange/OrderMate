@@ -37,6 +37,12 @@ class EventPreviewDialog : DialogFragment() {
     private var event: ScheduledEvent? = null
     private var onFullDetailsClick: ((ScheduledEvent) -> Unit)? = null
 
+    // (#81 QA) Use OrderMate dialog theme to prevent blink
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NO_FRAME, R.style.Theme_OrderMate_Dialog)
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         dialog.window?.requestFeature(Window.FEATURE_NO_TITLE)
@@ -69,9 +75,8 @@ class EventPreviewDialog : DialogFragment() {
         val itemCount = view.findViewById<TextView>(R.id.itemCount)
         val itemsList = view.findViewById<RecyclerView>(R.id.itemsList)
 
-        // Set order title (#76 - removed "Order" prefix)
-        val shortId = currentEvent.orderId.takeLast(4).uppercase()
-        orderTitle.text = "#$shortId"
+        // Set order title (#76 - removed "Order" prefix, #81 QA - render full order ID)
+        orderTitle.text = "#${currentEvent.orderId}"
 
         // (#76) Setup Clover default pill (payment status) above order level pills
         setupCloverDefaultPill(view, currentEvent)
