@@ -25,9 +25,13 @@ export const cloverWebhook = functions.https.onRequest(async (req, res) => {
     const verificationCode = req.query.verificationCode;
     if (verificationCode) {
       console.log("Webhook verification request received");
-      res.status(200).send(verificationCode);
+      res.set("Content-Type", "text/plain");
+      res.status(200).send(String(verificationCode));
       return;
     }
+    // GET without verificationCode - return OK for health checks
+    res.status(200).send("OK");
+    return;
   }
 
   // Handle actual webhook events (POST)
