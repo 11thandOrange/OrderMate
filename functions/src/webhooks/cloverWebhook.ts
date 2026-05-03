@@ -33,11 +33,10 @@ export const cloverWebhook = functions.https.onRequest(async (req, res) => {
   }
 
   // Handle Clover's verification request (POST with verificationCode)
+  // Echo back the full JSON body - Clover expects JSON response
   if (req.body.verificationCode) {
-    const code = req.body.verificationCode;
-    console.log(`VERIFICATION CODE: ${code}`);
-    res.set("Content-Type", "text/plain");
-    res.status(200).send(code);
+    console.log(`VERIFICATION CODE: ${req.body.verificationCode}`);
+    res.status(200).json(req.body);
     return;
   }
 
