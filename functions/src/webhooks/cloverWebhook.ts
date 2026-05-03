@@ -80,7 +80,9 @@ interface MerchantData {
  * @param {string} merchantId - The Clover merchant ID
  * @return {Promise<MerchantData>} Merchant data from Clover
  */
-async function fetchMerchantFromClover(merchantId: string): Promise<MerchantData> {
+async function fetchMerchantFromClover(
+  merchantId: string
+): Promise<MerchantData> {
   const apiToken = process.env.CLOVER_API_TOKEN;
   const baseUrl = process.env.CLOVER_BASE_URL || "https://api.clover.com";
 
@@ -216,7 +218,9 @@ async function handleSubscriptionChange(
   // Determine if upgrade or downgrade
   const planRanking: Record<string, number> = {free: 0, basic: 1, premium: 2};
   const isUpgrade = (planRanking[newPlan] || 0) > (planRanking[oldPlan] || 0);
-  const eventType = isUpgrade ? "SUBSCRIPTION_UPGRADE" : "SUBSCRIPTION_DOWNGRADE";
+  const upgradeType = "SUBSCRIPTION_UPGRADE";
+  const downgradeType = "SUBSCRIPTION_DOWNGRADE";
+  const eventType = isUpgrade ? upgradeType : downgradeType;
 
   // Record event
   const eventId = db.ref(`merchants/${merchantId}/events`).push().key;
