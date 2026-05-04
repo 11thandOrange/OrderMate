@@ -247,8 +247,11 @@ class CalendarFragment : Fragment() {
         sharedFilterViewModel.filterState.observe(viewLifecycleOwner) { state ->
             val dateCount = state.dateSelections.values.sumOf { it.size }
             Log.d(TAG, "[$fragmentId] OBSERVER filterState fired | dateCount=$dateCount, isAdded=$isAdded, view=${view != null}")
+            Log.d(TAG, "[$fragmentId] OBSERVER state.dateSelections = ${state.dateSelections.map { "${it.key}: ${it.value.size} dates" }}")
+            Log.d(TAG, "[$fragmentId] OBSERVER currentFilterState BEFORE = ${currentFilterState.dateSelections.map { "${it.key}: ${it.value.size} dates" }}")
             
             currentFilterState = state
+            Log.d(TAG, "[$fragmentId] OBSERVER currentFilterState AFTER = ${currentFilterState.dateSelections.map { "${it.key}: ${it.value.size} dates" }}")
             logFilterState("filterState updated")
             
             // Always update pills for visual consistency
@@ -533,11 +536,15 @@ class CalendarFragment : Fragment() {
                 
                 // Always sync currentFilterState from ViewModel after orders load
                 val sharedState = sharedFilterViewModel.filterState.value ?: FilterDialogFragment.FilterState()
+                Log.d(TAG, "[$fragmentId] loadOrders READ sharedState.dateSelections = ${sharedState.dateSelections.map { "${it.key}: ${it.value.size} dates" }}")
+                Log.d(TAG, "[$fragmentId] loadOrders currentFilterState BEFORE = ${currentFilterState.dateSelections.map { "${it.key}: ${it.value.size} dates" }}")
                 currentFilterState = sharedState
+                Log.d(TAG, "[$fragmentId] loadOrders currentFilterState AFTER = ${currentFilterState.dateSelections.map { "${it.key}: ${it.value.size} dates" }}")
                 val dateCount = sharedState.dateSelections.values.sumOf { it.size }
                 Log.d(TAG, "[$fragmentId] loadOrders synced state | hasFilters=${sharedState.hasActiveFilters()}, dateCount=$dateCount")
                 
                 // Always apply filters (applyFiltersSync handles empty filter case)
+                Log.d(TAG, "[$fragmentId] loadOrders calling applyFiltersSync")
                 applyFiltersSync(sharedState)
                 
                 onComplete?.invoke()
@@ -927,6 +934,10 @@ class CalendarFragment : Fragment() {
     }
     
     private fun updateFilterPills(filters: FilterDialogFragment.FilterState) {
+        Log.d(TAG, "[$fragmentId] updateFilterPills called with:")
+        Log.d(TAG, "[$fragmentId]   filters.dateSelections = ${filters.dateSelections.map { "${it.key}: ${it.value.size} dates" }}")
+        Log.d(TAG, "[$fragmentId]   filters.selections = ${filters.selections}")
+        
         filterPillsContainer?.removeAllViews()
         
         val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
@@ -997,8 +1008,12 @@ class CalendarFragment : Fragment() {
     }
     
     private fun removeDateFilter(categoryId: String, index: Int) {
+        Log.d(TAG, "[$fragmentId] removeDateFilter called | categoryId=$categoryId, index=$index")
+        Log.d(TAG, "[$fragmentId] removeDateFilter currentFilterState BEFORE = ${currentFilterState.dateSelections.map { "${it.key}: ${it.value.size} dates" }}")
+        
         val newDateSelections = currentFilterState.dateSelections.toMutableMap()
         newDateSelections[categoryId]?.let { dates ->
+            Log.d(TAG, "[$fragmentId] removeDateFilter found category with ${dates.size} dates")
             val newDates = dates.toMutableList()
             if (index < newDates.size) {
                 newDates.removeAt(index)
@@ -1008,8 +1023,12 @@ class CalendarFragment : Fragment() {
             } else {
                 newDateSelections[categoryId] = newDates
             }
+        } ?: run {
+            Log.w(TAG, "[$fragmentId] removeDateFilter category NOT FOUND: $categoryId")
         }
         currentFilterState = currentFilterState.copy(dateSelections = newDateSelections)
+        Log.d(TAG, "[$fragmentId] removeDateFilter currentFilterState AFTER = ${currentFilterState.dateSelections.map { "${it.key}: ${it.value.size} dates" }}")
+        
         // Sync to shared ViewModel for cross-tab consistency
         sharedFilterViewModel.setFilterState(currentFilterState)
         applyDialogFilters(currentFilterState)
@@ -1967,10 +1986,17 @@ class CalendarFragment : Fragment() {
      * Save all current state to ViewModel before navigation
      */
     private fun saveCurrentStateToViewModel() {
+        Log.d(TAG, "[$fragmentId] saveCurrentStateToViewModel BEFORE:")
+        Log.d(TAG, "[$fragmentId]   currentFilterState.dateSelections = ${currentFilterState.dateSelections.map { "${it.key}: ${it.value.size} dates" }}")
+        Log.d(TAG, "[$fragmentId]   currentFilterState.selections = ${currentFilterState.selections}")
+        Log.d(TAG, "[$fragmentId]   highlightedDates = ${highlightedDates.size} dates")
+        
         sharedFilterViewModel.setSelectedDate(currentDate.time)
         sharedFilterViewModel.setCalendarViewMode(currentViewMode)
         sharedFilterViewModel.setFilterState(currentFilterState)
         sharedFilterViewModel.setHighlightedDates(highlightedDates)
+        
+        Log.d(TAG, "[$fragmentId] saveCurrentStateToViewModel AFTER - saved to ViewModel")
     }
     
     private fun showNoUpcomingEventsMessage() {
