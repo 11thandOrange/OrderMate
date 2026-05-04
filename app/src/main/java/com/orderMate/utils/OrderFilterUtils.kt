@@ -94,7 +94,7 @@ object OrderFilterUtils {
                         val widgetId = FilterCategoryBuilder.getWidgetId(categoryId) ?: continue
                         val widget = WidgetManager.getInstance(context).getWidgetById(widgetId) ?: continue
                         val orderValues = extractWidgetValues(order, widget)
-miple,ke                        if (!selectedValues.any { it in orderValues }) return false
+                        if (!selectedValues.any { it in orderValues }) return false
                     }
                 }
             }
