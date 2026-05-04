@@ -482,16 +482,12 @@ class CalendarFragment : Fragment() {
     private fun applyFiltersSync(filters: FilterDialogFragment.FilterState) {
         if (!isAdded || view == null) return  // Safety check
         
+        // Use shared filter+search function for consistent behavior with List page
+        val results = OrderFilterUtils.filterAndSearchOrders(
+            allOrders, filters, currentSearchQuery, requireContext()
+        )
         filteredOrders.clear()
-        
-        // Use shared filter utility for consistent behavior with List page
-        allOrders.forEach { order ->
-            val filterMatch = OrderFilterUtils.orderMatchesFilters(order, filters, requireContext())
-            val searchMatch = currentSearchQuery.isEmpty() || OrderFilterUtils.orderMatchesSearch(order, currentSearchQuery)
-            if (filterMatch && searchMatch) {
-                filteredOrders.add(order)
-            }
-        }
+        filteredOrders.addAll(results)
         
         // Convert to events - uses OrderDueDateResolver's 3-tier priority for due dates
         filteredEvents = convertOrdersToEvents(filteredOrders)
@@ -640,15 +636,12 @@ class CalendarFragment : Fragment() {
                 highlightedDates = combined
             }
 
-            // Apply both search AND filters together using shared utility
+            // Use shared filter+search function for consistent behavior with List page
+            val results = OrderFilterUtils.filterAndSearchOrders(
+                allOrders, currentFilterState, query ?: "", requireContext()
+            )
             filteredOrders.clear()
-            allOrders.forEach { order ->
-                val filterMatch = OrderFilterUtils.orderMatchesFilters(order, currentFilterState, requireContext())
-                val searchMatch = query.isNullOrEmpty() || OrderFilterUtils.orderMatchesSearch(order, query)
-                if (filterMatch && searchMatch) {
-                    filteredOrders.add(order)
-                }
-            }
+            filteredOrders.addAll(results)
             
             // Convert filtered orders to events - uses OrderDueDateResolver's 3-tier priority
             filteredEvents = convertOrdersToEvents(filteredOrders)

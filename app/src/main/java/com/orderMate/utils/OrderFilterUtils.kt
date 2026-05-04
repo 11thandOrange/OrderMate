@@ -20,6 +20,29 @@ import java.util.Locale
 object OrderFilterUtils {
 
     /**
+     * Filter and search orders - single source of truth for both List and Calendar.
+     * Combines filter matching and search matching in one operation.
+     *
+     * @param orders List of orders to filter
+     * @param filters Current filter state from FilterDialogFragment
+     * @param searchQuery Current search query (empty string if no search)
+     * @param context Context for accessing WidgetManager
+     * @return List of orders matching both filters AND search
+     */
+    fun filterAndSearchOrders(
+        orders: List<Order?>,
+        filters: FilterDialogFragment.FilterState,
+        searchQuery: String,
+        context: Context
+    ): List<Order> {
+        return orders.filterNotNull().filter { order ->
+            val filterMatch = orderMatchesFilters(order, filters, context)
+            val searchMatch = searchQuery.isEmpty() || orderMatchesSearch(order, searchQuery)
+            filterMatch && searchMatch
+        }
+    }
+
+    /**
      * Check if an order matches the given filter state.
      * Used by both List and Calendar pages for consistent filtering.
      *

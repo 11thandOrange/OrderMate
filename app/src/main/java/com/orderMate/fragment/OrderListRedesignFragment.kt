@@ -401,34 +401,19 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     private fun searchOrders(query: String?) {
         runOnBackgroundThread(Dispatchers.Default) {
-            val isFilterApplied = isFilterActive()
+            // Use shared filter+search function for consistent behavior with Calendar page
+            val results = OrderFilterUtils.filterAndSearchOrders(
+                allItemList, currentFilterState, query ?: "", requireContext()
+            )
+            orderItems.clear()
+            orderItems.addAll(results)
 
-            if (query.isNullOrEmpty()) {
-                // Empty search - show all or filtered
-                orderItems.clear()
-                if (isFilterApplied) {
-                    filterData.forEach { orderItems.add(it) }
-                } else {
-                    allItemList.forEach { orderItems.add(it) }
-                }
-            } else {
-                // Search in data
-                orderItems.clear()
-                val sourceList = if (isFilterApplied) filterData else allItemList
-                
-                for (order in sourceList) {
-                    if (matchesSearch(order, query.lowercase())) {
-                        orderItems.add(order)
-                    }
-                }
-
-                // If no results and query looks like order ID, try direct lookup
-                if (orderItems.isEmpty() && query.length > 7) {
-                    exceptionHandler {
-                        val result = myApp.getOrderConnector().getOrder(query)
-                        if (result != null) {
-                            orderItems.add(result)
-                        }
+            // If no results and query looks like order ID, try direct lookup
+            if (orderItems.isEmpty() && !query.isNullOrEmpty() && query.length > 7) {
+                exceptionHandler {
+                    val result = myApp.getOrderConnector().getOrder(query)
+                    if (result != null) {
+                        orderItems.add(result)
                     }
                 }
             }
@@ -439,11 +424,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 updateEmptyState()
             }
         }
-    }
-
-    private fun matchesSearch(order: Order?, query: String): Boolean {
-        // Use shared search logic
-        return OrderSearchFilter.matchesSearch(order, query)
     }
     // ==================== Date Filter ====================
 
@@ -622,23 +602,12 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     private fun applyDialogFilters(filters: FilterDialogFragment.FilterState) {
         runOnBackgroundThread {
+            // Use shared filter+search function for consistent behavior with Calendar page
+            val results = OrderFilterUtils.filterAndSearchOrders(
+                allItemList, filters, currentSearchQuery, requireContext()
+            )
             orderItems.clear()
-            filterData.clear()
-
-            // Use shared filter utility for consistent behavior with Calendar page
-            allItemList.forEach { order ->
-                val filterMatch = OrderFilterUtils.orderMatchesFilters(order, filters, requireContext())
-                val searchMatch = OrderFilterUtils.orderMatchesSearch(order, currentSearchQuery)
-                
-                if (filterMatch && searchMatch) {
-                    orderItems.add(order)
-                }
-                
-                if (filterMatch) {
-                    // filterData stores filter-only results (without search) for search to work on
-                    filterData.add(order)
-                }
-            }
+            orderItems.addAll(results)
 
             runOnMainThread {
                 updateResultsInfo()
@@ -775,6 +744,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun isFilterActive(): Boolean {
+        // Check new filter state (from FilterDialogFragment)
+        if (currentFilterState.hasActiveFilters()) return true
+        // Also check legacy filterArray for backwards compatibility
         filterArray.forEach {
             if (it.value != 0) return true
         }
