@@ -531,19 +531,14 @@ class CalendarFragment : Fragment() {
                 
                 updateViewModeButtonsState()
                 
-                // Apply any pending shared state after orders are loaded
-                val sharedState = sharedFilterViewModel.filterState.value
-                val dateCount = sharedState?.dateSelections?.values?.sumOf { it.size } ?: 0
-                Log.d(TAG, "[$fragmentId] loadOrders checking shared state | hasFilters=${sharedState?.hasActiveFilters()}, dateCount=$dateCount")
+                // Always sync currentFilterState from ViewModel after orders load
+                val sharedState = sharedFilterViewModel.filterState.value ?: FilterDialogFragment.FilterState()
+                currentFilterState = sharedState
+                val dateCount = sharedState.dateSelections.values.sumOf { it.size }
+                Log.d(TAG, "[$fragmentId] loadOrders synced state | hasFilters=${sharedState.hasActiveFilters()}, dateCount=$dateCount")
                 
-                if (sharedState != null && sharedState.hasActiveFilters()) {
-                    currentFilterState = sharedState
-                    Log.d(TAG, "[$fragmentId] loadOrders applying filters sync")
-                    // applyFiltersSync handles pills and rendering
-                    applyFiltersSync(sharedState)
-                } else {
-                    renderCalendar()
-                }
+                // Always apply filters (applyFiltersSync handles empty filter case)
+                applyFiltersSync(sharedState)
                 
                 onComplete?.invoke()
             }
