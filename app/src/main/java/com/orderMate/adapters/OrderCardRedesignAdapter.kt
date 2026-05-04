@@ -20,6 +20,7 @@ import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatPaymentState
 import com.orderMate.utils.formatOrderState
+import com.orderMate.utils.getPaymentStateFromOrder
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.toDoubleFloatPoint
 import kotlinx.coroutines.CoroutineScope
@@ -104,7 +105,7 @@ class OrderCardRedesignAdapter(
             setupNotesPills(order)
 
             // Left Status Indicator (green for paid, red for unpaid)
-            val paymentState = order.paymentState?.name ?: "OPEN"
+            val paymentState = getPaymentStateFromOrder(order)
             val indicatorColor = when (paymentState) {
                 "PAID" -> ContextCompat.getColor(context, R.color.paid_status_color)
                 "OPEN" -> ContextCompat.getColor(context, R.color.unpaid_status_color)
@@ -275,7 +276,7 @@ class OrderCardRedesignAdapter(
         }
 
         private fun setupPaymentStatusBadge(order: Order) {
-            val paymentState = order.paymentState?.name ?: "OPEN"
+            val paymentState = getPaymentStateFromOrder(order)
             val displayText = formatPaymentState(paymentState)
             val density = binding.root.context.resources.displayMetrics.density
             
