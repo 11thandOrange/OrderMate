@@ -204,21 +204,32 @@ object OrderFilterUtils {
     /**
      * Check if a filter date matches any value in the order's widget values.
      * Tries multiple date formats to handle various storage formats.
-     * 
-     * Formats checked:
-     * - M/d (5/4) - without year
-     * - M/d/yy (5/4/26) - short year
-     * - M/d/yyyy (5/4/2026) - full year
-     * - MM/dd/yy (05/04/26) - zero-padded
-     * - MM/dd/yyyy (05/04/2026) - zero-padded full year
      */
     private fun matchesDateInValues(filterDate: Date, orderValues: Set<String>): Boolean {
+        // All possible date formats used in the app
         val dateFormats = listOf(
-            SimpleDateFormat("M/d", Locale.getDefault()),      // 5/4
-            SimpleDateFormat("M/d/yy", Locale.getDefault()),   // 5/4/26
-            SimpleDateFormat("M/d/yyyy", Locale.getDefault()), // 5/4/2026
-            SimpleDateFormat("MM/dd/yy", Locale.getDefault()), // 05/04/26
-            SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()) // 05/04/2026
+            // DateTimePickerDialog formats (actual storage format)
+            SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault()), // May 4, 2026 3:30 PM
+            SimpleDateFormat("MMM d, yyyy", Locale.getDefault()),         // May 4, 2026
+            // Numeric formats
+            SimpleDateFormat("M/d/yyyy", Locale.getDefault()),            // 5/4/2026
+            SimpleDateFormat("M/d/yy", Locale.getDefault()),              // 5/4/26
+            SimpleDateFormat("M/d", Locale.getDefault()),                 // 5/4
+            SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()),          // 05/04/2026
+            SimpleDateFormat("MM/dd/yy", Locale.getDefault()),            // 05/04/26
+            SimpleDateFormat("MM/dd", Locale.getDefault()),               // 05/04
+            // Hyphen formats
+            SimpleDateFormat("M-d-yyyy", Locale.getDefault()),            // 5-4-2026
+            SimpleDateFormat("M-d-yy", Locale.getDefault()),              // 5-4-26
+            SimpleDateFormat("MM-dd-yyyy", Locale.getDefault()),          // 05-04-2026
+            SimpleDateFormat("MM-dd-yy", Locale.getDefault()),            // 05-04-26
+            // ISO format
+            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()),          // 2026-05-04
+            // Full month name formats
+            SimpleDateFormat("MMMM d, yyyy", Locale.getDefault()),        // May 4, 2026
+            SimpleDateFormat("MMMM d", Locale.getDefault()),              // May 4
+            SimpleDateFormat("d MMM yyyy", Locale.getDefault()),          // 4 May 2026
+            SimpleDateFormat("d MMMM yyyy", Locale.getDefault())          // 4 May 2026
         )
         
         for (format in dateFormats) {
