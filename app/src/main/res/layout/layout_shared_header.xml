@@ -43,7 +43,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:hint="@string/search_orders"
+                android:hint="@string/search_placeholder"
                 android:textColorHint="@color/text_muted"
                 android:textColor="@color/text_light"
                 android:textSize="14sp"
@@ -52,16 +52,7 @@
                 android:imeOptions="actionSearch"
                 android:maxLines="1"/>
 
-            <!-- Date Picker Icon -->
-            <ImageView
-                android:id="@+id/datePickerButton"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:padding="4dp"
-                android:src="@drawable/ic_calendar"
-                app:tint="@color/text_muted"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Select date"/>
+            <!-- Calendar Icon removed - date filtering now via Filters dialog -->
 
         </LinearLayout>
 

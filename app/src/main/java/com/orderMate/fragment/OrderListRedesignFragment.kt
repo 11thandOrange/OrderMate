@@ -300,10 +300,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             resetFilters()
         }
 
-        // Calendar icon for date picker (#14 - expanded click area)
-        binding.header.calendarIconContainer.setOnClickListener {
-            showDatePicker()
-        }
+        // Calendar icon removed - date filtering now via Filters dialog
 
         // Sync button (#15)
         binding.header.syncButton.setOnClickListener {
