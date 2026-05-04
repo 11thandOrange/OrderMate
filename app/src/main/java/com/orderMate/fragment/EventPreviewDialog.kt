@@ -87,10 +87,11 @@ class EventPreviewDialog : DialogFragment() {
         // (#77) Setup text box rows (rendered as rows, not pills)
         setupTextBoxRows(view, currentEvent)
 
-        // (#77) Conditionally render customer row - only show if customer exists
+        // (#81 QA) Conditionally render customer row - hide if no customer
+        // Check both isBlank() and "-" fallback (matches CalendarFragment timeline line 1643)
         val customerRow = view.findViewById<View>(R.id.customerRow)
         val customerRowDivider = view.findViewById<View>(R.id.customerRowDivider)
-        if (currentEvent.customerName.isBlank()) {
+        if (currentEvent.customerName.isBlank() || currentEvent.customerName == "-") {
             customerRow.visibility = View.GONE
             customerRowDivider.visibility = View.GONE
         } else {

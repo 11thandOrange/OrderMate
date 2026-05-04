@@ -20,7 +20,11 @@ import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatPaymentState
 import com.orderMate.utils.formatOrderState
+import com.orderMate.utils.MyApp
 import com.orderMate.utils.toDoubleFloatPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * iOS-style Order Card Adapter (#80, #81 requirement)
@@ -81,8 +85,8 @@ class OrderCardRedesignAdapter(
             // Customer Name
             binding.customerName.text = getCustomerName(order)
 
-            // Employee Name
-            binding.employeeName.text = getEmployeeName(order)
+            // Employee Name (#81 QA) - use same async pattern as OrderDetailFragment
+            setupEmployeeName(order)
 
             // Payment Type
             setupPaymentType(order)
@@ -304,37 +308,34 @@ class OrderCardRedesignAdapter(
         }
 
         /**
-         * (#81 QA) Get employee name from order with fallback.
+         * (#81 QA) Setup employee name using same pattern as OrderDetailFragment.
          * 
          * Clover's getOrders() may return partial employee data (only ID, no name).
-         * This method tries:
-         * 1. Direct access to employee.jsonObject.name
-         * 2. Fallback to MyApp.getEmployeeName(employeeId) which queries the EmployeeConnector
-         * 
-         * Note: The fallback is synchronous here but uses cached data from MyApp.
+         * This method:
+         * 1. Tries direct access to employee.jsonObject.name (sync)
+         * 2. Falls back to MyApp.getEmployeeName(employeeId) on IO thread (async)
+         * 3. Updates UI on Main thread after async fetch
          */
-        private fun getEmployeeName(order: Order): String {
-            return try {
-                // Try direct access first
-                val directName = order.employee?.jsonObject?.get(Constants.name)?.toString()
-                if (!directName.isNullOrBlank() && directName != "null") {
-                    return directName
+        private fun setupEmployeeName(order: Order) {
+            val employee = order.employee
+            
+            // Try direct access first (same as OrderDetailFragment line 294-297)
+            exceptionHandler({
+                val employeeName = employee?.jsonObject?.get(Constants.name)?.toString()
+                binding.employeeName.text = if (!employeeName.isNullOrBlank() && employeeName != "null") {
+                    employeeName
+                } else {
+                    "-"
                 }
-                
-                // Fallback: Use MyApp's EmployeeConnector to get name by ID
-                val employeeId = order.employee?.id
-                if (!employeeId.isNullOrBlank()) {
-                    val context = binding.root.context
-                    val myApp = context.applicationContext as? com.orderMate.utils.MyApp
-                    val cachedName = myApp?.getEmployeeName(employeeId)
-                    if (!cachedName.isNullOrBlank()) {
-                        return cachedName
+            })
+            // Fallback: async fetch using coroutine (same as OrderDetailFragment line 300-308)
+            {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val value = MyApp.getInstance().getEmployeeName(employee?.id)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        binding.employeeName.text = value ?: "-"
                     }
                 }
-                
-                "-"
-            } catch (e: Exception) {
-                "-"
             }
         }
 
