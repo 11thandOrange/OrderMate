@@ -622,6 +622,30 @@ class FirebaseConfigManager private constructor() {
     }
     
     /**
+     * Get ALL employee profiles from Firebase (#81: cache all employees)
+     * Returns map of employeeId -> EmployeeProfile
+     */
+    fun getAllEmployeeProfiles(merchantId: String, callback: (Map<String, EmployeeProfile>) -> Unit) {
+        db.getReference(FirebasePaths.profiles(merchantId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val profiles = mutableMapOf<String, EmployeeProfile>()
+                snapshot.children.forEach { child ->
+                    val employeeId = child.key ?: return@forEach
+                    val profile = EmployeeProfile(
+                        color = child.child("color").getValue(String::class.java) ?: EmployeeProfile.DEFAULT_COLOR,
+                        avatar = child.child("avatar").getValue(String::class.java) ?: EmployeeProfile.DEFAULT_AVATAR
+                    )
+                    profiles[employeeId] = profile
+                }
+                callback(profiles)
+            }
+            .addOnFailureListener {
+                callback(emptyMap())
+            }
+    }
+    
+    /**
      * Save employee profile to Firebase
      */
     fun saveEmployeeProfile(merchantId: String, employeeId: String, profile: EmployeeProfile, callback: (Boolean) -> Unit) {

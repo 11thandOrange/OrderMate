@@ -49,9 +49,9 @@ class MainActivity : AppCompatActivity() {
     private val myApplication: MyApp by lazy {
         MyApp.getInstance()
     }
-    private val profileSettingsManager: ProfileSettingsManager by lazy {
-        ProfileSettingsManager.getInstance(this)
-    }
+    // #81: Get fresh instance each time to handle employee changes
+    private val profileSettingsManager: ProfileSettingsManager
+        get() = ProfileSettingsManager.getInstance(this)
     private val firebaseConfigManager: FirebaseConfigManager by lazy {
         FirebaseConfigManager.getInstance()
     }
@@ -75,6 +75,9 @@ class MainActivity : AppCompatActivity() {
     private var navProfileEmoji: TextView? = null
     
     private var currentNavItem: Int = R.id.navList
+    
+    // #81: Track employee to detect POS login changes
+    private var lastKnownEmployeeId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,11 +88,17 @@ class MainActivity : AppCompatActivity() {
         setupNavigation()
         setupSideNav()
         
-        // Apply theme settings immediately
+        // #81: Track current employee
+        lastKnownEmployeeId = myApplication.getEmployeeId()
+        
+        // Apply theme settings immediately (from local cache)
         applyThemeSettings()
         
-        // Sync from Firebase in background
+        // Sync current employee from Firebase (fast, small payload)
         syncProfileSettingsFromFirebase()
+        
+        // #81: Cache ALL employee profiles for instant switching (background)
+        cacheAllEmployeeProfiles()
     }
     
     /**
@@ -144,23 +153,39 @@ class MainActivity : AppCompatActivity() {
     }
     
     /**
-     * Sync profile settings from Firebase
+     * Sync profile settings from Firebase (#81: per-employee profiles)
      */
     private fun syncProfileSettingsFromFirebase() {
         val merchantId = myApplication.getMerchantId()
-        if (!merchantId.isNullOrEmpty()) {
-            firebaseConfigManager.getProfileSettings(merchantId) { settings ->
-                if (settings.themeColor != "#3C4B80" || settings.avatar.isNotEmpty()) {
-                    profileSettingsManager.setThemeColor(settings.themeColor)
-                    if (settings.avatar.isNotEmpty()) {
-                        profileSettingsManager.setAvatarEmoji(settings.avatar)
+        val employeeId = myApplication.getEmployeeId()
+        
+        if (!merchantId.isNullOrEmpty() && !employeeId.isNullOrEmpty()) {
+            // #81: Use per-employee profile path instead of deprecated merchant-level path
+            firebaseConfigManager.getEmployeeProfile(merchantId, employeeId) { profile ->
+                // Only apply if not default values (user has customized)
+                if (profile.color != ProfileSettingsManager.DEFAULT_THEME_COLOR || 
+                    profile.avatar != com.orderMate.modals.EmployeeProfile.DEFAULT_AVATAR) {
+                    profileSettingsManager.setThemeColor(profile.color)
+                    if (profile.avatar.isNotEmpty()) {
+                        profileSettingsManager.setAvatarEmoji(profile.avatar)
                     }
                     runOnUiThread {
                         applyThemeSettings()
                     }
                 }
             }
-            // #78: Removed migration code - no longer needed
+        }
+    }
+    
+    /**
+     * Cache ALL employee profiles locally (#81: instant switch, no flash)
+     */
+    private fun cacheAllEmployeeProfiles() {
+        val merchantId = myApplication.getMerchantId()
+        if (!merchantId.isNullOrEmpty()) {
+            firebaseConfigManager.getAllEmployeeProfiles(merchantId) { profiles ->
+                ProfileSettingsManager.cacheAllProfiles(this, profiles)
+            }
         }
     }
     
@@ -260,7 +285,15 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         
-        // Refresh theme settings when returning from profile
+        // #81: Check if employee changed (POS login)
+        val currentEmployeeId = myApplication.getEmployeeId()
+        if (currentEmployeeId != lastKnownEmployeeId) {
+            lastKnownEmployeeId = currentEmployeeId
+            // Sync from Firebase to refresh cache (in background)
+            syncProfileSettingsFromFirebase()
+        }
+        
+        // Refresh theme settings when returning from profile (from local cache)
         applyThemeSettings()
         
         // #81: Check settings nav visibility based on role permissions
