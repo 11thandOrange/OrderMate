@@ -335,21 +335,31 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         showLoading(true)
         
         runOnBackgroundThread {
+            // Fetch data on background thread into temporary list
+            val tempOrders = ArrayList<Order?>()
+            var fetchError: Exception? = null
+            
             try {
                 val orderData = myApp.getOrderConnector().getOrders(mutableListOf())
-                orderItems.clear()
-                allItemList.clear()
-                
                 orderData?.forEach {
-                    allItemList.add(it)
-                    orderItems.add(it)
+                    tempOrders.add(it)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                debugSnackBar(getString(R.string.there_is_issue_with_your_account))
+                fetchError = e
             }
 
             runOnMainThread {
+                // All list modifications on main thread to avoid RecyclerView inconsistency
+                if (fetchError != null) {
+                    debugSnackBar(getString(R.string.there_is_issue_with_your_account))
+                } else {
+                    orderItems.clear()
+                    allItemList.clear()
+                    allItemList.addAll(tempOrders)
+                    orderItems.addAll(tempOrders)
+                }
+                
                 showLoading(false)
                 
                 // Apply any pending shared state after orders are loaded
@@ -402,23 +412,27 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     private fun searchOrders(query: String?) {
         runOnBackgroundThread(Dispatchers.Default) {
             // Use shared filter+search function for consistent behavior with Calendar page
-            val results = OrderFilterUtils.filterAndSearchOrders(
+            // Filter into temporary list on background thread
+            val tempResults = ArrayList<Order?>()
+            tempResults.addAll(OrderFilterUtils.filterAndSearchOrders(
                 allItemList, currentFilterState, query ?: "", requireContext()
-            )
-            orderItems.clear()
-            orderItems.addAll(results)
+            ))
 
             // If no results and query looks like order ID, try direct lookup
-            if (orderItems.isEmpty() && !query.isNullOrEmpty() && query.length > 7) {
+            if (tempResults.isEmpty() && !query.isNullOrEmpty() && query.length > 7) {
                 exceptionHandler {
                     val result = myApp.getOrderConnector().getOrder(query)
                     if (result != null) {
-                        orderItems.add(result)
+                        tempResults.add(result)
                     }
                 }
             }
 
             runOnMainThread {
+                // All list modifications on main thread to avoid RecyclerView inconsistency
+                orderItems.clear()
+                orderItems.addAll(tempResults)
+                
                 updateResultsInfo()
                 notifyAdapter()
                 updateEmptyState()
@@ -464,7 +478,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         runOnBackgroundThread {
             val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
             
-            orderItems.clear()
+            // Filter into temporary list on background thread
+            val tempResults = ArrayList<Order?>()
             val sourceList = if (isFilterActive()) filterData else allItemList
 
             for (order in sourceList) {
@@ -501,11 +516,15 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 }
 
                 if (matchesOrderDate && matchesDueDate) {
-                    orderItems.add(order)
+                    tempResults.add(order)
                 }
             }
 
             runOnMainThread {
+                // All list modifications on main thread to avoid RecyclerView inconsistency
+                orderItems.clear()
+                orderItems.addAll(tempResults)
+                
                 updateResultsInfo()
                 notifyAdapter()
                 updateEmptyState()

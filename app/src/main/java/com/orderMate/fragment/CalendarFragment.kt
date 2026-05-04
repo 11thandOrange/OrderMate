@@ -423,24 +423,36 @@ class CalendarFragment : Fragment() {
         ordersLoaded = false
         
         runOnBackgroundThread {
+            // Build temp lists on background thread to avoid RecyclerView inconsistency
+            val tempAllOrders = ArrayList<Order?>()
+            val tempFilteredOrders = ArrayList<Order?>()
+            var tempAllEvents: List<ScheduledEvent> = emptyList()
+            var tempFilteredEvents: List<ScheduledEvent> = emptyList()
+            
             try {
                 val orderData = myApp.getOrderConnector().getOrders(mutableListOf())
-                allOrders.clear()
-                filteredOrders.clear()
                 
                 orderData?.forEach {
-                    allOrders.add(it)
-                    filteredOrders.add(it)
+                    tempAllOrders.add(it)
+                    tempFilteredOrders.add(it)
                 }
                 
                 // Convert orders to events for calendar display
-                allEvents = convertOrdersToEvents(allOrders)
-                filteredEvents = allEvents
+                tempAllEvents = convertOrdersToEvents(tempAllOrders)
+                tempFilteredEvents = tempAllEvents
             } catch (e: Exception) {
                 e.printStackTrace()
             }
 
             runOnMainThread {
+                // All list modifications on main thread to avoid RecyclerView inconsistency
+                allOrders.clear()
+                allOrders.addAll(tempAllOrders)
+                filteredOrders.clear()
+                filteredOrders.addAll(tempFilteredOrders)
+                allEvents = tempAllEvents
+                filteredEvents = tempFilteredEvents
+                
                 ordersLoaded = true
                 
                 // Restore selected date from shared state FIRST
@@ -621,7 +633,7 @@ class CalendarFragment : Fragment() {
     private fun searchOrders(query: String?) {
         runOnBackgroundThread {
             // Parse dates from search query (matches HTML parseSearchDates)
-            highlightedDates = if (!query.isNullOrEmpty()) {
+            var tempHighlightedDates = if (!query.isNullOrEmpty()) {
                 OrderSearchFilter.parseSearchDates(query, currentDate.get(Calendar.YEAR))
             } else {
                 emptyList()
@@ -630,23 +642,30 @@ class CalendarFragment : Fragment() {
             // Also include dates from filter state (matches HTML behavior)
             val filterDates = currentFilterState.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE] ?: emptyList()
             if (filterDates.isNotEmpty()) {
-                val combined = (highlightedDates + filterDates).distinctBy { 
+                val combined = (tempHighlightedDates + filterDates).distinctBy { 
                     SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(it)
                 }.sortedBy { it.time }
-                highlightedDates = combined
+                tempHighlightedDates = combined
             }
 
             // Use shared filter+search function for consistent behavior with List page
             val results = OrderFilterUtils.filterAndSearchOrders(
                 allOrders, currentFilterState, query ?: "", requireContext()
             )
-            filteredOrders.clear()
-            filteredOrders.addAll(results)
+            
+            // Build temp list on background thread
+            val tempFilteredOrders = ArrayList<Order?>()
+            tempFilteredOrders.addAll(results)
             
             // Convert filtered orders to events - uses OrderDueDateResolver's 3-tier priority
-            filteredEvents = convertOrdersToEvents(filteredOrders)
+            val tempFilteredEvents = convertOrdersToEvents(tempFilteredOrders)
 
             runOnMainThread {
+                // All list modifications on main thread to avoid RecyclerView inconsistency
+                highlightedDates = tempHighlightedDates
+                filteredOrders.clear()
+                filteredOrders.addAll(tempFilteredOrders)
+                filteredEvents = tempFilteredEvents
                 renderCalendar()
             }
         }
@@ -717,20 +736,25 @@ class CalendarFragment : Fragment() {
             val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
             val targetDate = dateFormat.format(date)
 
-            filteredOrders.clear()
+            // Build temp list on background thread
+            val tempFilteredOrders = ArrayList<Order?>()
 
             for (order in allOrders) {
                 val orderDate = order?.createdTime?.let {
                     dateFormat.format(Date(it))
                 }
                 if (orderDate == targetDate) {
-                    filteredOrders.add(order)
+                    tempFilteredOrders.add(order)
                 }
             }
             
-            filteredEvents = convertOrdersToEvents(filteredOrders)
+            val tempFilteredEvents = convertOrdersToEvents(tempFilteredOrders)
 
             runOnMainThread {
+                // All list modifications on main thread to avoid RecyclerView inconsistency
+                filteredOrders.clear()
+                filteredOrders.addAll(tempFilteredOrders)
+                filteredEvents = tempFilteredEvents
                 renderCalendar()
             }
         }
