@@ -248,11 +248,6 @@ class CalendarFragment : Fragment() {
             val dateCount = state.dateSelections.values.sumOf { it.size }
             Log.d(TAG, "[$fragmentId] OBSERVER filterState fired | dateCount=$dateCount, isAdded=$isAdded, view=${view != null}")
             
-            // Skip if state hasn't changed (prevents flash on back navigation)
-            if (state == currentFilterState) {
-                Log.d(TAG, "[$fragmentId] filterState unchanged, skipping")
-                return@observe
-            }
             currentFilterState = state
             logFilterState("filterState updated")
             
