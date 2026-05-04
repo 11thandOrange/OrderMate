@@ -715,71 +715,9 @@ class CalendarFragment : Fragment() {
     
     private fun searchOrders(query: String?) {
         Log.d(TAG, "[$fragmentId] searchOrders START | query='$query', isAdded=$isAdded")
-        logFilterState("searchOrders filter state")
-        
-        runOnBackgroundThread {
-            Log.d(TAG, "[$fragmentId] searchOrders BACKGROUND THREAD | isAdded=$isAdded")
-            
-            // Safety check - get context safely
-            val ctx = context
-            if (ctx == null) {
-                Log.e(TAG, "[$fragmentId] searchOrders BACKGROUND - context is NULL, aborting!")
-                return@runOnBackgroundThread
-            }
-            
-            // Parse dates from search query (matches HTML parseSearchDates)
-            var tempHighlightedDates = if (!query.isNullOrEmpty()) {
-                OrderSearchFilter.parseSearchDates(query, currentDate.get(Calendar.YEAR))
-            } else {
-                emptyList()
-            }
-            
-            // Also include dates from filter state (matches HTML behavior)
-            val filterDates = currentFilterState.dateSelections[FilterCategoryBuilder.CLOVER_ORDER_DATE] ?: emptyList()
-            if (filterDates.isNotEmpty()) {
-                val combined = (tempHighlightedDates + filterDates).distinctBy { 
-                    SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(it)
-                }.sortedBy { it.time }
-                tempHighlightedDates = combined
-            }
-            Log.d(TAG, "[$fragmentId] searchOrders parsed ${tempHighlightedDates.size} highlighted dates")
-
-            // Use shared filter+search function for consistent behavior with List page
-            var tempFilteredOrders = ArrayList<Order?>()
-            var tempFilteredEvents: List<ScheduledEvent> = emptyList()
-            
-            try {
-                val results = OrderFilterUtils.filterAndSearchOrders(
-                    allOrders, currentFilterState, query ?: "", ctx
-                )
-                
-                // Build temp list on background thread
-                tempFilteredOrders.addAll(results)
-                Log.d(TAG, "[$fragmentId] searchOrders filtered to ${results.size} results")
-                
-                // Convert filtered orders to events - uses OrderDueDateResolver's 3-tier priority
-                tempFilteredEvents = convertOrdersToEvents(tempFilteredOrders)
-            } catch (e: Exception) {
-                Log.e(TAG, "[$fragmentId] searchOrders ERROR: ${e.message}", e)
-            }
-
-            runOnMainThread {
-                Log.d(TAG, "[$fragmentId] searchOrders MAIN THREAD CALLBACK | isAdded=$isAdded, view=${view != null}")
-                
-                // Safety check before modifying UI
-                if (!isAdded || view == null) {
-                    Log.w(TAG, "[$fragmentId] searchOrders MAIN THREAD - Fragment not attached or view null, aborting!")
-                    return@runOnMainThread
-                }
-                
-                // All list modifications on main thread to avoid RecyclerView inconsistency
-                highlightedDates = tempHighlightedDates
-                filteredOrders.clear()
-                filteredOrders.addAll(tempFilteredOrders)
-                filteredEvents = tempFilteredEvents
-                renderCalendar()
-            }
-        }
+        // Delegate to applyFiltersSync which handles all filtering and highlightedDates calculation
+        // This ensures consistent behavior - single source of truth for filter logic
+        applyFiltersSync(currentFilterState)
     }
     
     /**
