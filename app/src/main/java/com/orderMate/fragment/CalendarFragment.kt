@@ -523,11 +523,6 @@ class CalendarFragment : Fragment() {
                     currentDate.time = date
                 }
                 
-                // Restore highlighted dates from shared state
-                val restoredHighlightedDates = sharedFilterViewModel.highlightedDates.value ?: emptyList()
-                highlightedDates = restoredHighlightedDates
-                Log.d(TAG, "[$fragmentId] loadOrders restored ${highlightedDates.size} highlighted dates")
-                
                 // Restore view mode from shared state
                 sharedFilterViewModel.calendarViewMode.value?.let { mode ->
                     currentViewMode = mode
