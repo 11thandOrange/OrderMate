@@ -51,6 +51,10 @@ object OrderSearchFilter {
             if (email.contains(lowerQuery) || phone.contains(lowerQuery)) return true
         } catch (e: Exception) { }
 
+        // Order-level note (ORDER widgets like Pickup Date, Order Type, etc.)
+        val orderNote = order.note?.lowercase() ?: ""
+        if (orderNote.contains(lowerQuery)) return true
+
         // Line item notes and names
         val lineItemMatch = order.lineItems?.any { lineItem ->
             val note = lineItem?.note?.lowercase() ?: ""
