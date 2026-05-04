@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -67,6 +68,7 @@ import java.util.Locale
 class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     companion object {
+        private const val TAG = "ListFragment_DEBUG"
         private var instance: OrderListRedesignFragment? = null
         
         fun getInstance(): OrderListRedesignFragment {
@@ -82,6 +84,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     private var _binding: FragmentOrderListRedesignBinding? = null
     private val binding get() = _binding!!
+    
+    // Debug: Track fragment instance ID for logging
+    private val fragmentId = System.identityHashCode(this).toString(16)
 
     // Filter data
     private var orderPaymentStatusType: MutableSet<String> = mutableSetOf(Constants.all_orders)
@@ -120,9 +125,20 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     // Current filter state for dialog (synced with shared ViewModel)
     private var currentFilterState = FilterDialogFragment.FilterState()
     private var currentSearchQuery = ""
+    
+    private fun logDebug(message: String) {
+        Log.d(TAG, "[$fragmentId] $message | isAdded=$isAdded, binding=${_binding != null}, view=${view != null}")
+    }
+    
+    private fun logFilterState(prefix: String) {
+        val dateCount = currentFilterState.dateSelections.values.sumOf { it.size }
+        val selectionCount = currentFilterState.selections.values.sumOf { it.size }
+        Log.d(TAG, "[$fragmentId] $prefix | dates=$dateCount, selections=$selectionCount, search='$currentSearchQuery'")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "[$fragmentId] onCreate")
         instance = this
     }
 
@@ -131,12 +147,14 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.d(TAG, "[$fragmentId] onCreateView - inflating binding")
         _binding = FragmentOrderListRedesignBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "[$fragmentId] onViewCreated - setting up UI")
         initializeRecyclerView()
         setupClickListeners()
         setupSearchListener()
@@ -144,6 +162,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         
         // Sync widgets from Firebase and refresh adapter to ensure pills display on first load
         WidgetManager.getInstance(requireContext()).reloadAll {
+            Log.d(TAG, "[$fragmentId] WidgetManager.reloadAll callback - isAdded=$isAdded")
             activity?.runOnUiThread { orderAdapter?.notifyDataSetChanged() }
         }
     }
@@ -153,25 +172,39 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
      * Restores state when navigating back to this tab
      */
     private fun observeSharedState() {
+        Log.d(TAG, "[$fragmentId] observeSharedState - setting up observers")
+        
         // Observe filter state - update pills and apply if orders loaded
         sharedFilterViewModel.filterState.observe(viewLifecycleOwner) { state ->
+            val dateCount = state.dateSelections.values.sumOf { it.size }
+            Log.d(TAG, "[$fragmentId] OBSERVER filterState fired | dateCount=$dateCount, isAdded=$isAdded, binding=${_binding != null}")
+            
             // Skip if state hasn't changed (prevents flash on back navigation)
             if (state == currentFilterState) {
+                Log.d(TAG, "[$fragmentId] filterState unchanged, skipping")
                 return@observe
             }
             currentFilterState = state
+            logFilterState("filterState updated")
+            
             // Always update pills for visual consistency
             if (_binding != null) {
+                Log.d(TAG, "[$fragmentId] Updating filter pills")
                 updateFilterPills(state)
+            } else {
+                Log.w(TAG, "[$fragmentId] WARNING: _binding is null in filterState observer!")
             }
             // Only apply filters if orders are loaded
             if (allItemList.isNotEmpty()) {
+                Log.d(TAG, "[$fragmentId] Applying dialog filters (orders loaded: ${allItemList.size})")
                 applyDialogFilters(state)
             }
         }
         
         // Observe search query
         sharedFilterViewModel.searchQuery.observe(viewLifecycleOwner) { query ->
+            Log.d(TAG, "[$fragmentId] OBSERVER searchQuery fired | query='$query', isAdded=$isAdded, binding=${_binding != null}")
+            
             if (query != currentSearchQuery) {
                 currentSearchQuery = query
                 // Update search input without triggering listener
@@ -184,12 +217,15 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                     }
                     // Update search pill
                     updateSearchPill(query)
+                } else {
+                    Log.w(TAG, "[$fragmentId] WARNING: _binding is null in searchQuery observer!")
                 }
             }
         }
         
         // Observe refresh trigger (e.g., after order deletion)
-        sharedFilterViewModel.refreshTrigger.observe(viewLifecycleOwner) { _ ->
+        sharedFilterViewModel.refreshTrigger.observe(viewLifecycleOwner) { trigger ->
+            Log.d(TAG, "[$fragmentId] OBSERVER refreshTrigger fired | trigger=$trigger")
             // Refresh order list when triggered
             if (allItemList.isNotEmpty() || orderItems.isNotEmpty()) {
                 loadOrders()
@@ -201,6 +237,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
      * Update search pill visibility and text based on search query
      */
     private fun updateSearchPill(query: String) {
+        Log.d(TAG, "[$fragmentId] updateSearchPill | query='$query', binding=${_binding != null}")
         if (query.isNotBlank()) {
             binding.header.searchPillContainer.showView()
             binding.header.searchPillText.text = query
@@ -211,6 +248,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     override fun onStart() {
         super.onStart()
+        Log.d(TAG, "[$fragmentId] onStart")
         if (orderItems.isEmpty()) {
             loadOrders()
         }
@@ -224,8 +262,16 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     override fun onDestroyView() {
+        Log.d(TAG, "[$fragmentId] onDestroyView - nullifying binding")
+        logFilterState("onDestroyView state")
+        handler.removeCallbacksAndMessages(null) // Cancel pending search runnables
         super.onDestroyView()
         _binding = null
+    }
+    
+    override fun onDestroy() {
+        Log.d(TAG, "[$fragmentId] onDestroy")
+        super.onDestroy()
     }
 
     // ==================== Initialization ====================
@@ -332,9 +378,11 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun loadOrders(onComplete: (() -> Unit)? = null) {
+        Log.d(TAG, "[$fragmentId] loadOrders START")
         showLoading(true)
         
         runOnBackgroundThread {
+            Log.d(TAG, "[$fragmentId] loadOrders BACKGROUND THREAD START | isAdded=$isAdded")
             // Fetch data on background thread into temporary list
             val tempOrders = ArrayList<Order?>()
             var fetchError: Exception? = null
@@ -344,12 +392,22 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 orderData?.forEach {
                     tempOrders.add(it)
                 }
+                Log.d(TAG, "[$fragmentId] loadOrders fetched ${tempOrders.size} orders")
             } catch (e: Exception) {
                 e.printStackTrace()
                 fetchError = e
+                Log.e(TAG, "[$fragmentId] loadOrders ERROR: ${e.message}")
             }
 
             runOnMainThread {
+                Log.d(TAG, "[$fragmentId] loadOrders MAIN THREAD CALLBACK | isAdded=$isAdded, binding=${_binding != null}")
+                
+                // Safety check before accessing fragment state
+                if (!isAdded || _binding == null) {
+                    Log.w(TAG, "[$fragmentId] loadOrders MAIN THREAD - Fragment not attached or binding null, aborting!")
+                    return@runOnMainThread
+                }
+                
                 // All list modifications on main thread to avoid RecyclerView inconsistency
                 if (fetchError != null) {
                     debugSnackBar(getString(R.string.there_is_issue_with_your_account))
@@ -364,11 +422,16 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 
                 // Apply any pending shared state after orders are loaded
                 val sharedState = sharedFilterViewModel.filterState.value
+                val dateCount = sharedState?.dateSelections?.values?.sumOf { it.size } ?: 0
+                Log.d(TAG, "[$fragmentId] loadOrders checking shared state | hasFilters=${sharedState?.hasActiveFilters()}, dateCount=$dateCount")
+                
                 if (sharedState != null && sharedState.hasActiveFilters()) {
                     currentFilterState = sharedState
+                    Log.d(TAG, "[$fragmentId] loadOrders applying dialog filters")
                     applyDialogFilters(sharedState)
                 } else if (currentSearchQuery.isNotEmpty()) {
                     // No dialog filters but search is active - apply search filter
+                    Log.d(TAG, "[$fragmentId] loadOrders applying search: '$currentSearchQuery'")
                     searchOrders(currentSearchQuery)
                 } else {
                     updateResultsInfo()
@@ -410,13 +473,30 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     // ==================== Search ====================
 
     private fun searchOrders(query: String?) {
+        Log.d(TAG, "[$fragmentId] searchOrders START | query='$query', isAdded=$isAdded")
+        logFilterState("searchOrders filter state")
+        
         runOnBackgroundThread(Dispatchers.Default) {
+            Log.d(TAG, "[$fragmentId] searchOrders BACKGROUND THREAD | isAdded=$isAdded")
+            
+            // Safety check - get context safely
+            val ctx = context
+            if (ctx == null) {
+                Log.e(TAG, "[$fragmentId] searchOrders BACKGROUND - context is NULL, aborting!")
+                return@runOnBackgroundThread
+            }
+            
             // Use shared filter+search function for consistent behavior with Calendar page
             // Filter into temporary list on background thread
             val tempResults = ArrayList<Order?>()
-            tempResults.addAll(OrderFilterUtils.filterAndSearchOrders(
-                allItemList, currentFilterState, query ?: "", requireContext()
-            ))
+            try {
+                tempResults.addAll(OrderFilterUtils.filterAndSearchOrders(
+                    allItemList, currentFilterState, query ?: "", ctx
+                ))
+                Log.d(TAG, "[$fragmentId] searchOrders filtered to ${tempResults.size} results")
+            } catch (e: Exception) {
+                Log.e(TAG, "[$fragmentId] searchOrders ERROR during filter: ${e.message}", e)
+            }
 
             // If no results and query looks like order ID, try direct lookup
             if (tempResults.isEmpty() && !query.isNullOrEmpty() && query.length > 7) {
@@ -429,6 +509,14 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             }
 
             runOnMainThread {
+                Log.d(TAG, "[$fragmentId] searchOrders MAIN THREAD CALLBACK | isAdded=$isAdded, binding=${_binding != null}")
+                
+                // Safety check before modifying UI
+                if (!isAdded || _binding == null) {
+                    Log.w(TAG, "[$fragmentId] searchOrders MAIN THREAD - Fragment not attached or binding null, aborting!")
+                    return@runOnMainThread
+                }
+                
                 // All list modifications on main thread to avoid RecyclerView inconsistency
                 orderItems.clear()
                 orderItems.addAll(tempResults)
@@ -620,15 +708,41 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun applyDialogFilters(filters: FilterDialogFragment.FilterState) {
+        val dateCount = filters.dateSelections.values.sumOf { it.size }
+        val selectionCount = filters.selections.values.sumOf { it.size }
+        Log.d(TAG, "[$fragmentId] applyDialogFilters START | dates=$dateCount, selections=$selectionCount, isAdded=$isAdded")
+        
         runOnBackgroundThread {
+            Log.d(TAG, "[$fragmentId] applyDialogFilters BACKGROUND THREAD | isAdded=$isAdded")
+            
+            // Safety check - get context safely
+            val ctx = context
+            if (ctx == null) {
+                Log.e(TAG, "[$fragmentId] applyDialogFilters BACKGROUND - context is NULL, aborting!")
+                return@runOnBackgroundThread
+            }
+            
             // Use shared filter+search function for consistent behavior with Calendar page
-            val results = OrderFilterUtils.filterAndSearchOrders(
-                allItemList, filters, currentSearchQuery, requireContext()
-            )
-            orderItems.clear()
-            orderItems.addAll(results)
+            try {
+                val results = OrderFilterUtils.filterAndSearchOrders(
+                    allItemList, filters, currentSearchQuery, ctx
+                )
+                orderItems.clear()
+                orderItems.addAll(results)
+                Log.d(TAG, "[$fragmentId] applyDialogFilters filtered to ${results.size} results")
+            } catch (e: Exception) {
+                Log.e(TAG, "[$fragmentId] applyDialogFilters ERROR: ${e.message}", e)
+            }
 
             runOnMainThread {
+                Log.d(TAG, "[$fragmentId] applyDialogFilters MAIN THREAD CALLBACK | isAdded=$isAdded, binding=${_binding != null}")
+                
+                // Safety check before modifying UI
+                if (!isAdded || _binding == null) {
+                    Log.w(TAG, "[$fragmentId] applyDialogFilters MAIN THREAD - Fragment not attached or binding null, aborting!")
+                    return@runOnMainThread
+                }
+                
                 updateResultsInfo()
                 notifyAdapter()
                 updateEmptyState()

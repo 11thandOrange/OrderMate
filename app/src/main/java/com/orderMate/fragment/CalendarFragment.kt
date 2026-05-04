@@ -3,6 +3,7 @@ package com.orderMate.fragment
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -72,6 +73,9 @@ class CalendarFragment : Fragment() {
     private var currentDate: Calendar = Calendar.getInstance()
     private var currentViewMode: String = "month"
     
+    // Debug: Track fragment instance ID for logging
+    private val fragmentId = System.identityHashCode(this).toString(16)
+    
     // Shared ViewModel for filter/search state persistence across tabs
     private val sharedFilterViewModel: SharedFilterViewModel by activityViewModels()
     
@@ -133,17 +137,34 @@ class CalendarFragment : Fragment() {
     private var searchPillText: TextView? = null
     private var searchPillClose: View? = null
     
+    private fun logDebug(message: String) {
+        Log.d(TAG, "[$fragmentId] $message | isAdded=$isAdded, view=${view != null}")
+    }
+    
+    private fun logFilterState(prefix: String) {
+        val dateCount = currentFilterState.dateSelections.values.sumOf { it.size }
+        val selectionCount = currentFilterState.selections.values.sumOf { it.size }
+        Log.d(TAG, "[$fragmentId] $prefix | dates=$dateCount, selections=$selectionCount, search='$currentSearchQuery', highlighted=${highlightedDates.size}")
+    }
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d(TAG, "[$fragmentId] onCreate")
+    }
+    
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d(TAG, "[$fragmentId] onCreateView - inflating layout")
         calendarManager = CalendarManager(requireContext())
         return inflater.inflate(R.layout.fragment_calendar_redesign, container, false)
     }
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "[$fragmentId] onViewCreated - setting up UI")
         initViews(view)
         setupHeaderActions()
         setupSearchListener()
@@ -155,6 +176,7 @@ class CalendarFragment : Fragment() {
         
         // Sync widgets from Firebase and refresh calendar to ensure pills display on first load
         WidgetManager.getInstance(requireContext()).reloadAll {
+            Log.d(TAG, "[$fragmentId] WidgetManager.reloadAll callback - isAdded=$isAdded")
             activity?.runOnUiThread {
                 if (allOrders.isNotEmpty()) {
                     allEvents = convertOrdersToEvents(allOrders)
@@ -163,6 +185,18 @@ class CalendarFragment : Fragment() {
                 }
             }
         }
+    }
+    
+    override fun onDestroyView() {
+        Log.d(TAG, "[$fragmentId] onDestroyView - cleaning up")
+        logFilterState("onDestroyView state")
+        handler.removeCallbacksAndMessages(null) // Cancel pending search runnables
+        super.onDestroyView()
+    }
+    
+    override fun onDestroy() {
+        Log.d(TAG, "[$fragmentId] onDestroy")
+        super.onDestroy()
     }
     
     private fun initViews(view: View) {
@@ -209,23 +243,36 @@ class CalendarFragment : Fragment() {
      * Restores state when navigating back to this tab
      */
     private fun observeSharedState() {
+        Log.d(TAG, "[$fragmentId] observeSharedState - setting up observers")
+        
         // Observe filter state - update pills and apply if orders loaded
         sharedFilterViewModel.filterState.observe(viewLifecycleOwner) { state ->
+            val dateCount = state.dateSelections.values.sumOf { it.size }
+            Log.d(TAG, "[$fragmentId] OBSERVER filterState fired | dateCount=$dateCount, isAdded=$isAdded, view=${view != null}")
+            
             // Skip if state hasn't changed (prevents flash on back navigation)
             if (state == currentFilterState) {
+                Log.d(TAG, "[$fragmentId] filterState unchanged, skipping")
                 return@observe
             }
             currentFilterState = state
+            logFilterState("filterState updated")
+            
             // Always update pills for visual consistency
+            Log.d(TAG, "[$fragmentId] Updating filter pills")
             updateFilterPills(state)
+            
             // Apply filters if orders are loaded (same pattern as List page)
             if (ordersLoaded && allOrders.isNotEmpty()) {
+                Log.d(TAG, "[$fragmentId] Applying filters sync (orders loaded: ${allOrders.size})")
                 applyFiltersSync(state)
             }
         }
         
         // Observe search query
         sharedFilterViewModel.searchQuery.observe(viewLifecycleOwner) { query ->
+            Log.d(TAG, "[$fragmentId] OBSERVER searchQuery fired | query='$query', isAdded=$isAdded, view=${view != null}")
+            
             if (query != currentSearchQuery) {
                 currentSearchQuery = query
                 // Update search input without triggering listener
@@ -239,6 +286,7 @@ class CalendarFragment : Fragment() {
                 updateSearchPill(query)
                 // Apply search if orders are loaded
                 if (ordersLoaded && allOrders.isNotEmpty()) {
+                    Log.d(TAG, "[$fragmentId] Applying search: '$query'")
                     searchOrders(query)
                 }
             }
@@ -246,12 +294,14 @@ class CalendarFragment : Fragment() {
         
         // Observe highlighted dates (affects view mode buttons)
         sharedFilterViewModel.highlightedDates.observe(viewLifecycleOwner) { dates ->
+            Log.d(TAG, "[$fragmentId] OBSERVER highlightedDates fired | count=${dates.size}, isAdded=$isAdded")
             highlightedDates = dates
             updateViewModeButtonsState()
         }
         
         // Observe calendar view mode (persists across navigation)
         sharedFilterViewModel.calendarViewMode.observe(viewLifecycleOwner) { mode ->
+            Log.d(TAG, "[$fragmentId] OBSERVER calendarViewMode fired | mode=$mode, isAdded=$isAdded")
             if (mode != currentViewMode) {
                 currentViewMode = mode
                 updateViewModeButtonVisuals(mode)
@@ -267,6 +317,14 @@ class CalendarFragment : Fragment() {
      * Update view mode button visuals without triggering renderCalendar
      */
     private fun updateViewModeButtonVisuals(mode: String) {
+        Log.d(TAG, "[$fragmentId] updateViewModeButtonVisuals | mode=$mode, isAdded=$isAdded")
+        
+        // Safety check
+        if (!isAdded || context == null) {
+            Log.w(TAG, "[$fragmentId] updateViewModeButtonVisuals - not attached, skipping!")
+            return
+        }
+        
         val inactiveColor = ContextCompat.getColor(requireContext(), R.color.text_muted)
         val activeColor = ContextCompat.getColor(requireContext(), R.color.text_primary)
         
@@ -420,9 +478,11 @@ class CalendarFragment : Fragment() {
      * Load orders from Clover (same as List tab)
      */
     private fun loadOrders(onComplete: (() -> Unit)? = null) {
+        Log.d(TAG, "[$fragmentId] loadOrders START")
         ordersLoaded = false
         
         runOnBackgroundThread {
+            Log.d(TAG, "[$fragmentId] loadOrders BACKGROUND THREAD START | isAdded=$isAdded")
             // Build temp lists on background thread to avoid RecyclerView inconsistency
             val tempAllOrders = ArrayList<Order?>()
             val tempFilteredOrders = ArrayList<Order?>()
@@ -437,14 +497,25 @@ class CalendarFragment : Fragment() {
                     tempFilteredOrders.add(it)
                 }
                 
+                Log.d(TAG, "[$fragmentId] loadOrders fetched ${tempAllOrders.size} orders")
+                
                 // Convert orders to events for calendar display
                 tempAllEvents = convertOrdersToEvents(tempAllOrders)
                 tempFilteredEvents = tempAllEvents
             } catch (e: Exception) {
+                Log.e(TAG, "[$fragmentId] loadOrders ERROR: ${e.message}", e)
                 e.printStackTrace()
             }
 
             runOnMainThread {
+                Log.d(TAG, "[$fragmentId] loadOrders MAIN THREAD CALLBACK | isAdded=$isAdded, view=${view != null}")
+                
+                // Safety check before accessing fragment state
+                if (!isAdded || view == null) {
+                    Log.w(TAG, "[$fragmentId] loadOrders MAIN THREAD - Fragment not attached or view null, aborting!")
+                    return@runOnMainThread
+                }
+                
                 // All list modifications on main thread to avoid RecyclerView inconsistency
                 allOrders.clear()
                 allOrders.addAll(tempAllOrders)
@@ -463,6 +534,7 @@ class CalendarFragment : Fragment() {
                 // Restore highlighted dates from shared state
                 val restoredHighlightedDates = sharedFilterViewModel.highlightedDates.value ?: emptyList()
                 highlightedDates = restoredHighlightedDates
+                Log.d(TAG, "[$fragmentId] loadOrders restored ${highlightedDates.size} highlighted dates")
                 
                 // Restore view mode from shared state
                 sharedFilterViewModel.calendarViewMode.value?.let { mode ->
@@ -474,8 +546,12 @@ class CalendarFragment : Fragment() {
                 
                 // Apply any pending shared state after orders are loaded
                 val sharedState = sharedFilterViewModel.filterState.value
+                val dateCount = sharedState?.dateSelections?.values?.sumOf { it.size } ?: 0
+                Log.d(TAG, "[$fragmentId] loadOrders checking shared state | hasFilters=${sharedState?.hasActiveFilters()}, dateCount=$dateCount")
+                
                 if (sharedState != null && sharedState.hasActiveFilters()) {
                     currentFilterState = sharedState
+                    Log.d(TAG, "[$fragmentId] loadOrders applying filters sync")
                     // applyFiltersSync handles pills and rendering
                     applyFiltersSync(sharedState)
                 } else {
@@ -492,14 +568,32 @@ class CalendarFragment : Fragment() {
      * Used to avoid race conditions with async operations
      */
     private fun applyFiltersSync(filters: FilterDialogFragment.FilterState) {
-        if (!isAdded || view == null) return  // Safety check
+        val dateCount = filters.dateSelections.values.sumOf { it.size }
+        Log.d(TAG, "[$fragmentId] applyFiltersSync START | dates=$dateCount, isAdded=$isAdded, view=${view != null}")
+        
+        if (!isAdded || view == null) {
+            Log.w(TAG, "[$fragmentId] applyFiltersSync - not attached, aborting!")
+            return  // Safety check
+        }
+        
+        // Safety check for context
+        val ctx = context
+        if (ctx == null) {
+            Log.e(TAG, "[$fragmentId] applyFiltersSync - context is NULL, aborting!")
+            return
+        }
         
         // Use shared filter+search function for consistent behavior with List page
-        val results = OrderFilterUtils.filterAndSearchOrders(
-            allOrders, filters, currentSearchQuery, requireContext()
-        )
-        filteredOrders.clear()
-        filteredOrders.addAll(results)
+        try {
+            val results = OrderFilterUtils.filterAndSearchOrders(
+                allOrders, filters, currentSearchQuery, ctx
+            )
+            filteredOrders.clear()
+            filteredOrders.addAll(results)
+            Log.d(TAG, "[$fragmentId] applyFiltersSync filtered to ${results.size} results")
+        } catch (e: Exception) {
+            Log.e(TAG, "[$fragmentId] applyFiltersSync ERROR: ${e.message}", e)
+        }
         
         // Convert to events - uses OrderDueDateResolver's 3-tier priority for due dates
         filteredEvents = convertOrdersToEvents(filteredOrders)
@@ -631,7 +725,19 @@ class CalendarFragment : Fragment() {
     private var highlightedDates: List<Date> = emptyList()
     
     private fun searchOrders(query: String?) {
+        Log.d(TAG, "[$fragmentId] searchOrders START | query='$query', isAdded=$isAdded")
+        logFilterState("searchOrders filter state")
+        
         runOnBackgroundThread {
+            Log.d(TAG, "[$fragmentId] searchOrders BACKGROUND THREAD | isAdded=$isAdded")
+            
+            // Safety check - get context safely
+            val ctx = context
+            if (ctx == null) {
+                Log.e(TAG, "[$fragmentId] searchOrders BACKGROUND - context is NULL, aborting!")
+                return@runOnBackgroundThread
+            }
+            
             // Parse dates from search query (matches HTML parseSearchDates)
             var tempHighlightedDates = if (!query.isNullOrEmpty()) {
                 OrderSearchFilter.parseSearchDates(query, currentDate.get(Calendar.YEAR))
@@ -647,20 +753,36 @@ class CalendarFragment : Fragment() {
                 }.sortedBy { it.time }
                 tempHighlightedDates = combined
             }
+            Log.d(TAG, "[$fragmentId] searchOrders parsed ${tempHighlightedDates.size} highlighted dates")
 
             // Use shared filter+search function for consistent behavior with List page
-            val results = OrderFilterUtils.filterAndSearchOrders(
-                allOrders, currentFilterState, query ?: "", requireContext()
-            )
+            var tempFilteredOrders = ArrayList<Order?>()
+            var tempFilteredEvents: List<ScheduledEvent> = emptyList()
             
-            // Build temp list on background thread
-            val tempFilteredOrders = ArrayList<Order?>()
-            tempFilteredOrders.addAll(results)
-            
-            // Convert filtered orders to events - uses OrderDueDateResolver's 3-tier priority
-            val tempFilteredEvents = convertOrdersToEvents(tempFilteredOrders)
+            try {
+                val results = OrderFilterUtils.filterAndSearchOrders(
+                    allOrders, currentFilterState, query ?: "", ctx
+                )
+                
+                // Build temp list on background thread
+                tempFilteredOrders.addAll(results)
+                Log.d(TAG, "[$fragmentId] searchOrders filtered to ${results.size} results")
+                
+                // Convert filtered orders to events - uses OrderDueDateResolver's 3-tier priority
+                tempFilteredEvents = convertOrdersToEvents(tempFilteredOrders)
+            } catch (e: Exception) {
+                Log.e(TAG, "[$fragmentId] searchOrders ERROR: ${e.message}", e)
+            }
 
             runOnMainThread {
+                Log.d(TAG, "[$fragmentId] searchOrders MAIN THREAD CALLBACK | isAdded=$isAdded, view=${view != null}")
+                
+                // Safety check before modifying UI
+                if (!isAdded || view == null) {
+                    Log.w(TAG, "[$fragmentId] searchOrders MAIN THREAD - Fragment not attached or view null, aborting!")
+                    return@runOnMainThread
+                }
+                
                 // All list modifications on main thread to avoid RecyclerView inconsistency
                 highlightedDates = tempHighlightedDates
                 filteredOrders.clear()
@@ -966,6 +1088,14 @@ class CalendarFragment : Fragment() {
     // ==================== Calendar Rendering ====================
     
     fun renderCalendar() {
+        Log.d(TAG, "[$fragmentId] renderCalendar START | isAdded=$isAdded, view=${view != null}, highlighted=${highlightedDates.size}, mode=$currentViewMode")
+        
+        // Safety check
+        if (!isAdded || view == null) {
+            Log.w(TAG, "[$fragmentId] renderCalendar - not attached, skipping!")
+            return
+        }
+        
         // Check if we have highlighted dates (matches HTML behavior)
         // When dates are highlighted/filtered, show those specific dates
         val hasHighlightedDates = highlightedDates.isNotEmpty()
@@ -980,12 +1110,14 @@ class CalendarFragment : Fragment() {
         when {
             highlightedDates.size > 1 -> {
                 // Multiple dates highlighted - show side-by-side view (matches HTML renderMultipleDaysView)
+                Log.d(TAG, "[$fragmentId] renderCalendar - rendering ${highlightedDates.size} highlighted dates view")
                 monthYearTitle?.text = "${highlightedDates.size} Selected Dates"
                 renderHighlightedDatesView()
             }
             highlightedDates.size == 1 -> {
                 // Single date highlighted - show day view for that date (matches HTML renderSingleHighlightedDay)
                 val highlightedDate = highlightedDates.first()
+                Log.d(TAG, "[$fragmentId] renderCalendar - rendering single highlighted date: $highlightedDate")
                 currentDate.time = highlightedDate
                 val dateFormat = SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault())
                 monthYearTitle?.text = dateFormat.format(highlightedDate)
@@ -993,6 +1125,7 @@ class CalendarFragment : Fragment() {
             }
             else -> {
                 // No highlighted dates - normal view mode
+                Log.d(TAG, "[$fragmentId] renderCalendar - rendering normal $currentViewMode view")
                 when (currentViewMode) {
                     "day" -> renderDayView()
                     "week" -> renderWeekView()
@@ -1990,7 +2123,7 @@ class CalendarFragment : Fragment() {
     }
     
     companion object {
-        const val TAG = "CalendarFragment"
+        private const val TAG = "CalendarFragment_DEBUG"
         
         fun newInstance(): CalendarFragment {
             return CalendarFragment()
