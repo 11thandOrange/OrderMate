@@ -304,8 +304,12 @@ object WidgetColorUtils {
             gravity = android.view.Gravity.CENTER_VERTICAL
             setPadding((10 * density).toInt(), (6 * density).toInt(), (6 * density).toInt(), (6 * density).toInt())
             
-            // Use consistent pill background styling
-            background = createPillBackground(tintColor, 12f, density)
+            // (#81 QA) Use original dark bg (#1AFFFFFF) with colored border
+            background = GradientDrawable().apply {
+                setColor(0x1AFFFFFF) // 10% white - original dark bg
+                cornerRadius = 12f * density
+                setStroke((1 * density).toInt(), tintColor) // colored border
+            }
             
             val params = android.view.ViewGroup.MarginLayoutParams(
                 android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -321,7 +325,7 @@ object WidgetColorUtils {
                 textSize = 12f
             })
 
-            // Remove button "×"
+            // Remove button "×" (colored)
             addView(TextView(context).apply {
                 this.text = "×"
                 setTextColor(tintColor)
