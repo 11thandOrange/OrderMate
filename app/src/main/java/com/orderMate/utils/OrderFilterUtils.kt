@@ -94,7 +94,7 @@ object OrderFilterUtils {
                         val widgetId = FilterCategoryBuilder.getWidgetId(categoryId) ?: continue
                         val widget = WidgetManager.getInstance(context).getWidgetById(widgetId) ?: continue
                         val orderValues = extractWidgetValues(order, widget)
-                        if (!selectedValues.any { it in orderValues }) return false
+miple,ke                        if (!selectedValues.any { it in orderValues }) return false
                     }
                 }
             }
@@ -144,34 +144,48 @@ object OrderFilterUtils {
      */
     private fun extractWidgetValues(order: Order, widget: WidgetConfig): Set<String> {
         return if (widget.level == NoteLevel.ORDER) {
-            extractValuesFromNote(order.note, widget.id)
+            extractValuesFromNote(order.note, widget.label)
         } else {
             // ITEM level - collect from all line items
             order.lineItems?.flatMap { lineItem ->
-                extractValuesFromNote(lineItem?.note, widget.id)
+                extractValuesFromNote(lineItem?.note, widget.label)
             }?.toSet() ?: emptySet()
         }
     }
 
     /**
      * Extract values for a specific widget from a note string.
-     * Note format: "[widgetId]Label: Value • [widgetId2]Label2: Value2"
+     * Matches by widget label (case-insensitive).
+     * Handles both formats:
+     * - Current: "Label: Value • Label2: Value2"
+     * - Legacy: "[widgetId]Label: Value • [widgetId2]Label2: Value2"
      */
-    private fun extractValuesFromNote(note: String?, widgetId: String): Set<String> {
+    private fun extractValuesFromNote(note: String?, widgetLabel: String): Set<String> {
         if (note.isNullOrBlank()) return emptySet()
         
         val values = mutableSetOf<String>()
-        // Match by widget ID in format [widgetId]label:value
-        val pattern = "\\[$widgetId\\][^:]*:([^•|]+)".toRegex()
+        val delimiter = if (note.contains("•")) "•" else "|"
+        val parts = note.split(delimiter).map { it.trim() }
         
-        pattern.findAll(note).forEach { match ->
-            val value = match.groupValues[1].trim()
-            if (value.isNotEmpty()) {
-                // Handle multi-select comma-separated values
-                value.split(",")
-                    .map { it.trim() }
-                    .filter { it.isNotEmpty() }
-                    .forEach { values.add(it) }
+        for (part in parts) {
+            val colonIndex = part.indexOf(':')
+            if (colonIndex > 0) {
+                var label = part.substring(0, colonIndex).trim()
+                val value = part.substring(colonIndex + 1).trim()
+                
+                // Handle legacy [widgetId]label format
+                if (label.startsWith("[") && label.contains("]")) {
+                    label = label.substring(label.indexOf(']') + 1)
+                }
+                
+                // Match by widget label (case-insensitive)
+                if (label.equals(widgetLabel, ignoreCase = true) && value.isNotBlank()) {
+                    // Handle multi-select comma-separated values
+                    value.split(",")
+                        .map { it.trim() }
+                        .filter { it.isNotEmpty() }
+                        .forEach { values.add(it) }
+                }
             }
         }
         return values
