@@ -565,13 +565,7 @@
                         android:paddingTop="12dp"
                         android:paddingBottom="12dp">
 
-                        <!-- (#81 QA) Divider above Order Date row -->
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#0DFFFFFF" />
-
-                        <!-- Order Date - matches HTML .detail-info-row -->
+                        <!-- Order Date (first row - no divider above) -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
