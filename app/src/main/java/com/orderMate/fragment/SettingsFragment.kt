@@ -1802,6 +1802,7 @@ class WidgetEditorAdapter(
         private val btnDeleteWidget: View = itemView.findViewById(R.id.btnDeleteWidget)
         
         private var currentWidgetTintColor: Int = 0xFFFFFFFF.toInt()
+        private var currentWidgetBorderColor: Int = 0xFFFFFFFF.toInt()
 
         fun bind(widget: PopUpWidget, position: Int) {
             widgetTitle.text = widget.label
@@ -1812,13 +1813,15 @@ class WidgetEditorAdapter(
             // Set icon and colors based on type - uses centralized WidgetColorUtils
             val iconRes = WidgetColorUtils.getIconForWidgetType(widget.type)
             val tintColor = WidgetColorUtils.getColorForWidgetType(widget.type)
+            val borderColor = WidgetColorUtils.getBgColorForWidgetType(widget.type)
             val bgRes = WidgetColorUtils.getIconBackgroundForWidgetType(widget.type)
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
             widgetIconContainer.setBackgroundResource(bgRes)
             
-            // Store tint color for value pills
+            // Store colors for value pills
             currentWidgetTintColor = tintColor
+            currentWidgetBorderColor = borderColor
 
             // Show options for select types
             val hasOptions = widget.type == WidgetType.SINGLE_SELECT || widget.type == WidgetType.MULTI_SELECT
@@ -1905,7 +1908,7 @@ class WidgetEditorAdapter(
         private fun createValueTag(text: String, onRemove: () -> Unit): View {
             // Use shared editable pill function for consistent styling
             return WidgetColorUtils.createEditableValuePill(
-                itemView.context, text, currentWidgetTintColor, onRemove
+                itemView.context, text, currentWidgetTintColor, currentWidgetBorderColor, onRemove
             )
         }
         
@@ -2009,6 +2012,7 @@ class FirebaseWidgetEditorAdapter(
         private val btnDeleteWidget: View = itemView.findViewById(R.id.btnDeleteWidget)
         
         private var currentWidgetTintColor: Int = 0xFFFFFFFF.toInt()
+        private var currentWidgetBorderColor: Int = 0xFFFFFFFF.toInt()
         private var saveHandler = android.os.Handler(android.os.Looper.getMainLooper())
         private var saveRunnable: Runnable? = null
         private var labelWatcher: TextWatcher? = null
@@ -2026,11 +2030,13 @@ class FirebaseWidgetEditorAdapter(
             // Set icon and colors based on type - uses centralized WidgetColorUtils
             val iconRes = WidgetColorUtils.getIconForWidgetType(widget.type)
             val tintColor = WidgetColorUtils.getColorForWidgetType(widget.type)
+            val borderColor = WidgetColorUtils.getBgColorForWidgetType(widget.type)
             val bgRes = WidgetColorUtils.getIconBackgroundForWidgetType(widget.type)
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
             widgetIconContainer.setBackgroundResource(bgRes)
             currentWidgetTintColor = tintColor
+            currentWidgetBorderColor = borderColor
 
             // Show/hide options for select types
             val hasOptions = widget.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
@@ -2135,7 +2141,7 @@ class FirebaseWidgetEditorAdapter(
         private fun createValuePill(text: String, density: Float, onRemove: () -> Unit): LinearLayout {
             // Use shared editable pill function for consistent styling
             return WidgetColorUtils.createEditableValuePill(
-                itemView.context, text, currentWidgetTintColor, onRemove
+                itemView.context, text, currentWidgetTintColor, currentWidgetBorderColor, onRemove
             )
         }
         

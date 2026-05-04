@@ -44,11 +44,17 @@ object WidgetColorUtils {
     // Dark container background color (matches filter modal bg_dialog.xml)
     const val COLOR_PILL_CONTAINER = 0xCC292D3E.toInt()
     
-    // Widget type colors (full opacity)
+    // Widget type colors - ICON (lighter shade)
     const val COLOR_CALENDAR = 0xFF64B5F6.toInt()      // Blue
     const val COLOR_SINGLE_SELECT = 0xFFCE93D8.toInt() // Purple
     const val COLOR_MULTI_SELECT = 0xFF81C784.toInt()  // Green
     const val COLOR_TEXT_BOX = 0xFFA1887F.toInt()      // Brown
+    
+    // Widget type colors - BACKGROUND (darker shade, matches bg_widget_icon_*.xml)
+    const val BG_COLOR_CALENDAR = 0xFF1976D2.toInt()      // Dark Blue
+    const val BG_COLOR_SINGLE_SELECT = 0xFF7B1FA2.toInt() // Dark Purple
+    const val BG_COLOR_MULTI_SELECT = 0xFF388E3C.toInt()  // Dark Green
+    const val BG_COLOR_TEXT_BOX = 0xFFF57C00.toInt()      // Dark Orange
     
     // Clover filter colors
     const val COLOR_PAYMENT_STATUS = 0xFFFFB74D.toInt()  // Yellow
@@ -66,6 +72,19 @@ object WidgetColorUtils {
             WidgetType.SINGLE_SELECT -> COLOR_SINGLE_SELECT
             WidgetType.MULTI_SELECT -> COLOR_MULTI_SELECT
             WidgetType.TEXT_BOX -> COLOR_TEXT_BOX
+        }
+    }
+    
+    /**
+     * Get background color (darker shade) for a widget type
+     * Used for editable pill borders in Settings tabs
+     */
+    fun getBgColorForWidgetType(type: WidgetType): Int {
+        return when (type) {
+            WidgetType.CALENDAR -> BG_COLOR_CALENDAR
+            WidgetType.SINGLE_SELECT -> BG_COLOR_SINGLE_SELECT
+            WidgetType.MULTI_SELECT -> BG_COLOR_MULTI_SELECT
+            WidgetType.TEXT_BOX -> BG_COLOR_TEXT_BOX
         }
     }
     
@@ -105,6 +124,19 @@ object WidgetColorUtils {
             com.orderMate.utils.WidgetType.SINGLE_SELECT -> COLOR_SINGLE_SELECT
             com.orderMate.utils.WidgetType.MULTI_SELECT -> COLOR_MULTI_SELECT
             com.orderMate.utils.WidgetType.TEXT_BOX -> COLOR_TEXT_BOX
+        }
+    }
+    
+    /**
+     * Get background color (darker shade) for utils WidgetType
+     * Overload for compatibility with com.orderMate.utils.WidgetType
+     */
+    fun getBgColorForWidgetType(type: com.orderMate.utils.WidgetType): Int {
+        return when (type) {
+            com.orderMate.utils.WidgetType.CALENDAR -> BG_COLOR_CALENDAR
+            com.orderMate.utils.WidgetType.SINGLE_SELECT -> BG_COLOR_SINGLE_SELECT
+            com.orderMate.utils.WidgetType.MULTI_SELECT -> BG_COLOR_MULTI_SELECT
+            com.orderMate.utils.WidgetType.TEXT_BOX -> BG_COLOR_TEXT_BOX
         }
     }
     
@@ -283,11 +315,12 @@ object WidgetColorUtils {
     /**
      * Create an editable value pill for popup tabs (Item Level & Order Level).
      * Shows text + colored "×" remove button.
-     * Uses consistent styling: dark container + colored border.
+     * Uses consistent styling: dark container + darker shade border.
      * 
      * @param context Context
      * @param text The value text to display
-     * @param tintColor Widget color for border and remove button
+     * @param tintColor Widget icon color (lighter) for X button
+     * @param borderColor Widget bg color (darker) for border
      * @param onRemove Callback when remove button is clicked
      * @return LinearLayout pill with text and remove button
      */
@@ -295,6 +328,7 @@ object WidgetColorUtils {
         context: Context,
         text: String,
         tintColor: Int,
+        borderColor: Int,
         onRemove: () -> Unit
     ): LinearLayout {
         val density = context.resources.displayMetrics.density
@@ -304,11 +338,11 @@ object WidgetColorUtils {
             gravity = android.view.Gravity.CENTER_VERTICAL
             setPadding((10 * density).toInt(), (6 * density).toInt(), (6 * density).toInt(), (6 * density).toInt())
             
-            // (#81 QA) Use original dark bg (#1AFFFFFF) with colored border
+            // (#81 QA) Dark bg with darker shade border
             background = GradientDrawable().apply {
                 setColor(0x1AFFFFFF) // 10% white - original dark bg
                 cornerRadius = 12f * density
-                setStroke((1 * density).toInt(), tintColor) // colored border
+                setStroke((1 * density).toInt(), borderColor) // darker shade border
             }
             
             val params = android.view.ViewGroup.MarginLayoutParams(
