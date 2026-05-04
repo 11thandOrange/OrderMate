@@ -132,10 +132,23 @@ fun formatPaymentState(state: String?): String {
 /**
  * (#76) Gets the payment state string from an Order with correct fallback.
  * Single source of truth for extracting payment state from orders.
- * Falls back to "OPEN" when paymentState is null.
+ * 
+ * Fallback logic:
+ * - If paymentState is available, use it
+ * - If paymentState is null but order.state is "locked" (closed), infer "PAID"
+ *   (Clover requires payment to close an order)
+ * - Otherwise fall back to "OPEN"
  */
 fun getPaymentStateFromOrder(order: Order?): String {
-    return order?.paymentState?.name ?: "OPEN"
+    // Use paymentState if available
+    order?.paymentState?.name?.let { return it }
+    
+    // Infer PAID from closed order state (Clover requires payment to close)
+    if (order?.state == "locked") {
+        return "PAID"
+    }
+    
+    return "OPEN"
 }
 
 /**
@@ -198,8 +211,8 @@ fun formatOrderStateTitleCase(state: String?): String {
 }
 
 fun Context.getThePaymentState(order: Order?): String {
-    val state = order?.paymentState?.name ?: order?.state
-    return if (state != null) formatPaymentState(state) else getString(R.string.dash)
+    // Use the single source of truth function for payment state
+    return formatPaymentState(getPaymentStateFromOrder(order))
 }
 
 
