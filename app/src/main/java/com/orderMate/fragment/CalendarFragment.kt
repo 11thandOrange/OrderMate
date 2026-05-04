@@ -40,7 +40,9 @@ import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
 import com.orderMate.utils.formatPaymentState
+import com.orderMate.utils.formatPaymentStateTitleCase
 import com.orderMate.utils.formatOrderState
+import com.orderMate.utils.formatOrderStateTitleCase
 import com.orderMate.utils.showView
 import com.orderMate.utils.hideView
 import com.orderMate.modals.NoteLevel
@@ -943,11 +945,12 @@ class CalendarFragment : Fragment() {
     
     /**
      * Format filter values for display (consistent with List tab)
+     * (#81 QA) Use title case for Clover status pills in header
      */
     private fun formatFilterValue(categoryId: String, value: String): String {
         return when (categoryId) {
-            FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> formatPaymentState(value)
-            FilterCategoryBuilder.CLOVER_ORDER_STATUS -> formatOrderState(value)
+            FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> formatPaymentStateTitleCase(value)
+            FilterCategoryBuilder.CLOVER_ORDER_STATUS -> formatOrderStateTitleCase(value)
             else -> value
         }
     }

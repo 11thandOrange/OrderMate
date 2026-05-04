@@ -43,7 +43,9 @@ import com.orderMate.utils.runOnMainThread
 import com.orderMate.utils.SettingsManager
 import com.orderMate.utils.showView
 import com.orderMate.utils.formatPaymentState
+import com.orderMate.utils.formatPaymentStateTitleCase
 import com.orderMate.utils.formatOrderState
+import com.orderMate.utils.formatOrderStateTitleCase
 import com.orderMate.viewmodel.SharedFilterViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -797,12 +799,13 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         var hasPills = false
         
         // Add selection filters as pills
+        // (#81 QA) Use title case for Clover status pills in header
         filters.selections.forEach { (categoryId, values) ->
             values.forEach { value ->
                 hasPills = true
                 val displayValue = when (categoryId) {
-                    FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> formatPaymentState(value)
-                    FilterCategoryBuilder.CLOVER_ORDER_STATUS -> formatOrderState(value)
+                    FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> formatPaymentStateTitleCase(value)
+                    FilterCategoryBuilder.CLOVER_ORDER_STATUS -> formatOrderStateTitleCase(value)
                     else -> value
                 }
                 val pill = createFilterPillWithClose(displayValue) {
