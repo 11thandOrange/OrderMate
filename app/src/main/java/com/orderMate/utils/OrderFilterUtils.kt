@@ -94,11 +94,9 @@ object OrderFilterUtils {
                         val widget = WidgetManager.getInstance(context).getWidgetById(widgetId) ?: continue
                         val orderDateValues = extractWidgetValues(order, widget)
                         
-                        // Match date format used in notes (M/d/yy)
-                        val dateFormat = SimpleDateFormat("M/d/yy", Locale.getDefault())
+                        // Check multiple date formats that might be stored in notes
                         val matchesAny = dates.any { filterDate ->
-                            val dateStr = dateFormat.format(filterDate)
-                            orderDateValues.any { it.contains(dateStr) }
+                            matchesDateInValues(filterDate, orderDateValues)
                         }
                         if (!matchesAny) return false
                     }
@@ -164,5 +162,34 @@ object OrderFilterUtils {
         val cal2 = Calendar.getInstance().apply { time = date2 }
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+    }
+
+    /**
+     * Check if a filter date matches any value in the order's widget values.
+     * Tries multiple date formats to handle various storage formats.
+     * 
+     * Formats checked:
+     * - M/d (5/4) - without year
+     * - M/d/yy (5/4/26) - short year
+     * - M/d/yyyy (5/4/2026) - full year
+     * - MM/dd/yy (05/04/26) - zero-padded
+     * - MM/dd/yyyy (05/04/2026) - zero-padded full year
+     */
+    private fun matchesDateInValues(filterDate: Date, orderValues: Set<String>): Boolean {
+        val dateFormats = listOf(
+            SimpleDateFormat("M/d", Locale.getDefault()),      // 5/4
+            SimpleDateFormat("M/d/yy", Locale.getDefault()),   // 5/4/26
+            SimpleDateFormat("M/d/yyyy", Locale.getDefault()), // 5/4/2026
+            SimpleDateFormat("MM/dd/yy", Locale.getDefault()), // 05/04/26
+            SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()) // 05/04/2026
+        )
+        
+        for (format in dateFormats) {
+            val dateStr = format.format(filterDate)
+            if (orderValues.any { it.contains(dateStr) }) {
+                return true
+            }
+        }
+        return false
     }
 }
