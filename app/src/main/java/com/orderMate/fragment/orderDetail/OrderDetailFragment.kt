@@ -525,8 +525,18 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         container.visibility = View.VISIBLE
         val density = resources.displayMetrics.density
         
-        // (#81 QA) Add divider AFTER each row, not before
+        // (#81 QA) Add divider BEFORE each row (last row has no trailing divider)
         parsedValues.entries.forEachIndexed { index, (widget, value) ->
+            // Add divider BEFORE each row
+            val divider = View(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    (1 * density).toInt()
+                )
+                setBackgroundColor(0x0DFFFFFF)
+            }
+            container.addView(divider)
+            
             // Create row layout
             val rowLayout = LinearLayout(requireContext()).apply {
                 orientation = LinearLayout.HORIZONTAL
@@ -563,16 +573,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             rowLayout.addView(labelView)
             rowLayout.addView(valueView)
             container.addView(rowLayout)
-            
-            // Add divider AFTER each row
-            val divider = View(requireContext()).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    (1 * density).toInt()
-                )
-                setBackgroundColor(0x0DFFFFFF)
-            }
-            container.addView(divider)
+            // No divider after last row - Employee row's divider handles separation
         }
     }
     

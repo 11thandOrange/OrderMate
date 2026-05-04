@@ -565,8 +565,13 @@
                         android:paddingTop="12dp"
                         android:paddingBottom="12dp">
 
+                        <!-- (#81 QA) Divider above Order Date row -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#0DFFFFFF" />
+
                         <!-- Order Date - matches HTML .detail-info-row -->
-                        <!-- padding: 12px 0, border-bottom: 1px solid rgba(255,255,255,0.05) -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -630,6 +635,7 @@
                         </LinearLayout>
                         
                         <!-- Task 21: Dynamic Widget Rows Container - renders CALENDAR and TEXT_BOX widgets -->
+                        <!-- (#81 QA) Dividers are added programmatically BEFORE each row -->
                         <LinearLayout
                             android:id="@+id/dynamicWidgetRowsContainer"
                             android:layout_width="match_parent"
@@ -637,7 +643,14 @@
                             android:orientation="vertical"
                             android:visibility="gone" />
 
-                        <!-- Employee -->
+                        <!-- (#81 QA) Divider above Employee row -->
+                        <View
+                            android:id="@+id/employeeDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#0DFFFFFF" />
+
+                        <!-- Employee (last row - no divider below) -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

@@ -147,7 +147,7 @@
                 android:id="@+id/customerRowDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/divider_color"/>
+                android:background="#1AFFFFFF"/>
 
             <!-- Due Date Row -->
             <LinearLayout
@@ -198,7 +198,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/divider_color"/>
+                android:background="#1AFFFFFF"/>
 
             <!-- Total Row -->
             <LinearLayout
@@ -249,7 +249,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/divider_color"/>
+                android:background="#1AFFFFFF"/>
 
             <!-- Items Row -->
             <LinearLayout
