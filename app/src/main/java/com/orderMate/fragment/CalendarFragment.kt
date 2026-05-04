@@ -31,6 +31,7 @@ import com.orderMate.utils.FilterCategoryBuilder
 import com.orderMate.utils.getPaymentStateFromOrder
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.OrderDueDateResolver
+import com.orderMate.utils.OrderFilterUtils
 import com.orderMate.utils.OrderNoteParser
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.OrderSearchFilter
@@ -209,13 +210,18 @@ class CalendarFragment : Fragment() {
      */
     private fun observeSharedState() {
         // Observe filter state - update pills and apply if orders loaded
-        // Note: Initial filter application is handled by loadOrders() to avoid race conditions
         sharedFilterViewModel.filterState.observe(viewLifecycleOwner) { state ->
+            // Skip if state hasn't changed (prevents flash on back navigation)
+            if (state == currentFilterState) {
+                return@observe
+            }
             currentFilterState = state
             // Always update pills for visual consistency
             updateFilterPills(state)
-            // Don't apply filters here during initial load - loadOrders handles that
-            // Only apply for subsequent filter changes (when user interacts with filters)
+            // Apply filters if orders are loaded (same pattern as List page)
+            if (ordersLoaded && allOrders.isNotEmpty()) {
+                applyFiltersSync(state)
+            }
         }
         
         // Observe search query
@@ -231,6 +237,10 @@ class CalendarFragment : Fragment() {
                 }
                 // Update search pill
                 updateSearchPill(query)
+                // Apply search if orders are loaded
+                if (ordersLoaded && allOrders.isNotEmpty()) {
+                    searchOrders(query)
+                }
             }
         }
         
@@ -238,7 +248,6 @@ class CalendarFragment : Fragment() {
         sharedFilterViewModel.highlightedDates.observe(viewLifecycleOwner) { dates ->
             highlightedDates = dates
             updateViewModeButtonsState()
-            // Don't render here - the filter application will handle rendering
         }
         
         // Observe calendar view mode (persists across navigation)
@@ -246,7 +255,10 @@ class CalendarFragment : Fragment() {
             if (mode != currentViewMode) {
                 currentViewMode = mode
                 updateViewModeButtonVisuals(mode)
-                // Don't render here - wait for filter application or loadOrders
+                // Render calendar with new view mode if orders loaded
+                if (ordersLoaded) {
+                    renderCalendar()
+                }
             }
         }
     }
@@ -472,12 +484,16 @@ class CalendarFragment : Fragment() {
         
         filteredOrders.clear()
         
+        // Use shared filter utility for consistent behavior with List page
         allOrders.forEach { order ->
-            if (orderMatchesFilters(order, filters)) {
+            val filterMatch = OrderFilterUtils.orderMatchesFilters(order, filters, requireContext())
+            val searchMatch = currentSearchQuery.isEmpty() || OrderFilterUtils.orderMatchesSearch(order, currentSearchQuery)
+            if (filterMatch && searchMatch) {
                 filteredOrders.add(order)
             }
         }
         
+        // Convert to events - uses OrderDueDateResolver's 3-tier priority for due dates
         filteredEvents = convertOrdersToEvents(filteredOrders)
         
         // Update highlightedDates from filter state (all date filters, not just CLOVER_ORDER_DATE)
@@ -608,8 +624,6 @@ class CalendarFragment : Fragment() {
     
     private fun searchOrders(query: String?) {
         runOnBackgroundThread {
-            val isFilterApplied = currentFilterState.hasActiveFilters()
-            
             // Parse dates from search query (matches HTML parseSearchDates)
             highlightedDates = if (!query.isNullOrEmpty()) {
                 OrderSearchFilter.parseSearchDates(query, currentDate.get(Calendar.YEAR))
@@ -626,39 +640,23 @@ class CalendarFragment : Fragment() {
                 highlightedDates = combined
             }
 
-            if (query.isNullOrEmpty()) {
-                filteredOrders.clear()
-                if (isFilterApplied) {
-                    // Keep filtered results
-                } else {
-                    allOrders.forEach { filteredOrders.add(it) }
-                }
-            } else {
-                filteredOrders.clear()
-                val sourceList = allOrders
-                
-                for (order in sourceList) {
-                    if (matchesSearch(order, query.lowercase())) {
-                        filteredOrders.add(order)
-                    }
+            // Apply both search AND filters together using shared utility
+            filteredOrders.clear()
+            allOrders.forEach { order ->
+                val filterMatch = OrderFilterUtils.orderMatchesFilters(order, currentFilterState, requireContext())
+                val searchMatch = query.isNullOrEmpty() || OrderFilterUtils.orderMatchesSearch(order, query)
+                if (filterMatch && searchMatch) {
+                    filteredOrders.add(order)
                 }
             }
             
-            // Convert filtered orders to events
+            // Convert filtered orders to events - uses OrderDueDateResolver's 3-tier priority
             filteredEvents = convertOrdersToEvents(filteredOrders)
 
             runOnMainThread {
                 renderCalendar()
             }
         }
-    }
-    
-    /**
-     * Search matching logic (same as List tab)
-     */
-    private fun matchesSearch(order: Order?, query: String): Boolean {
-        // Use shared search logic
-        return OrderSearchFilter.matchesSearch(order, query)
     }
     
     /**
@@ -780,103 +778,8 @@ class CalendarFragment : Fragment() {
         applyFiltersSync(filters)
     }
     
-    /**
-     * Order filter matching logic (same as List tab)
-     */
-    private fun orderMatchesFilters(order: Order?, filters: FilterDialogFragment.FilterState): Boolean {
-        if (order == null) return false
-
-        for ((categoryId, selectedValues) in filters.selections) {
-            if (selectedValues.isEmpty()) continue
-            
-            when {
-                categoryId == FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> {
-                    val orderPayment = order.paymentState?.name ?: ""
-                    if (!selectedValues.contains(orderPayment)) return false
-                }
-                categoryId == FilterCategoryBuilder.CLOVER_ORDER_STATUS -> {
-                    val orderState = order.state?.lowercase() ?: ""
-                    if (!selectedValues.any { it.lowercase() == orderState }) return false
-                }
-                categoryId == FilterCategoryBuilder.CLOVER_PAYMENT_TYPE -> {
-                    val paymentTypes = order.payments?.mapNotNull { it?.tender?.label?.lowercase() } ?: emptyList()
-                    val selectedLower = selectedValues.map { it.lowercase() }
-                    if (!paymentTypes.any { it in selectedLower }) return false
-                }
-                categoryId == FilterCategoryBuilder.CLOVER_EMPLOYEE -> {
-                    val employeeName = try {
-                        order.employee?.jsonObject?.getString("name") ?: ""
-                    } catch (e: Exception) { "" }
-                    if (!selectedValues.contains(employeeName)) return false
-                }
-                FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
-                    val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
-                    val widget = WidgetManager.getInstance(requireContext()).getWidgetById(widgetId ?: "") ?: continue
-                    val orderValues = if (widget.level == NoteLevel.ORDER) {
-                        extractWidgetValuesFromOrderNote(order.note, widget.id)
-                    } else {
-                        extractWidgetValuesFromNotes(order.lineItems, widget.id)
-                    }
-                    if (!selectedValues.any { it in orderValues }) return false
-                }
-            }
-        }
-
-        for ((categoryId, dates) in filters.dateSelections) {
-            if (dates.isEmpty()) continue
-            
-            when {
-                categoryId == FilterCategoryBuilder.CLOVER_ORDER_DATE -> {
-                    val orderDate = order.createdTime?.let { Date(it) }
-                    if (orderDate == null) return false
-                    
-                    val matchesAny = dates.any { filterDate ->
-                        isSameDay(orderDate, filterDate)
-                    }
-                    if (!matchesAny) return false
-                }
-            }
-        }
-
-        return true
-    }
-    
-    private fun extractWidgetValuesFromNotes(lineItems: List<com.clover.sdk.v3.order.LineItem>?, widgetId: String): Set<String> {
-        val values = mutableSetOf<String>()
-        lineItems?.forEach { lineItem ->
-            val note = lineItem?.note ?: return@forEach
-            values.addAll(extractWidgetValuesFromString(note, widgetId))
-        }
-        return values
-    }
-    
-    private fun extractWidgetValuesFromOrderNote(orderNote: String?, widgetId: String): Set<String> {
-        if (orderNote.isNullOrBlank()) return emptySet()
-        return extractWidgetValuesFromString(orderNote, widgetId)
-    }
-    
-    private fun extractWidgetValuesFromString(note: String, widgetId: String): Set<String> {
-        val values = mutableSetOf<String>()
-        // Match by widget ID in format [widgetId]label:value
-        val pattern = "\\[$widgetId\\][^:]*:([^•|]+)".toRegex()
-        pattern.findAll(note).forEach { match ->
-            val value = match.groupValues[1].trim()
-            if (value.isNotEmpty()) {
-                // Handle multi-select comma-separated values
-                value.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { v ->
-                    values.add(v)
-                }
-            }
-        }
-        return values
-    }
-    
-    private fun isSameDay(date1: Date, date2: Date): Boolean {
-        val cal1 = Calendar.getInstance().apply { time = date1 }
-        val cal2 = Calendar.getInstance().apply { time = date2 }
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-               cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
-    }
+    // Note: Filter matching logic moved to shared OrderFilterUtils.orderMatchesFilters()
+    // Calendar events still render on due date using OrderDueDateResolver's 3-tier priority
     
     private fun resetFilters() {
         currentFilterState = FilterDialogFragment.FilterState()

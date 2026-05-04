@@ -25,7 +25,6 @@ import com.orderMate.databinding.FragmentOrderListRedesignBinding
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FilterCategories
 import com.orderMate.utils.FilterCategoryBuilder
-import com.orderMate.modals.NoteLevel
 import com.orderMate.utils.ModalDialogCategories
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.OrderSearchFilter
@@ -33,6 +32,7 @@ import com.orderMate.utils.MyApp.Companion.filterArray
 import com.orderMate.utils.PreferenceManager
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.OrderDueDateResolver
+import com.orderMate.utils.OrderFilterUtils
 import com.orderMate.utils.debugSnackBar
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.exceptionHandlerWithReturn
@@ -621,29 +621,16 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun applyDialogFilters(filters: FilterDialogFragment.FilterState) {
-        android.util.Log.d("FILTER_DEBUG", "=== applyDialogFilters START ===")
-        android.util.Log.d("FILTER_DEBUG", "currentSearchQuery: '$currentSearchQuery'")
-        android.util.Log.d("FILTER_DEBUG", "filters.selections: ${filters.selections}")
-        android.util.Log.d("FILTER_DEBUG", "filters.dateSelections: ${filters.dateSelections}")
-        android.util.Log.d("FILTER_DEBUG", "allItemList.size: ${allItemList.size}")
-        
         runOnBackgroundThread {
             orderItems.clear()
             filterData.clear()
 
-            var filterMatchCount = 0
-            var searchMatchCount = 0
-            var bothMatchCount = 0
-
+            // Use shared filter utility for consistent behavior with Calendar page
             allItemList.forEach { order ->
-                val filterMatch = orderMatchesFilters(order, filters)
-                val searchMatch = currentSearchQuery.isEmpty() || OrderSearchFilter.matchesSearch(order, currentSearchQuery)
-                
-                if (filterMatch) filterMatchCount++
-                if (searchMatch) searchMatchCount++
+                val filterMatch = OrderFilterUtils.orderMatchesFilters(order, filters, requireContext())
+                val searchMatch = OrderFilterUtils.orderMatchesSearch(order, currentSearchQuery)
                 
                 if (filterMatch && searchMatch) {
-                    bothMatchCount++
                     orderItems.add(order)
                 }
                 
@@ -652,13 +639,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                     filterData.add(order)
                 }
             }
-            
-            android.util.Log.d("FILTER_DEBUG", "filterMatchCount: $filterMatchCount")
-            android.util.Log.d("FILTER_DEBUG", "searchMatchCount: $searchMatchCount")
-            android.util.Log.d("FILTER_DEBUG", "bothMatchCount: $bothMatchCount")
-            android.util.Log.d("FILTER_DEBUG", "orderItems.size: ${orderItems.size}")
-            android.util.Log.d("FILTER_DEBUG", "filterData.size: ${filterData.size}")
-            android.util.Log.d("FILTER_DEBUG", "=== applyDialogFilters END ===")
 
             runOnMainThread {
                 updateResultsInfo()
@@ -669,128 +649,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         }
     }
 
-    private fun orderMatchesFilters(order: Order?, filters: FilterDialogFragment.FilterState): Boolean {
-        if (order == null) return false
-
-        // Check each category in selections
-        for ((categoryId, selectedValues) in filters.selections) {
-            if (selectedValues.isEmpty()) continue
-            
-            when {
-                // Clover filters
-                categoryId == FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> {
-                    val orderPayment = order.paymentState?.name ?: "OPEN"
-                    android.util.Log.d("FILTER_DEBUG", "PAYMENT_STATUS: orderId=${order.id?.takeLast(6)}, orderPayment='$orderPayment', selectedValues=$selectedValues, match=${selectedValues.contains(orderPayment)}")
-                    if (!selectedValues.contains(orderPayment)) return false
-                }
-                categoryId == FilterCategoryBuilder.CLOVER_ORDER_STATUS -> {
-                    val orderState = order.state?.lowercase() ?: ""
-                    if (!selectedValues.any { it.lowercase() == orderState }) return false
-                }
-                categoryId == FilterCategoryBuilder.CLOVER_PAYMENT_TYPE -> {
-                    val paymentTypes = order.payments?.mapNotNull { it?.tender?.label?.lowercase() } ?: emptyList()
-                    val selectedLower = selectedValues.map { it.lowercase() }
-                    if (!paymentTypes.any { it in selectedLower }) return false
-                }
-                categoryId == FilterCategoryBuilder.CLOVER_EMPLOYEE -> {
-                    val employeeName = try {
-                        order.employee?.jsonObject?.getString("name") ?: ""
-                    } catch (e: Exception) { "" }
-                    if (!selectedValues.contains(employeeName)) return false
-                }
-                // OrderMate widget filters
-                FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
-                    val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
-                    val widget = WidgetManager.getInstance(requireContext()).getWidgetById(widgetId ?: "") ?: continue
-                    val orderValues = if (widget.level == NoteLevel.ORDER) {
-                        extractWidgetValuesFromOrderNote(order.note, widget.id)
-                    } else {
-                        extractWidgetValuesFromNotes(order.lineItems, widget.id)
-                    }
-                    if (!selectedValues.any { it in orderValues }) return false
-                }
-            }
-        }
-
-        // Check date filters
-        for ((categoryId, dates) in filters.dateSelections) {
-            if (dates.isEmpty()) continue
-            
-            when {
-                // Order Date filter (Clover createdTime)
-                categoryId == FilterCategoryBuilder.CLOVER_ORDER_DATE -> {
-                    val orderDate = order.createdTime?.let { java.util.Date(it) }
-                    if (orderDate == null) return false
-                    
-                    val matchesAny = dates.any { filterDate ->
-                        isSameDay(orderDate, filterDate)
-                    }
-                    if (!matchesAny) return false
-                }
-                
-                // Widget date filters (like Pickup Date from OrderMate widgets)
-                FilterCategoryBuilder.isWidgetFilter(categoryId) -> {
-                    val widgetId = FilterCategoryBuilder.getWidgetId(categoryId)
-                    val widget = WidgetManager.getInstance(requireContext()).getWidgetById(widgetId ?: "") ?: continue
-                    val orderDateValues = if (widget.level == NoteLevel.ORDER) {
-                        extractWidgetValuesFromOrderNote(order.note, widget.id)
-                    } else {
-                        extractWidgetValuesFromNotes(order.lineItems, widget.id)
-                    }
-                    
-                    val matchesAny = dates.any { filterDate ->
-                        val dateStr = java.text.SimpleDateFormat("M/d/yy", java.util.Locale.getDefault()).format(filterDate)
-                        orderDateValues.any { it.contains(dateStr) }
-                    }
-                    if (!matchesAny) return false
-                }
-            }
-        }
-
-        return true
-    }
-    
-    /**
-     * Extract widget values from line item notes
-     * Notes format: "[widgetId]Label: Value • [widgetId2]Label2: Value2"
-     */
-    private fun extractWidgetValuesFromNotes(lineItems: MutableList<LineItem?>?, widgetId: String): Set<String> {
-        val values = mutableSetOf<String>()
-        lineItems?.forEach { item ->
-            item?.note?.let { note ->
-                values.addAll(extractWidgetValuesFromString(note, widgetId))
-            }
-        }
-        return values
-    }
-    
-    private fun extractWidgetValuesFromOrderNote(orderNote: String?, widgetId: String): Set<String> {
-        if (orderNote.isNullOrBlank()) return emptySet()
-        return extractWidgetValuesFromString(orderNote, widgetId)
-    }
-    
-    private fun extractWidgetValuesFromString(note: String, widgetId: String): Set<String> {
-        val values = mutableSetOf<String>()
-        // Match by widget ID in format [widgetId]label:value
-        val pattern = "\\[$widgetId\\][^:]*:([^•|]+)".toRegex()
-        pattern.findAll(note).forEach { match ->
-            val value = match.groupValues[1].trim()
-            if (value.isNotEmpty()) {
-                // Handle multi-select comma-separated values
-                value.split(",").map { it.trim() }.filter { it.isNotEmpty() }.forEach { v ->
-                    values.add(v)
-                }
-            }
-        }
-        return values
-    }
-
-    private fun isSameDay(d1: java.util.Date, d2: java.util.Date): Boolean {
-        val cal1 = java.util.Calendar.getInstance().apply { time = d1 }
-        val cal2 = java.util.Calendar.getInstance().apply { time = d2 }
-        return cal1.get(java.util.Calendar.YEAR) == cal2.get(java.util.Calendar.YEAR) &&
-               cal1.get(java.util.Calendar.DAY_OF_YEAR) == cal2.get(java.util.Calendar.DAY_OF_YEAR)
-    }
+    // Note: Filter matching logic moved to shared OrderFilterUtils.orderMatchesFilters()
 
     private fun updateFilterPills(filters: FilterDialogFragment.FilterState) {
         binding.header.filterPillsContainer.removeAllViews()
