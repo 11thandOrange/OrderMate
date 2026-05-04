@@ -399,7 +399,7 @@
         .order-card {
             background: rgba(255,255,255,0.08);
             border-radius: var(--border-radius-md);
-            padding: 16px;
+            padding: 20px;
             border: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -412,9 +412,28 @@
         }
 
 
+        .order-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+
         .order-id {
             font-weight: 600;
-            font-size: 15px;
+            font-size: 16px;
+        }
+
+
+        .order-level-notes {
+            display: flex;
+            gap: 0;
+        }
+
+
+        .status-badges {
+            display: flex;
+            gap: 8px;
         }
 
 
@@ -423,6 +442,7 @@
             padding: 4px 10px;
             border-radius: 20px;
             font-weight: 600;
+            text-transform: uppercase;
         }
 
 
@@ -438,35 +458,116 @@
         }
 
 
-        .order-details {
-            display: flex;
-            gap: 16px;
-            font-size: 13px;
-            color: var(--text-muted);
+        .order-details-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
         }
 
 
-        .order-pills {
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+
+        .detail-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+
+        .detail-value {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+
+        .detail-value i {
+            margin-right: 4px;
+            font-size: 11px;
+        }
+
+
+        .notes-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+
+        .notes-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+
+        .notes-chips {
             display: flex;
             gap: 6px;
-            margin-top: 12px;
             flex-wrap: wrap;
         }
 
 
-        .pill {
+        /* Order-level note pills (inline with order #) */
+        .order-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
             font-size: 10px;
-            padding: 4px 8px;
-            border-radius: 12px;
-            background: rgba(115,103,240,0.2);
-            color: #a5a0f5;
+            padding: 2px 8px;
+            border-radius: 10px;
             font-weight: 500;
+            background: rgba(123, 31, 162, 0.2);
+            color: #ce93d8;
+        }
+
+        .order-pill.category {
+            background: rgba(123, 31, 162, 0.2);
+            color: #ce93d8;
+        }
+
+        .order-pill.tag {
+            background: rgba(56, 142, 60, 0.2);
+            color: #81c784;
+        }
+
+        .order-pill.text {
+            background: rgba(245, 124, 0, 0.2);
+            color: #ffb74d;
         }
 
 
-        .pill.orange {
+        /* Item-level note pills (in notes section) */
+        .item-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .item-pill.category {
             background: rgba(255,159,67,0.2);
-            color: #ffb876;
+            color: #FF9F43;
+        }
+
+        .item-pill.tag {
+            background: rgba(115,103,240,0.2);
+            color: #7367F0;
+        }
+
+        .item-pill i {
+            font-size: 10px;
         }
 
 
@@ -1088,12 +1189,10 @@
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="#demos">Demos</a>
-                <a href="#benefits">Why OrderMate</a>
-                <a href="#get-started" class="cta-btn">
-                    <svg class="clover-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 1.5.7 2.8 1.8 3.7C8 11.1 7 12.7 7 14.5 7 17 9 19 11.5 19c1.5 0 2.8-.7 3.7-1.8.9 1.1 2.2 1.8 3.7 1.8 2.5 0 4.5-2 4.5-4.5 0-1.8-1-3.4-2.3-4.3 1.1-.9 1.8-2.2 1.8-3.7C23 4 21 2 18.5 2c-1.5 0-2.8.7-3.7 1.8C13.9 2.7 13 2 12 2z"/>
-                    </svg>
-                    Get on Clover
+                <a href="#benefits">Why OrderMate?</a>
+                <a href="faq.html">FAQ</a>
+                <a href="https://www.clover.com/appmarket/apps/WWTF1AKT87VJ8" target="_blank" class="cta-btn">
+                    Install Now!
                 </a>
             </div>
         </div>
@@ -1104,20 +1203,13 @@
     <section class="hero" id="home">
         <div class="hero-container">
             <div class="hero-content">
-                <div class="hero-badge">
-                    <i class="fas fa-check-circle"></i>
-                    Native Clover POS Integration
-                </div>
-                <h1>Supercharge Your <span>Clover Orders</span> with Custom Notes & Scheduling</h1>
+                <h1>Supercharge Your <span>Orders</span> with Custom Notes, Notifications, & Scheduling</h1>
                 <p class="hero-subtitle">
                     Add item-level and order-level notes, schedule pickups and deliveries on a visual calendar, 
-                    and send customer notifications — all seamlessly integrated with your Clover POS.
+                    and send customers email & SMS notifications — all seamlessly integrated with your Clover POS.
                 </p>
                 <div class="hero-ctas">
-                    <a href="#get-started" class="cta-btn cta-btn-large">
-                        <svg class="clover-icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 1.5.7 2.8 1.8 3.7C8 11.1 7 12.7 7 14.5 7 17 9 19 11.5 19c1.5 0 2.8-.7 3.7-1.8.9 1.1 2.2 1.8 3.7 1.8 2.5 0 4.5-2 4.5-4.5 0-1.8-1-3.4-2.3-4.3 1.1-.9 1.8-2.2 1.8-3.7C23 4 21 2 18.5 2c-1.5 0-2.8.7-3.7 1.8C13.9 2.7 13 2 12 2z"/>
-                        </svg>
+                    <a href="https://www.clover.com/appmarket/apps/WWTF1AKT87VJ8" target="_blank" class="cta-btn cta-btn-large">
                         Install on Clover
                     </a>
                     <a href="#demos" class="cta-btn cta-btn-outline cta-btn-large">
@@ -1142,30 +1234,78 @@
                     <div class="mockup-content">
                         <div class="order-card">
                             <div class="order-card-header">
-                                <span class="order-id">#1042 · Sarah M.</span>
-                                <span class="order-status status-paid">PAID</span>
+                                <span class="order-id">#1042</span>
+                                <div class="status-badges">
+                                    <span class="order-pill text"><i class="fas fa-calendar"></i> Pickup Today</span>
+                                    <span class="order-status status-open">Open</span>
+                                    <span class="order-status status-paid">Paid</span>
+                                </div>
                             </div>
-                            <div class="order-details">
-                                <span><i class="fas fa-clock"></i> 2:30 PM</span>
-                                <span><i class="fas fa-dollar-sign"></i> $45.50</span>
+                            <div class="order-details-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">Order Date</span>
+                                    <span class="detail-value">May 3</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Customer</span>
+                                    <span class="detail-value">Sarah M.</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Employee</span>
+                                    <span class="detail-value">Alex T.</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Payment</span>
+                                    <span class="detail-value"><i class="fas fa-credit-card"></i> Card</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Total</span>
+                                    <span class="detail-value">$45.50</span>
+                                </div>
                             </div>
-                            <div class="order-pills">
-                                <span class="pill">🎂 Birthday Cake</span>
-                                <span class="pill orange">Pickup Today</span>
+                            <div class="notes-section">
+                                <div class="notes-label">Item Level Notes</div>
+                                <div class="notes-chips">
+                                    <span class="item-pill category"><i class="fas fa-tag"></i> Birthday Cake</span>
+                                    <span class="item-pill tag"><i class="fas fa-tag"></i> No Nuts</span>
+                                </div>
                             </div>
                         </div>
                         <div class="order-card">
                             <div class="order-card-header">
-                                <span class="order-id">#1041 · John D.</span>
-                                <span class="order-status status-open">OPEN</span>
+                                <span class="order-id">#1041</span>
+                                <div class="status-badges">
+                                    <span class="order-pill category"><i class="fas fa-truck"></i> Delivery</span>
+                                    <span class="order-status status-open">Open</span>
+                                </div>
                             </div>
-                            <div class="order-details">
-                                <span><i class="fas fa-clock"></i> 4:00 PM</span>
-                                <span><i class="fas fa-dollar-sign"></i> $128.00</span>
+                            <div class="order-details-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">Order Date</span>
+                                    <span class="detail-value">May 3</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Customer</span>
+                                    <span class="detail-value">John D.</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Employee</span>
+                                    <span class="detail-value">Sarah J.</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Payment</span>
+                                    <span class="detail-value"><i class="fas fa-money-bill"></i> Cash</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Total</span>
+                                    <span class="detail-value">$128.00</span>
+                                </div>
                             </div>
-                            <div class="order-pills">
-                                <span class="pill">🚚 Delivery</span>
-                                <span class="pill">Rush Order</span>
+                            <div class="notes-section">
+                                <div class="notes-label">Item Level Notes</div>
+                                <div class="notes-chips">
+                                    <span class="item-pill category"><i class="fas fa-tag"></i> Rush Order</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1197,8 +1337,7 @@
             <span class="section-label">Features</span>
             <h2 class="section-title">Powerful Order Management Tools</h2>
             <p class="section-subtitle">
-                OrderMate extends your Clover POS with customizable widgets, a visual calendar, 
-                and customer notification capabilities designed for busy merchants.
+                OrderMate gives merchants unique calendar scheduling, customizable notes, and easy to use SMS & email notification.
             </p>
         </div>
         <div class="features-grid">
@@ -1220,7 +1359,7 @@
                 <div class="feature-icon">
                     <i class="fas fa-calendar-alt"></i>
                 </div>
-                <h3>Visual Calendar Scheduling</h3>
+                <h3>Visual Calendar</h3>
                 <p>View all scheduled orders in Day, Week, or Month view. Jump to today or next fulfillment with one tap. Never miss a pickup or delivery again.</p>
             </div>
             <div class="feature-card">
@@ -1228,21 +1367,21 @@
                     <i class="fas fa-bell"></i>
                 </div>
                 <h3>Customer Notifications</h3>
-                <p>Send SMS or email notifications to customers when their order is ready. Schedule automated reminders X days or minutes before due dates.</p>
+                <p>Send SMS or email notifications to customers when their order is ready. Create templates for messages you send most often!</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-sliders-h"></i>
+                    <i class="fas fa-clock"></i>
                 </div>
-                <h3>Customizable Widgets</h3>
-                <p>Create single-select, multi-select, text box, and calendar widgets. Configure colors, make fields required, and show them in filters for quick ordering.</p>
+                <h3>Schedule Orders</h3>
+                <p>Merchants can schedule email reminders sent to them before an order is due. And schedule receipt printing so the printers automatically print upcoming orders before one is due.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-search"></i>
                 </div>
                 <h3>Smart Search & Filters</h3>
-                <p>Instantly find orders by customer name, order number, or custom fields. Filter by payment status (Paid, Open, Refunded), order type, date range, and more.</p>
+                <p>Customize filters to quickly search & find orders. Only search by the filters that matter most to you.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
@@ -1303,7 +1442,7 @@
                     </div>
                     <div class="demo-info">
                         <span class="demo-tag">Item Management</span>
-                        <h3>Add Item-Level Notes</h3>
+                        <h3>Add Item Level Notes</h3>
                         <p>Attach specific instructions to individual line items — customize each product with allergies, modifications, or special requests using single-select, multi-select, or text widgets.</p>
                     </div>
                 </div>
@@ -1332,13 +1471,13 @@
                     </div>
                     <div class="demo-info">
                         <span class="demo-tag">Order Management</span>
-                        <h3>Add Order-Level Notes</h3>
+                        <h3>Add Order Level Notes</h3>
                         <p>Attach notes to the entire order for delivery instructions, pickup times, gift messages, or scheduling with the built-in calendar date picker.</p>
                     </div>
                 </div>
 
 
-                <!-- Demo 3: Add Customer & Send Notification -->
+                <!-- Demo 3: Send Customer Notifications -->
                 <div class="demo-card" id="demo-customer-notification">
                     <div class="demo-video-container">
                         <!-- 
@@ -1350,7 +1489,7 @@
                         -->
                         <div class="video-placeholder">
                             <i class="fas fa-film"></i>
-                            <span>Video: Customer & Notifications</span>
+                            <span>Video: Send Customer Notifications</span>
                             <small style="opacity: 0.5;">Screen_recording_20260428_175149.webm</small>
                         </div>
                         <div class="play-overlay">
@@ -1361,13 +1500,13 @@
                     </div>
                     <div class="demo-info">
                         <span class="demo-tag">Customer Engagement</span>
-                        <h3>Customer Notifications</h3>
+                        <h3>Send Customer Notifications</h3>
                         <p>Link customers to orders and send instant SMS or email notifications when orders are ready. Schedule automated reminders before due dates.</p>
                     </div>
                 </div>
 
 
-                <!-- Demo 4: Customize Profile -->
+                <!-- Demo 4: Customize Your Profile -->
                 <div class="demo-card" id="demo-profile">
                     <div class="demo-video-container">
                         <!-- 
@@ -1379,7 +1518,7 @@
                         -->
                         <div class="video-placeholder">
                             <i class="fas fa-film"></i>
-                            <span>Video: Customize Profile</span>
+                            <span>Video: Customize Your Profile</span>
                             <small style="opacity: 0.5;">Screen_recording_20260428_175359.webm</small>
                         </div>
                         <div class="play-overlay">
@@ -1396,7 +1535,7 @@
                 </div>
 
 
-                <!-- Demo 5: Find & Edit Orders (Wide) -->
+                <!-- Demo 5: Smart Search, Filters & Calendar View (Wide) -->
                 <div class="demo-card wide" id="demo-find-edit">
                     <div class="demo-video-container">
                         <!-- 
@@ -1408,7 +1547,7 @@
                         -->
                         <div class="video-placeholder">
                             <i class="fas fa-film"></i>
-                            <span>Video: Easily Find & Edit Orders</span>
+                            <span>Video: Smart Search, Filters & Calendar View</span>
                             <small style="opacity: 0.5;">Screen_recording_20260428_175841.webm</small>
                         </div>
                         <div class="play-overlay">
@@ -1431,7 +1570,7 @@
     <!-- Benefits Section -->
     <section class="benefits" id="benefits">
         <div class="section-header">
-            <span class="section-label">Why OrderMate</span>
+            <span class="section-label">Why OrderMate?</span>
             <h2 class="section-title">Built for Busy Clover Merchants</h2>
             <p class="section-subtitle">
                 We understand the challenges of running a business. OrderMate saves you time and keeps customers happy.
@@ -1447,10 +1586,10 @@
             </div>
             <div class="benefit-card">
                 <div class="benefit-icon">
-                    <i class="fas fa-plug"></i>
+                    <i class="fas fa-users"></i>
                 </div>
-                <h4>Native Clover Integration</h4>
-                <p>Syncs directly with Clover Register and your order data in real-time</p>
+                <h4>Keep Team in Sync</h4>
+                <p>Keep orders up to date and keep all team members and customers on the same page</p>
             </div>
             <div class="benefit-card">
                 <div class="benefit-icon">
@@ -1461,10 +1600,10 @@
             </div>
             <div class="benefit-card">
                 <div class="benefit-icon">
-                    <i class="fas fa-cloud"></i>
+                    <i class="fas fa-store"></i>
                 </div>
-                <h4>Firebase-Backed Storage</h4>
-                <p>Your custom widget configurations persist securely across devices</p>
+                <h4>Built by Merchants for Merchants</h4>
+                <p>Order management made easy by peers who know what you need</p>
             </div>
         </div>
     </section>
@@ -1476,11 +1615,8 @@
             <h2>Ready to Transform Your Order Management?</h2>
             <p>Join merchants who are saving time and delighting customers with OrderMate.</p>
             <div class="cta-buttons">
-                <a href="https://www.clover.com/appmarket" target="_blank" class="cta-btn cta-btn-large">
-                    <svg class="clover-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 1.5.7 2.8 1.8 3.7C8 11.1 7 12.7 7 14.5 7 17 9 19 11.5 19c1.5 0 2.8-.7 3.7-1.8.9 1.1 2.2 1.8 3.7 1.8 2.5 0 4.5-2 4.5-4.5 0-1.8-1-3.4-2.3-4.3 1.1-.9 1.8-2.2 1.8-3.7C23 4 21 2 18.5 2c-1.5 0-2.8.7-3.7 1.8C13.9 2.7 13 2 12 2z"/>
-                    </svg>
-                    Get OrderMate on Clover App Market
+                <a href="https://www.clover.com/appmarket/apps/WWTF1AKT87VJ8" target="_blank" class="cta-btn cta-btn-large">
+                    Install OrderMate on Clover App Market
                 </a>
             </div>
         </div>
@@ -1499,7 +1635,8 @@
             <div class="footer-links">
                 <a href="#features">Features</a>
                 <a href="#demos">Demos</a>
-                <a href="#benefits">Why OrderMate</a>
+                <a href="#benefits">Why OrderMate?</a>
+                <a href="faq.html">FAQ</a>
                 <a href="mailto:support@11thandorange.com">Support</a>
             </div>
             <div class="footer-copy">
