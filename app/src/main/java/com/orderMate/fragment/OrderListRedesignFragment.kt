@@ -648,7 +648,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
             val targetDate = dateFormat.format(date)
 
-            orderItems.clear()
+            // IMPORTANT: Build temp list on background thread, don't modify orderItems here!
+            val tempResults = ArrayList<Order?>()
             val sourceList = if (isFilterActive()) filterData else allItemList
 
             for (order in sourceList) {
@@ -656,11 +657,20 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                     dateFormat.format(Date(it))
                 }
                 if (orderDate == targetDate) {
-                    orderItems.add(order)
+                    tempResults.add(order)
                 }
             }
 
             runOnMainThread {
+                // Safety check before modifying UI
+                if (!isAdded || _binding == null) {
+                    return@runOnMainThread
+                }
+                
+                // Update orderItems on main thread BEFORE notifying adapter
+                orderItems.clear()
+                orderItems.addAll(tempResults)
+                
                 updateResultsInfo()
                 notifyAdapter()
                 updateEmptyState()
@@ -723,12 +733,14 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             }
             
             // Use shared filter+search function for consistent behavior with Calendar page
+            // IMPORTANT: Build temp list on background thread, don't modify orderItems here!
+            // Modifying orderItems on background thread causes RecyclerView inconsistency crash
+            val tempResults = ArrayList<Order?>()
             try {
                 val results = OrderFilterUtils.filterAndSearchOrders(
                     allItemList, filters, currentSearchQuery, ctx
                 )
-                orderItems.clear()
-                orderItems.addAll(results)
+                tempResults.addAll(results)
                 Log.d(TAG, "[$fragmentId] applyDialogFilters filtered to ${results.size} results")
             } catch (e: Exception) {
                 Log.e(TAG, "[$fragmentId] applyDialogFilters ERROR: ${e.message}", e)
@@ -742,6 +754,10 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                     Log.w(TAG, "[$fragmentId] applyDialogFilters MAIN THREAD - Fragment not attached or binding null, aborting!")
                     return@runOnMainThread
                 }
+                
+                // Update orderItems on main thread BEFORE notifying adapter
+                orderItems.clear()
+                orderItems.addAll(tempResults)
                 
                 updateResultsInfo()
                 notifyAdapter()
@@ -934,8 +950,10 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     fun applyFilters(matchArray: HashMap<String, String>) {
         runOnBackgroundThread {
-            orderItems.clear()
-            filterData.clear()
+            // IMPORTANT: Build temp lists on background thread, don't modify orderItems/filterData here!
+            // Modifying them on background thread causes RecyclerView inconsistency crash
+            val tempOrderItems = ArrayList<Order?>()
+            val tempFilterData = ArrayList<Order?>()
 
             allItemList.forEach { order ->
                 val employeeName = try {
@@ -956,12 +974,23 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 val matchesNotes = isNoteDataMatched(matchArray, order?.lineItems)
 
                 if (matchesPayment && matchesEmployee && matchesBooking && matchesTender && matchesNotes) {
-                    orderItems.add(order)
-                    filterData.add(order)
+                    tempOrderItems.add(order)
+                    tempFilterData.add(order)
                 }
             }
 
             runOnMainThread {
+                // Safety check before modifying UI
+                if (!isAdded || _binding == null) {
+                    return@runOnMainThread
+                }
+                
+                // Update lists on main thread BEFORE notifying adapter
+                orderItems.clear()
+                orderItems.addAll(tempOrderItems)
+                filterData.clear()
+                filterData.addAll(tempFilterData)
+                
                 updateResultsInfo()
                 notifyAdapter()
                 updateEmptyState()
