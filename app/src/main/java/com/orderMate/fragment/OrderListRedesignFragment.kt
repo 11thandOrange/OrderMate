@@ -909,7 +909,10 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         orderTenderType.clear()
         orderTenderType.add(Constants.all_tenders)
 
-        orderItems.forEach { order ->
+        // Make a copy to avoid ConcurrentModificationException when iterating
+        // while another thread modifies orderItems
+        val ordersCopy = ArrayList(allItemList)
+        ordersCopy.forEach { order ->
             order?.paymentState?.name?.let { orderPaymentStatusType.add(it) }
             
             order?.payments?.forEach { payment ->
