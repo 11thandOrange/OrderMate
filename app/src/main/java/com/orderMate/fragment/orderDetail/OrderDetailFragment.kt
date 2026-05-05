@@ -805,32 +805,69 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
 
 
     private fun showTheDiscountAndTaxData() {
-        // Hide entire discount row if no discounts applied
-        if (orderArguments?.discounts == null || orderArguments?.discounts?.isEmpty() == true) {
+        val symbol = currencyName.convertToSymbol()
+        
+        // Subtotal - always shown
+        "${symbol}${myApp.orderLineItemTotal(orderArguments).toDoubleFloatPoint()}".also {
+            binding.subtotalValue.text = it
+        }
+        
+        // Tax - always shown
+        "${symbol}${myApp.orderTax(orderArguments).toDoubleFloatPoint()}".also {
+            binding.taxValue.text = it
+        }
+        
+        // Discount row - conditional: only when discounts applied
+        val discountAmount = myApp.orderDiscount(orderArguments)
+        if (orderArguments?.discounts.isNullOrEmpty() || discountAmount <= 0) {
             binding.discountRow.hideView()
         } else {
             binding.discountRow.showView()
-            "${currencyName.convertToSymbol()}${
-                myApp.orderDiscount(orderArguments).toDoubleFloatPoint()
-            }".also {
+            "-${symbol}${discountAmount.toDoubleFloatPoint()}".also {
                 binding.discountValue.text = it
             }
             exceptionHandler {
-                val discountName =
-                    orderArguments?.discounts?.get(0)?.jsonObject?.get(Constants.name)
-                binding.discountLabel.text = discountName.toString()
+                val discountName = orderArguments?.discounts?.get(0)?.jsonObject?.get(Constants.name)
+                if (discountName != null) {
+                    binding.discountLabel.text = discountName.toString()
+                }
             }
         }
-
-        "${currencyName.convertToSymbol()}${
-            myApp.orderTax(orderArguments).toDoubleFloatPoint()
-        }".also {
-            binding.taxValue.text = it
+        
+        // Payment row - conditional: only when payments made
+        val payments = orderArguments?.payments
+        val totalPayments = payments?.sumOf { it?.amount ?: 0L } ?: 0L
+        if (payments.isNullOrEmpty() || totalPayments <= 0) {
+            binding.paymentRow.hideView()
+        } else {
+            binding.paymentRow.showView()
+            "-${symbol}${totalPayments.toDoubleFloatPoint()}".also {
+                binding.paymentValue.text = it
+            }
         }
-        "${currencyName.convertToSymbol()}${
-            myApp.orderLineItemTotal(orderArguments).toDoubleFloatPoint()
-        }".also {
-            binding.subtotalValue.text = it
+        
+        // Refund row - conditional: only when refunds issued
+        val refunds = orderArguments?.refunds
+        val totalRefunds = refunds?.sumOf { it?.amount ?: 0L } ?: 0L
+        if (refunds.isNullOrEmpty() || totalRefunds <= 0) {
+            binding.refundRow.hideView()
+        } else {
+            binding.refundRow.showView()
+            "${symbol}${totalRefunds.toDoubleFloatPoint()}".also {
+                binding.refundValue.text = it
+            }
+        }
+        
+        // Credit row - conditional: only when credits applied
+        val credits = orderArguments?.credits
+        val totalCredits = credits?.sumOf { it?.amount ?: 0L } ?: 0L
+        if (credits.isNullOrEmpty() || totalCredits <= 0) {
+            binding.creditRow.hideView()
+        } else {
+            binding.creditRow.showView()
+            "-${symbol}${totalCredits.toDoubleFloatPoint()}".also {
+                binding.creditValue.text = it
+            }
         }
     }
 
