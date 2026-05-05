@@ -148,32 +148,33 @@ fun getPaymentStateFromOrder(order: Order?): String? {
     
     val orderId = order.id?.takeLast(8) ?: "unknown"
     val cloverPaymentState = order.paymentState?.name
-    val total = order.total
+    val total = order.total ?: 0L
     val unpaidBalance = order.unpaidBalance
     val payments = order.payments
     val paymentCount = payments?.size ?: 0
     val state = order.state
     
-    android.util.Log.d("PaymentStateDebug", "Order #$orderId - paymentState: $cloverPaymentState, state: $state, total: $total, unpaidBalance: $unpaidBalance, payments: $paymentCount")
+    // Sum payment amounts
+    var totalPaid = 0L
+    payments?.forEach { payment ->
+        totalPaid += payment.amount ?: 0L
+    }
+    
+    android.util.Log.d("PaymentStateDebug", "Order #$orderId - paymentState: $cloverPaymentState, state: $state, total: $total, unpaidBalance: $unpaidBalance, payments: $paymentCount, totalPaid: $totalPaid")
     
     // Use Clover's paymentState if available
     if (cloverPaymentState != null) {
         return cloverPaymentState
     }
     
-    // Clover doesn't populate paymentState, infer from unpaidBalance
-    if (unpaidBalance != null && total != null) {
-        val inferred = when {
-            unpaidBalance <= 0 -> "PAID"
-            unpaidBalance < total -> "PARTIALLY_PAID"
-            else -> "OPEN"
-        }
-        android.util.Log.d("PaymentStateDebug", "Order #$orderId - Inferred from unpaidBalance: $inferred")
-        return inferred
+    // Clover doesn't populate paymentState, infer from payments vs total
+    val inferred = when {
+        totalPaid <= 0 -> "OPEN"
+        totalPaid >= total -> "PAID"
+        else -> "PARTIALLY_PAID"
     }
-    
-    android.util.Log.d("PaymentStateDebug", "Order #$orderId - Cannot infer, returning null")
-    return null
+    android.util.Log.d("PaymentStateDebug", "Order #$orderId - Inferred: $inferred")
+    return inferred
 }
 
 /**
