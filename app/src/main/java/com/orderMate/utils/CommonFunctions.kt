@@ -156,46 +156,8 @@ fun getPaymentStateFromOrder(order: Order?): String? {
         return cloverPaymentState
     }
     
-    // Infer from payment data
-    val total = order.total ?: 0L
-    val payments = order.payments?.elements
-    val paymentCount = payments?.size ?: 0
-    
-    android.util.Log.d("PaymentStateDebug", "Order #$orderId - total: $total, paymentCount: $paymentCount")
-    
-    if (payments.isNullOrEmpty()) {
-        android.util.Log.d("PaymentStateDebug", "Order #$orderId - No payments, returning OPEN")
-        return "OPEN"
-    }
-    
-    // Calculate total paid and refunded
-    var totalPaid = 0L
-    var totalRefunded = 0L
-    
-    payments.forEach { payment ->
-        val amount = payment.amount ?: 0L
-        totalPaid += amount
-        android.util.Log.d("PaymentStateDebug", "Order #$orderId - Payment amount: $amount")
-        
-        // Check for refunds on this payment
-        payment.refunds?.elements?.forEach { refund ->
-            totalRefunded += refund.amount ?: 0L
-        }
-    }
-    
-    android.util.Log.d("PaymentStateDebug", "Order #$orderId - totalPaid: $totalPaid, totalRefunded: $totalRefunded")
-    
-    // Determine state based on amounts
-    val inferredState = when {
-        totalRefunded > 0 && totalRefunded >= totalPaid -> "REFUNDED"
-        totalRefunded > 0 -> "PARTIALLY_REFUNDED"
-        totalPaid >= total -> "PAID"
-        totalPaid > 0 -> "PARTIALLY_PAID"
-        else -> "OPEN"
-    }
-    
-    android.util.Log.d("PaymentStateDebug", "Order #$orderId - Inferred state: $inferredState")
-    return inferredState
+    android.util.Log.d("PaymentStateDebug", "Order #$orderId - paymentState is NULL, no inference")
+    return null
 }
 
 /**
