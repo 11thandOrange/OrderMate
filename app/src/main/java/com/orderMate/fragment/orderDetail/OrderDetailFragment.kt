@@ -210,10 +210,18 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             orderArguments?.apply {
                 totalPriceFromApi = total ?: Constants.defaultLong
                 currencyName = currency ?: Constants.defaultString
+                
+                // Calculate balance due: Total - Payments + Refunds - Credits
+                val orderTotal = total ?: 0L
+                val totalPayments = payments?.sumOf { it?.amount ?: 0L } ?: 0L
+                val totalRefunds = refunds?.sumOf { it?.amount ?: 0L } ?: 0L
+                val totalCredits = credits?.sumOf { it?.amount ?: 0L } ?: 0L
+                val balanceDue = orderTotal - totalPayments + totalRefunds - totalCredits
+                
                 getString(
                     R.string.priceString,
                     currencyName.convertToSymbol(),
-                    total?.toDoubleFloatPoint()
+                    balanceDue.toDoubleFloatPoint()
                 ).also {
                     binding.totalValue.text = it
                 }

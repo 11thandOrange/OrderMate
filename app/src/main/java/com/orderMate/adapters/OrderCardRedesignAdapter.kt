@@ -357,28 +357,46 @@ class OrderCardRedesignAdapter(
         private fun setupPaymentType(order: Order) {
             val context = binding.root.context
             val payments = order.payments
+            val density = context.resources.displayMetrics.density
 
             if (payments.isNullOrEmpty()) {
                 binding.paymentType.text = "-"
                 binding.paymentIcon.setImageResource(R.drawable.ic_credit_card)
+                binding.paymentTypeBadge.visibility = View.GONE
                 return
             }
 
             val tenderLabel = payments.firstOrNull()?.tender?.label?.lowercase() ?: ""
+            val displayLabel: String
             
             when {
                 tenderLabel.contains("cash") -> {
+                    displayLabel = "Cash"
                     binding.paymentType.text = "Cash"
                     binding.paymentIcon.setImageResource(R.drawable.ic_cash)
                 }
                 tenderLabel.contains("card") || tenderLabel.contains("credit") || tenderLabel.contains("debit") -> {
+                    displayLabel = "Card"
                     binding.paymentType.text = "Card"
                     binding.paymentIcon.setImageResource(R.drawable.ic_credit_card)
                 }
                 else -> {
-                    binding.paymentType.text = payments.firstOrNull()?.tender?.label ?: "-"
+                    displayLabel = payments.firstOrNull()?.tender?.label ?: "-"
+                    binding.paymentType.text = displayLabel
                     binding.paymentIcon.setImageResource(R.drawable.ic_credit_card)
                 }
+            }
+            
+            // Also show as pill badge in badges row
+            if (displayLabel != "-") {
+                binding.paymentTypeBadge.text = displayLabel.uppercase()
+                binding.paymentTypeBadge.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
+                    com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_TYPE, 20f, density
+                )
+                binding.paymentTypeBadge.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_TYPE)
+                binding.paymentTypeBadge.visibility = View.VISIBLE
+            } else {
+                binding.paymentTypeBadge.visibility = View.GONE
             }
         }
 
