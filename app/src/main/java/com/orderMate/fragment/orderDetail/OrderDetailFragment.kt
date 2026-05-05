@@ -883,6 +883,14 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             "${symbol}${balance.toDoubleFloatPoint()}".also {
                 binding.balanceValue.text = it
             }
+            
+            // Balance amount: red if > 0, white if 0
+            val balanceColor = if (balance > 0) {
+                ContextCompat.getColor(requireContext(), R.color.unpaid_status_color)
+            } else {
+                ContextCompat.getColor(requireContext(), R.color.white)
+            }
+            binding.balanceValue.setTextColor(balanceColor)
         } else {
             binding.adjustmentsDivider.hideView()
             binding.balanceRow.hideView()

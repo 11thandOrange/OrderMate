@@ -476,7 +476,7 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
-                        <!-- Balance Row - RED color, shows after adjustments -->
+                        <!-- Balance Row - shows after adjustments -->
                         <LinearLayout
                             android:id="@+id/balanceRow"
                             android:layout_width="match_parent"
@@ -485,11 +485,12 @@
                             android:paddingVertical="8dp"
                             android:visibility="gone">
                             <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/balanceLabel"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="Balance"
-                                android:textColor="#FF5252"
+                                android:textColor="@color/white"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
                             <com.google.android.material.textview.MaterialTextView
@@ -497,7 +498,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="$0.00"
-                                android:textColor="#FF5252"
+                                android:textColor="@color/white"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
