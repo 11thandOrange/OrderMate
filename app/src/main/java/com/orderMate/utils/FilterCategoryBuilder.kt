@@ -67,7 +67,8 @@ object FilterCategoryBuilder {
     const val WIDGET_PREFIX = "widget_"
     
     // Clover enum values (from Clover SDK)
-    private val CLOVER_PAYMENT_STATUS_VALUES = listOf("OPEN", "PAID", "PARTIALLY_PAID", "REFUNDED", "PARTIALLY_REFUNDED", "CREDITED")
+    // Note: OPEN is excluded - order status filter handles open/closed, payment status only shows actual payment states
+    private val CLOVER_PAYMENT_STATUS_VALUES = listOf("PAID", "PARTIALLY_PAID", "REFUNDED", "PARTIALLY_REFUNDED", "CREDITED")
     private val CLOVER_ORDER_STATUS_VALUES = listOf("open", "locked")
     private val CLOVER_PAYMENT_TYPE_VALUES = listOf("Cash", "Credit Card", "Debit Card", "Check", "Gift Card", "External Gift Card", "Other")
     

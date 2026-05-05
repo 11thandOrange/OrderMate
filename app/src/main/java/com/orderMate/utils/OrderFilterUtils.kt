@@ -64,10 +64,10 @@ object OrderFilterUtils {
             
             when (categoryId) {
                 FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> {
-                    // Use shared function for correct fallback to "OPEN"
-                    // Filter values: "OPEN", "PAID", "PARTIALLY_PAID", etc.
+                    // Filter values: "PAID", "PARTIALLY_PAID", etc. (OPEN excluded)
+                    // Returns null if no payment state - order won't match any payment filter
                     val orderPayment = getPaymentStateFromOrder(order)
-                    if (!selectedValues.contains(orderPayment)) return false
+                    if (orderPayment == null || !selectedValues.contains(orderPayment)) return false
                 }
                 FilterCategoryBuilder.CLOVER_ORDER_STATUS -> {
                     // Filter values: "open", "locked" (lowercase)

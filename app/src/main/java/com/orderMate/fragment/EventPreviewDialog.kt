@@ -179,8 +179,9 @@ class EventPreviewDialog : DialogFragment() {
         val container = view.findViewById<FlexboxLayout>(R.id.cloverDefaultPillContainer)
         container.removeAllViews()
         
-        // Only show if there's a payment state
-        if (event.paymentState.isNullOrBlank()) {
+        // Only show if there's a payment state and it's not OPEN
+        // OPEN means unpaid - order status pill already indicates this
+        if (event.paymentState.isNullOrBlank() || event.paymentState == "OPEN") {
             container.visibility = View.GONE
             return
         }

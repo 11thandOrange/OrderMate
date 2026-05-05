@@ -108,18 +108,19 @@ fun getCustomerContactDetails(customer: Customer?): Pair<String, String> {
  * Single source of truth for payment status formatting.
  * 
  * Mapping (Clover SDK PaymentState enum):
- * - OPEN → UNPAID
  * - PAID → PAID
  * - PARTIALLY_PAID → PARTIALLY PAID
  * - PARTIALLY_REFUNDED → PARTIALLY REFUNDED
  * - REFUNDED → REFUNDED
  * - CREDITED → CREDITED
+ * 
+ * Note: OPEN is not mapped here - payment pill should not be shown for OPEN state.
+ * The order status pill (order.state) already indicates open/closed status.
  */
 fun formatPaymentState(state: String?): String {
-    if (state.isNullOrEmpty()) return "UNPAID"
+    if (state.isNullOrEmpty()) return ""
     
     return when (state.uppercase()) {
-        "OPEN" -> "UNPAID"
         "PAID" -> "PAID"
         "PARTIALLY_PAID" -> "PARTIALLY PAID"
         "PARTIALLY_REFUNDED" -> "PARTIALLY REFUNDED"
@@ -130,34 +131,32 @@ fun formatPaymentState(state: String?): String {
 }
 
 /**
- * (#76) Gets the payment state string from an Order with correct fallback.
+ * (#76) Gets the payment state string from an Order.
  * Single source of truth for extracting payment state from orders.
  * 
- * Fallback logic:
- * - If paymentState is available, use it
- * - If paymentState is null but order.state is "locked" (closed), infer "PAID"
- *   (Clover requires payment to close an order)
- * - Otherwise fall back to "OPEN"
+ * Returns the actual paymentState from Clover, or null if not available.
+ * Does NOT infer payment state - returns exactly what Clover provides.
+ * 
+ * Note: PaymentState.OPEN means "no payments applied" (unpaid).
+ * The order status pill (order.state) already shows open/closed status,
+ * so payment status pill should be hidden when paymentState is OPEN.
  */
-fun getPaymentStateFromOrder(order: Order?): String {
-    // Use paymentState if available
-    order?.paymentState?.name?.let { return it }
-    
-    // Infer PAID from closed order state (Clover requires payment to close)
-    if (order?.state == "locked") {
-        return "PAID"
-    }
-    
-    return "OPEN"
+fun getPaymentStateFromOrder(order: Order?): String? {
+    return order?.paymentState?.name
 }
 
 /**
  * (#76) Gets the formatted payment state from an Order.
  * Combines getPaymentStateFromOrder() and formatPaymentState() for convenience.
  * Use this when you need the display text directly.
+ * 
+ * Returns null if paymentState is OPEN or not available (no pill should be shown).
  */
-fun getFormattedPaymentState(order: Order?): String {
-    return formatPaymentState(getPaymentStateFromOrder(order))
+fun getFormattedPaymentState(order: Order?): String? {
+    val paymentState = getPaymentStateFromOrder(order)
+    // Don't format OPEN - no payment pill should be shown
+    if (paymentState == null || paymentState == "OPEN") return null
+    return formatPaymentState(paymentState)
 }
 
 /**
@@ -181,12 +180,14 @@ fun formatOrderState(state: String?): String {
 /**
  * (#76) Formats Clover payment state to title case (only first letter capitalized).
  * Used specifically for Settings filters tab display.
+ * 
+ * Note: OPEN is not mapped here - payment filter should not include OPEN/Unpaid.
+ * The order status filter already handles open/closed status.
  */
 fun formatPaymentStateTitleCase(state: String?): String {
-    if (state.isNullOrEmpty()) return "Unpaid"
+    if (state.isNullOrEmpty()) return ""
     
     return when (state.uppercase()) {
-        "OPEN" -> "Unpaid"
         "PAID" -> "Paid"
         "PARTIALLY_PAID" -> "Partially paid"
         "PARTIALLY_REFUNDED" -> "Partially refunded"
@@ -210,9 +211,10 @@ fun formatOrderStateTitleCase(state: String?): String {
     }
 }
 
-fun Context.getThePaymentState(order: Order?): String {
+fun Context.getThePaymentState(order: Order?): String? {
     // Use the single source of truth function for payment state
-    return formatPaymentState(getPaymentStateFromOrder(order))
+    // Returns null for OPEN state (no payment pill should be shown)
+    return getFormattedPaymentState(order)
 }
 
 

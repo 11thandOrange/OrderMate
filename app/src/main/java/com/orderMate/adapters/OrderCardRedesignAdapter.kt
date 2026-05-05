@@ -104,14 +104,15 @@ class OrderCardRedesignAdapter(
             // Item-level Notes Pills (in notes section)
             setupNotesPills(order)
 
-            // Left Status Indicator (green for paid, red for unpaid)
+            // Left Status Indicator (green for paid, red for unpaid/open, orange for partial)
             val paymentState = getPaymentStateFromOrder(order)
             val indicatorColor = when (paymentState) {
                 "PAID" -> ContextCompat.getColor(context, R.color.paid_status_color)
-                "OPEN" -> ContextCompat.getColor(context, R.color.unpaid_status_color)
                 "PARTIALLY_PAID" -> ContextCompat.getColor(context, R.color.orange_accent)
-                "REFUNDED" -> ContextCompat.getColor(context, R.color.orange_accent)
-                else -> ContextCompat.getColor(context, R.color.paid_status_color)
+                "REFUNDED", "PARTIALLY_REFUNDED" -> ContextCompat.getColor(context, R.color.orange_accent)
+                "CREDITED" -> ContextCompat.getColor(context, R.color.paid_status_color)
+                // null or OPEN means unpaid - show red indicator
+                else -> ContextCompat.getColor(context, R.color.unpaid_status_color)
             }
             binding.unpaidIndicator.setBackgroundColor(indicatorColor)
             binding.unpaidIndicator.visibility = View.VISIBLE
@@ -277,6 +278,14 @@ class OrderCardRedesignAdapter(
 
         private fun setupPaymentStatusBadge(order: Order) {
             val paymentState = getPaymentStateFromOrder(order)
+            
+            // Don't show payment status pill when paymentState is OPEN (unpaid)
+            // The order status pill already indicates the order is open/unpaid
+            if (paymentState == null || paymentState == "OPEN") {
+                binding.paymentStatusBadge.visibility = View.GONE
+                return
+            }
+            
             val displayText = formatPaymentState(paymentState)
             val density = binding.root.context.resources.displayMetrics.density
             
@@ -286,6 +295,7 @@ class OrderCardRedesignAdapter(
             binding.paymentStatusBadge.text = displayText
             binding.paymentStatusBadge.background = WidgetColorUtils.createPillBackground(color, 12f, density)
             binding.paymentStatusBadge.setTextColor(color)
+            binding.paymentStatusBadge.visibility = View.VISIBLE
         }
 
         private fun getCustomerName(order: Order): String {

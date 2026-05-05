@@ -1600,13 +1600,15 @@ class SettingsFragment : Fragment() {
     
     /**
      * Populate the options tags for each Clover filter - uses WidgetColorUtils for consistency
-     * Payment Status uses Clover SDK PaymentState enum: OPEN, PAID, PARTIALLY_PAID, REFUNDED, PARTIALLY_REFUNDED, CREDITED
+     * Payment Status uses Clover SDK PaymentState enum: PAID, PARTIALLY_PAID, REFUNDED, PARTIALLY_REFUNDED, CREDITED
+     * Note: OPEN/Unpaid is excluded - order status filter handles open/closed status
      * (#76) Updated to use title case (only capitalize first letter) per text changes requirement
      */
     private fun populateCloverFilterOptions() {
         // Payment Status options (Yellow) - display names for Clover PaymentState enum
         // (#76) Title case: only first letter capitalized
-        val paymentStatusValues = listOf("Unpaid", "Paid", "Partially paid", "Refunded", "Partially refunded", "Credited")
+        // Note: Unpaid is excluded - order status (Open/Closed) handles this
+        val paymentStatusValues = listOf("Paid", "Partially paid", "Refunded", "Partially refunded", "Credited")
         populateOptionsContainer(paymentStatusOptions, paymentStatusValues, WidgetColorUtils.COLOR_PAYMENT_STATUS)
         
         // Order Status options (Red)

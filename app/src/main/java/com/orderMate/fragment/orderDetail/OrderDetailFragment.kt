@@ -236,11 +236,18 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 binding.orderPlacedStatusValue.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_ORDER_STATUS)
                 
                 // Payment Status badge (Yellow) - using shared function
-                binding.paymentStatusBadge.text = getFormattedPaymentState(orderArguments)
-                binding.paymentStatusBadge.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
-                    com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_STATUS, 20f, density
-                )
-                binding.paymentStatusBadge.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_STATUS)
+                // Don't show payment status pill when paymentState is OPEN (unpaid)
+                val formattedPaymentState = getFormattedPaymentState(orderArguments)
+                if (formattedPaymentState.isNullOrEmpty()) {
+                    binding.paymentStatusBadge.visibility = android.view.View.GONE
+                } else {
+                    binding.paymentStatusBadge.text = formattedPaymentState
+                    binding.paymentStatusBadge.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
+                        com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_STATUS, 20f, density
+                    )
+                    binding.paymentStatusBadge.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_STATUS)
+                    binding.paymentStatusBadge.visibility = android.view.View.VISIBLE
+                }
                 
                 // Payment Type badge - get from order payments
                 populatePaymentTypeBadge()
