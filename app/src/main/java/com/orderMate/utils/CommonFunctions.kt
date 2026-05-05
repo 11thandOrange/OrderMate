@@ -281,21 +281,34 @@ fun setupPaymentStatusPillFromState(textView: TextView, paymentState: String?) {
  * Hides pill if no payments.
  */
 fun setupPaymentTypePill(textView: TextView, order: Order?) {
+    val orderId = order?.id?.takeLast(8) ?: "null"
     val payments = order?.payments
+    val paymentCount = payments?.size ?: 0
+    
+    android.util.Log.d("PaymentTypePillDebug", "Order #$orderId - payments count: $paymentCount")
     
     if (payments.isNullOrEmpty()) {
+        android.util.Log.d("PaymentTypePillDebug", "Order #$orderId - HIDING: payments is null or empty")
         textView.visibility = View.GONE
         return
     }
     
-    val tenderLabel = payments.firstOrNull()?.tender?.label?.lowercase() ?: ""
+    val firstPayment = payments.firstOrNull()
+    val tender = firstPayment?.tender
+    val tenderLabel = tender?.label?.lowercase() ?: ""
+    
+    android.util.Log.d("PaymentTypePillDebug", "Order #$orderId - tender: ${tender?.label}, tenderLabel: '$tenderLabel'")
+    
     val displayLabel = when {
         tenderLabel.contains("cash") -> "CASH"
         tenderLabel.contains("card") || tenderLabel.contains("credit") || tenderLabel.contains("debit") -> "CARD"
         else -> payments.firstOrNull()?.tender?.label?.uppercase() ?: ""
     }
     
+    android.util.Log.d("PaymentTypePillDebug", "Order #$orderId - displayLabel: '$displayLabel'")
+    
     if (displayLabel.isEmpty()) {
+        android.util.Log.d("PaymentTypePillDebug", "Order #$orderId - HIDING: displayLabel is empty")
         textView.visibility = View.GONE
         return
     }
@@ -307,6 +320,7 @@ fun setupPaymentTypePill(textView: TextView, order: Order?) {
     )
     textView.setTextColor(WidgetColorUtils.COLOR_PAYMENT_TYPE)
     textView.visibility = View.VISIBLE
+    android.util.Log.d("PaymentTypePillDebug", "Order #$orderId - SHOWING pill with text='$displayLabel'")
 }
 
 /**
@@ -314,15 +328,27 @@ fun setupPaymentTypePill(textView: TextView, order: Order?) {
  * Returns: "Cash", "Card", or tender label.
  */
 fun getPaymentTypeLabel(order: Order?): String? {
+    val orderId = order?.id?.takeLast(8) ?: "null"
     val payments = order?.payments
-    if (payments.isNullOrEmpty()) return null
+    val paymentCount = payments?.size ?: 0
+    
+    android.util.Log.d("PaymentTypeLabelDebug", "Order #$orderId - payments count: $paymentCount")
+    
+    if (payments.isNullOrEmpty()) {
+        android.util.Log.d("PaymentTypeLabelDebug", "Order #$orderId - returning null: payments is null or empty")
+        return null
+    }
     
     val tenderLabel = payments.firstOrNull()?.tender?.label?.lowercase() ?: ""
-    return when {
+    android.util.Log.d("PaymentTypeLabelDebug", "Order #$orderId - tenderLabel: '$tenderLabel'")
+    
+    val result = when {
         tenderLabel.contains("cash") -> "Cash"
         tenderLabel.contains("card") || tenderLabel.contains("credit") || tenderLabel.contains("debit") -> "Card"
         else -> payments.firstOrNull()?.tender?.label
     }
+    android.util.Log.d("PaymentTypeLabelDebug", "Order #$orderId - returning: '$result'")
+    return result
 }
 
 /**

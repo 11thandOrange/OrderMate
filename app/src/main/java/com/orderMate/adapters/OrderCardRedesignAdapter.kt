@@ -342,20 +342,30 @@ class OrderCardRedesignAdapter(
         }
 
         private fun setupPaymentType(order: Order) {
+            val orderId = order.id?.takeLast(8) ?: "null"
+            android.util.Log.d("SetupPaymentTypeDebug", "Order #$orderId - setupPaymentType CALLED")
+            
             // Use shared function for pill badge
+            android.util.Log.d("SetupPaymentTypeDebug", "Order #$orderId - calling setupPaymentTypePill...")
             setupPaymentTypePill(binding.paymentTypeBadge, order)
+            android.util.Log.d("SetupPaymentTypeDebug", "Order #$orderId - pill visibility after: ${binding.paymentTypeBadge.visibility} (0=VISIBLE, 4=INVISIBLE, 8=GONE)")
             
             // Also update the payment type column (text + icon)
+            android.util.Log.d("SetupPaymentTypeDebug", "Order #$orderId - calling getPaymentTypeLabel...")
             val displayLabel = getPaymentTypeLabel(order)
+            android.util.Log.d("SetupPaymentTypeDebug", "Order #$orderId - displayLabel from getPaymentTypeLabel: '$displayLabel'")
+            
             if (displayLabel != null) {
                 binding.paymentType.text = displayLabel
                 binding.paymentIcon.setImageResource(
                     if (displayLabel.lowercase().contains("cash")) R.drawable.ic_cash 
                     else R.drawable.ic_credit_card
                 )
+                android.util.Log.d("SetupPaymentTypeDebug", "Order #$orderId - text column set to: '$displayLabel'")
             } else {
                 binding.paymentType.text = "-"
                 binding.paymentIcon.setImageResource(R.drawable.ic_credit_card)
+                android.util.Log.d("SetupPaymentTypeDebug", "Order #$orderId - text column set to: '-'")
             }
         }
 
