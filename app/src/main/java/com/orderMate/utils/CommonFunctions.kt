@@ -134,14 +134,48 @@ fun formatPaymentState(state: String?): String {
  * (#76) Gets the payment state string from an Order.
  * Single source of truth for extracting payment state from orders.
  * 
- * Returns the actual paymentState from Clover, or null if not available.
- * Does NOT infer payment state - returns exactly what Clover provides.
- * 
- * Note: PaymentState.OPEN means "no payments applied" (unpaid).
- * Payment status pill is now shown for ALL states including OPEN (displayed as "UNPAID").
+ * Uses paymentState if available from Clover SDK, otherwise infers from payment data:
+ * - No payments → OPEN
+ * - Partial payment (paid < total) → PARTIALLY_PAID  
+ * - Fully paid (paid >= total) → PAID
+ * - Has refunds → REFUNDED or PARTIALLY_REFUNDED based on amounts
  */
 fun getPaymentStateFromOrder(order: Order?): String? {
-    return order?.paymentState?.name
+    if (order == null) return null
+    
+    // Use Clover's paymentState if available
+    order.paymentState?.name?.let { return it }
+    
+    // Infer from payment data
+    val total = order.total ?: 0L
+    val payments = order.payments?.elements
+    
+    if (payments.isNullOrEmpty()) {
+        return "OPEN"
+    }
+    
+    // Calculate total paid and refunded
+    var totalPaid = 0L
+    var totalRefunded = 0L
+    
+    payments.forEach { payment ->
+        val amount = payment.amount ?: 0L
+        totalPaid += amount
+        
+        // Check for refunds on this payment
+        payment.refunds?.elements?.forEach { refund ->
+            totalRefunded += refund.amount ?: 0L
+        }
+    }
+    
+    // Determine state based on amounts
+    return when {
+        totalRefunded > 0 && totalRefunded >= totalPaid -> "REFUNDED"
+        totalRefunded > 0 -> "PARTIALLY_REFUNDED"
+        totalPaid >= total -> "PAID"
+        totalPaid > 0 -> "PARTIALLY_PAID"
+        else -> "OPEN"
+    }
 }
 
 /**
