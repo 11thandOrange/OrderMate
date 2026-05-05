@@ -43,8 +43,7 @@ import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
 import com.orderMate.utils.formatPaymentState
 import com.orderMate.utils.formatPaymentStateTitleCase
-import com.orderMate.utils.formatOrderState
-import com.orderMate.utils.formatOrderStateTitleCase
+// formatOrderState and formatOrderStateTitleCase removed - only using payment status now
 import com.orderMate.utils.showView
 import com.orderMate.utils.hideView
 import com.orderMate.modals.NoteLevel
@@ -923,7 +922,7 @@ class CalendarFragment : Fragment() {
     private fun formatFilterValue(categoryId: String, value: String): String {
         return when (categoryId) {
             FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> formatPaymentStateTitleCase(value)
-            FilterCategoryBuilder.CLOVER_ORDER_STATUS -> formatOrderStateTitleCase(value)
+            // CLOVER_ORDER_STATUS removed - only using payment status now
             else -> value
         }
     }

@@ -67,9 +67,9 @@ object FilterCategoryBuilder {
     const val WIDGET_PREFIX = "widget_"
     
     // Clover enum values (from Clover SDK)
-    // Note: OPEN is excluded - order status filter handles open/closed, payment status only shows actual payment states
-    private val CLOVER_PAYMENT_STATUS_VALUES = listOf("PAID", "PARTIALLY_PAID", "REFUNDED", "PARTIALLY_REFUNDED", "CREDITED")
-    private val CLOVER_ORDER_STATUS_VALUES = listOf("open", "locked")
+    // OPEN included as filter option (shown as "Unpaid")
+    private val CLOVER_PAYMENT_STATUS_VALUES = listOf("OPEN", "PAID", "PARTIALLY_PAID", "REFUNDED", "PARTIALLY_REFUNDED", "CREDITED")
+    // Order status filter REMOVED - only using payment status now
     private val CLOVER_PAYMENT_TYPE_VALUES = listOf("Cash", "Credit Card", "Debit Card", "Check", "Gift Card", "External Gift Card", "Other")
     
     /**
@@ -93,11 +93,9 @@ object FilterCategoryBuilder {
         }
         
         // 2. Clover filters - check settings for each (default: shown)
+        // Order status filter REMOVED - only using payment status now
         if (settingsManager?.getShowFilterPaymentStatus() != false) {
             categories.add(buildPaymentStatusFilter())
-        }
-        if (settingsManager?.getShowFilterOrderStatus() != false) {
-            categories.add(buildOrderStatusFilter())
         }
         if (settingsManager?.getShowFilterPaymentType() != false) {
             categories.add(buildPaymentTypeFilter())
@@ -178,27 +176,8 @@ object FilterCategoryBuilder {
         )
     }
     
-    /**
-     * Build Order Status filter using Clover's known values
-     * (#81 QA) Uses title case for filter popup and pills
-     */
-    private fun buildOrderStatusFilter(): FilterCategory {
-        val options = CLOVER_ORDER_STATUS_VALUES.map { status ->
-            FilterOption(
-                id = status.lowercase(),
-                label = formatOrderStateTitleCase(status),
-                value = status
-            )
-        }
-        
-        return FilterCategory(
-            id = CLOVER_ORDER_STATUS,
-            label = "Order Status",
-            type = FilterType.MULTI_SELECT,
-            source = FilterSource.CLOVER,
-            options = options
-        )
-    }
+    // Order Status filter REMOVED - only using payment status now
+    // buildOrderStatusFilter() function removed
     
     /**
      * Build Payment Type filter using Clover's known tender types

@@ -108,19 +108,19 @@ fun getCustomerContactDetails(customer: Customer?): Pair<String, String> {
  * Single source of truth for payment status formatting.
  * 
  * Mapping (Clover SDK PaymentState enum):
+ * - OPEN → OPEN
  * - PAID → PAID
  * - PARTIALLY_PAID → PARTIALLY PAID
  * - PARTIALLY_REFUNDED → PARTIALLY REFUNDED
  * - REFUNDED → REFUNDED
  * - CREDITED → CREDITED
- * 
- * Note: OPEN is not mapped here - payment pill should not be shown for OPEN state.
- * The order status pill (order.state) already indicates open/closed status.
+ * - null/empty → empty string (no pill should be shown)
  */
 fun formatPaymentState(state: String?): String {
     if (state.isNullOrEmpty()) return ""
     
     return when (state.uppercase()) {
+        "OPEN" -> "OPEN"
         "PAID" -> "PAID"
         "PARTIALLY_PAID" -> "PARTIALLY PAID"
         "PARTIALLY_REFUNDED" -> "PARTIALLY REFUNDED"
@@ -138,8 +138,7 @@ fun formatPaymentState(state: String?): String {
  * Does NOT infer payment state - returns exactly what Clover provides.
  * 
  * Note: PaymentState.OPEN means "no payments applied" (unpaid).
- * The order status pill (order.state) already shows open/closed status,
- * so payment status pill should be hidden when paymentState is OPEN.
+ * Payment status pill is now shown for ALL states including OPEN (displayed as "UNPAID").
  */
 fun getPaymentStateFromOrder(order: Order?): String? {
     return order?.paymentState?.name
@@ -150,44 +149,25 @@ fun getPaymentStateFromOrder(order: Order?): String? {
  * Combines getPaymentStateFromOrder() and formatPaymentState() for convenience.
  * Use this when you need the display text directly.
  * 
- * Returns null if paymentState is OPEN or not available (no pill should be shown).
+ * Returns formatted payment state for ALL states including OPEN (shown as UNPAID).
  */
-fun getFormattedPaymentState(order: Order?): String? {
+fun getFormattedPaymentState(order: Order?): String {
     val paymentState = getPaymentStateFromOrder(order)
-    // Don't format OPEN - no payment pill should be shown
-    if (paymentState == null || paymentState == "OPEN") return null
     return formatPaymentState(paymentState)
 }
 
-/**
- * Formats Clover order state to display text (UPPERCASE).
- * Single source of truth for order status formatting.
- * 
- * Mapping:
- * - open → OPEN
- * - locked → CLOSED
- */
-fun formatOrderState(state: String?): String {
-    if (state.isNullOrEmpty()) return "OPEN"
-    
-    return when (state.lowercase()) {
-        "open" -> "OPEN"
-        "locked" -> "CLOSED"
-        else -> state.uppercase()
-    }
-}
+// formatOrderState and formatOrderStateTitleCase REMOVED
+// Order status (order.state) is no longer used - only payment status is shown
 
 /**
  * (#76) Formats Clover payment state to title case (only first letter capitalized).
  * Used specifically for Settings filters tab display.
- * 
- * Note: OPEN is not mapped here - payment filter should not include OPEN/Unpaid.
- * The order status filter already handles open/closed status.
  */
 fun formatPaymentStateTitleCase(state: String?): String {
     if (state.isNullOrEmpty()) return ""
     
     return when (state.uppercase()) {
+        "OPEN" -> "Open"
         "PAID" -> "Paid"
         "PARTIALLY_PAID" -> "Partially paid"
         "PARTIALLY_REFUNDED" -> "Partially refunded"
@@ -197,23 +177,10 @@ fun formatPaymentStateTitleCase(state: String?): String {
     }
 }
 
-/**
- * (#76) Formats Clover order state to title case (only first letter capitalized).
- * Used specifically for Settings filters tab display.
- */
-fun formatOrderStateTitleCase(state: String?): String {
-    if (state.isNullOrEmpty()) return "Open"
-    
-    return when (state.lowercase()) {
-        "open" -> "Open"
-        "locked" -> "Closed"
-        else -> state.lowercase().replaceFirstChar { it.uppercase() }
-    }
-}
+// formatOrderStateTitleCase REMOVED - order status no longer used
 
-fun Context.getThePaymentState(order: Order?): String? {
+fun Context.getThePaymentState(order: Order?): String {
     // Use the single source of truth function for payment state
-    // Returns null for OPEN state (no payment pill should be shown)
     return getFormattedPaymentState(order)
 }
 

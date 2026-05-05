@@ -64,17 +64,12 @@ object OrderFilterUtils {
             
             when (categoryId) {
                 FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> {
-                    // Filter values: "PAID", "PARTIALLY_PAID", etc. (OPEN excluded)
-                    // Returns null if no payment state - order won't match any payment filter
-                    val orderPayment = getPaymentStateFromOrder(order)
-                    if (orderPayment == null || !selectedValues.contains(orderPayment)) return false
+                    // Filter values: "OPEN", "PAID", "PARTIALLY_PAID", etc.
+                    // OPEN means unpaid (null paymentState)
+                    val orderPayment = getPaymentStateFromOrder(order) ?: "OPEN"
+                    if (!selectedValues.contains(orderPayment)) return false
                 }
-                FilterCategoryBuilder.CLOVER_ORDER_STATUS -> {
-                    // Filter values: "open", "locked" (lowercase)
-                    // order.state is lowercase ("open", "locked")
-                    val orderState = order.state?.lowercase() ?: "open"
-                    if (!selectedValues.any { it.lowercase() == orderState }) return false
-                }
+                // CLOVER_ORDER_STATUS filter REMOVED - only using payment status now
                 FilterCategoryBuilder.CLOVER_PAYMENT_TYPE -> {
                     val paymentTypes = order.payments?.mapNotNull { 
                         it?.tender?.label?.lowercase() 

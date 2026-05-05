@@ -43,8 +43,7 @@ import com.orderMate.utils.debugSnackBar
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatMillisToDateTime
 import com.orderMate.utils.formatPaymentState
-import com.orderMate.utils.formatOrderState
-import com.orderMate.utils.getFormattedPaymentState
+// formatOrderState and getFormattedPaymentState imports removed - using formatPaymentState directly
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.getThePaymentState
 import com.orderMate.utils.hideView
@@ -227,18 +226,14 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 // #45: Clover tags in header - using unified pill styling (15% opacity + border)
                 val density = resources.displayMetrics.density
                 
-                // Order Status badge (Red)
-                val orderState = orderArguments?.state
-                binding.orderPlacedStatusValue.text = formatOrderState(orderState)
-                binding.orderPlacedStatusValue.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
-                    com.orderMate.utils.WidgetColorUtils.COLOR_ORDER_STATUS, 20f, density
-                )
-                binding.orderPlacedStatusValue.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_ORDER_STATUS)
+                // Order Status badge - REMOVED (only using payment status now)
+                binding.orderPlacedStatusValue.visibility = android.view.View.GONE
                 
-                // Payment Status badge (Yellow) - using shared function
-                // Don't show payment status pill when paymentState is OPEN (unpaid)
-                val formattedPaymentState = getFormattedPaymentState(orderArguments)
-                if (formattedPaymentState.isNullOrEmpty()) {
+                // Payment Status badge (Yellow) - only show if there's an actual payment state
+                val paymentState = orderArguments?.paymentState?.name
+                val formattedPaymentState = formatPaymentState(paymentState)
+                if (formattedPaymentState.isEmpty()) {
+                    // No payment state - don't show pill
                     binding.paymentStatusBadge.visibility = android.view.View.GONE
                 } else {
                     binding.paymentStatusBadge.text = formattedPaymentState
@@ -334,17 +329,22 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
 
+    /**
+     * Determines if order has remaining balance (is "open" for payment purposes).
+     * Uses unpaidBalance from Clover SDK - if > 0, order still needs payment.
+     * Fallback: calculate from total - payments if unpaidBalance not available.
+     */
     private fun isStatusOpen(): Boolean {
-        return ((orderArguments?.paymentState?.name?.equals(
-            Constants.OPEN,
-            true
-        ) == true)
-
-                || (orderArguments?.state?.equals(
-            Constants.OPEN,
-            true
-        ) == true))
-
+        val unpaidBalance = orderArguments?.unpaidBalance
+        return when {
+            unpaidBalance != null -> unpaidBalance > 0L
+            else -> {
+                // Fallback: if unpaidBalance not available, calculate from total - payments
+                val total = orderArguments?.total ?: 0L
+                val paidAmount = orderArguments?.payments?.sumOf { it?.amount ?: 0L } ?: 0L
+                total > paidAmount
+            }
+        }
     }
 
 

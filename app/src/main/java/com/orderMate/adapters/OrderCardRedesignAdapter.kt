@@ -19,7 +19,7 @@ import com.orderMate.utils.WidgetColorUtils
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatPaymentState
-import com.orderMate.utils.formatOrderState
+// formatOrderState removed - only using payment status now
 import com.orderMate.utils.getPaymentStateFromOrder
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.toDoubleFloatPoint
@@ -74,10 +74,10 @@ class OrderCardRedesignAdapter(
             // Order Number
             binding.orderNumber.text = "#${order.id?.takeLast(8) ?: "---"}"
 
-            // Order Status Badge
-            setupOrderStatusBadge(order)
+            // Order Status Badge - REMOVED (only using payment status now)
+            binding.orderStatusBadge.visibility = View.GONE
 
-            // Payment Status Badge
+            // Payment Status Badge - show for ALL payment states including OPEN/UNPAID
             setupPaymentStatusBadge(order)
 
             // Order Date (Task 19)
@@ -263,30 +263,19 @@ class OrderCardRedesignAdapter(
             return this * binding.root.context.resources.displayMetrics.density
         }
 
-        private fun setupOrderStatusBadge(order: Order) {
-            val state = order.state
-            val displayText = formatOrderState(state)
-            val density = binding.root.context.resources.displayMetrics.density
-            
-            // Use WidgetColorUtils for consistent colors - ORDER_STATUS = Red
-            val color = WidgetColorUtils.COLOR_ORDER_STATUS
-            
-            binding.orderStatusBadge.text = displayText
-            binding.orderStatusBadge.background = WidgetColorUtils.createPillBackground(color, 12f, density)
-            binding.orderStatusBadge.setTextColor(color)
-        }
+        // setupOrderStatusBadge REMOVED - only using payment status now
+        // Order status badge is hidden in bind() method
 
         private fun setupPaymentStatusBadge(order: Order) {
             val paymentState = getPaymentStateFromOrder(order)
+            val displayText = formatPaymentState(paymentState)
             
-            // Don't show payment status pill when paymentState is OPEN (unpaid)
-            // The order status pill already indicates the order is open/unpaid
-            if (paymentState == null || paymentState == "OPEN") {
+            // Only show pill if there's an actual payment state value
+            if (displayText.isEmpty()) {
                 binding.paymentStatusBadge.visibility = View.GONE
                 return
             }
             
-            val displayText = formatPaymentState(paymentState)
             val density = binding.root.context.resources.displayMetrics.density
             
             // Use WidgetColorUtils for consistent colors - PAYMENT_STATUS = Yellow

@@ -45,8 +45,7 @@ import com.orderMate.utils.SettingsManager
 import com.orderMate.utils.showView
 import com.orderMate.utils.formatPaymentState
 import com.orderMate.utils.formatPaymentStateTitleCase
-import com.orderMate.utils.formatOrderState
-import com.orderMate.utils.formatOrderStateTitleCase
+// formatOrderState and formatOrderStateTitleCase removed - only using payment status now
 import com.orderMate.viewmodel.SharedFilterViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -774,7 +773,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 hasPills = true
                 val displayValue = when (categoryId) {
                     FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> formatPaymentStateTitleCase(value)
-                    FilterCategoryBuilder.CLOVER_ORDER_STATUS -> formatOrderStateTitleCase(value)
+                    // CLOVER_ORDER_STATUS removed - only using payment status now
                     else -> value
                 }
                 val pill = createFilterPillWithClose(displayValue) {

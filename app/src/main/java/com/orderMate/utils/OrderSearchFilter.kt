@@ -149,11 +149,14 @@ object OrderSearchFilter {
 
     private fun matchesPaymentStatus(order: Order, value: String): Boolean {
         val state = order.paymentState?.name?.uppercase()
-        // If no payment state, order is unpaid - but we don't filter by "unpaid" anymore
-        // Use order status (open/closed) filter instead
-        if (state == null) return false
+        
+        // If no payment state, only match if searching for "open" or no filter
+        if (state.isNullOrEmpty()) {
+            return value.lowercase() == "open" || value.lowercase() == "all"
+        }
         
         return when (value.lowercase()) {
+            "open" -> state == "OPEN"
             "paid" -> state == "PAID"
             "refunded" -> state == "REFUNDED" || state == "PARTIALLY_REFUNDED"
             "partial", "partially paid" -> state == "PARTIALLY_PAID"
@@ -163,10 +166,7 @@ object OrderSearchFilter {
         }
     }
 
-    private fun matchesOrderStatus(order: Order, value: String): Boolean {
-        val state = order.state?.lowercase() ?: ""
-        return state == value.lowercase() || value.lowercase() == "all"
-    }
+    // matchesOrderStatus REMOVED - only using payment status now
 
     private fun matchesPaymentType(order: Order, value: String): Boolean {
         val type = order.payType?.name?.lowercase() ?: ""

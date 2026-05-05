@@ -179,18 +179,17 @@ class EventPreviewDialog : DialogFragment() {
         val container = view.findViewById<FlexboxLayout>(R.id.cloverDefaultPillContainer)
         container.removeAllViews()
         
-        // Only show if there's a payment state and it's not OPEN
-        // OPEN means unpaid - order status pill already indicates this
-        if (event.paymentState.isNullOrBlank() || event.paymentState == "OPEN") {
+        // Format the payment state using the common formatter (UPPERCASE like Order Detail page)
+        val displayText = formatPaymentState(event.paymentState)
+        
+        // Only show pill if there's an actual payment state value
+        if (displayText.isEmpty()) {
             container.visibility = View.GONE
             return
         }
         
         container.visibility = View.VISIBLE
         val density = resources.displayMetrics.density
-        
-        // Format the payment state using the common formatter (UPPERCASE like Order Detail page)
-        val displayText = formatPaymentState(event.paymentState)
         
         // Use same color as Order Detail page: Yellow for Payment Status
         val pillColor = WidgetColorUtils.COLOR_PAYMENT_STATUS
