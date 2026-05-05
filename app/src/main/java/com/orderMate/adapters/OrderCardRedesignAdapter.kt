@@ -189,9 +189,9 @@ class OrderCardRedesignAdapter(
             val tagsContainer = binding.tagsContainer
             val density = context.resources.displayMetrics.density
             
-            // Remove any previously added custom tags (keep first 2 - order status and payment status)
-            while (tagsContainer.childCount > 2) {
-                tagsContainer.removeViewAt(2)
+            // Remove any previously added custom tags (keep first 3 - order status, payment status, payment type)
+            while (tagsContainer.childCount > 3) {
+                tagsContainer.removeViewAt(3)
             }
             
             val customTags = getCustomTags(order)
