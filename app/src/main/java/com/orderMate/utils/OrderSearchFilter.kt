@@ -141,7 +141,7 @@ object OrderSearchFilter {
     private fun matchesSelection(order: Order, category: String, selectedValue: String): Boolean {
         return when (category.lowercase()) {
             "payment status" -> matchesPaymentStatus(order, selectedValue)
-            "order status" -> matchesOrderStatus(order, selectedValue)
+            // "order status" removed - only using payment status now
             "payment type" -> matchesPaymentType(order, selectedValue)
             else -> matchesNoteCategory(order, category, selectedValue)
         }
