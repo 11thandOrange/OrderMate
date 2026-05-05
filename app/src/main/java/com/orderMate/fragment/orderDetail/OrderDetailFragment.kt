@@ -43,7 +43,7 @@ import com.orderMate.utils.debugSnackBar
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatMillisToDateTime
 import com.orderMate.utils.formatPaymentState
-// formatOrderState and getFormattedPaymentState imports removed - using formatPaymentState directly
+import com.orderMate.utils.getPaymentStateFromOrder
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.getThePaymentState
 import com.orderMate.utils.hideView
