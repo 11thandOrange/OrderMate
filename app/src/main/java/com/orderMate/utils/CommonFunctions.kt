@@ -141,16 +141,30 @@ fun formatPaymentState(state: String?): String {
  * - Has refunds → REFUNDED or PARTIALLY_REFUNDED based on amounts
  */
 fun getPaymentStateFromOrder(order: Order?): String? {
-    if (order == null) return null
+    if (order == null) {
+        android.util.Log.d("PaymentStateDebug", "order is null")
+        return null
+    }
+    
+    val orderId = order.id?.takeLast(8) ?: "unknown"
+    val cloverPaymentState = order.paymentState?.name
+    android.util.Log.d("PaymentStateDebug", "Order #$orderId - Clover paymentState: $cloverPaymentState")
     
     // Use Clover's paymentState if available
-    order.paymentState?.name?.let { return it }
+    if (cloverPaymentState != null) {
+        android.util.Log.d("PaymentStateDebug", "Order #$orderId - Using Clover value: $cloverPaymentState")
+        return cloverPaymentState
+    }
     
     // Infer from payment data
     val total = order.total ?: 0L
     val payments = order.payments?.elements
+    val paymentCount = payments?.size ?: 0
+    
+    android.util.Log.d("PaymentStateDebug", "Order #$orderId - total: $total, paymentCount: $paymentCount")
     
     if (payments.isNullOrEmpty()) {
+        android.util.Log.d("PaymentStateDebug", "Order #$orderId - No payments, returning OPEN")
         return "OPEN"
     }
     
@@ -161,6 +175,7 @@ fun getPaymentStateFromOrder(order: Order?): String? {
     payments.forEach { payment ->
         val amount = payment.amount ?: 0L
         totalPaid += amount
+        android.util.Log.d("PaymentStateDebug", "Order #$orderId - Payment amount: $amount")
         
         // Check for refunds on this payment
         payment.refunds?.elements?.forEach { refund ->
@@ -168,14 +183,19 @@ fun getPaymentStateFromOrder(order: Order?): String? {
         }
     }
     
+    android.util.Log.d("PaymentStateDebug", "Order #$orderId - totalPaid: $totalPaid, totalRefunded: $totalRefunded")
+    
     // Determine state based on amounts
-    return when {
+    val inferredState = when {
         totalRefunded > 0 && totalRefunded >= totalPaid -> "REFUNDED"
         totalRefunded > 0 -> "PARTIALLY_REFUNDED"
         totalPaid >= total -> "PAID"
         totalPaid > 0 -> "PARTIALLY_PAID"
         else -> "OPEN"
     }
+    
+    android.util.Log.d("PaymentStateDebug", "Order #$orderId - Inferred state: $inferredState")
+    return inferredState
 }
 
 /**
