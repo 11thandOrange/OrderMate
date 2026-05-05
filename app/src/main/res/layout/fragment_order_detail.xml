@@ -343,13 +343,15 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
-                        <!-- Discount Row -->
+                        <!-- Discount Row - hidden when no discounts applied -->
                         <LinearLayout
+                            android:id="@+id/discountRow"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:paddingVertical="8dp">
                             <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/discountLabel"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"

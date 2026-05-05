@@ -229,8 +229,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 // Order Status badge - REMOVED (only using payment status now)
                 binding.orderPlacedStatusValue.visibility = android.view.View.GONE
                 
-                // Payment Status badge (Yellow) - only show if there's an actual payment state
-                val paymentState = orderArguments?.paymentState?.name
+                // Payment Status badge (Yellow) - use getPaymentStateFromOrder which infers if needed
+                val paymentState = getPaymentStateFromOrder(orderArguments)
                 val formattedPaymentState = formatPaymentState(paymentState)
                 if (formattedPaymentState.isEmpty()) {
                     // No payment state - don't show pill
@@ -805,10 +805,21 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
 
 
     private fun showTheDiscountAndTaxData() {
-        // Hide discount row if no discounts applied
+        // Hide entire discount row if no discounts applied
         if (orderArguments?.discounts == null || orderArguments?.discounts?.isEmpty() == true) {
-            binding.discount.hideView()
-            binding.discountValue.hideView()
+            binding.discountRow.hideView()
+        } else {
+            binding.discountRow.showView()
+            "${currencyName.convertToSymbol()}${
+                myApp.orderDiscount(orderArguments).toDoubleFloatPoint()
+            }".also {
+                binding.discountValue.text = it
+            }
+            exceptionHandler {
+                val discountName =
+                    orderArguments?.discounts?.get(0)?.jsonObject?.get(Constants.name)
+                binding.discountLabel.text = discountName.toString()
+            }
         }
 
         "${currencyName.convertToSymbol()}${
@@ -820,16 +831,6 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             myApp.orderLineItemTotal(orderArguments).toDoubleFloatPoint()
         }".also {
             binding.subtotalValue.text = it
-        }
-        "${currencyName.convertToSymbol()}${
-            myApp.orderDiscount(orderArguments).toDoubleFloatPoint()
-        }".also {
-            binding.discountValue.text = it
-        }
-        exceptionHandler {
-            val discountName =
-                orderArguments?.discounts?.get(0)?.jsonObject?.get(Constants.name)
-            binding.discount.text = discountName.toString()
         }
     }
 
