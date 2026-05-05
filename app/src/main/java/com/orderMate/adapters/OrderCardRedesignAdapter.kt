@@ -19,6 +19,9 @@ import com.orderMate.utils.WidgetColorUtils
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatPaymentState
+import com.orderMate.utils.getPaymentTypeLabel
+import com.orderMate.utils.setupPaymentStatusPill
+import com.orderMate.utils.setupPaymentTypePill
 // formatOrderState removed - only using payment status now
 import com.orderMate.utils.getPaymentStateFromOrder
 import com.orderMate.utils.MyApp
@@ -267,24 +270,8 @@ class OrderCardRedesignAdapter(
         // Order status badge is hidden in bind() method
 
         private fun setupPaymentStatusBadge(order: Order) {
-            val paymentState = getPaymentStateFromOrder(order)
-            val displayText = formatPaymentState(paymentState)
-            
-            // Only show pill if there's an actual payment state value
-            if (displayText.isEmpty()) {
-                binding.paymentStatusBadge.visibility = View.GONE
-                return
-            }
-            
-            val density = binding.root.context.resources.displayMetrics.density
-            
-            // Use WidgetColorUtils for consistent colors - PAYMENT_STATUS = Yellow
-            val color = WidgetColorUtils.COLOR_PAYMENT_STATUS
-            
-            binding.paymentStatusBadge.text = displayText
-            binding.paymentStatusBadge.background = WidgetColorUtils.createPillBackground(color, 12f, density)
-            binding.paymentStatusBadge.setTextColor(color)
-            binding.paymentStatusBadge.visibility = View.VISIBLE
+            // Use shared function from CommonFunctions.kt
+            setupPaymentStatusPill(binding.paymentStatusBadge, order)
         }
 
         private fun getCustomerName(order: Order): String {
@@ -355,48 +342,20 @@ class OrderCardRedesignAdapter(
         }
 
         private fun setupPaymentType(order: Order) {
-            val context = binding.root.context
-            val payments = order.payments
-            val density = context.resources.displayMetrics.density
-
-            if (payments.isNullOrEmpty()) {
+            // Use shared function for pill badge
+            setupPaymentTypePill(binding.paymentTypeBadge, order)
+            
+            // Also update the payment type column (text + icon)
+            val displayLabel = getPaymentTypeLabel(order)
+            if (displayLabel != null) {
+                binding.paymentType.text = displayLabel
+                binding.paymentIcon.setImageResource(
+                    if (displayLabel.lowercase().contains("cash")) R.drawable.ic_cash 
+                    else R.drawable.ic_credit_card
+                )
+            } else {
                 binding.paymentType.text = "-"
                 binding.paymentIcon.setImageResource(R.drawable.ic_credit_card)
-                binding.paymentTypeBadge.visibility = View.GONE
-                return
-            }
-
-            val tenderLabel = payments.firstOrNull()?.tender?.label?.lowercase() ?: ""
-            val displayLabel: String
-            
-            when {
-                tenderLabel.contains("cash") -> {
-                    displayLabel = "Cash"
-                    binding.paymentType.text = "Cash"
-                    binding.paymentIcon.setImageResource(R.drawable.ic_cash)
-                }
-                tenderLabel.contains("card") || tenderLabel.contains("credit") || tenderLabel.contains("debit") -> {
-                    displayLabel = "Card"
-                    binding.paymentType.text = "Card"
-                    binding.paymentIcon.setImageResource(R.drawable.ic_credit_card)
-                }
-                else -> {
-                    displayLabel = payments.firstOrNull()?.tender?.label ?: "-"
-                    binding.paymentType.text = displayLabel
-                    binding.paymentIcon.setImageResource(R.drawable.ic_credit_card)
-                }
-            }
-            
-            // Also show as pill badge in badges row
-            if (displayLabel != "-") {
-                binding.paymentTypeBadge.text = displayLabel.uppercase()
-                binding.paymentTypeBadge.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
-                    com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_TYPE, 20f, density
-                )
-                binding.paymentTypeBadge.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_TYPE)
-                binding.paymentTypeBadge.visibility = View.VISIBLE
-            } else {
-                binding.paymentTypeBadge.visibility = View.GONE
             }
         }
 

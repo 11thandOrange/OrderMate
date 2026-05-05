@@ -30,6 +30,7 @@ import com.orderMate.utils.CalendarManager
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FilterCategoryBuilder
 import com.orderMate.utils.getPaymentStateFromOrder
+import com.orderMate.utils.getPaymentTypeLabel
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.OrderDueDateResolver
 import com.orderMate.utils.OrderFilterUtils
@@ -659,8 +660,9 @@ class CalendarFragment : Fragment() {
             // (#30) Extract order-level tags for event preview (ORDER level widgets only)
             val customTags = extractOrderLevelTags(order.note, orderLevelWidgets)
             
-            // (#76) Get payment state from order using shared function
+            // (#76) Get payment state and type from order using shared functions
             val paymentState = getPaymentStateFromOrder(order)
+            val paymentType = getPaymentTypeLabel(order)
             
             ScheduledEvent(
                 id = order.id?.hashCode()?.toLong() ?: System.currentTimeMillis(),
@@ -674,7 +676,8 @@ class CalendarFragment : Fragment() {
                 lineItems = lineItems,
                 orderNote = order.note,
                 customTags = customTags,  // (#30) Add custom tags for event preview
-                paymentState = paymentState  // (#76) Clover payment state for event preview
+                paymentState = paymentState,  // (#76) Clover payment state for event preview
+                paymentType = paymentType     // (#76) Clover payment type (Cash, Card, etc.)
             )
         }
     }

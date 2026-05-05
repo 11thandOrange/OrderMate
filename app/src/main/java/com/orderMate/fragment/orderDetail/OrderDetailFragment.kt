@@ -44,6 +44,8 @@ import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatMillisToDateTime
 import com.orderMate.utils.formatPaymentState
 import com.orderMate.utils.getPaymentStateFromOrder
+import com.orderMate.utils.setupPaymentStatusPill
+import com.orderMate.utils.setupPaymentTypePill
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.getThePaymentState
 import com.orderMate.utils.hideView
@@ -237,23 +239,11 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 // Order Status badge - REMOVED (only using payment status now)
                 binding.orderPlacedStatusValue.visibility = android.view.View.GONE
                 
-                // Payment Status badge (Yellow) - use getPaymentStateFromOrder which infers if needed
-                val paymentState = getPaymentStateFromOrder(orderArguments)
-                val formattedPaymentState = formatPaymentState(paymentState)
-                if (formattedPaymentState.isEmpty()) {
-                    // No payment state - don't show pill
-                    binding.paymentStatusBadge.visibility = android.view.View.GONE
-                } else {
-                    binding.paymentStatusBadge.text = formattedPaymentState
-                    binding.paymentStatusBadge.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
-                        com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_STATUS, 20f, density
-                    )
-                    binding.paymentStatusBadge.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_STATUS)
-                    binding.paymentStatusBadge.visibility = android.view.View.VISIBLE
-                }
+                // Payment Status badge - use shared function
+                setupPaymentStatusPill(binding.paymentStatusBadge, orderArguments)
                 
-                // Payment Type badge - get from order payments
-                populatePaymentTypeBadge()
+                // Payment Type badge - use shared function
+                setupPaymentTypePill(binding.paymentTypeBadge, orderArguments)
                 
                 if (isStatusOpen()) {
                     binding.reOpenButton.isVisible = true
@@ -1274,29 +1264,5 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         viewModel.shareSms(data)
     }
     
-    /**
-     * Populate Payment Type badge from order payments
-     * Shows the tender type used (CASH, CREDIT_CARD, etc.)
-     */
-    private fun populatePaymentTypeBadge() {
-        val payments = orderArguments?.payments
-        if (payments.isNullOrEmpty()) {
-            binding.paymentTypeBadge.visibility = View.GONE
-            return
-        }
-        
-        // Get the first payment's tender type
-        val firstPayment = payments.firstOrNull()
-        val tenderType = firstPayment?.tender?.label 
-            ?: firstPayment?.tender?.labelKey
-            ?: return
-        
-        val density = resources.displayMetrics.density
-        binding.paymentTypeBadge.text = tenderType.uppercase()
-        binding.paymentTypeBadge.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
-            com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_TYPE, 20f, density
-        )
-        binding.paymentTypeBadge.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_TYPE)
-        binding.paymentTypeBadge.visibility = View.VISIBLE
-    }
+    // populatePaymentTypeBadge() REMOVED - using shared setupPaymentTypePill() from CommonFunctions.kt
 }

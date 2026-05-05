@@ -24,6 +24,7 @@ import com.orderMate.modals.NoteLevel
 import com.orderMate.utils.OrderNoteParser
 import com.orderMate.utils.WidgetColorUtils
 import com.orderMate.utils.WidgetManager
+import com.orderMate.utils.createPaymentStatusPillView
 import com.orderMate.utils.formatPaymentState
 import java.text.SimpleDateFormat
 import java.util.*
@@ -169,54 +170,54 @@ class EventPreviewDialog : DialogFragment() {
     }
     
     /**
-     * (#76) Setup Clover default pill (payment status) above order level pills.
-     * Uses the same styling as Order Detail page payment status badge:
-     * - Yellow color (COLOR_PAYMENT_STATUS)
-     * - No icon (just text, matching the paymentStatusBadge on Order Detail)
-     * - Same pill background styling
+     * (#76) Setup Clover default pills (payment status + payment type) above order level pills.
+     * Uses shared functions from CommonFunctions.kt for consistent styling.
      */
     private fun setupCloverDefaultPill(view: View, event: ScheduledEvent) {
         val container = view.findViewById<FlexboxLayout>(R.id.cloverDefaultPillContainer)
         container.removeAllViews()
         
-        // Format the payment state using the common formatter (UPPERCASE like Order Detail page)
-        val displayText = formatPaymentState(event.paymentState)
+        var hasAnyPill = false
         
-        // Only show pill if there's an actual payment state value
-        if (displayText.isEmpty()) {
-            container.visibility = View.GONE
-            return
-        }
-        
-        container.visibility = View.VISIBLE
-        val density = resources.displayMetrics.density
-        
-        // Use same color as Order Detail page: Yellow for Payment Status
-        val pillColor = WidgetColorUtils.COLOR_PAYMENT_STATUS
-        
-        // Create text-only pill (no icon) to match Order Detail page paymentStatusBadge
-        val textView = TextView(requireContext()).apply {
-            text = displayText
-            setTextColor(pillColor)
-            textSize = 10f
-            typeface = android.graphics.Typeface.DEFAULT_BOLD
-            setPadding(
-                (10 * density).toInt(),
-                (4 * density).toInt(),
-                (10 * density).toInt(),
-                (4 * density).toInt()
+        // Payment Status pill - use shared function
+        createPaymentStatusPillView(requireContext(), event.paymentState)?.let { textView ->
+            val lp = FlexboxLayout.LayoutParams(
+                FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                FlexboxLayout.LayoutParams.WRAP_CONTENT
             )
-            background = WidgetColorUtils.createPillBackground(pillColor, 10f, density)
+            lp.setMargins(0, 0, dpToPx(6), dpToPx(4))
+            textView.layoutParams = lp
+            container.addView(textView)
+            hasAnyPill = true
         }
         
-        val lp = FlexboxLayout.LayoutParams(
-            FlexboxLayout.LayoutParams.WRAP_CONTENT,
-            FlexboxLayout.LayoutParams.WRAP_CONTENT
-        )
-        lp.setMargins(0, 0, dpToPx(6), dpToPx(4))
-        textView.layoutParams = lp
+        // Payment Type pill - use shared function (need order for this, use paymentType from event if available)
+        event.paymentType?.let { paymentType ->
+            val density = resources.displayMetrics.density
+            val textView = TextView(requireContext()).apply {
+                text = paymentType.uppercase()
+                setTextColor(WidgetColorUtils.COLOR_PAYMENT_TYPE)
+                textSize = 10f
+                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                setPadding(
+                    (10 * density).toInt(),
+                    (4 * density).toInt(),
+                    (10 * density).toInt(),
+                    (4 * density).toInt()
+                )
+                background = WidgetColorUtils.createPillBackground(WidgetColorUtils.COLOR_PAYMENT_TYPE, 10f, density)
+            }
+            val lp = FlexboxLayout.LayoutParams(
+                FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                FlexboxLayout.LayoutParams.WRAP_CONTENT
+            )
+            lp.setMargins(0, 0, dpToPx(6), dpToPx(4))
+            textView.layoutParams = lp
+            container.addView(textView)
+            hasAnyPill = true
+        }
         
-        container.addView(textView)
+        container.visibility = if (hasAnyPill) View.VISIBLE else View.GONE
     }
     
     /**

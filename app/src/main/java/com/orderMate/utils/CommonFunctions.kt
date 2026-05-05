@@ -1,6 +1,8 @@
 package com.orderMate.utils
 
 import android.content.Context
+import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.clover.sdk.v3.customers.Customer
 import com.clover.sdk.v3.order.LineItem
@@ -215,6 +217,155 @@ fun formatPaymentStateTitleCase(state: String?): String {
 fun Context.getThePaymentState(order: Order?): String {
     // Use the single source of truth function for payment state
     return getFormattedPaymentState(order)
+}
+
+/**
+ * SHARED PILL RENDERING FUNCTIONS
+ * Use these everywhere Clover default pills need to render:
+ * - Order List (OrderCardRedesignAdapter)
+ * - Order Details (OrderDetailFragment)
+ * - Calendar Event Preview (EventPreviewDialog)
+ */
+
+/**
+ * Setup payment status pill on a TextView.
+ * Shows: Open, Paid, Partially Paid, Refunded, etc.
+ * Hides pill if no payment state available.
+ */
+fun setupPaymentStatusPill(textView: TextView, order: Order?) {
+    val paymentState = getPaymentStateFromOrder(order)
+    val displayText = formatPaymentState(paymentState)
+    
+    if (displayText.isEmpty()) {
+        textView.visibility = View.GONE
+        return
+    }
+    
+    val density = textView.context.resources.displayMetrics.density
+    textView.text = displayText
+    textView.background = WidgetColorUtils.createPillBackground(
+        WidgetColorUtils.COLOR_PAYMENT_STATUS, 20f, density
+    )
+    textView.setTextColor(WidgetColorUtils.COLOR_PAYMENT_STATUS)
+    textView.visibility = View.VISIBLE
+}
+
+/**
+ * Setup payment status pill from a payment state string (for EventPreviewDialog).
+ */
+fun setupPaymentStatusPillFromState(textView: TextView, paymentState: String?) {
+    val displayText = formatPaymentState(paymentState)
+    
+    if (displayText.isEmpty()) {
+        textView.visibility = View.GONE
+        return
+    }
+    
+    val density = textView.context.resources.displayMetrics.density
+    textView.text = displayText
+    textView.background = WidgetColorUtils.createPillBackground(
+        WidgetColorUtils.COLOR_PAYMENT_STATUS, 20f, density
+    )
+    textView.setTextColor(WidgetColorUtils.COLOR_PAYMENT_STATUS)
+    textView.visibility = View.VISIBLE
+}
+
+/**
+ * Setup payment type pill on a TextView.
+ * Shows: Cash, Card, or tender label.
+ * Hides pill if no payments.
+ */
+fun setupPaymentTypePill(textView: TextView, order: Order?) {
+    val payments = order?.payments
+    
+    if (payments.isNullOrEmpty()) {
+        textView.visibility = View.GONE
+        return
+    }
+    
+    val tenderLabel = payments.firstOrNull()?.tender?.label?.lowercase() ?: ""
+    val displayLabel = when {
+        tenderLabel.contains("cash") -> "CASH"
+        tenderLabel.contains("card") || tenderLabel.contains("credit") || tenderLabel.contains("debit") -> "CARD"
+        else -> payments.firstOrNull()?.tender?.label?.uppercase() ?: ""
+    }
+    
+    if (displayLabel.isEmpty()) {
+        textView.visibility = View.GONE
+        return
+    }
+    
+    val density = textView.context.resources.displayMetrics.density
+    textView.text = displayLabel
+    textView.background = WidgetColorUtils.createPillBackground(
+        WidgetColorUtils.COLOR_PAYMENT_TYPE, 20f, density
+    )
+    textView.setTextColor(WidgetColorUtils.COLOR_PAYMENT_TYPE)
+    textView.visibility = View.VISIBLE
+}
+
+/**
+ * Get payment type display label from order.
+ * Returns: "Cash", "Card", or tender label.
+ */
+fun getPaymentTypeLabel(order: Order?): String? {
+    val payments = order?.payments
+    if (payments.isNullOrEmpty()) return null
+    
+    val tenderLabel = payments.firstOrNull()?.tender?.label?.lowercase() ?: ""
+    return when {
+        tenderLabel.contains("cash") -> "Cash"
+        tenderLabel.contains("card") || tenderLabel.contains("credit") || tenderLabel.contains("debit") -> "Card"
+        else -> payments.firstOrNull()?.tender?.label
+    }
+}
+
+/**
+ * Create a payment status pill TextView (for dynamic containers like FlexboxLayout).
+ * Returns null if no payment state.
+ */
+fun createPaymentStatusPillView(context: Context, paymentState: String?): TextView? {
+    val displayText = formatPaymentState(paymentState)
+    if (displayText.isEmpty()) return null
+    
+    val density = context.resources.displayMetrics.density
+    return TextView(context).apply {
+        text = displayText
+        setTextColor(WidgetColorUtils.COLOR_PAYMENT_STATUS)
+        textSize = 10f
+        typeface = android.graphics.Typeface.DEFAULT_BOLD
+        setPadding(
+            (10 * density).toInt(),
+            (4 * density).toInt(),
+            (10 * density).toInt(),
+            (4 * density).toInt()
+        )
+        background = WidgetColorUtils.createPillBackground(WidgetColorUtils.COLOR_PAYMENT_STATUS, 10f, density)
+    }
+}
+
+/**
+ * Create a payment type pill TextView (for dynamic containers like FlexboxLayout).
+ * Returns null if no payments.
+ */
+fun createPaymentTypePillView(context: Context, order: Order?): TextView? {
+    val displayLabel = getPaymentTypeLabel(order)?.uppercase()
+    if (displayLabel.isNullOrEmpty()) return null
+    
+    val density = context.resources.displayMetrics.density
+    return TextView(context).apply {
+        text = displayLabel
+        setTextColor(WidgetColorUtils.COLOR_PAYMENT_TYPE)
+        textSize = 10f
+        typeface = android.graphics.Typeface.DEFAULT_BOLD
+        setPadding(
+            (10 * density).toInt(),
+            (4 * density).toInt(),
+            (10 * density).toInt(),
+            (4 * density).toInt()
+        )
+        background = WidgetColorUtils.createPillBackground(WidgetColorUtils.COLOR_PAYMENT_TYPE, 10f, density)
+    }
 }
 
 
