@@ -299,7 +299,7 @@
                             android:background="#1AFFFFFF"
                             android:layout_marginBottom="16dp" />
 
-                        <!-- Subtotal Row - matches HTML .detail-summary-row -->
+                        <!-- Subtotal Row -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -343,7 +343,43 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
-                        <!-- Discount Row - conditional: only when discounts applied -->
+                        <!-- Total Row (BOLD) - Order Total before adjustments -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingVertical="8dp">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/total"
+                                android:textColor="@color/text_light"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/totalValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="$0.00"
+                                android:textColor="@color/text_light"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Dividing line -->
+                        <View
+                            android:id="@+id/adjustmentsDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#1AFFFFFF"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:visibility="gone" />
+
+                        <!-- CONDITIONAL ROWS (below divider) -->
+                        
+                        <!-- Discount Row - conditional -->
                         <LinearLayout
                             android:id="@+id/discountRow"
                             android:layout_width="match_parent"
@@ -368,7 +404,7 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
-                        <!-- Payment Row - conditional: only when payments made -->
+                        <!-- Payment Row - conditional -->
                         <LinearLayout
                             android:id="@+id/paymentRow"
                             android:layout_width="match_parent"
@@ -392,7 +428,7 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
-                        <!-- Refund Row - conditional: only when refunds issued -->
+                        <!-- Refund Row - conditional -->
                         <LinearLayout
                             android:id="@+id/refundRow"
                             android:layout_width="match_parent"
@@ -416,7 +452,7 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
-                        <!-- Credit Row - conditional: only when credits applied -->
+                        <!-- Credit Row - conditional -->
                         <LinearLayout
                             android:id="@+id/creditRow"
                             android:layout_width="match_parent"
@@ -440,34 +476,28 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
-                        <!-- Total separator - matches HTML .detail-summary-row.total border-top -->
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#1AFFFFFF"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="12dp" />
-
-                        <!-- Total Row - matches HTML .detail-summary-row.total -->
-                        <!-- font-weight: 600, font-size: 16px -->
+                        <!-- Balance Row - RED color, shows after adjustments -->
                         <LinearLayout
+                            android:id="@+id/balanceRow"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:paddingVertical="8dp"
+                            android:visibility="gone">
                             <com.google.android.material.textview.MaterialTextView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="@string/total"
-                                android:textColor="@color/text_light"
+                                android:text="Balance"
+                                android:textColor="#FF5252"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
                             <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/totalValue"
+                                android:id="@+id/balanceValue"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="$0.00"
-                                android:textColor="@color/text_light"
+                                android:textColor="#FF5252"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
                         </LinearLayout>

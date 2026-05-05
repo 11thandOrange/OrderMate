@@ -236,7 +236,11 @@ fun setupPaymentStatusPill(textView: TextView, order: Order?) {
     val paymentState = getPaymentStateFromOrder(order)
     val displayText = formatPaymentState(paymentState)
     
+    val orderId = order?.id?.takeLast(8) ?: "null"
+    android.util.Log.d("PillDebug", "setupPaymentStatusPill: Order #$orderId - paymentState=$paymentState, displayText='$displayText'")
+    
     if (displayText.isEmpty()) {
+        android.util.Log.d("PillDebug", "setupPaymentStatusPill: Order #$orderId - HIDING pill (empty displayText)")
         textView.visibility = View.GONE
         return
     }
@@ -248,6 +252,7 @@ fun setupPaymentStatusPill(textView: TextView, order: Order?) {
     )
     textView.setTextColor(WidgetColorUtils.COLOR_PAYMENT_STATUS)
     textView.visibility = View.VISIBLE
+    android.util.Log.d("PillDebug", "setupPaymentStatusPill: Order #$orderId - SHOWING pill with text='$displayText'")
 }
 
 /**

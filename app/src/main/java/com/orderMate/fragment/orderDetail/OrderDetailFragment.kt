@@ -213,17 +213,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 totalPriceFromApi = total ?: Constants.defaultLong
                 currencyName = currency ?: Constants.defaultString
                 
-                // Calculate balance due: Total - Payments + Refunds - Credits
+                // Total row shows order total (before adjustments)
                 val orderTotal = total ?: 0L
-                val totalPayments = payments?.sumOf { it?.amount ?: 0L } ?: 0L
-                val totalRefunds = refunds?.sumOf { it?.amount ?: 0L } ?: 0L
-                val totalCredits = credits?.sumOf { it?.amount ?: 0L } ?: 0L
-                val balanceDue = orderTotal - totalPayments + totalRefunds - totalCredits
-                
                 getString(
                     R.string.priceString,
                     currencyName.convertToSymbol(),
-                    balanceDue.toDoubleFloatPoint()
+                    orderTotal.toDoubleFloatPoint()
                 ).also {
                     binding.totalValue.text = it
                 }
@@ -815,12 +810,16 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             binding.taxValue.text = it
         }
         
-        // Discount row - conditional: only when discounts applied
+        // Track if any conditional rows are shown
+        var hasAdjustments = false
+        
+        // Discount row - conditional
         val discountAmount = myApp.orderDiscount(orderArguments)
         if (orderArguments?.discounts.isNullOrEmpty() || discountAmount <= 0) {
             binding.discountRow.hideView()
         } else {
             binding.discountRow.showView()
+            hasAdjustments = true
             "-${symbol}${discountAmount.toDoubleFloatPoint()}".also {
                 binding.discountValue.text = it
             }
@@ -832,40 +831,61 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             }
         }
         
-        // Payment row - conditional: only when payments made
+        // Payment row - conditional
         val payments = orderArguments?.payments
         val totalPayments = payments?.sumOf { it?.amount ?: 0L } ?: 0L
         if (payments.isNullOrEmpty() || totalPayments <= 0) {
             binding.paymentRow.hideView()
         } else {
             binding.paymentRow.showView()
+            hasAdjustments = true
             "-${symbol}${totalPayments.toDoubleFloatPoint()}".also {
                 binding.paymentValue.text = it
             }
         }
         
-        // Refund row - conditional: only when refunds issued
+        // Refund row - conditional
         val refunds = orderArguments?.refunds
         val totalRefunds = refunds?.sumOf { it?.amount ?: 0L } ?: 0L
         if (refunds.isNullOrEmpty() || totalRefunds <= 0) {
             binding.refundRow.hideView()
         } else {
             binding.refundRow.showView()
+            hasAdjustments = true
             "${symbol}${totalRefunds.toDoubleFloatPoint()}".also {
                 binding.refundValue.text = it
             }
         }
         
-        // Credit row - conditional: only when credits applied
+        // Credit row - conditional
         val credits = orderArguments?.credits
         val totalCredits = credits?.sumOf { it?.amount ?: 0L } ?: 0L
         if (credits.isNullOrEmpty() || totalCredits <= 0) {
             binding.creditRow.hideView()
         } else {
             binding.creditRow.showView()
+            hasAdjustments = true
             "-${symbol}${totalCredits.toDoubleFloatPoint()}".also {
                 binding.creditValue.text = it
             }
+        }
+        
+        // Show divider and balance row only if there are adjustments
+        if (hasAdjustments) {
+            binding.adjustmentsDivider.showView()
+            binding.balanceRow.showView()
+            
+            // Calculate balance: Total - Payments + Refunds - Credits
+            // Note: Discount is already factored into the order total from Clover
+            val orderTotal = orderArguments?.total ?: 0L
+            val balance = orderTotal - totalPayments + totalRefunds - totalCredits
+            
+            "${symbol}${balance.toDoubleFloatPoint()}".also {
+                binding.balanceValue.text = it
+            }
+        } else {
+            binding.adjustmentsDivider.hideView()
+            binding.balanceRow.hideView()
         }
     }
 
