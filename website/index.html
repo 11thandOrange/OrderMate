@@ -819,6 +819,67 @@
             overflow: hidden;
         }
 
+        .demo-video-container iframe {
+            position: absolute;
+            top: -60px;
+            left: 0;
+            width: 100%;
+            height: calc(100% + 120px);
+            border: none;
+        }
+
+        .demo-video-container .video-overlay {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .demo-video-container .video-overlay::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            transition: var(--transition);
+        }
+
+        .demo-video-container .video-overlay:hover::after {
+            background: rgba(0,0,0,0.4);
+        }
+
+        .demo-video-container .play-btn-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 72px;
+            height: 72px;
+            background: var(--orange-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            transition: var(--transition);
+            box-shadow: 0 4px 24px rgba(255,159,67,0.4);
+        }
+
+        .demo-video-container .video-overlay:hover .play-btn-overlay {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 8px 32px rgba(255,159,67,0.5);
+        }
+
+        .demo-video-container .play-btn-overlay i {
+            color: white;
+            font-size: 24px;
+            margin-left: 4px;
+        }
+
+        .demo-video-container.playing .video-overlay {
+            display: none;
+        }
 
         .demo-video-container video {
             width: 100%;
@@ -1459,22 +1520,10 @@
             <div class="demo-grid">
                 <!-- Demo 1: Add Item Level Notes -->
                 <div class="demo-card" id="demo-item-notes">
-                    <div class="demo-video-container">
-                        <!-- 
-                        TO ADD YOUR VIDEO:
-                        1. Upload Screen_recording_20260428_174151.webm to the website/videos/ folder
-                        2. Uncomment the video tag below and remove the placeholder div
-                        
-                        <video src="videos/Screen_recording_20260428_174151.webm" controls playsinline></video>
-                        -->
-                        <div class="video-placeholder">
-                            <i class="fas fa-film"></i>
-                            <span>Video: Add Item Level Notes</span>
-                            <small style="opacity: 0.5;">Screen_recording_20260428_174151.webm</small>
-                        </div>
-                        <div class="play-overlay">
-                            <div class="play-btn">
-                                <i class="fas fa-play" style="margin-left: 4px;"></i>
+                    <div class="demo-video-container" data-video-id="cwyF2NgQz54">
+                        <div class="video-overlay" style="background-image: url('https://img.youtube.com/vi/cwyF2NgQz54/maxresdefault.jpg');">
+                            <div class="play-btn-overlay">
+                                <i class="fas fa-play"></i>
                             </div>
                         </div>
                     </div>
@@ -1488,22 +1537,10 @@
 
                 <!-- Demo 2: Add Order Level Notes -->
                 <div class="demo-card" id="demo-order-notes">
-                    <div class="demo-video-container">
-                        <!-- 
-                        TO ADD YOUR VIDEO:
-                        1. Upload Screen_recording_20260428_174453.webm to the website/videos/ folder
-                        2. Uncomment the video tag below and remove the placeholder div
-                        
-                        <video src="videos/Screen_recording_20260428_174453.webm" controls playsinline></video>
-                        -->
-                        <div class="video-placeholder">
-                            <i class="fas fa-film"></i>
-                            <span>Video: Add Order Level Notes</span>
-                            <small style="opacity: 0.5;">Screen_recording_20260428_174453.webm</small>
-                        </div>
-                        <div class="play-overlay">
-                            <div class="play-btn">
-                                <i class="fas fa-play" style="margin-left: 4px;"></i>
+                    <div class="demo-video-container" data-video-id="nNO3-6LSZrY">
+                        <div class="video-overlay" style="background-image: url('https://img.youtube.com/vi/nNO3-6LSZrY/maxresdefault.jpg');">
+                            <div class="play-btn-overlay">
+                                <i class="fas fa-play"></i>
                             </div>
                         </div>
                     </div>
@@ -1517,22 +1554,10 @@
 
                 <!-- Demo 3: Send Customer Notifications -->
                 <div class="demo-card" id="demo-customer-notification">
-                    <div class="demo-video-container">
-                        <!-- 
-                        TO ADD YOUR VIDEO:
-                        1. Upload Screen_recording_20260428_175149.webm to the website/videos/ folder
-                        2. Uncomment the video tag below and remove the placeholder div
-                        
-                        <video src="videos/Screen_recording_20260428_175149.webm" controls playsinline></video>
-                        -->
-                        <div class="video-placeholder">
-                            <i class="fas fa-film"></i>
-                            <span>Video: Send Customer Notifications</span>
-                            <small style="opacity: 0.5;">Screen_recording_20260428_175149.webm</small>
-                        </div>
-                        <div class="play-overlay">
-                            <div class="play-btn">
-                                <i class="fas fa-play" style="margin-left: 4px;"></i>
+                    <div class="demo-video-container" data-video-id="EfkYBxFmgOM">
+                        <div class="video-overlay" style="background-image: url('https://img.youtube.com/vi/EfkYBxFmgOM/maxresdefault.jpg');">
+                            <div class="play-btn-overlay">
+                                <i class="fas fa-play"></i>
                             </div>
                         </div>
                     </div>
@@ -1544,53 +1569,29 @@
                 </div>
 
 
-                <!-- Demo 4: Customize Your Profile -->
+                <!-- Demo 4: Easily Customize Your Settings -->
                 <div class="demo-card" id="demo-profile">
-                    <div class="demo-video-container">
-                        <!-- 
-                        TO ADD YOUR VIDEO:
-                        1. Upload Screen_recording_20260428_175359.webm to the website/videos/ folder
-                        2. Uncomment the video tag below and remove the placeholder div
-                        
-                        <video src="videos/Screen_recording_20260428_175359.webm" controls playsinline></video>
-                        -->
-                        <div class="video-placeholder">
-                            <i class="fas fa-film"></i>
-                            <span>Video: Customize Your Profile</span>
-                            <small style="opacity: 0.5;">Screen_recording_20260428_175359.webm</small>
-                        </div>
-                        <div class="play-overlay">
-                            <div class="play-btn">
-                                <i class="fas fa-play" style="margin-left: 4px;"></i>
+                    <div class="demo-video-container" data-video-id="eAGtLMxInnw">
+                        <div class="video-overlay" style="background-image: url('https://img.youtube.com/vi/eAGtLMxInnw/maxresdefault.jpg');">
+                            <div class="play-btn-overlay">
+                                <i class="fas fa-play"></i>
                             </div>
                         </div>
                     </div>
                     <div class="demo-info">
                         <span class="demo-tag">Personalization</span>
-                        <h3>Customize Your Profile</h3>
-                        <p>Personalize your experience with custom avatars and theme colors. Choose accent colors that match your brand or personal preference.</p>
+                        <h3>Easily Customize Your Settings</h3>
+                        <p>Schedule reminders, receipt printing, and more with unique preferences that make your life easier.</p>
                     </div>
                 </div>
 
 
                 <!-- Demo 5: Smart Search, Filters & Calendar View (Wide) -->
                 <div class="demo-card wide" id="demo-find-edit">
-                    <div class="demo-video-container">
-                        <!-- 
-                        TO ADD YOUR VIDEO:
-                        1. Upload Screen_recording_20260428_175841.webm to the website/videos/ folder
-                        2. Uncomment the video tag below and remove the placeholder div
-                        
-                        <video src="videos/Screen_recording_20260428_175841.webm" controls playsinline></video>
-                        -->
-                        <div class="video-placeholder">
-                            <i class="fas fa-film"></i>
-                            <span>Video: Smart Search, Filters & Calendar View</span>
-                            <small style="opacity: 0.5;">Screen_recording_20260428_175841.webm</small>
-                        </div>
-                        <div class="play-overlay">
-                            <div class="play-btn">
-                                <i class="fas fa-play" style="margin-left: 4px;"></i>
+                    <div class="demo-video-container" data-video-id="j8ylpJlR21o">
+                        <div class="video-overlay" style="background-image: url('https://img.youtube.com/vi/j8ylpJlR21o/maxresdefault.jpg');">
+                            <div class="play-btn-overlay">
+                                <i class="fas fa-play"></i>
                             </div>
                         </div>
                     </div>
@@ -1711,25 +1712,53 @@
         });
 
 
-        // Video play functionality (for when videos are added)
-        document.querySelectorAll('.demo-card').forEach(card => {
-            const video = card.querySelector('video');
-            const overlay = card.querySelector('.play-overlay');
+        // YouTube API Player
+        let players = {};
+        
+        // Load YouTube IFrame API
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // Handle video overlay clicks
+        document.querySelectorAll('.demo-video-container').forEach((container, index) => {
+            const overlay = container.querySelector('.video-overlay');
+            const videoId = container.dataset.videoId;
             
-            if (video && overlay) {
+            if (overlay && videoId) {
                 overlay.addEventListener('click', function() {
-                    if (video.paused) {
-                        video.play();
-                        overlay.style.opacity = '0';
-                    } else {
-                        video.pause();
-                        overlay.style.opacity = '1';
-                    }
-                });
-
-
-                video.addEventListener('ended', function() {
-                    overlay.style.opacity = '1';
+                    // Create iframe container
+                    const playerDiv = document.createElement('div');
+                    playerDiv.id = 'player-' + index;
+                    container.insertBefore(playerDiv, overlay);
+                    
+                    // Hide overlay
+                    container.classList.add('playing');
+                    
+                    // Create YouTube player
+                    players[index] = new YT.Player('player-' + index, {
+                        videoId: videoId,
+                        playerVars: {
+                            autoplay: 1,
+                            controls: 1,
+                            modestbranding: 1,
+                            rel: 0,
+                            showinfo: 0,
+                            iv_load_policy: 3,
+                            fs: 1
+                        },
+                        events: {
+                            onStateChange: function(event) {
+                                if (event.data === YT.PlayerState.ENDED) {
+                                    container.classList.remove('playing');
+                                    const iframe = container.querySelector('iframe');
+                                    if (iframe) iframe.remove();
+                                    delete players[index];
+                                }
+                            }
+                        }
+                    });
                 });
             }
         });
