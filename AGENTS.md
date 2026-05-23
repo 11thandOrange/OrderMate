@@ -13,6 +13,12 @@ ordermate-agent (Orchestrator)
 ├── build-release     - APK builds, version management, releases
 ├── postman-manager   - API testing with Postman collections
 └── pr-reviewer       - Pull request reviews and GitHub interactions
+
+docs-agent (Documentation Orchestrator)
+├── docs-writer       - Writes and updates documentation content
+├── api-spec-generator - Extracts API specs from Kotlin code
+├── changelog-agent   - Generates changelogs from git commits
+└── site-deployer     - Builds and deploys to GitHub Pages
 ```
 
 ### Critical Safety Rules
@@ -34,6 +40,17 @@ All agent definitions are stored in `.agents/agents/`:
 - `build-release.md` - Build & release management
 - `postman-manager.md` - API testing with Postman
 - `pr-reviewer.md` - PR review & GitHub interactions
+- `docs-agent.md` - Documentation orchestrator
+- `docs-writer.md` - Documentation content writer
+- `api-spec-generator.md` - API spec extraction from Kotlin
+- `changelog-agent.md` - Changelog generation
+- `site-deployer.md` - GitHub Pages deployment
+
+### Skills Location
+
+Custom skills are stored in `.agents/skills/`:
+- `openapi-extractor.md` - Parse Kotlin/Retrofit for API definitions
+- `docs-deploy.md` - GitHub Pages deployment configuration
 
 ### Common Agent Commands
 
@@ -46,6 +63,10 @@ All agent definitions are stored in `.agents/agents/`:
 | "Build a debug APK" | build-release |
 | "Review PR #42" | pr-reviewer |
 | "Create Postman collections" | postman-manager |
+| "Update the documentation site" | docs-agent |
+| "Generate API docs from Kotlin" | api-spec-generator |
+| "Create changelog for latest release" | changelog-agent |
+| "Deploy docs to GitHub Pages" | site-deployer |
 
 ## Tech Stack
 - **Language**: Kotlin
@@ -137,3 +158,40 @@ Parent tickets organize work into 7 areas:
 | PARTIALLY_REFUNDED | Partially Refunded |
 | REFUNDED | Refunded |
 | LOCKED | Closed |
+
+## Documentation Site
+
+The documentation site is located in `docs-site/` and uses:
+- **Frontend**: React + TypeScript + Tailwind CSS v4 + Vite
+- **Backend**: Python FastAPI (proxy/mock endpoints)
+- **Style**: Stripe-style 3-panel API documentation layout
+
+### Documentation Structure
+```
+docs-site/
+├── frontend/
+│   ├── src/
+│   │   ├── components/     # UI components (Layout, ApiReference, ui)
+│   │   ├── pages/          # Route pages (Home, GettingStarted, Api/*)
+│   │   ├── data/           # endpoints.ts, navigation.ts
+│   │   └── types/          # TypeScript definitions
+│   └── dist/               # Built output
+└── backend/
+    └── app/                # FastAPI application
+```
+
+### Documentation Commands
+```bash
+# Development
+cd docs-site/frontend && npm run dev
+
+# Build
+cd docs-site/frontend && npm run build
+
+# Deploy (via GitHub Actions)
+git push origin main  # Triggers .github/workflows/deploy-docs.yml
+```
+
+### Live Site
+- **URL**: https://11thandorange.github.io/OrderMate/
+- **Deployment**: GitHub Pages (automatic on merge to main)
