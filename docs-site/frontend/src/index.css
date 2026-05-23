@@ -3,96 +3,164 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-@theme {
-  --color-om-orange: #FF9F43;
-  --color-om-orange-hover: #e68a2e;
-  --color-om-orange-dark: #F46809;
-  --color-om-purple: #7367F0;
-  --color-om-green: #3ccd79;
-  --color-om-dark: #1a1a2e;
-  --color-om-dark-secondary: #16213e;
-  
-  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
-}
-
+/* ===========================================
+   CSS CUSTOM PROPERTIES (Design Tokens)
+   =========================================== */
 :root {
-  font-family: var(--font-family-sans);
-  line-height: 1.5;
-  font-weight: 400;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Brand Colors */
+  --color-brand: #FF9F43;
+  --color-brand-hover: #e68a2e;
+  --color-brand-dark: #F46809;
+  --color-brand-muted: rgba(255, 159, 67, 0.1);
+  
+  /* Accent Colors */
+  --color-accent-purple: #7367F0;
+  --color-accent-green: #3ccd79;
+  --color-accent-blue: #3b82f6;
+  --color-accent-amber: #f59e0b;
+  --color-accent-red: #ef4444;
+  
+  /* Background Colors */
+  --color-bg: #0f0f10;
+  --color-bg-elevated: #141416;
+  --color-bg-surface: #1a1a1e;
+  
+  /* Surface Colors */
+  --color-surface: rgba(255, 255, 255, 0.03);
+  --color-surface-hover: rgba(255, 255, 255, 0.06);
+  --color-surface-border: rgba(255, 255, 255, 0.08);
+  
+  /* Text Colors */
+  --color-text: #ffffff;
+  --color-text-secondary: #a1a1aa;
+  --color-text-muted: #71717a;
+  
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Spacing */
+  --space-container: clamp(1rem, 5vw, 2.5rem);
+  --space-section: clamp(3rem, 8vw, 5rem);
+  --space-card: 1.5rem;
+  
+  /* Radii */
+  --radius-card: 1rem;
+  --radius-card-lg: 1.5rem;
+  --radius-button: 0.5rem;
+  
+  /* Shadows */
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.2);
+  --shadow-button: 0 4px 16px rgba(255, 159, 67, 0.25);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
 }
 
+/* ===========================================
+   BASE STYLES
+   =========================================== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html {
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
 body {
   min-height: 100vh;
-  background-color: #0f0f10;
-  color: #e5e5e5;
+  background-color: var(--color-bg);
+  color: var(--color-text-secondary);
 }
 
 #root {
   min-height: 100vh;
 }
 
-/* Custom scrollbar */
+/* ===========================================
+   CUSTOM SCROLLBAR
+   =========================================== */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a2e;
+  background: var(--color-bg-elevated);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3a3a5e;
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #4a4a7e;
+  background: rgba(255, 255, 255, 0.25);
 }
 
-/* Code block styling */
-pre {
-  font-family: var(--font-family-mono);
+/* ===========================================
+   CODE STYLING
+   =========================================== */
+pre, code {
+  font-family: var(--font-mono);
 }
 
-code {
-  font-family: var(--font-family-mono);
-}
-
-/* Method badges - using inline styles instead of @apply for Tailwind v4 */
+/* ===========================================
+   METHOD BADGES
+   =========================================== */
 .method-get { 
-  background-color: rgba(16, 185, 129, 0.2); 
-  color: #34d399; 
-  border: 1px solid rgba(16, 185, 129, 0.3); 
+  background-color: rgba(34, 197, 94, 0.15); 
+  color: #4ade80; 
+  border: 1px solid rgba(34, 197, 94, 0.3); 
 }
+
 .method-post { 
-  background-color: rgba(59, 130, 246, 0.2); 
+  background-color: rgba(59, 130, 246, 0.15); 
   color: #60a5fa; 
   border: 1px solid rgba(59, 130, 246, 0.3); 
 }
+
 .method-put { 
-  background-color: rgba(245, 158, 11, 0.2); 
+  background-color: rgba(245, 158, 11, 0.15); 
   color: #fbbf24; 
   border: 1px solid rgba(245, 158, 11, 0.3); 
 }
+
 .method-delete { 
-  background-color: rgba(239, 68, 68, 0.2); 
+  background-color: rgba(239, 68, 68, 0.15); 
   color: #f87171; 
   border: 1px solid rgba(239, 68, 68, 0.3); 
 }
+
 .method-patch { 
-  background-color: rgba(168, 85, 247, 0.2); 
+  background-color: rgba(168, 85, 247, 0.15); 
   color: #c084fc; 
   border: 1px solid rgba(168, 85, 247, 0.3); 
+}
+
+/* ===========================================
+   FOCUS STYLES
+   =========================================== */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* ===========================================
+   SELECTION
+   =========================================== */
+::selection {
+  background-color: rgba(255, 159, 67, 0.3);
+  color: var(--color-text);
 }
