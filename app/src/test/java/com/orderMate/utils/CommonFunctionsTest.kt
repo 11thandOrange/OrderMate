@@ -207,20 +207,12 @@ class CommonFunctionsTest {
     }
 
     // ==================== formatPaymentState Tests (Issue #8) ====================
-
-    @Test
-    fun `formatPaymentState returns Open for OPEN`() {
-        assertEquals("Open", formatPaymentState("OPEN"))
-    }
+    // Note: OPEN is not a valid payment state for display - order status handles open/closed
+    // Payment status pill should NOT be shown for OPEN state
 
     @Test
     fun `formatPaymentState returns Paid for PAID`() {
         assertEquals("Paid", formatPaymentState("PAID"))
-    }
-
-    @Test
-    fun `formatPaymentState returns Unpaid for NOT_PAID`() {
-        assertEquals("Unpaid", formatPaymentState("NOT_PAID"))
     }
 
     @Test
@@ -239,18 +231,18 @@ class CommonFunctionsTest {
     }
 
     @Test
-    fun `formatPaymentState returns Closed for LOCKED`() {
-        assertEquals("Closed", formatPaymentState("LOCKED"))
+    fun `formatPaymentState returns Credited for CREDITED`() {
+        assertEquals("Credited", formatPaymentState("CREDITED"))
     }
 
     @Test
-    fun `formatPaymentState returns Open for null`() {
-        assertEquals("Open", formatPaymentState(null))
+    fun `formatPaymentState returns empty for null`() {
+        assertEquals("", formatPaymentState(null))
     }
 
     @Test
-    fun `formatPaymentState returns Open for empty string`() {
-        assertEquals("Open", formatPaymentState(""))
+    fun `formatPaymentState returns empty for empty string`() {
+        assertEquals("", formatPaymentState(""))
     }
 
     @Test
@@ -268,16 +260,14 @@ class CommonFunctionsTest {
     // ==================== Helper Functions for Testing ====================
 
     private fun formatPaymentState(state: String?): String {
-        if (state.isNullOrEmpty()) return "Open"
+        if (state.isNullOrEmpty()) return ""
         
         return when (state.uppercase()) {
-            "OPEN" -> "Open"
             "PAID" -> "Paid"
-            "NOT_PAID" -> "Unpaid"
             "PARTIALLY_PAID" -> "Partially Paid"
             "PARTIALLY_REFUNDED" -> "Partially Refunded"
             "REFUNDED" -> "Refunded"
-            "LOCKED" -> "Closed"
+            "CREDITED" -> "Credited"
             else -> state.replace("_", " ")
                 .lowercase()
                 .replaceFirstChar { it.uppercase() }

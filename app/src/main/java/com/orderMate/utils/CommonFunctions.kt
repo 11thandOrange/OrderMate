@@ -1,13 +1,15 @@
 package com.orderMate.utils
 
 import android.content.Context
+import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.clover.sdk.v3.customers.Customer
 import com.clover.sdk.v3.order.LineItem
 import com.clover.sdk.v3.order.Order
 import com.google.android.material.textview.MaterialTextView
 import com.orderMate.R
-import com.orderMate.adapters.OrderAdapter
+
 import com.orderMate.modals.CustomItemJson
 import com.orderMate.modals.ItemModal
 import com.orderMate.modals.ModalData
@@ -108,18 +110,19 @@ fun getCustomerContactDetails(customer: Customer?): Pair<String, String> {
  * Single source of truth for payment status formatting.
  * 
  * Mapping (Clover SDK PaymentState enum):
- * - OPEN → UNPAID
+ * - OPEN → OPEN
  * - PAID → PAID
  * - PARTIALLY_PAID → PARTIALLY PAID
  * - PARTIALLY_REFUNDED → PARTIALLY REFUNDED
  * - REFUNDED → REFUNDED
  * - CREDITED → CREDITED
+ * - null/empty → empty string (no pill should be shown)
  */
 fun formatPaymentState(state: String?): String {
-    if (state.isNullOrEmpty()) return "UNPAID"
+    if (state.isNullOrEmpty()) return ""
     
     return when (state.uppercase()) {
-        "OPEN" -> "UNPAID"
+        "OPEN" -> "OPEN"
         "PAID" -> "PAID"
         "PARTIALLY_PAID" -> "PARTIALLY PAID"
         "PARTIALLY_REFUNDED" -> "PARTIALLY REFUNDED"
@@ -130,26 +133,270 @@ fun formatPaymentState(state: String?): String {
 }
 
 /**
- * Formats Clover order state to display text (UPPERCASE).
- * Single source of truth for order status formatting.
+ * (#76) Gets the payment state string from an Order.
+ * Single source of truth for extracting payment state from orders.
  * 
- * Mapping:
- * - open → OPEN
- * - locked → CLOSED
+ * Uses paymentState if available from Clover SDK, otherwise infers from payment data:
+ * - No payments → OPEN
+ * - Partial payment (paid < total) → PARTIALLY_PAID  
+ * - Fully paid (paid >= total) → PAID
+ * - Has refunds → REFUNDED or PARTIALLY_REFUNDED based on amounts
  */
-fun formatOrderState(state: String?): String {
-    if (state.isNullOrEmpty()) return "OPEN"
+fun getPaymentStateFromOrder(order: Order?): String? {
+    if (order == null) {
+        android.util.Log.d("PaymentStateDebug", "order is null")
+        return null
+    }
     
-    return when (state.lowercase()) {
-        "open" -> "OPEN"
-        "locked" -> "CLOSED"
-        else -> state.uppercase()
+    val orderId = order.id?.takeLast(8) ?: "unknown"
+    val cloverPaymentState = order.paymentState?.name
+    val total = order.total ?: 0L
+    val unpaidBalance = order.unpaidBalance
+    val payments = order.payments
+    val paymentCount = payments?.size ?: 0
+    val state = order.state
+    
+    // Sum payment amounts
+    var totalPaid = 0L
+    payments?.forEach { payment ->
+        totalPaid += payment.amount ?: 0L
+    }
+    
+    android.util.Log.d("PaymentStateDebug", "Order #$orderId - paymentState: $cloverPaymentState, state: $state, total: $total, unpaidBalance: $unpaidBalance, payments: $paymentCount, totalPaid: $totalPaid")
+    
+    // Use Clover's paymentState if available
+    if (cloverPaymentState != null) {
+        return cloverPaymentState
+    }
+    
+    // Clover doesn't populate paymentState, infer from payments vs total
+    val inferred = when {
+        totalPaid <= 0 -> "OPEN"
+        totalPaid >= total -> "PAID"
+        else -> "PARTIALLY_PAID"
+    }
+    android.util.Log.d("PaymentStateDebug", "Order #$orderId - Inferred: $inferred")
+    return inferred
+}
+
+/**
+ * (#76) Gets the formatted payment state from an Order.
+ * Combines getPaymentStateFromOrder() and formatPaymentState() for convenience.
+ * Use this when you need the display text directly.
+ * 
+ * Returns formatted payment state for ALL states including OPEN (shown as UNPAID).
+ */
+fun getFormattedPaymentState(order: Order?): String {
+    val paymentState = getPaymentStateFromOrder(order)
+    return formatPaymentState(paymentState)
+}
+
+// formatOrderState and formatOrderStateTitleCase REMOVED
+// Order status (order.state) is no longer used - only payment status is shown
+
+/**
+ * (#76) Formats Clover payment state to title case (only first letter capitalized).
+ * Used specifically for Settings filters tab display.
+ */
+fun formatPaymentStateTitleCase(state: String?): String {
+    if (state.isNullOrEmpty()) return ""
+    
+    return when (state.uppercase()) {
+        "OPEN" -> "Open"
+        "PAID" -> "Paid"
+        "PARTIALLY_PAID" -> "Partially paid"
+        "PARTIALLY_REFUNDED" -> "Partially refunded"
+        "REFUNDED" -> "Refunded"
+        "CREDITED" -> "Credited"
+        else -> state.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
     }
 }
 
+// formatOrderStateTitleCase REMOVED - order status no longer used
+
 fun Context.getThePaymentState(order: Order?): String {
-    val state = order?.paymentState?.name ?: order?.state
-    return if (state != null) formatPaymentState(state) else getString(R.string.dash)
+    // Use the single source of truth function for payment state
+    return getFormattedPaymentState(order)
+}
+
+/**
+ * SHARED PILL RENDERING FUNCTIONS
+ * Use these everywhere Clover default pills need to render:
+ * - Order List (OrderCardRedesignAdapter)
+ * - Order Details (OrderDetailFragment)
+ * - Calendar Event Preview (EventPreviewDialog)
+ */
+
+/**
+ * Setup payment status pill on a TextView.
+ * Shows: Open, Paid, Partially Paid, Refunded, etc.
+ * Hides pill if no payment state available.
+ */
+fun setupPaymentStatusPill(textView: TextView, order: Order?) {
+    val paymentState = getPaymentStateFromOrder(order)
+    val displayText = formatPaymentState(paymentState)
+    
+    val orderId = order?.id?.takeLast(8) ?: "null"
+    android.util.Log.d("PillDebug", "setupPaymentStatusPill: Order #$orderId - paymentState=$paymentState, displayText='$displayText'")
+    
+    if (displayText.isEmpty()) {
+        android.util.Log.d("PillDebug", "setupPaymentStatusPill: Order #$orderId - HIDING pill (empty displayText)")
+        textView.visibility = View.GONE
+        return
+    }
+    
+    val density = textView.context.resources.displayMetrics.density
+    textView.text = displayText
+    textView.background = WidgetColorUtils.createPillBackground(
+        WidgetColorUtils.COLOR_PAYMENT_STATUS, 20f, density
+    )
+    textView.setTextColor(WidgetColorUtils.COLOR_PAYMENT_STATUS)
+    textView.visibility = View.VISIBLE
+    android.util.Log.d("PillDebug", "setupPaymentStatusPill: Order #$orderId - SHOWING pill with text='$displayText'")
+}
+
+/**
+ * Setup payment status pill from a payment state string (for EventPreviewDialog).
+ */
+fun setupPaymentStatusPillFromState(textView: TextView, paymentState: String?) {
+    val displayText = formatPaymentState(paymentState)
+    
+    if (displayText.isEmpty()) {
+        textView.visibility = View.GONE
+        return
+    }
+    
+    val density = textView.context.resources.displayMetrics.density
+    textView.text = displayText
+    textView.background = WidgetColorUtils.createPillBackground(
+        WidgetColorUtils.COLOR_PAYMENT_STATUS, 20f, density
+    )
+    textView.setTextColor(WidgetColorUtils.COLOR_PAYMENT_STATUS)
+    textView.visibility = View.VISIBLE
+}
+
+/**
+ * Setup payment type pill on a TextView.
+ * Shows: Cash, Card, or tender label.
+ * Hides pill if no payments.
+ */
+fun setupPaymentTypePill(textView: TextView, order: Order?) {
+    val orderId = order?.id?.takeLast(8) ?: "null"
+    val payments = order?.payments
+    val paymentCount = payments?.size ?: 0
+    
+    android.util.Log.d("PaymentTypePillDebug", "Order #$orderId - payments count: $paymentCount")
+    
+    if (payments.isNullOrEmpty()) {
+        android.util.Log.d("PaymentTypePillDebug", "Order #$orderId - HIDING: payments is null or empty")
+        textView.visibility = View.GONE
+        return
+    }
+    
+    val firstPayment = payments.firstOrNull()
+    val tender = firstPayment?.tender
+    val tenderLabel = tender?.label?.lowercase() ?: ""
+    
+    android.util.Log.d("PaymentTypePillDebug", "Order #$orderId - tender: ${tender?.label}, tenderLabel: '$tenderLabel'")
+    
+    val displayLabel = when {
+        tenderLabel.contains("cash") -> "CASH"
+        tenderLabel.contains("card") || tenderLabel.contains("credit") || tenderLabel.contains("debit") -> "CARD"
+        else -> payments.firstOrNull()?.tender?.label?.uppercase() ?: ""
+    }
+    
+    android.util.Log.d("PaymentTypePillDebug", "Order #$orderId - displayLabel: '$displayLabel'")
+    
+    if (displayLabel.isEmpty()) {
+        android.util.Log.d("PaymentTypePillDebug", "Order #$orderId - HIDING: displayLabel is empty")
+        textView.visibility = View.GONE
+        return
+    }
+    
+    val density = textView.context.resources.displayMetrics.density
+    textView.text = displayLabel
+    textView.background = WidgetColorUtils.createPillBackground(
+        WidgetColorUtils.COLOR_PAYMENT_TYPE, 20f, density
+    )
+    textView.setTextColor(WidgetColorUtils.COLOR_PAYMENT_TYPE)
+    textView.visibility = View.VISIBLE
+    android.util.Log.d("PaymentTypePillDebug", "Order #$orderId - SHOWING pill with text='$displayLabel'")
+}
+
+/**
+ * Get payment type display label from order.
+ * Returns: "Cash", "Card", or tender label.
+ */
+fun getPaymentTypeLabel(order: Order?): String? {
+    val orderId = order?.id?.takeLast(8) ?: "null"
+    val payments = order?.payments
+    val paymentCount = payments?.size ?: 0
+    
+    android.util.Log.d("PaymentTypeLabelDebug", "Order #$orderId - payments count: $paymentCount")
+    
+    if (payments.isNullOrEmpty()) {
+        android.util.Log.d("PaymentTypeLabelDebug", "Order #$orderId - returning null: payments is null or empty")
+        return null
+    }
+    
+    val tenderLabel = payments.firstOrNull()?.tender?.label?.lowercase() ?: ""
+    android.util.Log.d("PaymentTypeLabelDebug", "Order #$orderId - tenderLabel: '$tenderLabel'")
+    
+    val result = when {
+        tenderLabel.contains("cash") -> "Cash"
+        tenderLabel.contains("card") || tenderLabel.contains("credit") || tenderLabel.contains("debit") -> "Card"
+        else -> payments.firstOrNull()?.tender?.label
+    }
+    android.util.Log.d("PaymentTypeLabelDebug", "Order #$orderId - returning: '$result'")
+    return result
+}
+
+/**
+ * Create a payment status pill TextView (for dynamic containers like FlexboxLayout).
+ * Returns null if no payment state.
+ */
+fun createPaymentStatusPillView(context: Context, paymentState: String?): TextView? {
+    val displayText = formatPaymentState(paymentState)
+    if (displayText.isEmpty()) return null
+    
+    val density = context.resources.displayMetrics.density
+    return TextView(context).apply {
+        text = displayText
+        setTextColor(WidgetColorUtils.COLOR_PAYMENT_STATUS)
+        textSize = 10f
+        typeface = android.graphics.Typeface.DEFAULT_BOLD
+        setPadding(
+            (10 * density).toInt(),
+            (4 * density).toInt(),
+            (10 * density).toInt(),
+            (4 * density).toInt()
+        )
+        background = WidgetColorUtils.createPillBackground(WidgetColorUtils.COLOR_PAYMENT_STATUS, 10f, density)
+    }
+}
+
+/**
+ * Create a payment type pill TextView (for dynamic containers like FlexboxLayout).
+ * Returns null if no payments.
+ */
+fun createPaymentTypePillView(context: Context, order: Order?): TextView? {
+    val displayLabel = getPaymentTypeLabel(order)?.uppercase()
+    if (displayLabel.isNullOrEmpty()) return null
+    
+    val density = context.resources.displayMetrics.density
+    return TextView(context).apply {
+        text = displayLabel
+        setTextColor(WidgetColorUtils.COLOR_PAYMENT_TYPE)
+        textSize = 10f
+        typeface = android.graphics.Typeface.DEFAULT_BOLD
+        setPadding(
+            (10 * density).toInt(),
+            (4 * density).toInt(),
+            (10 * density).toInt(),
+            (4 * density).toInt()
+        )
+        background = WidgetColorUtils.createPillBackground(WidgetColorUtils.COLOR_PAYMENT_TYPE, 10f, density)
+    }
 }
 
 
@@ -182,6 +429,9 @@ fun createAndShowDialog(
 
 }
 
+// Holder for pickup date during parsing
+private var resultantPickupDate = ""
+
 //isTextRequired if true means from the order history screen
 // else false means order detail screen
 fun generateString(
@@ -191,7 +441,7 @@ fun generateString(
 ): String {
     var hashmap: HashMap<String, Int> = hashMapOf()
     var pickUpDate = ""
-    OrderAdapter.resultantPickupDate = ""
+    resultantPickupDate = ""
 
 
     lineItems.forEach {
@@ -336,15 +586,15 @@ private fun addTheDataToDialog(
                 hashMap[splitItem[1]] = doesHashMapHasValue(hashMap, splitItem[1])
             } else {
                 if (isPickup) {
-                    OrderAdapter.resultantPickupDate =
-                        compareDates(OrderAdapter.resultantPickupDate, splitItem[1])
-                            ?: OrderAdapter.resultantPickupDate
+                    resultantPickupDate =
+                        compareDates(resultantPickupDate, splitItem[1])
+                            ?: resultantPickupDate
                 }
             }
         }
     }
 
-    return Pair(hashMap, OrderAdapter.resultantPickupDate)
+    return Pair(hashMap, resultantPickupDate)
 }
 
 private fun compareDates(dateString1: String, dateString2: String): String? {

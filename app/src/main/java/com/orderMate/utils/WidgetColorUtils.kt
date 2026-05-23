@@ -1,7 +1,13 @@
 package com.orderMate.utils
 
+import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.orderMate.R
 import com.orderMate.modals.WidgetType
 
@@ -32,14 +38,23 @@ import com.orderMate.modals.WidgetType
  */
 object WidgetColorUtils {
     
+    // Consistent pill text truncation length (#77)
+    const val PILL_TRUNCATE_LENGTH = 20
+    
     // Dark container background color (matches filter modal bg_dialog.xml)
     const val COLOR_PILL_CONTAINER = 0xCC292D3E.toInt()
     
-    // Widget type colors (full opacity)
+    // Widget type colors - ICON (lighter shade)
     const val COLOR_CALENDAR = 0xFF64B5F6.toInt()      // Blue
     const val COLOR_SINGLE_SELECT = 0xFFCE93D8.toInt() // Purple
     const val COLOR_MULTI_SELECT = 0xFF81C784.toInt()  // Green
     const val COLOR_TEXT_BOX = 0xFFA1887F.toInt()      // Brown
+    
+    // Widget type colors - BACKGROUND (darker shade, matches bg_widget_icon_*.xml)
+    const val BG_COLOR_CALENDAR = 0xFF1976D2.toInt()      // Dark Blue
+    const val BG_COLOR_SINGLE_SELECT = 0xFF7B1FA2.toInt() // Dark Purple
+    const val BG_COLOR_MULTI_SELECT = 0xFF388E3C.toInt()  // Dark Green
+    const val BG_COLOR_TEXT_BOX = 0xFFF57C00.toInt()      // Dark Orange
     
     // Clover filter colors
     const val COLOR_PAYMENT_STATUS = 0xFFFFB74D.toInt()  // Yellow
@@ -61,14 +76,93 @@ object WidgetColorUtils {
     }
     
     /**
+     * Get background color (darker shade) for a widget type
+     * Used for editable pill borders in Settings tabs
+     */
+    fun getBgColorForWidgetType(type: WidgetType): Int {
+        return when (type) {
+            WidgetType.CALENDAR -> BG_COLOR_CALENDAR
+            WidgetType.SINGLE_SELECT -> BG_COLOR_SINGLE_SELECT
+            WidgetType.MULTI_SELECT -> BG_COLOR_MULTI_SELECT
+            WidgetType.TEXT_BOX -> BG_COLOR_TEXT_BOX
+        }
+    }
+    
+    /**
      * Get icon resource for a widget type - centralized to avoid duplicate functions
+     * (#77) Single Select = checkmark, Multi Select = double checkmark, Text Box = 'A' icon
      */
     fun getIconForWidgetType(type: WidgetType): Int {
         return when (type) {
             WidgetType.CALENDAR -> R.drawable.ic_calendar
             WidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
-            WidgetType.MULTI_SELECT -> R.drawable.ic_label
-            WidgetType.TEXT_BOX -> R.drawable.ic_edit
+            WidgetType.MULTI_SELECT -> R.drawable.ic_check_double
+            WidgetType.TEXT_BOX -> R.drawable.ic_text_format
+        }
+    }
+    
+    /**
+     * Get icon resource for utils WidgetType (used in SettingsFragment)
+     * Overload for compatibility with com.orderMate.utils.WidgetType
+     */
+    fun getIconForWidgetType(type: com.orderMate.utils.WidgetType): Int {
+        return when (type) {
+            com.orderMate.utils.WidgetType.CALENDAR -> R.drawable.ic_calendar
+            com.orderMate.utils.WidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
+            com.orderMate.utils.WidgetType.MULTI_SELECT -> R.drawable.ic_check_double
+            com.orderMate.utils.WidgetType.TEXT_BOX -> R.drawable.ic_text_format
+        }
+    }
+    
+    /**
+     * Get color for utils WidgetType (used in SettingsFragment)
+     * Overload for compatibility with com.orderMate.utils.WidgetType
+     */
+    fun getColorForWidgetType(type: com.orderMate.utils.WidgetType): Int {
+        return when (type) {
+            com.orderMate.utils.WidgetType.CALENDAR -> COLOR_CALENDAR
+            com.orderMate.utils.WidgetType.SINGLE_SELECT -> COLOR_SINGLE_SELECT
+            com.orderMate.utils.WidgetType.MULTI_SELECT -> COLOR_MULTI_SELECT
+            com.orderMate.utils.WidgetType.TEXT_BOX -> COLOR_TEXT_BOX
+        }
+    }
+    
+    /**
+     * Get background color (darker shade) for utils WidgetType
+     * Overload for compatibility with com.orderMate.utils.WidgetType
+     */
+    fun getBgColorForWidgetType(type: com.orderMate.utils.WidgetType): Int {
+        return when (type) {
+            com.orderMate.utils.WidgetType.CALENDAR -> BG_COLOR_CALENDAR
+            com.orderMate.utils.WidgetType.SINGLE_SELECT -> BG_COLOR_SINGLE_SELECT
+            com.orderMate.utils.WidgetType.MULTI_SELECT -> BG_COLOR_MULTI_SELECT
+            com.orderMate.utils.WidgetType.TEXT_BOX -> BG_COLOR_TEXT_BOX
+        }
+    }
+    
+    /**
+     * Get background drawable resource for widget icon container.
+     * Used in Settings tabs and Register popup for styled widget icons.
+     */
+    fun getIconBackgroundForWidgetType(type: WidgetType): Int {
+        return when (type) {
+            WidgetType.CALENDAR -> R.drawable.bg_widget_icon_calendar
+            WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
+            WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
+            WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
+        }
+    }
+    
+    /**
+     * Get background drawable resource for widget icon container.
+     * Overload for compatibility with com.orderMate.utils.WidgetType
+     */
+    fun getIconBackgroundForWidgetType(type: com.orderMate.utils.WidgetType): Int {
+        return when (type) {
+            com.orderMate.utils.WidgetType.CALENDAR -> R.drawable.bg_widget_icon_calendar
+            com.orderMate.utils.WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
+            com.orderMate.utils.WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
+            com.orderMate.utils.WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
         }
     }
     
@@ -143,6 +237,170 @@ object WidgetColorUtils {
             } else {
                 setColor(0x1AFFFFFF) // 10% white
                 setStroke((1 * density).toInt(), 0x33FFFFFF) // 20% white border
+            }
+        }
+    }
+    
+    /**
+     * Truncate text for pill display with consistent length (#77)
+     * Removes newlines and truncates to PILL_TRUNCATE_LENGTH chars with ellipsis
+     */
+    fun truncateForPill(text: String, maxLength: Int = PILL_TRUNCATE_LENGTH): String {
+        val cleaned = text.replace("\n", " ")
+        return if (cleaned.length > maxLength) {
+            cleaned.take(maxLength) + "..."
+        } else {
+            cleaned
+        }
+    }
+    
+    /**
+     * Create and style a pill view with consistent styling across the app.
+     * This is the SINGLE source of truth for all pill rendering.
+     * 
+     * @param context Context for inflation
+     * @param container Parent container to attach pill to (not added automatically)
+     * @param text Text to display (will be truncated)
+     * @param widgetType Widget type for color and icon
+     * @param cornerRadiusDp Corner radius in dp (default 10f)
+     * @param truncate Whether to truncate text (default true)
+     * @return Styled LinearLayout pill view (not attached to container)
+     */
+    fun createPillView(
+        context: Context,
+        container: ViewGroup,
+        text: String,
+        widgetType: WidgetType,
+        cornerRadiusDp: Float = 10f,
+        truncate: Boolean = true
+    ): LinearLayout {
+        val density = context.resources.displayMetrics.density
+        val color = getColorForWidgetType(widgetType)
+        val iconRes = getIconForWidgetType(widgetType)
+        
+        val pillView = LayoutInflater.from(context)
+            .inflate(R.layout.item_note_pill, container, false) as LinearLayout
+        
+        val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
+        val pillText = pillView.findViewById<TextView>(R.id.pillText)
+        
+        pillText.text = if (truncate) truncateForPill(text) else text
+        pillText.maxLines = 1
+        pillText.setTextColor(color)
+        
+        pillIcon.setImageResource(iconRes)
+        pillIcon.setColorFilter(color)
+        
+        pillView.background = createPillBackground(color, cornerRadiusDp, density)
+        
+        return pillView
+    }
+    
+    /**
+     * Create and add a pill view to a container.
+     * Convenience method that creates and immediately adds the pill.
+     */
+    fun addPillToContainer(
+        context: Context,
+        container: ViewGroup,
+        text: String,
+        widgetType: WidgetType,
+        cornerRadiusDp: Float = 10f,
+        truncate: Boolean = true
+    ) {
+        val pillView = createPillView(context, container, text, widgetType, cornerRadiusDp, truncate)
+        container.addView(pillView)
+    }
+    
+    /**
+     * Create an editable value pill for popup tabs (Item Level & Order Level).
+     * Shows text + colored "×" remove button.
+     * Uses consistent styling: dark container + darker shade border.
+     * 
+     * @param context Context
+     * @param text The value text to display
+     * @param tintColor Widget icon color (lighter) for X button
+     * @param borderColor Widget bg color (darker) for border
+     * @param onRemove Callback when remove button is clicked
+     * @return LinearLayout pill with text and remove button
+     */
+    fun createEditableValuePill(
+        context: Context,
+        text: String,
+        tintColor: Int,
+        borderColor: Int,
+        onRemove: () -> Unit
+    ): LinearLayout {
+        val density = context.resources.displayMetrics.density
+        
+        return LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            setPadding((10 * density).toInt(), (6 * density).toInt(), (6 * density).toInt(), (6 * density).toInt())
+            
+            // (#81 QA) Dark bg with darker shade border
+            background = GradientDrawable().apply {
+                setColor(0x1AFFFFFF) // 10% white - original dark bg
+                cornerRadius = 12f * density
+                setStroke((1 * density).toInt(), borderColor) // darker shade border
+            }
+            
+            val params = android.view.ViewGroup.MarginLayoutParams(
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            params.setMargins(0, 0, (8 * density).toInt(), (8 * density).toInt())
+            layoutParams = params
+
+            // Value text
+            addView(TextView(context).apply {
+                this.text = text
+                setTextColor(0xFFE0E0E0.toInt()) // text_light equivalent
+                textSize = 12f
+            })
+
+            // Remove button "×" (colored)
+            addView(TextView(context).apply {
+                this.text = "×"
+                setTextColor(tintColor)
+                textSize = 14f
+                setPadding((8 * density).toInt(), 0, (2 * density).toInt(), 0)
+                setOnClickListener { onRemove() }
+            })
+        }
+    }
+    
+    /**
+     * Create a read-only filter chip for the Filter tab.
+     * Displays option text with widget color styling.
+     * Uses consistent styling: dark container + 15% color overlay + 25% color border.
+     * 
+     * @param context Context
+     * @param text The option text to display
+     * @param tintColor Widget/filter color
+     * @return TextView styled as a filter chip
+     */
+    fun createFilterTabChip(
+        context: Context,
+        text: String,
+        tintColor: Int
+    ): TextView {
+        val density = context.resources.displayMetrics.density
+        
+        return TextView(context).apply {
+            this.text = text
+            setTextColor(tintColor)
+            textSize = 12f
+            setPadding((10 * density).toInt(), (6 * density).toInt(), (10 * density).toInt(), (6 * density).toInt())
+            
+            // Use consistent pill background styling
+            background = createPillBackground(tintColor, 8f, density)
+            
+            layoutParams = android.view.ViewGroup.MarginLayoutParams(
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 0, (6 * density).toInt(), (6 * density).toInt())
             }
         }
     }

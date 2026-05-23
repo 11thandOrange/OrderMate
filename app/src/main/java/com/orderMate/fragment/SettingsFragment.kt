@@ -36,9 +36,11 @@ import java.util.Collections
 import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.modals.WidgetType as FirebaseWidgetType
+import com.orderMate.utils.EmployeeRoleUtils
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
+import androidx.navigation.fragment.findNavController
 
 /**
  * Settings Fragment with Sub-tabs (#83 requirement)
@@ -143,6 +145,15 @@ class SettingsFragment : Fragment() {
     private var switchPrintNotesCustomer: Switch? = null
     private var switchPrintNotesOrder: Switch? = null
     
+    // #79: Permission Settings
+    private var switchAllowAdminSettings: Switch? = null
+    private var switchAllowManagersSettings: Switch? = null
+    private var switchAllowEmployeesSettings: Switch? = null
+    
+    // #81: Permission Settings Card container (owner-only visibility)
+    private var permissionSettingsCard: View? = null
+    private var isOwner: Boolean = false
+    
     // Loading
     private var loadingOverlay: View? = null
     
@@ -165,20 +176,47 @@ class SettingsFragment : Fragment() {
         
         settingsManager = SettingsManager(requireContext())
         
-        // Get merchantId from MyApp (Clover SDK) on background thread
+        // Get merchantId and employee info from MyApp (Clover SDK) on background thread
         runOnBackgroundThread {
             try {
                 val app = requireContext().applicationContext as? MyApp
                 val mid = app?.getMerchantId()
+                val employee = app?.getCurrentEmployee()
+                
+                // #81: Check if current user is owner for permission settings visibility
+                isOwner = EmployeeRoleUtils.isOwner(employee)
+                
                 if (!mid.isNullOrEmpty()) {
                     merchantId = mid
-                    runOnMainThread {
-                        if (isAdded) {
-                            widgetManager.setMerchantId(mid)
-                            // Now that we have merchantId, reload widgets from Firebase (not cache)
-                            loadAllWidgetsFromFirebase()
-                            // Also load templates
-                            loadTemplatesFromFirebase()
+                    
+                    // #81: Verify user has settings access (entry guard/failsafe)
+                    // If a non-permitted user somehow navigates here, redirect them
+                    firebase.getAdvancedSettings(mid) { settings ->
+                        val canAccess = EmployeeRoleUtils.canAccessSettings(employee, settings)
+                        
+                        runOnMainThread {
+                            if (isAdded) {
+                                if (!canAccess) {
+                                    // User doesn't have settings access - navigate back to order list
+                                    try {
+                                        findNavController().navigate(R.id.orderListRedesignFragment)
+                                    } catch (e: Exception) {
+                                        // Fallback: pop back if navigate fails
+                                        findNavController().popBackStack()
+                                    }
+                                    return@runOnMainThread
+                                }
+                                
+                                widgetManager.setMerchantId(mid)
+                                // Now that we have merchantId, reload widgets from Firebase (not cache)
+                                loadAllWidgetsFromFirebase()
+                                // Also load templates
+                                loadTemplatesFromFirebase()
+                                
+                                // #81: Hide permission settings card if not owner
+                                // Only owners should see and modify permission settings
+                                updatePermissionSettingsVisibility()
+                            }
                         }
                     }
                 }
@@ -198,6 +236,15 @@ class SettingsFragment : Fragment() {
         
         // Show general panel by default
         switchToTab("general")
+    }
+    
+    /**
+     * #81: Update permission settings card visibility based on user role.
+     * Only owners should see the Permission Settings card in Advanced tab.
+     * This prevents non-owners from changing their own or others' permissions.
+     */
+    private fun updatePermissionSettingsVisibility() {
+        permissionSettingsCard?.visibility = if (isOwner) View.VISIBLE else View.GONE
     }
     
     override fun onResume() {
@@ -298,6 +345,14 @@ class SettingsFragment : Fragment() {
         // Receipt Settings
         switchPrintNotesCustomer = view.findViewById(R.id.switchPrintNotesCustomer)
         switchPrintNotesOrder = view.findViewById(R.id.switchPrintNotesOrder)
+        
+        // #79: Permission Settings
+        switchAllowAdminSettings = view.findViewById(R.id.switchAllowAdminSettings)
+        switchAllowManagersSettings = view.findViewById(R.id.switchAllowManagersSettings)
+        switchAllowEmployeesSettings = view.findViewById(R.id.switchAllowEmployeesSettings)
+        
+        // #81: Permission Settings Card container (owner-only visibility)
+        permissionSettingsCard = view.findViewById(R.id.permissionSettingsCard)
     }
 
     private fun setupSubTabs() {
@@ -789,6 +844,8 @@ class SettingsFragment : Fragment() {
             .create()
         
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        // (#81 QA) Apply smooth fade animation to prevent blink
+        dialog.window?.setWindowAnimations(R.style.Animation_OrderMate_Dialog)
         
         // Set title based on level
         val title = if (level == NoteLevel.ITEM) "Add Item Widget" else "Add Order Widget"
@@ -894,7 +951,6 @@ class SettingsFragment : Fragment() {
         )
     }
     
-    // Legacy support for old SettingsManager widgets - TODO: Remove after migration
     private fun showDeleteWidgetDialog(widget: PopUpWidget) {
         showDeleteConfirmationDialog(
             title = "Delete Widget?",
@@ -988,8 +1044,9 @@ class SettingsFragment : Fragment() {
             adapter = templateAdapter
         }
         
-        // Load templates from Firebase
-        loadTemplatesFromFirebase()
+        // #78: Removed duplicate loadTemplatesFromFirebase() call here
+        // Templates are loaded in onViewCreated after merchantId is retrieved (line 181)
+        // Having it here caused race condition creating duplicate default templates
         
         // Add template button
         btnAddTemplate?.setOnClickListener {
@@ -1101,6 +1158,19 @@ class SettingsFragment : Fragment() {
             scheduleAdvancedSettingsSave()
         }
         
+        // #79: Permission Settings toggles
+        switchAllowAdminSettings?.setOnCheckedChangeListener { _, _ ->
+            scheduleAdvancedSettingsSave()
+        }
+        
+        switchAllowManagersSettings?.setOnCheckedChangeListener { _, _ ->
+            scheduleAdvancedSettingsSave()
+        }
+        
+        switchAllowEmployeesSettings?.setOnCheckedChangeListener { _, _ ->
+            scheduleAdvancedSettingsSave()
+        }
+        
         // Initial visibility state
         updateInputsVisibility()
         
@@ -1187,7 +1257,11 @@ class SettingsFragment : Fragment() {
                 receiptDays = settingsManager.getReceiptDays(),
                 receiptMinutes = settingsManager.getReceiptMinutes(),
                 printNotesOnCustomerReceipts = switchPrintNotesCustomer?.isChecked ?: true,
-                printNotesOnOrderReceipts = switchPrintNotesOrder?.isChecked ?: true
+                printNotesOnOrderReceipts = switchPrintNotesOrder?.isChecked ?: true,
+                // #79: Permission Settings
+                allowAdminUpdateSettings = switchAllowAdminSettings?.isChecked ?: true,
+                allowManagersUpdateSettings = switchAllowManagersSettings?.isChecked ?: true,
+                allowEmployeesUpdateSettings = switchAllowEmployeesSettings?.isChecked ?: true
             )
             firebase.saveAdvancedSettings(mid, settings) { success ->
                 // Silent save - no toast on success
@@ -1285,6 +1359,11 @@ class SettingsFragment : Fragment() {
                     // Update Receipt Settings toggles
                     switchPrintNotesCustomer?.isChecked = settings.printNotesOnCustomerReceipts
                     switchPrintNotesOrder?.isChecked = settings.printNotesOnOrderReceipts
+                    
+                    // #79: Update Permission Settings toggles
+                    switchAllowAdminSettings?.isChecked = settings.allowAdminUpdateSettings
+                    switchAllowManagersSettings?.isChecked = settings.allowManagersUpdateSettings
+                    switchAllowEmployeesSettings?.isChecked = settings.allowEmployeesUpdateSettings
                 }
             }
         }
@@ -1373,6 +1452,9 @@ class SettingsFragment : Fragment() {
         }
     }
     
+    // Track expanded state for order-level filter widgets
+    private val orderFilterExpandedIds = mutableSetOf<String>()
+    
     private fun bindFilterWidgetView(itemView: View, widget: WidgetConfig, onUpdate: (WidgetConfig) -> Unit) {
         val widgetIconContainer: View = itemView.findViewById(R.id.filterWidgetIconContainer)
         val widgetIcon: ImageView = itemView.findViewById(R.id.filterWidgetIcon)
@@ -1380,19 +1462,19 @@ class SettingsFragment : Fragment() {
         val widgetTypeView: TextView = itemView.findViewById(R.id.filterWidgetType)
         val widgetToggle: Switch = itemView.findViewById(R.id.filterWidgetToggle)
         val expandChevron: ImageView = itemView.findViewById(R.id.filterExpandChevron)
+        val widgetHeader: View = itemView.findViewById(R.id.filterWidgetHeader)
         val widgetBody: View = itemView.findViewById(R.id.filterWidgetBody)
+        val optionsLabel: TextView = itemView.findViewById(R.id.filterOptionsLabel)
+        val valuesContainer: FlexboxLayout = itemView.findViewById(R.id.filterValuesContainer)
         
         // Set title and type
         widgetTitle.text = widget.label
         widgetTypeView.text = widget.type.displayName
         
-        // Set icon and colors based on type - matches FilterWidgetAdapter pattern
-        val (iconRes, bgRes, tintColor) = when (widget.type) {
-            com.orderMate.modals.WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, WidgetColorUtils.COLOR_CALENDAR)
-            com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
-            com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
-            com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
-        }
+        // Set icon and colors based on type - uses centralized WidgetColorUtils
+        val iconRes = WidgetColorUtils.getIconForWidgetType(widget.type)
+        val tintColor = WidgetColorUtils.getColorForWidgetType(widget.type)
+        val bgRes = WidgetColorUtils.getIconBackgroundForWidgetType(widget.type)
         widgetIcon.setImageResource(iconRes)
         widgetIcon.setColorFilter(tintColor)
         widgetIconContainer.setBackgroundResource(bgRes)
@@ -1404,9 +1486,60 @@ class SettingsFragment : Fragment() {
             onUpdate(widget)
         }
         
-        // Hide expand chevron and body (simplified version without expand/collapse)
-        expandChevron.visibility = View.GONE
-        widgetBody.visibility = View.GONE
+        // (#77) Show/hide options based on widget type - same logic as FilterWidgetAdapter
+        val hasDropdown = widget.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
+                          widget.type == com.orderMate.modals.WidgetType.MULTI_SELECT ||
+                          widget.type == com.orderMate.modals.WidgetType.TEXT_BOX
+        
+        if (hasDropdown && widget.type != com.orderMate.modals.WidgetType.TEXT_BOX && widget.options.isNotEmpty()) {
+            optionsLabel.visibility = View.VISIBLE
+            setupOrderFilterOptionsDisplay(valuesContainer, widget, tintColor)
+            expandChevron.visibility = View.VISIBLE
+        } else if (widget.type == com.orderMate.modals.WidgetType.TEXT_BOX) {
+            optionsLabel.text = "Type: Free Text"
+            optionsLabel.visibility = View.VISIBLE
+            valuesContainer.removeAllViews()
+            expandChevron.visibility = View.VISIBLE
+        } else {
+            // CALENDAR - no dropdown needed
+            optionsLabel.visibility = View.GONE
+            valuesContainer.removeAllViews()
+            expandChevron.visibility = View.GONE
+        }
+        
+        // Expand/collapse state - only for types with dropdown
+        if (hasDropdown) {
+            val isExpanded = orderFilterExpandedIds.contains(widget.id)
+            widgetBody.visibility = if (isExpanded) View.VISIBLE else View.GONE
+            expandChevron.rotation = if (isExpanded) 180f else 0f
+            
+            // Header click to expand/collapse
+            widgetHeader.setOnClickListener {
+                val expanding = !orderFilterExpandedIds.contains(widget.id)
+                if (expanding) {
+                    orderFilterExpandedIds.add(widget.id)
+                } else {
+                    orderFilterExpandedIds.remove(widget.id)
+                }
+                // Animate
+                widgetBody.visibility = if (expanding) View.VISIBLE else View.GONE
+                expandChevron.animate().rotation(if (expanding) 180f else 0f).setDuration(200).start()
+            }
+        } else {
+            // No dropdown - hide body, no click handler
+            widgetBody.visibility = View.GONE
+            widgetHeader.setOnClickListener(null)
+        }
+    }
+    
+    private fun setupOrderFilterOptionsDisplay(container: FlexboxLayout, widget: WidgetConfig, tintColor: Int) {
+        container.removeAllViews()
+        
+        widget.options.forEach { option ->
+            // Use shared filter chip function for consistent styling
+            val chip = WidgetColorUtils.createFilterTabChip(requireContext(), option.label, tintColor)
+            container.addView(chip)
+        }
     }
     
     /**
@@ -1468,23 +1601,26 @@ class SettingsFragment : Fragment() {
     /**
      * Populate the options tags for each Clover filter - uses WidgetColorUtils for consistency
      * Payment Status uses Clover SDK PaymentState enum: OPEN, PAID, PARTIALLY_PAID, REFUNDED, PARTIALLY_REFUNDED, CREDITED
+     * (#76) Updated to use title case (only capitalize first letter) per text changes requirement
      */
     private fun populateCloverFilterOptions() {
         // Payment Status options (Yellow) - display names for Clover PaymentState enum
-        val paymentStatusValues = listOf("UNPAID", "PAID", "PARTIALLY PAID", "REFUNDED", "PARTIALLY REFUNDED", "CREDITED")
+        // (#76) Title case: only first letter capitalized
+        val paymentStatusValues = listOf("Open", "Paid", "Partially paid", "Refunded", "Partially refunded", "Credited")
         populateOptionsContainer(paymentStatusOptions, paymentStatusValues, WidgetColorUtils.COLOR_PAYMENT_STATUS)
         
-        // Order Status options (Red)
-        val orderStatusValues = listOf("OPEN", "CLOSED")
-        populateOptionsContainer(orderStatusOptions, orderStatusValues, WidgetColorUtils.COLOR_ORDER_STATUS)
+        // Order Status options - REMOVED (only using payment status now)
+        // Hide the order status section
+        orderStatusHeader?.visibility = View.GONE
+        orderStatusBody?.visibility = View.GONE
         
-        // Payment Type options (Grey)
+        // Payment Type options (Grey) - already in title case
         val paymentTypeValues = listOf("Cash", "Credit Card", "Debit Card", "Check", "Gift Card", "Other")
         populateOptionsContainer(paymentTypeOptions, paymentTypeValues, WidgetColorUtils.COLOR_PAYMENT_TYPE)
     }
     
     /**
-     * Populate a FlexboxLayout with option tags
+     * Populate a FlexboxLayout with option tags using shared filter chip styling
      */
     private fun populateOptionsContainer(
         container: com.google.android.flexbox.FlexboxLayout?, 
@@ -1493,22 +1629,9 @@ class SettingsFragment : Fragment() {
     ) {
         container?.removeAllViews()
         values.forEach { value ->
-            val tag = TextView(requireContext()).apply {
-                text = value
-                setTextColor(tintColor)
-                textSize = 12f
-                setPadding(dpToPx(10), dpToPx(4), dpToPx(10), dpToPx(4))
-                setBackgroundResource(R.drawable.bg_value_tag)
-                background.setTint(tintColor and 0x33FFFFFF.toInt() or 0x33000000)
-                
-                val lp = com.google.android.flexbox.FlexboxLayout.LayoutParams(
-                    com.google.android.flexbox.FlexboxLayout.LayoutParams.WRAP_CONTENT,
-                    com.google.android.flexbox.FlexboxLayout.LayoutParams.WRAP_CONTENT
-                )
-                lp.setMargins(0, 0, dpToPx(6), dpToPx(6))
-                layoutParams = lp
-            }
-            container?.addView(tag)
+            // Use shared filter chip function for consistent styling
+            val chip = WidgetColorUtils.createFilterTabChip(requireContext(), value, tintColor)
+            container?.addView(chip)
         }
     }
     
@@ -1531,6 +1654,8 @@ class SettingsFragment : Fragment() {
             .create()
         
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        // (#81 QA) Apply smooth fade animation to prevent blink
+        dialog.window?.setWindowAnimations(R.style.Animation_OrderMate_Dialog)
         
         dialogView.findViewById<TextView>(R.id.dialogTitle)?.text = title
         dialogView.findViewById<TextView>(R.id.dialogMessage)?.text = message
@@ -1677,6 +1802,7 @@ class WidgetEditorAdapter(
         private val btnDeleteWidget: View = itemView.findViewById(R.id.btnDeleteWidget)
         
         private var currentWidgetTintColor: Int = 0xFFFFFFFF.toInt()
+        private var currentWidgetBorderColor: Int = 0xFFFFFFFF.toInt()
 
         fun bind(widget: PopUpWidget, position: Int) {
             widgetTitle.text = widget.label
@@ -1684,19 +1810,18 @@ class WidgetEditorAdapter(
             widgetToggle.isChecked = widget.enabled
             inputWidgetLabel.setText(widget.label)
 
-            // Set icon and colors based on type - uses WidgetColorUtils for consistency
-            val (iconRes, bgRes, tintColor) = when (widget.type) {
-                WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, WidgetColorUtils.COLOR_CALENDAR)
-                WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
-                WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
-                WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
-            }
+            // Set icon and colors based on type - uses centralized WidgetColorUtils
+            val iconRes = WidgetColorUtils.getIconForWidgetType(widget.type)
+            val tintColor = WidgetColorUtils.getColorForWidgetType(widget.type)
+            val borderColor = WidgetColorUtils.getBgColorForWidgetType(widget.type)
+            val bgRes = WidgetColorUtils.getIconBackgroundForWidgetType(widget.type)
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
             widgetIconContainer.setBackgroundResource(bgRes)
             
-            // Store tint color for value pills
+            // Store colors for value pills
             currentWidgetTintColor = tintColor
+            currentWidgetBorderColor = borderColor
 
             // Show options for select types
             val hasOptions = widget.type == WidgetType.SINGLE_SELECT || widget.type == WidgetType.MULTI_SELECT
@@ -1781,43 +1906,10 @@ class WidgetEditorAdapter(
         }
 
         private fun createValueTag(text: String, onRemove: () -> Unit): View {
-            val context = itemView.context
-            val density = context.resources.displayMetrics.density
-            
-            return LinearLayout(context).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = android.view.Gravity.CENTER_VERTICAL
-                setPadding((10 * density).toInt(), (6 * density).toInt(), (10 * density).toInt(), (6 * density).toInt())
-                
-                // Create pill background with widget-specific border color
-                val pillBg = GradientDrawable().apply {
-                    setColor(0x33000000) // Dark semi-transparent background
-                    cornerRadius = 16 * density
-                    setStroke((1 * density).toInt(), currentWidgetTintColor)
-                }
-                background = pillBg
-                
-                val params = ViewGroup.MarginLayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-                params.setMargins(0, 0, (8 * density).toInt(), (8 * density).toInt())
-                layoutParams = params
-
-                addView(TextView(context).apply {
-                    this.text = text
-                    setTextColor(ContextCompat.getColor(context, R.color.text_light))
-                    textSize = 12f
-                })
-
-                addView(TextView(context).apply {
-                    this.text = "×"
-                    setTextColor(currentWidgetTintColor)
-                    textSize = 14f
-                    setPadding((8 * density).toInt(), 0, (2 * density).toInt(), 0)
-                    setOnClickListener { onRemove() }
-                })
-            }
+            // Use shared editable pill function for consistent styling
+            return WidgetColorUtils.createEditableValuePill(
+                itemView.context, text, currentWidgetTintColor, currentWidgetBorderColor, onRemove
+            )
         }
         
         private fun animateExpand(expanding: Boolean) {
@@ -1920,6 +2012,7 @@ class FirebaseWidgetEditorAdapter(
         private val btnDeleteWidget: View = itemView.findViewById(R.id.btnDeleteWidget)
         
         private var currentWidgetTintColor: Int = 0xFFFFFFFF.toInt()
+        private var currentWidgetBorderColor: Int = 0xFFFFFFFF.toInt()
         private var saveHandler = android.os.Handler(android.os.Looper.getMainLooper())
         private var saveRunnable: Runnable? = null
         private var labelWatcher: TextWatcher? = null
@@ -1934,17 +2027,16 @@ class FirebaseWidgetEditorAdapter(
             widgetToggle.isChecked = widget.isEnabled
             inputWidgetLabel.setText(widget.label)
 
-            // Set icon and colors based on type - uses WidgetColorUtils for consistency
-            val (iconRes, bgRes, tintColor) = when (widget.type) {
-                com.orderMate.modals.WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, WidgetColorUtils.COLOR_CALENDAR)
-                com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
-                com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
-                com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
-            }
+            // Set icon and colors based on type - uses centralized WidgetColorUtils
+            val iconRes = WidgetColorUtils.getIconForWidgetType(widget.type)
+            val tintColor = WidgetColorUtils.getColorForWidgetType(widget.type)
+            val borderColor = WidgetColorUtils.getBgColorForWidgetType(widget.type)
+            val bgRes = WidgetColorUtils.getIconBackgroundForWidgetType(widget.type)
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
             widgetIconContainer.setBackgroundResource(bgRes)
             currentWidgetTintColor = tintColor
+            currentWidgetBorderColor = borderColor
 
             // Show/hide options for select types
             val hasOptions = widget.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
@@ -2047,33 +2139,10 @@ class FirebaseWidgetEditorAdapter(
         }
 
         private fun createValuePill(text: String, density: Float, onRemove: () -> Unit): LinearLayout {
-            return LinearLayout(itemView.context).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = android.view.Gravity.CENTER_VERTICAL
-                setBackgroundResource(R.drawable.bg_value_pill)
-                setPadding((8 * density).toInt(), (4 * density).toInt(), (6 * density).toInt(), (4 * density).toInt())
-                
-                val params = ViewGroup.MarginLayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-                params.setMargins(0, 0, (8 * density).toInt(), (8 * density).toInt())
-                layoutParams = params
-
-                addView(TextView(context).apply {
-                    this.text = text
-                    setTextColor(ContextCompat.getColor(context, R.color.text_light))
-                    textSize = 12f
-                })
-
-                addView(TextView(context).apply {
-                    this.text = "×"
-                    setTextColor(currentWidgetTintColor)
-                    textSize = 14f
-                    setPadding((8 * density).toInt(), 0, (2 * density).toInt(), 0)
-                    setOnClickListener { onRemove() }
-                })
-            }
+            // Use shared editable pill function for consistent styling
+            return WidgetColorUtils.createEditableValuePill(
+                itemView.context, text, currentWidgetTintColor, currentWidgetBorderColor, onRemove
+            )
         }
         
         private fun animateExpand(expanding: Boolean) {
@@ -2317,47 +2386,57 @@ class FilterWidgetAdapter(
             widgetType.text = widget.type.displayName
             widgetToggle.isChecked = widget.showInFilter
 
-            // Set icon and colors based on type - uses WidgetColorUtils for consistency
-            val (iconRes, bgRes, tintColor) = when (widget.type) {
-                com.orderMate.modals.WidgetType.CALENDAR -> Triple(R.drawable.ic_calendar, R.drawable.bg_widget_icon_calendar, WidgetColorUtils.COLOR_CALENDAR)
-                com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
-                com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
-                com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
-            }
+            // Set icon and colors based on type - uses centralized WidgetColorUtils
+            val iconRes = WidgetColorUtils.getIconForWidgetType(widget.type)
+            val tintColor = WidgetColorUtils.getColorForWidgetType(widget.type)
+            val bgRes = WidgetColorUtils.getIconBackgroundForWidgetType(widget.type)
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
             widgetIconContainer.setBackgroundResource(bgRes)
 
-            // Show/hide options based on widget type
-            val hasOptions = widget.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
-                            widget.type == com.orderMate.modals.WidgetType.MULTI_SELECT
+            // (#77) Show/hide options based on widget type
+            // Types that need dropdown: SINGLE_SELECT, MULTI_SELECT, TEXT_BOX
+            // Types that DON'T need dropdown: CALENDAR (and Employee for Clover filters)
+            val hasDropdown = widget.type == com.orderMate.modals.WidgetType.SINGLE_SELECT || 
+                              widget.type == com.orderMate.modals.WidgetType.MULTI_SELECT ||
+                              widget.type == com.orderMate.modals.WidgetType.TEXT_BOX
             
-            if (hasOptions && widget.options.isNotEmpty()) {
+            if (hasDropdown && widget.type != com.orderMate.modals.WidgetType.TEXT_BOX && widget.options.isNotEmpty()) {
                 optionsLabel.visibility = View.VISIBLE
                 setupOptionsDisplay(widget, tintColor)
-            } else if (widget.type == com.orderMate.modals.WidgetType.CALENDAR) {
-                optionsLabel.text = "Type: Date Picker"
+                expandChevron.visibility = View.VISIBLE
+            } else if (widget.type == com.orderMate.modals.WidgetType.TEXT_BOX) {
+                optionsLabel.text = "Type: Free Text"
                 optionsLabel.visibility = View.VISIBLE
                 valuesContainer.removeAllViews()
+                expandChevron.visibility = View.VISIBLE
             } else {
+                // CALENDAR - no dropdown needed
                 optionsLabel.visibility = View.GONE
                 valuesContainer.removeAllViews()
+                expandChevron.visibility = View.GONE
             }
 
-            // Expand/collapse state
-            val isExpanded = expandedIds.contains(widget.id)
-            widgetBody.visibility = if (isExpanded) View.VISIBLE else View.GONE
-            expandChevron.rotation = if (isExpanded) 180f else 0f
+            // Expand/collapse state - only for types with dropdown
+            if (hasDropdown) {
+                val isExpanded = expandedIds.contains(widget.id)
+                widgetBody.visibility = if (isExpanded) View.VISIBLE else View.GONE
+                expandChevron.rotation = if (isExpanded) 180f else 0f
 
-            // Header click to expand/collapse
-            widgetHeader.setOnClickListener {
-                val expanding = !expandedIds.contains(widget.id)
-                if (expanding) {
-                    expandedIds.add(widget.id)
-                } else {
-                    expandedIds.remove(widget.id)
+                // Header click to expand/collapse
+                widgetHeader.setOnClickListener {
+                    val expanding = !expandedIds.contains(widget.id)
+                    if (expanding) {
+                        expandedIds.add(widget.id)
+                    } else {
+                        expandedIds.remove(widget.id)
+                    }
+                    animateExpand(expanding)
                 }
-                animateExpand(expanding)
+            } else {
+                // No dropdown - hide body, no click handler
+                widgetBody.visibility = View.GONE
+                widgetHeader.setOnClickListener(null)
             }
 
             // Toggle showInFilter
@@ -2369,32 +2448,10 @@ class FilterWidgetAdapter(
 
         private fun setupOptionsDisplay(widget: WidgetConfig, tintColor: Int) {
             valuesContainer.removeAllViews()
-            val context = itemView.context
-            val density = context.resources.displayMetrics.density
-
+            
             widget.options.forEach { option ->
-                val chip = TextView(context).apply {
-                    text = option.label
-                    setTextColor(tintColor)
-                    textSize = 12f
-                    setPadding((10 * density).toInt(), (6 * density).toInt(), (10 * density).toInt(), (6 * density).toInt())
-                    
-                    // Create chip background
-                    val bgDrawable = android.graphics.drawable.GradientDrawable().apply {
-                        shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                        cornerRadius = 8f * density
-                        setColor((tintColor and 0x00FFFFFF) or 0x26000000) // 15% opacity
-                        setStroke((1 * density).toInt(), (tintColor and 0x00FFFFFF) or 0x40000000) // 25% opacity border
-                    }
-                    background = bgDrawable
-                    
-                    layoutParams = com.google.android.flexbox.FlexboxLayout.LayoutParams(
-                        com.google.android.flexbox.FlexboxLayout.LayoutParams.WRAP_CONTENT,
-                        com.google.android.flexbox.FlexboxLayout.LayoutParams.WRAP_CONTENT
-                    ).apply {
-                        setMargins(0, 0, (6 * density).toInt(), (6 * density).toInt())
-                    }
-                }
+                // Use shared filter chip function for consistent styling
+                val chip = WidgetColorUtils.createFilterTabChip(itemView.context, option.label, tintColor)
                 valuesContainer.addView(chip)
             }
         }

@@ -23,7 +23,9 @@ data class ScheduledEvent(
     val notificationScheduled: Boolean = false,
     val lineItems: List<LineItemPreview> = emptyList(),
     val orderNote: String? = null,  // Order-level note from Order.note (#93)
-    val customTags: List<EventTag> = emptyList()  // (#30) Order-level tags with widgetType for colors
+    val customTags: List<EventTag> = emptyList(),  // (#30) Order-level tags with widgetType for colors
+    val paymentState: String? = null,  // (#76) Clover payment state for event preview pill
+    val paymentType: String? = null    // (#76) Clover payment type (Cash, Card, etc.)
 ) {
     // For backwards compatibility
     val lineItemNames: List<String>

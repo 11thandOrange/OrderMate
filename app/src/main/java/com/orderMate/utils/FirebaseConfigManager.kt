@@ -4,16 +4,32 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
 import com.google.gson.Gson
-import com.orderMate.modals.LegacyCustomItemJson
+import com.orderMate.modals.BillingRecord
+import com.orderMate.modals.EmployeeProfile
+import com.orderMate.modals.MerchantDiscount
+import com.orderMate.modals.MerchantEvent
+import com.orderMate.modals.MerchantInfo
 import com.orderMate.modals.MerchantMeta
 import com.orderMate.modals.NoteLevel
 import com.orderMate.modals.PopupSettings
+import com.orderMate.modals.ReferralInfo
+import com.orderMate.modals.SubscriptionInfo
 import com.orderMate.modals.WidgetConfig
 import com.orderMate.modals.WidgetOption
 import com.orderMate.modals.WidgetType
 
 /**
- * Firebase CRUD operations for new schema structure
+ * Firebase CRUD operations for schema structure
+ * 
+ * #81: Added support for:
+ * - Per-employee profiles (color, avatar)
+ * - Referrals (partner tracking)
+ * - Discounts (admin-only, read in app)
+ * 
+ * #97/#98: Added support for:
+ * - Merchant info (name, email, store, install date)
+ * - Subscription & billing tracking
+ * - Lifecycle events (install, uninstall, etc.)
  */
 class FirebaseConfigManager private constructor() {
     
@@ -399,51 +415,39 @@ class FirebaseConfigManager private constructor() {
             .addOnFailureListener { callback(false) }
     }
     
-    // ==================== Legacy Data ====================
-    
-    fun getLegacyData(merchantId: String, callback: (LegacyCustomItemJson?) -> Unit) {
-        db.getReference(FirebasePaths.legacyData(merchantId))
-            .get()
-            .addOnSuccessListener { snapshot ->
-                try {
-                    val jsonStr = snapshot.getValue(String::class.java)
-                    if (jsonStr != null) {
-                        val legacy = gson.fromJson(jsonStr, LegacyCustomItemJson::class.java)
-                        callback(legacy)
-                    } else {
-                        callback(null)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    callback(null)
-                }
-            }
-            .addOnFailureListener { 
-                it.printStackTrace()
-                callback(null) 
-            }
-    }
-    
-    fun legacyDataExists(merchantId: String, callback: (Boolean) -> Unit) {
-        db.getReference(FirebasePaths.legacyData(merchantId))
-            .get()
-            .addOnSuccessListener { callback(it.exists()) }
-            .addOnFailureListener { callback(false) }
-    }
+    // #78: Removed Legacy Data section - migration no longer needed
     
     // ==================== Initialization ====================
     
     fun initializeMerchant(merchantId: String, widgets: List<WidgetConfig>, settings: PopupSettings, callback: (Boolean) -> Unit) {
         val updates = mutableMapOf<String, Any?>()
+        val advancedDefaults = AdvancedSettings()  // #78: Use data class defaults
         
         // Meta
         updates["${FirebasePaths.meta(merchantId)}/${FirebasePaths.SCHEMA_VERSION}"] = MerchantMeta.CURRENT_SCHEMA_VERSION
         updates["${FirebasePaths.meta(merchantId)}/${FirebasePaths.CREATED_AT}"] = ServerValue.TIMESTAMP
         updates["${FirebasePaths.meta(merchantId)}/${FirebasePaths.UPDATED_AT}"] = ServerValue.TIMESTAMP
         
-        // Settings
+        // PopupSettings
         updates["${FirebasePaths.settings(merchantId)}/triggerOnItemAdd"] = settings.triggerOnItemAdd
         updates["${FirebasePaths.settings(merchantId)}/showOMButtonInRegister"] = settings.showOMButtonInRegister
+        
+        // #78: AdvancedSettings defaults - store in DB for new merchants
+        updates["${FirebasePaths.settings(merchantId)}/useOrderMateInRegister"] = advancedDefaults.useOrderMateInRegister
+        updates["${FirebasePaths.settings(merchantId)}/useOrderMateRegisterInstead"] = advancedDefaults.useOrderMateRegisterInstead
+        updates["${FirebasePaths.settings(merchantId)}/scheduledNotificationsEnabled"] = advancedDefaults.scheduledNotificationsEnabled
+        updates["${FirebasePaths.settings(merchantId)}/notificationDays"] = advancedDefaults.notificationDays
+        updates["${FirebasePaths.settings(merchantId)}/notificationMinutes"] = advancedDefaults.notificationMinutes
+        updates["${FirebasePaths.settings(merchantId)}/scheduledReceiptEnabled"] = advancedDefaults.scheduledReceiptEnabled
+        updates["${FirebasePaths.settings(merchantId)}/receiptDays"] = advancedDefaults.receiptDays
+        updates["${FirebasePaths.settings(merchantId)}/receiptMinutes"] = advancedDefaults.receiptMinutes
+        updates["${FirebasePaths.settings(merchantId)}/printNotesOnCustomerReceipts"] = advancedDefaults.printNotesOnCustomerReceipts
+        updates["${FirebasePaths.settings(merchantId)}/printNotesOnOrderReceipts"] = advancedDefaults.printNotesOnOrderReceipts
+        
+        // #79: Permission Settings defaults
+        updates["${FirebasePaths.settings(merchantId)}/allowAdminUpdateSettings"] = advancedDefaults.allowAdminUpdateSettings
+        updates["${FirebasePaths.settings(merchantId)}/allowManagersUpdateSettings"] = advancedDefaults.allowManagersUpdateSettings
+        updates["${FirebasePaths.settings(merchantId)}/allowEmployeesUpdateSettings"] = advancedDefaults.allowEmployeesUpdateSettings
         
         // Widgets
         widgets.forEach { widget ->
@@ -538,20 +542,27 @@ class FirebaseConfigManager private constructor() {
     // ==================== Advanced Settings ====================
     
     fun getAdvancedSettings(merchantId: String, callback: (AdvancedSettings) -> Unit) {
+        // #78: Use AdvancedSettings defaults for consistency
+        val defaults = AdvancedSettings()
+        
         db.getReference(FirebasePaths.settings(merchantId))
             .get()
             .addOnSuccessListener { snapshot ->
                 val settings = AdvancedSettings(
-                    useOrderMateInRegister = snapshot.child("useOrderMateInRegister").getValue(Boolean::class.java) ?: false,
-                    useOrderMateRegisterInstead = snapshot.child("useOrderMateRegisterInstead").getValue(Boolean::class.java) ?: true,
-                    scheduledNotificationsEnabled = snapshot.child("scheduledNotificationsEnabled").getValue(Boolean::class.java) ?: false,
-                    notificationDays = snapshot.child("notificationDays").getValue(Int::class.java) ?: 3,
-                    notificationMinutes = snapshot.child("notificationMinutes").getValue(Int::class.java) ?: 0,
-                    scheduledReceiptEnabled = snapshot.child("scheduledReceiptEnabled").getValue(Boolean::class.java) ?: false,
-                    receiptDays = snapshot.child("receiptDays").getValue(Int::class.java) ?: 0,
-                    receiptMinutes = snapshot.child("receiptMinutes").getValue(Int::class.java) ?: 60,
-                    printNotesOnCustomerReceipts = snapshot.child("printNotesOnCustomerReceipts").getValue(Boolean::class.java) ?: false,
-                    printNotesOnOrderReceipts = snapshot.child("printNotesOnOrderReceipts").getValue(Boolean::class.java) ?: true
+                    useOrderMateInRegister = snapshot.child("useOrderMateInRegister").getValue(Boolean::class.java) ?: defaults.useOrderMateInRegister,
+                    useOrderMateRegisterInstead = snapshot.child("useOrderMateRegisterInstead").getValue(Boolean::class.java) ?: defaults.useOrderMateRegisterInstead,
+                    scheduledNotificationsEnabled = snapshot.child("scheduledNotificationsEnabled").getValue(Boolean::class.java) ?: defaults.scheduledNotificationsEnabled,
+                    notificationDays = snapshot.child("notificationDays").getValue(Int::class.java) ?: defaults.notificationDays,
+                    notificationMinutes = snapshot.child("notificationMinutes").getValue(Int::class.java) ?: defaults.notificationMinutes,
+                    scheduledReceiptEnabled = snapshot.child("scheduledReceiptEnabled").getValue(Boolean::class.java) ?: defaults.scheduledReceiptEnabled,
+                    receiptDays = snapshot.child("receiptDays").getValue(Int::class.java) ?: defaults.receiptDays,
+                    receiptMinutes = snapshot.child("receiptMinutes").getValue(Int::class.java) ?: defaults.receiptMinutes,
+                    printNotesOnCustomerReceipts = snapshot.child("printNotesOnCustomerReceipts").getValue(Boolean::class.java) ?: defaults.printNotesOnCustomerReceipts,
+                    printNotesOnOrderReceipts = snapshot.child("printNotesOnOrderReceipts").getValue(Boolean::class.java) ?: defaults.printNotesOnOrderReceipts,
+                    // #79: Permission Settings
+                    allowAdminUpdateSettings = snapshot.child("allowAdminUpdateSettings").getValue(Boolean::class.java) ?: defaults.allowAdminUpdateSettings,
+                    allowManagersUpdateSettings = snapshot.child("allowManagersUpdateSettings").getValue(Boolean::class.java) ?: defaults.allowManagersUpdateSettings,
+                    allowEmployeesUpdateSettings = snapshot.child("allowEmployeesUpdateSettings").getValue(Boolean::class.java) ?: defaults.allowEmployeesUpdateSettings
                 )
                 callback(settings)
             }
@@ -571,7 +582,11 @@ class FirebaseConfigManager private constructor() {
             "receiptDays" to settings.receiptDays,
             "receiptMinutes" to settings.receiptMinutes,
             "printNotesOnCustomerReceipts" to settings.printNotesOnCustomerReceipts,
-            "printNotesOnOrderReceipts" to settings.printNotesOnOrderReceipts
+            "printNotesOnOrderReceipts" to settings.printNotesOnOrderReceipts,
+            // #79: Permission Settings
+            "allowAdminUpdateSettings" to settings.allowAdminUpdateSettings,
+            "allowManagersUpdateSettings" to settings.allowManagersUpdateSettings,
+            "allowEmployeesUpdateSettings" to settings.allowEmployeesUpdateSettings
         )
         db.getReference(FirebasePaths.settings(merchantId))
             .updateChildren(updates)
@@ -585,12 +600,224 @@ class FirebaseConfigManager private constructor() {
             }
     }
     
-    // ==================== Profile Settings ====================
+    // ==================== #81: Employee Profiles (Per-Employee) ====================
     
     /**
-     * Get profile settings from Firebase
+     * Get employee profile from Firebase
+     * Each employee has their own color and avatar settings
      */
+    fun getEmployeeProfile(merchantId: String, employeeId: String, callback: (EmployeeProfile) -> Unit) {
+        db.getReference(FirebasePaths.employeeProfile(merchantId, employeeId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val profile = EmployeeProfile(
+                    color = snapshot.child("color").getValue(String::class.java) ?: EmployeeProfile.DEFAULT_COLOR,
+                    avatar = snapshot.child("avatar").getValue(String::class.java) ?: EmployeeProfile.DEFAULT_AVATAR
+                )
+                callback(profile)
+            }
+            .addOnFailureListener {
+                callback(EmployeeProfile())
+            }
+    }
+    
+    /**
+     * Get ALL employee profiles from Firebase (#81: cache all employees)
+     * Returns map of employeeId -> EmployeeProfile
+     */
+    fun getAllEmployeeProfiles(merchantId: String, callback: (Map<String, EmployeeProfile>) -> Unit) {
+        db.getReference(FirebasePaths.profiles(merchantId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val profiles = mutableMapOf<String, EmployeeProfile>()
+                snapshot.children.forEach { child ->
+                    val employeeId = child.key ?: return@forEach
+                    val profile = EmployeeProfile(
+                        color = child.child("color").getValue(String::class.java) ?: EmployeeProfile.DEFAULT_COLOR,
+                        avatar = child.child("avatar").getValue(String::class.java) ?: EmployeeProfile.DEFAULT_AVATAR
+                    )
+                    profiles[employeeId] = profile
+                }
+                callback(profiles)
+            }
+            .addOnFailureListener {
+                callback(emptyMap())
+            }
+    }
+    
+    /**
+     * Save employee profile to Firebase
+     */
+    fun saveEmployeeProfile(merchantId: String, employeeId: String, profile: EmployeeProfile, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.employeeProfile(merchantId, employeeId))
+            .updateChildren(profile.toMap())
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
+    
+    // ==================== #81: Referrals ====================
+    
+    /**
+     * Get all referrals for a merchant
+     */
+    fun getReferrals(merchantId: String, callback: (List<ReferralInfo>) -> Unit) {
+        db.getReference(FirebasePaths.referrals(merchantId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val referrals = mutableListOf<ReferralInfo>()
+                snapshot.children.forEach { child ->
+                    val referral = parseReferral(child)
+                    if (referral != null) referrals.add(referral)
+                }
+                callback(referrals.sortedByDescending { it.submittedAt })
+            }
+            .addOnFailureListener {
+                callback(emptyList())
+            }
+    }
+    
+    /**
+     * Get a single referral by ID
+     */
+    fun getReferral(merchantId: String, referralId: String, callback: (ReferralInfo?) -> Unit) {
+        db.getReference(FirebasePaths.referral(merchantId, referralId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                callback(parseReferral(snapshot))
+            }
+            .addOnFailureListener {
+                callback(null)
+            }
+    }
+    
+    /**
+     * Save a new referral
+     */
+    fun saveReferral(merchantId: String, referral: ReferralInfo, callback: (Boolean) -> Unit) {
+        val referralWithId = if (referral.id.isEmpty()) {
+            referral.copy(id = ReferralInfo.generateId())
+        } else {
+            referral
+        }
+        
+        db.getReference(FirebasePaths.referral(merchantId, referralWithId.id))
+            .setValue(referralWithId.toMap())
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
+    
+    /**
+     * Check if merchant has any referrals
+     */
+    fun hasAnyReferral(merchantId: String, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.referrals(merchantId))
+            .limitToFirst(1)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                callback(snapshot.exists() && snapshot.childrenCount > 0)
+            }
+            .addOnFailureListener {
+                callback(false)
+            }
+    }
+    
+    private fun parseReferral(snapshot: DataSnapshot): ReferralInfo? {
+        if (!snapshot.exists()) return null
+        return ReferralInfo(
+            id = snapshot.child("id").getValue(String::class.java) ?: snapshot.key ?: "",
+            partnerName = snapshot.child("partnerName").getValue(String::class.java) ?: "",
+            submittedAt = snapshot.child("submittedAt").getValue(Long::class.java) ?: 0,
+            submittedBy = snapshot.child("submittedBy").getValue(String::class.java) ?: ""
+        )
+    }
+    
+    // ==================== #81: Discounts (Read-only in app) ====================
+    
+    /**
+     * Get all discounts for a merchant
+     */
+    fun getDiscounts(merchantId: String, callback: (List<MerchantDiscount>) -> Unit) {
+        db.getReference(FirebasePaths.discounts(merchantId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val discounts = mutableListOf<MerchantDiscount>()
+                snapshot.children.forEach { child ->
+                    val discount = parseDiscount(child)
+                    if (discount != null) discounts.add(discount)
+                }
+                callback(discounts.sortedByDescending { it.createdAt })
+            }
+            .addOnFailureListener {
+                callback(emptyList())
+            }
+    }
+    
+    /**
+     * Get only active (valid) discounts
+     */
+    fun getActiveDiscounts(merchantId: String, callback: (List<MerchantDiscount>) -> Unit) {
+        getDiscounts(merchantId) { discounts ->
+            callback(discounts.filter { it.isValid() })
+        }
+    }
+    
+    /**
+     * Get a single discount by ID
+     */
+    fun getDiscount(merchantId: String, discountId: String, callback: (MerchantDiscount?) -> Unit) {
+        db.getReference(FirebasePaths.discount(merchantId, discountId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                callback(parseDiscount(snapshot))
+            }
+            .addOnFailureListener {
+                callback(null)
+            }
+    }
+    
+    /**
+     * Get total active discount amount
+     */
+    fun getTotalActiveDiscount(merchantId: String, callback: (Double) -> Unit) {
+        getActiveDiscounts(merchantId) { discounts ->
+            callback(discounts.sumOf { it.amount })
+        }
+    }
+    
+    private fun parseDiscount(snapshot: DataSnapshot): MerchantDiscount? {
+        if (!snapshot.exists()) return null
+        return MerchantDiscount(
+            id = snapshot.child("id").getValue(String::class.java) ?: snapshot.key ?: "",
+            amount = snapshot.child("amount").getValue(Double::class.java) ?: 0.0,
+            startDate = snapshot.child("startDate").getValue(Long::class.java) ?: 0,
+            endDate = snapshot.child("endDate").getValue(Long::class.java) ?: 0,
+            discountCode = snapshot.child("discountCode").getValue(String::class.java),
+            createdAt = snapshot.child("createdAt").getValue(Long::class.java) ?: 0,
+            isActive = snapshot.child("isActive").getValue(Boolean::class.java) ?: true
+        )
+    }
+    
+    // ==================== Legacy Profile Settings (Deprecated) ====================
+    
+    /**
+     * @deprecated Use getEmployeeProfile() instead
+     */
+    @Deprecated("Use getEmployeeProfile() for per-employee profiles", 
+        ReplaceWith("getEmployeeProfile(merchantId, employeeId, callback)"))
     fun getProfileSettings(merchantId: String, callback: (ProfileSettings) -> Unit) {
+        @Suppress("DEPRECATION")
         db.getReference(FirebasePaths.profileSettings(merchantId))
             .get()
             .addOnSuccessListener { snapshot ->
@@ -606,13 +833,16 @@ class FirebaseConfigManager private constructor() {
     }
     
     /**
-     * Save profile settings to Firebase
+     * @deprecated Use saveEmployeeProfile() instead
      */
+    @Deprecated("Use saveEmployeeProfile() for per-employee profiles",
+        ReplaceWith("saveEmployeeProfile(merchantId, employeeId, profile, callback)"))
     fun saveProfileSettings(merchantId: String, settings: ProfileSettings, callback: (Boolean) -> Unit) {
         val updates = mapOf<String, Any>(
             "themeColor" to settings.themeColor,
             "avatar" to settings.avatar
         )
+        @Suppress("DEPRECATION")
         db.getReference(FirebasePaths.profileSettings(merchantId))
             .updateChildren(updates)
             .addOnSuccessListener {
@@ -622,6 +852,265 @@ class FirebaseConfigManager private constructor() {
             .addOnFailureListener {
                 it.printStackTrace()
                 callback(false)
+            }
+    }
+
+    // ==================== #97/#98: Merchant Info ====================
+
+    /**
+     * Get merchant info
+     */
+    fun getMerchantInfo(merchantId: String, callback: (MerchantInfo?) -> Unit) {
+        db.getReference(FirebasePaths.merchantInfo(merchantId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val map = snapshot.value as? Map<String, Any?>
+                callback(MerchantInfo.fromMap(map))
+            }
+            .addOnFailureListener {
+                callback(null)
+            }
+    }
+
+    /**
+     * Save merchant info
+     */
+    fun saveMerchantInfo(merchantId: String, info: MerchantInfo, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.merchantInfo(merchantId))
+            .setValue(info.toMap())
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
+
+    /**
+     * Update merchant's last active date
+     */
+    fun updateLastActiveDate(merchantId: String, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.merchantInfo(merchantId))
+            .child("lastActiveDate")
+            .setValue(ServerValue.TIMESTAMP)
+            .addOnSuccessListener { callback(true) }
+            .addOnFailureListener { callback(false) }
+    }
+
+    /**
+     * Set uninstall date for merchant
+     */
+    fun setUninstallDate(merchantId: String, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.merchantInfo(merchantId))
+            .child("uninstallDate")
+            .setValue(ServerValue.TIMESTAMP)
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener { callback(false) }
+    }
+
+    // ==================== #97/#98: Subscription ====================
+
+    /**
+     * Get subscription info
+     */
+    fun getSubscription(merchantId: String, callback: (SubscriptionInfo) -> Unit) {
+        db.getReference(FirebasePaths.subscription(merchantId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val map = snapshot.value as? Map<String, Any?>
+                callback(SubscriptionInfo.fromMap(map))
+            }
+            .addOnFailureListener {
+                callback(SubscriptionInfo())
+            }
+    }
+
+    /**
+     * Save subscription info
+     */
+    fun saveSubscription(merchantId: String, subscription: SubscriptionInfo, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.subscription(merchantId))
+            .updateChildren(subscription.toMap())
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
+
+    /**
+     * Update subscription plan
+     */
+    fun updateSubscriptionPlan(merchantId: String, plan: String, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.subscription(merchantId))
+            .child("plan")
+            .setValue(plan)
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener { callback(false) }
+    }
+
+    // ==================== #97/#98: Billing History ====================
+
+    /**
+     * Get billing history
+     */
+    fun getBillingHistory(merchantId: String, callback: (List<BillingRecord>) -> Unit) {
+        db.getReference(FirebasePaths.billingHistory(merchantId))
+            .orderByChild("dueDate")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val records = mutableListOf<BillingRecord>()
+                snapshot.children.forEach { child ->
+                    val map = child.value as? Map<String, Any?>
+                    BillingRecord.fromMap(map)?.let { records.add(it) }
+                }
+                callback(records.sortedByDescending { it.dueDate })
+            }
+            .addOnFailureListener {
+                callback(emptyList())
+            }
+    }
+
+    /**
+     * Add billing record
+     */
+    fun addBillingRecord(merchantId: String, record: BillingRecord, callback: (Boolean) -> Unit) {
+        val recordWithId = if (record.id.isEmpty()) {
+            record.copy(id = BillingRecord.generateId())
+        } else {
+            record
+        }
+
+        db.getReference(FirebasePaths.billingRecord(merchantId, recordWithId.id))
+            .setValue(recordWithId.toMap())
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
+
+    /**
+     * Update billing record (e.g., mark as paid)
+     */
+    fun updateBillingRecord(merchantId: String, record: BillingRecord, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.billingRecord(merchantId, record.id))
+            .setValue(record.toMap())
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener { callback(false) }
+    }
+
+    // ==================== #97/#98: Lifecycle Events ====================
+
+    /**
+     * Get all events for a merchant
+     */
+    fun getEvents(merchantId: String, callback: (List<MerchantEvent>) -> Unit) {
+        db.getReference(FirebasePaths.events(merchantId))
+            .orderByChild("timestamp")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val events = mutableListOf<MerchantEvent>()
+                snapshot.children.forEach { child ->
+                    val map = child.value as? Map<String, Any?>
+                    MerchantEvent.fromMap(map)?.let { events.add(it) }
+                }
+                callback(events.sortedByDescending { it.timestamp })
+            }
+            .addOnFailureListener {
+                callback(emptyList())
+            }
+    }
+
+    /**
+     * Get events since a specific timestamp (for weekly reports)
+     */
+    fun getEventsSince(merchantId: String, sinceTimestamp: Long, callback: (List<MerchantEvent>) -> Unit) {
+        db.getReference(FirebasePaths.events(merchantId))
+            .orderByChild("timestamp")
+            .startAt(sinceTimestamp.toDouble())
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val events = mutableListOf<MerchantEvent>()
+                snapshot.children.forEach { child ->
+                    val map = child.value as? Map<String, Any?>
+                    MerchantEvent.fromMap(map)?.let { events.add(it) }
+                }
+                callback(events.sortedByDescending { it.timestamp })
+            }
+            .addOnFailureListener {
+                callback(emptyList())
+            }
+    }
+
+    /**
+     * Record a new event
+     */
+    fun recordEvent(merchantId: String, event: MerchantEvent, callback: (Boolean) -> Unit) {
+        val eventWithId = if (event.id.isEmpty()) {
+            event.copy(id = MerchantEvent.generateId())
+        } else {
+            event
+        }
+
+        db.getReference(FirebasePaths.event(merchantId, eventWithId.id))
+            .setValue(eventWithId.toMap())
+            .addOnSuccessListener {
+                updateTimestamp(merchantId)
+                callback(true)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                callback(false)
+            }
+    }
+
+    /**
+     * Mark event as processed (email sent)
+     */
+    fun markEventProcessed(merchantId: String, eventId: String, callback: (Boolean) -> Unit) {
+        db.getReference(FirebasePaths.event(merchantId, eventId))
+            .child("processed")
+            .setValue(true)
+            .addOnSuccessListener { callback(true) }
+            .addOnFailureListener { callback(false) }
+    }
+
+    /**
+     * Get unprocessed events (for email sending)
+     */
+    fun getUnprocessedEvents(merchantId: String, callback: (List<MerchantEvent>) -> Unit) {
+        db.getReference(FirebasePaths.events(merchantId))
+            .orderByChild("processed")
+            .equalTo(false)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val events = mutableListOf<MerchantEvent>()
+                snapshot.children.forEach { child ->
+                    val map = child.value as? Map<String, Any?>
+                    MerchantEvent.fromMap(map)?.let { events.add(it) }
+                }
+                callback(events.sortedByDescending { it.timestamp })
+            }
+            .addOnFailureListener {
+                callback(emptyList())
             }
     }
 }
@@ -649,18 +1138,23 @@ data class NotificationTemplate(
 
 /**
  * Advanced settings data class
+ * #78: Updated defaults - scheduledNotificationsEnabled=true, printNotesOnCustomerReceipts=true
  */
 data class AdvancedSettings(
     val useOrderMateInRegister: Boolean = false,
     val useOrderMateRegisterInstead: Boolean = true,
-    val scheduledNotificationsEnabled: Boolean = false,
-    val notificationDays: Int = 3,
+    val scheduledNotificationsEnabled: Boolean = true,  // #78: Enable by default
+    val notificationDays: Int = 3,  // #78: 3 days before due date
     val notificationMinutes: Int = 0,
     val scheduledReceiptEnabled: Boolean = false,
     val receiptDays: Int = 0,
     val receiptMinutes: Int = 60,
-    val printNotesOnCustomerReceipts: Boolean = false,
-    val printNotesOnOrderReceipts: Boolean = true
+    val printNotesOnCustomerReceipts: Boolean = true,  // #78: Enable by default
+    val printNotesOnOrderReceipts: Boolean = true,
+    // #79: Permission Settings - control who can access settings
+    val allowAdminUpdateSettings: Boolean = true,
+    val allowManagersUpdateSettings: Boolean = true,
+    val allowEmployeesUpdateSettings: Boolean = true
 )
 
 /**

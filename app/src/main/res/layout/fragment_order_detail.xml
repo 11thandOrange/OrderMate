@@ -299,7 +299,7 @@
                             android:background="#1AFFFFFF"
                             android:layout_marginBottom="16dp" />
 
-                        <!-- Subtotal Row - matches HTML .detail-summary-row -->
+                        <!-- Subtotal Row -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -343,42 +343,12 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
-                        <!-- Discount Row -->
+                        <!-- Total Row (BOLD) - Order Total before adjustments -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:paddingVertical="8dp">
-                            <com.google.android.material.textview.MaterialTextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/discount"
-                                android:textColor="@color/text_muted"
-                                android:textSize="14sp" />
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/discountValue"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="-$0.00"
-                                android:textColor="@color/text_light"
-                                android:textSize="14sp" />
-                        </LinearLayout>
-
-                        <!-- Total separator - matches HTML .detail-summary-row.total border-top -->
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#1AFFFFFF"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="12dp" />
-
-                        <!-- Total Row - matches HTML .detail-summary-row.total -->
-                        <!-- font-weight: 600, font-size: 16px -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
                             <com.google.android.material.textview.MaterialTextView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -393,6 +363,142 @@
                                 android:layout_height="wrap_content"
                                 android:text="$0.00"
                                 android:textColor="@color/text_light"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Dividing line -->
+                        <View
+                            android:id="@+id/adjustmentsDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#1AFFFFFF"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:visibility="gone" />
+
+                        <!-- CONDITIONAL ROWS (below divider) -->
+                        
+                        <!-- Discount Row - conditional -->
+                        <LinearLayout
+                            android:id="@+id/discountRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingVertical="8dp"
+                            android:visibility="gone">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/discountLabel"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/discount"
+                                android:textColor="@color/text_muted"
+                                android:textSize="14sp" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/discountValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="-$0.00"
+                                android:textColor="@color/paid_status_color"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <!-- Payment Row - conditional -->
+                        <LinearLayout
+                            android:id="@+id/paymentRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingVertical="8dp"
+                            android:visibility="gone">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Payment"
+                                android:textColor="@color/text_muted"
+                                android:textSize="14sp" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/paymentValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="-$0.00"
+                                android:textColor="@color/paid_status_color"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <!-- Refund Row - conditional -->
+                        <LinearLayout
+                            android:id="@+id/refundRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingVertical="8dp"
+                            android:visibility="gone">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Refund"
+                                android:textColor="@color/text_muted"
+                                android:textSize="14sp" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/refundValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="$0.00"
+                                android:textColor="@color/text_light"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <!-- Credit Row - conditional -->
+                        <LinearLayout
+                            android:id="@+id/creditRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingVertical="8dp"
+                            android:visibility="gone">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Credit"
+                                android:textColor="@color/text_muted"
+                                android:textSize="14sp" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/creditValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="-$0.00"
+                                android:textColor="@color/paid_status_color"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <!-- Balance Row - shows after adjustments -->
+                        <LinearLayout
+                            android:id="@+id/balanceRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingVertical="8dp"
+                            android:visibility="gone">
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/balanceLabel"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Balance"
+                                android:textColor="@color/white"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/balanceValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="$0.00"
+                                android:textColor="@color/white"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -565,8 +671,7 @@
                         android:paddingTop="12dp"
                         android:paddingBottom="12dp">
 
-                        <!-- Order Date - matches HTML .detail-info-row -->
-                        <!-- padding: 12px 0, border-bottom: 1px solid rgba(255,255,255,0.05) -->
+                        <!-- Order Date (first row - no divider above) -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -630,6 +735,7 @@
                         </LinearLayout>
                         
                         <!-- Task 21: Dynamic Widget Rows Container - renders CALENDAR and TEXT_BOX widgets -->
+                        <!-- (#81 QA) Dividers are added programmatically BEFORE each row -->
                         <LinearLayout
                             android:id="@+id/dynamicWidgetRowsContainer"
                             android:layout_width="match_parent"
@@ -637,7 +743,14 @@
                             android:orientation="vertical"
                             android:visibility="gone" />
 
-                        <!-- Employee -->
+                        <!-- (#81 QA) Divider above Employee row -->
+                        <View
+                            android:id="@+id/employeeDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#0DFFFFFF" />
+
+                        <!-- Employee (last row - no divider below) -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

@@ -1,0 +1,1037 @@
+{
+  "info": {
+    "name": "OrderMate API",
+    "description": "Complete API collection for OrderMate - Clover POS integration app.\n\nIncludes:\n- Cloud Functions (Clover Webhooks)\n- Firebase Realtime Database REST API\n\n## Setup\n1. Set `baseUrl` environment variable\n2. Set `merchantId` for testing\n3. Add Firebase auth if rules require it",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "ordermate"
+  },
+  "variable": [
+    {
+      "key": "firebaseUrl",
+      "value": "https://ordermate-53077-default-rtdb.firebaseio.com",
+      "type": "string"
+    },
+    {
+      "key": "functionsUrl",
+      "value": "https://us-central1-ordermate-53077.cloudfunctions.net",
+      "type": "string"
+    },
+    {
+      "key": "merchantId",
+      "value": "TEST_MERCHANT_ID",
+      "type": "string"
+    },
+    {
+      "key": "employeeId",
+      "value": "TEST_EMPLOYEE_ID",
+      "type": "string"
+    },
+    {
+      "key": "widgetId",
+      "value": "widget_test123",
+      "type": "string"
+    },
+    {
+      "key": "optionId",
+      "value": "opt_test123",
+      "type": "string"
+    },
+    {
+      "key": "templateId",
+      "value": "template_test123",
+      "type": "string"
+    },
+    {
+      "key": "referralId",
+      "value": "ref_test1234",
+      "type": "string"
+    },
+    {
+      "key": "discountId",
+      "value": "disc_test123",
+      "type": "string"
+    },
+    {
+      "key": "eventId",
+      "value": "event_test123",
+      "type": "string"
+    },
+    {
+      "key": "paymentId",
+      "value": "pay_test123",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Cloud Functions",
+      "description": "Clover webhook endpoints hosted on Firebase Cloud Functions",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{functionsUrl}}/cloverWebhook",
+              "host": ["{{functionsUrl}}"],
+              "path": ["cloverWebhook"]
+            },
+            "description": "Simple health check - returns 'OK'"
+          },
+          "response": []
+        },
+        {
+          "name": "Webhook Verification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"verificationCode\": \"abc123xyz\"\n}"
+            },
+            "url": {
+              "raw": "{{functionsUrl}}/cloverWebhook",
+              "host": ["{{functionsUrl}}"],
+              "path": ["cloverWebhook"]
+            },
+            "description": "Clover sends this to verify webhook URL. Returns 'OK' and logs the code."
+          },
+          "response": []
+        },
+        {
+          "name": "App Installed Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appId\": \"ORDERMATE_APP_ID\",\n  \"merchants\": {\n    \"{{merchantId}}\": [\n      {\n        \"objectId\": \"A:ORDERMATE_APP_ID\",\n        \"type\": \"CREATE\",\n        \"ts\": 1714766133000\n      }\n    ]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{functionsUrl}}/cloverWebhook",
+              "host": ["{{functionsUrl}}"],
+              "path": ["cloverWebhook"]
+            },
+            "description": "Simulates Clover APP_INSTALLED webhook event"
+          },
+          "response": []
+        },
+        {
+          "name": "App Uninstalled Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appId\": \"ORDERMATE_APP_ID\",\n  \"merchants\": {\n    \"{{merchantId}}\": [\n      {\n        \"objectId\": \"A:ORDERMATE_APP_ID\",\n        \"type\": \"DELETE\",\n        \"ts\": 1714766133000\n      }\n    ]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{functionsUrl}}/cloverWebhook",
+              "host": ["{{functionsUrl}}"],
+              "path": ["cloverWebhook"]
+            },
+            "description": "Simulates Clover APP_UNINSTALLED webhook event"
+          },
+          "response": []
+        },
+        {
+          "name": "Subscription Changed Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appId\": \"ORDERMATE_APP_ID\",\n  \"merchants\": {\n    \"{{merchantId}}\": [\n      {\n        \"objectId\": \"A:ORDERMATE_APP_ID\",\n        \"type\": \"UPDATE\",\n        \"ts\": 1714766133000\n      }\n    ]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{functionsUrl}}/cloverWebhook",
+              "host": ["{{functionsUrl}}"],
+              "path": ["cloverWebhook"]
+            },
+            "description": "Simulates Clover SUBSCRIPTION_CHANGED webhook event"
+          },
+          "response": []
+        },
+        {
+          "name": "Legacy - App Installed",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchantId\": \"{{merchantId}}\",\n  \"type\": \"APP_INSTALLED\",\n  \"appId\": \"ORDERMATE_APP_ID\"\n}"
+            },
+            "url": {
+              "raw": "{{functionsUrl}}/cloverWebhook",
+              "host": ["{{functionsUrl}}"],
+              "path": ["cloverWebhook"]
+            },
+            "description": "Legacy format for APP_INSTALLED event"
+          },
+          "response": []
+        },
+        {
+          "name": "Legacy - App Uninstalled",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchantId\": \"{{merchantId}}\",\n  \"type\": \"APP_UNINSTALLED\"\n}"
+            },
+            "url": {
+              "raw": "{{functionsUrl}}/cloverWebhook",
+              "host": ["{{functionsUrl}}"],
+              "path": ["cloverWebhook"]
+            },
+            "description": "Legacy format for APP_UNINSTALLED event"
+          },
+          "response": []
+        },
+        {
+          "name": "Legacy - Subscription Changed",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchantId\": \"{{merchantId}}\",\n  \"type\": \"SUBSCRIPTION_CHANGED\",\n  \"oldPlan\": \"free\",\n  \"newPlan\": \"premium\"\n}"
+            },
+            "url": {
+              "raw": "{{functionsUrl}}/cloverWebhook",
+              "host": ["{{functionsUrl}}"],
+              "path": ["cloverWebhook"]
+            },
+            "description": "Legacy format for SUBSCRIPTION_CHANGED event"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Merchant Info",
+      "description": "Merchant information endpoints (#97)",
+      "item": [
+        {
+          "name": "Get Merchant Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/merchantInfo.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "merchantInfo.json"]
+            },
+            "description": "Get merchant information including install date, owner details"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Merchant Info",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchantId\": \"{{merchantId}}\",\n  \"name\": \"John Smith\",\n  \"email\": \"john@example.com\",\n  \"storeName\": \"Taco Palace\",\n  \"installDate\": 1714766133000,\n  \"uninstallDate\": null,\n  \"lastActiveDate\": 1714766133000\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/merchantInfo.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "merchantInfo.json"]
+            },
+            "description": "Update merchant information"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Subscription & Billing",
+      "description": "Subscription and billing history endpoints (#97)",
+      "item": [
+        {
+          "name": "Get Subscription",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/subscription.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "subscription.json"]
+            },
+            "description": "Get subscription details (plan, status, billing)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Subscription",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan\": \"premium\",\n  \"status\": \"active\",\n  \"monthlyDueDate\": 1\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/subscription.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "subscription.json"]
+            },
+            "description": "Update subscription plan and status"
+          },
+          "response": []
+        },
+        {
+          "name": "Patch Subscription Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"cancelled\"\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/subscription.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "subscription.json"]
+            },
+            "description": "Partially update subscription (e.g., just status)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Billing History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/subscription/billingHistory.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "subscription", "billingHistory.json"]
+            },
+            "description": "Get all billing records for merchant"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Billing Record",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 9.99,\n  \"dueDate\": 1714766133000,\n  \"paidDate\": 1714766133000,\n  \"status\": \"paid\",\n  \"lateDays\": 0\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/subscription/billingHistory/{{paymentId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "subscription", "billingHistory", "{{paymentId}}.json"]
+            },
+            "description": "Add a billing record"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Billing Record",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/subscription/billingHistory/{{paymentId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "subscription", "billingHistory", "{{paymentId}}.json"]
+            },
+            "description": "Get a specific billing record"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Lifecycle Events",
+      "description": "Merchant lifecycle events (#97/#98)",
+      "item": [
+        {
+          "name": "Get All Events",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/events.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "events.json"]
+            },
+            "description": "Get all lifecycle events (install, uninstall, subscription changes)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Event",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/events/{{eventId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "events", "{{eventId}}.json"]
+            },
+            "description": "Get a specific event by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Event",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{eventId}}\",\n  \"type\": \"INSTALL\",\n  \"timestamp\": 1714766133000,\n  \"details\": {\n    \"source\": \"manual_test\"\n  },\n  \"processed\": false\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/events/{{eventId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "events", "{{eventId}}.json"]
+            },
+            "description": "Create a lifecycle event"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Event",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/events/{{eventId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "events", "{{eventId}}.json"]
+            },
+            "description": "Delete an event (cleanup)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "description": "App settings endpoints",
+      "item": [
+        {
+          "name": "Get Settings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/settings.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "settings.json"]
+            },
+            "description": "Get all app settings for merchant"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"triggerOnItemAdd\": true,\n  \"triggerFromBasket\": false,\n  \"useOrderMateInRegister\": true,\n  \"notificationDays\": 0,\n  \"notificationMinutes\": 30,\n  \"receiptDays\": 0,\n  \"receiptMinutes\": 15\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/settings.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "settings.json"]
+            },
+            "description": "Update app settings"
+          },
+          "response": []
+        },
+        {
+          "name": "Patch Settings",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"triggerOnItemAdd\": false\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/settings.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "settings.json"]
+            },
+            "description": "Partially update settings"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Widgets",
+      "description": "Widget configuration endpoints (V2 schema)",
+      "item": [
+        {
+          "name": "Get All Widgets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/widgets.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "widgets.json"]
+            },
+            "description": "Get all widget configurations"
+          },
+          "response": []
+        },
+        {
+          "name": "Save All Widgets",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"widget_status\": {\n    \"id\": \"widget_status\",\n    \"type\": \"DROPDOWN\",\n    \"label\": \"Order Status\",\n    \"isEnabled\": true,\n    \"isRequired\": false,\n    \"showInFilter\": true,\n    \"order\": 0,\n    \"options\": {\n      \"opt_open\": {\n        \"id\": \"opt_open\",\n        \"label\": \"Open\",\n        \"value\": \"open\",\n        \"isDefault\": true,\n        \"color\": \"#4CAF50\"\n      },\n      \"opt_closed\": {\n        \"id\": \"opt_closed\",\n        \"label\": \"Closed\",\n        \"value\": \"closed\",\n        \"isDefault\": false,\n        \"color\": \"#F44336\"\n      }\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/widgets.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "widgets.json"]
+            },
+            "description": "Replace all widgets (full update)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Widget",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/widgets/{{widgetId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "widgets", "{{widgetId}}.json"]
+            },
+            "description": "Get a specific widget by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create/Update Widget",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{widgetId}}\",\n  \"type\": \"DROPDOWN\",\n  \"label\": \"Test Widget\",\n  \"isEnabled\": true,\n  \"isRequired\": false,\n  \"showInFilter\": true,\n  \"order\": 5\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/widgets/{{widgetId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "widgets", "{{widgetId}}.json"]
+            },
+            "description": "Create or update a widget"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Widget",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/widgets/{{widgetId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "widgets", "{{widgetId}}.json"]
+            },
+            "description": "Delete a widget"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Widget Options",
+      "description": "Widget option endpoints",
+      "item": [
+        {
+          "name": "Get Widget Options",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/widgets/{{widgetId}}/options.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "widgets", "{{widgetId}}", "options.json"]
+            },
+            "description": "Get all options for a widget"
+          },
+          "response": []
+        },
+        {
+          "name": "Create/Update Option",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{optionId}}\",\n  \"label\": \"Test Option\",\n  \"value\": \"test_value\",\n  \"isDefault\": false,\n  \"color\": \"#FF9500\"\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/widgets/{{widgetId}}/options/{{optionId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "widgets", "{{widgetId}}", "options", "{{optionId}}.json"]
+            },
+            "description": "Create or update an option"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Option",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/widgets/{{widgetId}}/options/{{optionId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "widgets", "{{widgetId}}", "options", "{{optionId}}.json"]
+            },
+            "description": "Get a specific option"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Option",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/widgets/{{widgetId}}/options/{{optionId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "widgets", "{{widgetId}}", "options", "{{optionId}}.json"]
+            },
+            "description": "Delete an option"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Templates",
+      "description": "Notification template endpoints",
+      "item": [
+        {
+          "name": "Get All Templates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/templates.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "templates.json"]
+            },
+            "description": "Get all notification templates"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Template",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/templates/{{templateId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "templates", "{{templateId}}.json"]
+            },
+            "description": "Get a specific template"
+          },
+          "response": []
+        },
+        {
+          "name": "Create/Update Template",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{templateId}}\",\n  \"name\": \"Order Ready\",\n  \"content\": \"Hi {customerName}, your order #{orderId} is ready for pickup!\"\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/templates/{{templateId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "templates", "{{templateId}}.json"]
+            },
+            "description": "Create or update a template"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Template",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/templates/{{templateId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "templates", "{{templateId}}.json"]
+            },
+            "description": "Delete a template"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Employee Profiles",
+      "description": "Per-employee profile settings (#81)",
+      "item": [
+        {
+          "name": "Get All Profiles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/profiles.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "profiles.json"]
+            },
+            "description": "Get all employee profiles for merchant"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Employee Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/profiles/{{employeeId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "profiles", "{{employeeId}}.json"]
+            },
+            "description": "Get a specific employee's profile"
+          },
+          "response": []
+        },
+        {
+          "name": "Save Employee Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"color\": \"#3C4B80\",\n  \"avatar\": \"👨‍🍳\"\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/profiles/{{employeeId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "profiles", "{{employeeId}}.json"]
+            },
+            "description": "Save/update employee profile (theme color, avatar)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Employee Profile",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/profiles/{{employeeId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "profiles", "{{employeeId}}.json"]
+            },
+            "description": "Delete employee profile"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Referrals",
+      "description": "Referral partner tracking (#81)",
+      "item": [
+        {
+          "name": "Get All Referrals",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/referrals.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "referrals.json"]
+            },
+            "description": "Get all referrals for merchant (should be 0 or 1)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Referral",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/referrals/{{referralId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "referrals", "{{referralId}}.json"]
+            },
+            "description": "Get a specific referral"
+          },
+          "response": []
+        },
+        {
+          "name": "Save Referral",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{referralId}}\",\n  \"partnerName\": \"TestPartner\",\n  \"submittedAt\": 1714766133000,\n  \"submittedBy\": \"{{employeeId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/referrals/{{referralId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "referrals", "{{referralId}}.json"]
+            },
+            "description": "Save a referral (Owner only in app)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Referral",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/referrals/{{referralId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "referrals", "{{referralId}}.json"]
+            },
+            "description": "Delete a referral (for testing cleanup)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Discounts",
+      "description": "Admin discount management (#81)",
+      "item": [
+        {
+          "name": "Get All Discounts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/discounts.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "discounts.json"]
+            },
+            "description": "Get all discounts for merchant"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Discount",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/discounts/{{discountId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "discounts", "{{discountId}}.json"]
+            },
+            "description": "Get a specific discount"
+          },
+          "response": []
+        },
+        {
+          "name": "Create/Update Discount",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{discountId}}\",\n  \"amount\": 10.00,\n  \"startDate\": 1714766133000,\n  \"endDate\": 1717358133000,\n  \"discountCode\": \"SAVE10\",\n  \"createdAt\": 1714766133000,\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/discounts/{{discountId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "discounts", "{{discountId}}.json"]
+            },
+            "description": "Create or update a discount"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Discount",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/discounts/{{discountId}}.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "discounts", "{{discountId}}.json"]
+            },
+            "description": "Delete a discount"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Meta",
+      "description": "Schema metadata",
+      "item": [
+        {
+          "name": "Get Meta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/meta.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "meta.json"]
+            },
+            "description": "Get schema metadata (version, timestamps)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Meta",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schemaVersion\": 2,\n  \"createdAt\": 1714766133000,\n  \"updatedAt\": 1714766133000\n}"
+            },
+            "url": {
+              "raw": "{{firebaseUrl}}/merchants/{{merchantId}}/meta.json",
+              "host": ["{{firebaseUrl}}"],
+              "path": ["merchants", "{{merchantId}}", "meta.json"]
+            },
+            "description": "Update schema metadata"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

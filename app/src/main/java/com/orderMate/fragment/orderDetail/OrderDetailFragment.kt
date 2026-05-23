@@ -43,7 +43,9 @@ import com.orderMate.utils.debugSnackBar
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatMillisToDateTime
 import com.orderMate.utils.formatPaymentState
-import com.orderMate.utils.formatOrderState
+import com.orderMate.utils.getPaymentStateFromOrder
+import com.orderMate.utils.setupPaymentStatusPill
+import com.orderMate.utils.setupPaymentTypePill
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.getThePaymentState
 import com.orderMate.utils.hideView
@@ -210,10 +212,13 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             orderArguments?.apply {
                 totalPriceFromApi = total ?: Constants.defaultLong
                 currencyName = currency ?: Constants.defaultString
+                
+                // Total row shows order total (before adjustments)
+                val orderTotal = total ?: 0L
                 getString(
                     R.string.priceString,
                     currencyName.convertToSymbol(),
-                    total?.toDoubleFloatPoint()
+                    orderTotal.toDoubleFloatPoint()
                 ).also {
                     binding.totalValue.text = it
                 }
@@ -226,24 +231,14 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 // #45: Clover tags in header - using unified pill styling (15% opacity + border)
                 val density = resources.displayMetrics.density
                 
-                // Order Status badge (Red)
-                val orderState = orderArguments?.state
-                binding.orderPlacedStatusValue.text = formatOrderState(orderState)
-                binding.orderPlacedStatusValue.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
-                    com.orderMate.utils.WidgetColorUtils.COLOR_ORDER_STATUS, 20f, density
-                )
-                binding.orderPlacedStatusValue.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_ORDER_STATUS)
+                // Order Status badge - REMOVED (only using payment status now)
+                binding.orderPlacedStatusValue.visibility = android.view.View.GONE
                 
-                // Payment Status badge (Yellow)
-                val paymentState = orderArguments?.paymentState?.name ?: "OPEN"
-                binding.paymentStatusBadge.text = formatPaymentState(paymentState)
-                binding.paymentStatusBadge.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
-                    com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_STATUS, 20f, density
-                )
-                binding.paymentStatusBadge.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_STATUS)
+                // Payment Status badge - use shared function
+                setupPaymentStatusPill(binding.paymentStatusBadge, orderArguments)
                 
-                // Payment Type badge - get from order payments
-                populatePaymentTypeBadge()
+                // Payment Type badge - use shared function
+                setupPaymentTypePill(binding.paymentTypeBadge, orderArguments)
                 
                 if (isStatusOpen()) {
                     binding.reOpenButton.isVisible = true
@@ -327,17 +322,22 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
 
+    /**
+     * Determines if order has remaining balance (is "open" for payment purposes).
+     * Uses unpaidBalance from Clover SDK - if > 0, order still needs payment.
+     * Fallback: calculate from total - payments if unpaidBalance not available.
+     */
     private fun isStatusOpen(): Boolean {
-        return ((orderArguments?.paymentState?.name?.equals(
-            Constants.OPEN,
-            true
-        ) == true)
-
-                || (orderArguments?.state?.equals(
-            Constants.OPEN,
-            true
-        ) == true))
-
+        val unpaidBalance = orderArguments?.unpaidBalance
+        return when {
+            unpaidBalance != null -> unpaidBalance > 0L
+            else -> {
+                // Fallback: if unpaidBalance not available, calculate from total - payments
+                val total = orderArguments?.total ?: 0L
+                val paidAmount = orderArguments?.payments?.sumOf { it?.amount ?: 0L } ?: 0L
+                total > paidAmount
+            }
+        }
     }
 
 
@@ -480,29 +480,11 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         // Show section when there are tags
         tagsSection.visibility = View.VISIBLE
         
-        val density = resources.displayMetrics.density
-        
         tags.forEach { tag ->
-            // Use WidgetColorUtils for consistent colors and icons (same as item-level)
-            val tagColor = com.orderMate.utils.WidgetColorUtils.getColorForWidgetType(tag.widgetType)
-            val iconRes = com.orderMate.utils.WidgetColorUtils.getIconForWidgetType(tag.widgetType)
-            
-            // Inflate the same pill layout used by item-level widgets
-            val pillView = layoutInflater.inflate(R.layout.item_note_pill, tagsContainer, false) as LinearLayout
-            
-            val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-            val pillText = pillView.findViewById<TextView>(R.id.pillText)
-            
-            pillText.text = tag.value
-            pillText.setTextColor(tagColor)
-            
-            pillIcon.setImageResource(iconRes)
-            pillIcon.setColorFilter(tagColor)
-            
-            // Unified pill background: 15% opacity + 25% border
-            pillView.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(tagColor, 10f, density)
-            
-            tagsContainer.addView(pillView)
+            // Use shared pill utility for consistent styling
+            com.orderMate.utils.WidgetColorUtils.addPillToContainer(
+                requireContext(), tagsContainer, tag.value, tag.widgetType
+            )
         }
     }
     
@@ -543,8 +525,9 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         container.visibility = View.VISIBLE
         val density = resources.displayMetrics.density
         
+        // (#81 QA) Add divider BEFORE each row (last row has no trailing divider)
         parsedValues.entries.forEachIndexed { index, (widget, value) ->
-            // Add divider before each row (acts as separator from previous row)
+            // Add divider BEFORE each row
             val divider = View(requireContext()).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -590,6 +573,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             rowLayout.addView(labelView)
             rowLayout.addView(valueView)
             container.addView(rowLayout)
+            // No divider after last row - Employee row's divider handles separation
         }
     }
     
@@ -813,36 +797,103 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
 
-    /*
-    * For discount some time clover directly provide the value in the amount key sometime it will
-    * provide us the percentage so we need to check this also.
-    * */
     private fun showTheDiscountAndTaxData() {
-        // case 1 if no discount is applied then there will be tax applied only.
-        if (orderArguments?.discounts == null || orderArguments?.discounts?.isEmpty() == true) {
-            binding.discount.hideView()
-            binding.discountValue.hideView()
-        }
-
-        "${currencyName.convertToSymbol()}${
-            myApp.orderTax(orderArguments).toDoubleFloatPoint()
-        }".also {
-            binding.taxValue.text = it
-        }
-        "${currencyName.convertToSymbol()}${
-            myApp.orderLineItemTotal(orderArguments).toDoubleFloatPoint()
-        }".also {
+        val symbol = currencyName.convertToSymbol()
+        
+        // Subtotal - always shown
+        "${symbol}${myApp.orderLineItemTotal(orderArguments).toDoubleFloatPoint()}".also {
             binding.subtotalValue.text = it
         }
-        "${currencyName.convertToSymbol()}${
-            myApp.orderDiscount(orderArguments).toDoubleFloatPoint()
-        }".also {
-            binding.discountValue.text = it
+        
+        // Tax - always shown
+        "${symbol}${myApp.orderTax(orderArguments).toDoubleFloatPoint()}".also {
+            binding.taxValue.text = it
         }
-        exceptionHandler {
-            val discountName =
-                orderArguments?.discounts?.get(0)?.jsonObject?.get(Constants.name)
-            binding.discount.text = discountName.toString()
+        
+        // Track if any conditional rows are shown
+        var hasAdjustments = false
+        
+        // Discount row - conditional
+        val discountAmount = myApp.orderDiscount(orderArguments)
+        if (orderArguments?.discounts.isNullOrEmpty() || discountAmount <= 0) {
+            binding.discountRow.hideView()
+        } else {
+            binding.discountRow.showView()
+            hasAdjustments = true
+            "-${symbol}${discountAmount.toDoubleFloatPoint()}".also {
+                binding.discountValue.text = it
+            }
+            exceptionHandler {
+                val discountName = orderArguments?.discounts?.get(0)?.jsonObject?.get(Constants.name)
+                if (discountName != null) {
+                    binding.discountLabel.text = discountName.toString()
+                }
+            }
+        }
+        
+        // Payment row - conditional
+        val payments = orderArguments?.payments
+        val totalPayments = payments?.sumOf { it?.amount ?: 0L } ?: 0L
+        if (payments.isNullOrEmpty() || totalPayments <= 0) {
+            binding.paymentRow.hideView()
+        } else {
+            binding.paymentRow.showView()
+            hasAdjustments = true
+            "-${symbol}${totalPayments.toDoubleFloatPoint()}".also {
+                binding.paymentValue.text = it
+            }
+        }
+        
+        // Refund row - conditional
+        val refunds = orderArguments?.refunds
+        val totalRefunds = refunds?.sumOf { it?.amount ?: 0L } ?: 0L
+        if (refunds.isNullOrEmpty() || totalRefunds <= 0) {
+            binding.refundRow.hideView()
+        } else {
+            binding.refundRow.showView()
+            hasAdjustments = true
+            "${symbol}${totalRefunds.toDoubleFloatPoint()}".also {
+                binding.refundValue.text = it
+            }
+        }
+        
+        // Credit row - conditional
+        val credits = orderArguments?.credits
+        val totalCredits = credits?.sumOf { it?.amount ?: 0L } ?: 0L
+        if (credits.isNullOrEmpty() || totalCredits <= 0) {
+            binding.creditRow.hideView()
+        } else {
+            binding.creditRow.showView()
+            hasAdjustments = true
+            "-${symbol}${totalCredits.toDoubleFloatPoint()}".also {
+                binding.creditValue.text = it
+            }
+        }
+        
+        // Show divider and balance row only if there are adjustments
+        if (hasAdjustments) {
+            binding.adjustmentsDivider.showView()
+            binding.balanceRow.showView()
+            
+            // Calculate balance: Total - Payments + Refunds - Credits
+            // Note: Discount is already factored into the order total from Clover
+            val orderTotal = orderArguments?.total ?: 0L
+            val balance = orderTotal - totalPayments + totalRefunds - totalCredits
+            
+            "${symbol}${balance.toDoubleFloatPoint()}".also {
+                binding.balanceValue.text = it
+            }
+            
+            // Balance amount: red if > 0, white if 0
+            val balanceColor = if (balance > 0) {
+                ContextCompat.getColor(requireContext(), R.color.unpaid_status_color)
+            } else {
+                ContextCompat.getColor(requireContext(), R.color.white)
+            }
+            binding.balanceValue.setTextColor(balanceColor)
+        } else {
+            binding.adjustmentsDivider.hideView()
+            binding.balanceRow.hideView()
         }
     }
 
@@ -884,11 +935,18 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
     suspend fun updateTheTransaction(){
-        exceptionHandler {
+        try {
             // update the dashboard after the order is delay
-            val orderData = myApp.getOrderConnector().getOrder(orderArguments?.id)
+            var orderData = myApp.getOrderConnector().getOrder(orderArguments?.id)
+            
+            // #78: Enrich order with full customer data (phone/email)
+            context?.let { ctx ->
+                orderData = CloverRepository.getInstance(ctx).enrichOrderWithFullCustomer(orderData)
+            }
+            
             orderArguments = orderData
-
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         CoroutineScope(Dispatchers.Main).launch {
             showThePaymentData()
@@ -1088,6 +1146,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         }
         val data = myApp.getOrderConnector().getOrders(mutableListOf())
         orderArguments = getTheRequiredData(data)
+        
+        // #78: Enrich order with full customer data (phone/email)
+        context?.let { ctx ->
+            orderArguments = CloverRepository.getInstance(ctx).enrichOrderWithFullCustomer(orderArguments)
+        }
+        
         runOnMainThread {
             binding.syncingText.hideView()
             data?.let {
@@ -1228,29 +1292,5 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         viewModel.shareSms(data)
     }
     
-    /**
-     * Populate Payment Type badge from order payments
-     * Shows the tender type used (CASH, CREDIT_CARD, etc.)
-     */
-    private fun populatePaymentTypeBadge() {
-        val payments = orderArguments?.payments
-        if (payments.isNullOrEmpty()) {
-            binding.paymentTypeBadge.visibility = View.GONE
-            return
-        }
-        
-        // Get the first payment's tender type
-        val firstPayment = payments.firstOrNull()
-        val tenderType = firstPayment?.tender?.label 
-            ?: firstPayment?.tender?.labelKey
-            ?: return
-        
-        val density = resources.displayMetrics.density
-        binding.paymentTypeBadge.text = tenderType.uppercase()
-        binding.paymentTypeBadge.background = com.orderMate.utils.WidgetColorUtils.createPillBackground(
-            com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_TYPE, 20f, density
-        )
-        binding.paymentTypeBadge.setTextColor(com.orderMate.utils.WidgetColorUtils.COLOR_PAYMENT_TYPE)
-        binding.paymentTypeBadge.visibility = View.VISIBLE
-    }
+    // populatePaymentTypeBadge() REMOVED - using shared setupPaymentTypePill() from CommonFunctions.kt
 }

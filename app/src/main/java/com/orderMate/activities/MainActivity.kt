@@ -14,19 +14,21 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.orderMate.R
-import com.orderMate.fragment.orderHistory.OrderHistoryFragment
+
 import com.orderMate.modals.PopupSettings
 import com.orderMate.utils.Constants
 import com.orderMate.utils.DefaultWidgetFactory
 import com.orderMate.utils.FirebaseConfigManager
 import com.orderMate.utils.MyApp
+import com.orderMate.utils.EmployeeRoleUtils
 import com.orderMate.utils.PermissionUtils
 import com.orderMate.utils.PreferenceManager
 import com.orderMate.utils.ProfileSettingsManager
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.createAndShowDialog
 import com.orderMate.utils.exceptionHandler
-import com.orderMate.utils.migrations.SchemaMigrator
+import com.orderMate.utils.runOnBackgroundThread
+import com.orderMate.utils.runOnMainThread
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -47,9 +49,9 @@ class MainActivity : AppCompatActivity() {
     private val myApplication: MyApp by lazy {
         MyApp.getInstance()
     }
-    private val profileSettingsManager: ProfileSettingsManager by lazy {
-        ProfileSettingsManager.getInstance(this)
-    }
+    // #81: Get fresh instance each time to handle employee changes
+    private val profileSettingsManager: ProfileSettingsManager
+        get() = ProfileSettingsManager.getInstance(this)
     private val firebaseConfigManager: FirebaseConfigManager by lazy {
         FirebaseConfigManager.getInstance()
     }
@@ -73,6 +75,9 @@ class MainActivity : AppCompatActivity() {
     private var navProfileEmoji: TextView? = null
     
     private var currentNavItem: Int = R.id.navList
+    
+    // #81: Track employee to detect POS login changes
+    private var lastKnownEmployeeId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,11 +88,17 @@ class MainActivity : AppCompatActivity() {
         setupNavigation()
         setupSideNav()
         
-        // Apply theme settings immediately
+        // #81: Track current employee
+        lastKnownEmployeeId = myApplication.getEmployeeId()
+        
+        // Apply theme settings immediately (from local cache)
         applyThemeSettings()
         
-        // Sync from Firebase in background
+        // Sync current employee from Firebase (fast, small payload)
         syncProfileSettingsFromFirebase()
+        
+        // #81: Cache ALL employee profiles for instant switching (background)
+        cacheAllEmployeeProfiles()
     }
     
     /**
@@ -142,61 +153,38 @@ class MainActivity : AppCompatActivity() {
     }
     
     /**
-     * Sync profile settings from Firebase
+     * Sync profile settings from Firebase (#81: per-employee profiles)
      */
     private fun syncProfileSettingsFromFirebase() {
         val merchantId = myApplication.getMerchantId()
-        if (!merchantId.isNullOrEmpty()) {
-            firebaseConfigManager.getProfileSettings(merchantId) { settings ->
-                if (settings.themeColor != "#3C4B80" || settings.avatar.isNotEmpty()) {
-                    profileSettingsManager.setThemeColor(settings.themeColor)
-                    if (settings.avatar.isNotEmpty()) {
-                        profileSettingsManager.setAvatarEmoji(settings.avatar)
+        val employeeId = myApplication.getEmployeeId()
+        
+        if (!merchantId.isNullOrEmpty() && !employeeId.isNullOrEmpty()) {
+            // #81: Use per-employee profile path instead of deprecated merchant-level path
+            firebaseConfigManager.getEmployeeProfile(merchantId, employeeId) { profile ->
+                // Only apply if not default values (user has customized)
+                if (profile.color != ProfileSettingsManager.DEFAULT_THEME_COLOR || 
+                    profile.avatar != com.orderMate.modals.EmployeeProfile.DEFAULT_AVATAR) {
+                    profileSettingsManager.setThemeColor(profile.color)
+                    if (profile.avatar.isNotEmpty()) {
+                        profileSettingsManager.setAvatarEmoji(profile.avatar)
                     }
                     runOnUiThread {
                         applyThemeSettings()
                     }
                 }
             }
-            
-            // Run Clover notes migration (one-time)
-            runCloverNotesMigration(merchantId)
         }
     }
     
     /**
-     * Run migration from legacy Clover notes to V2 widgets
-     * Reads orders, analyzes notes, creates widgets in Firebase
-     * Only runs once per merchant (tracks completion in SharedPreferences)
+     * Cache ALL employee profiles locally (#81: instant switch, no flash)
      */
-    private fun runCloverNotesMigration(merchantId: String) {
-        val migrationKey = "clover_notes_migration_completed_$merchantId"
-        val prefs = getSharedPreferences("migration_prefs", MODE_PRIVATE)
-        val alreadyMigrated = prefs.getBoolean(migrationKey, false)
-        
-        if (alreadyMigrated) {
-            Log.d("MainActivity", "Clover notes migration already completed for $merchantId")
-            return
-        }
-        
-        Log.d("MainActivity", "Starting Clover notes migration...")
-        
-        SchemaMigrator.migrateCloverNotes(this, merchantId) { result ->
-            Log.d("MainActivity", "=== Migration Result ===")
-            Log.d("MainActivity", "Success: ${result.success}")
-            Log.d("MainActivity", "Orders analyzed: ${result.ordersAnalyzed}")
-            Log.d("MainActivity", "Items analyzed: ${result.itemsAnalyzed}")
-            Log.d("MainActivity", "Legacy notes found: ${result.legacyNotesFound}")
-            Log.d("MainActivity", "Widgets created: ${result.widgetsCreated}")
-            if (result.errors.isNotEmpty()) {
-                Log.e("MainActivity", "Errors: ${result.errors}")
-            }
-            Log.d("MainActivity", "========================")
-            
-            // Mark migration as completed if successful
-            if (result.success) {
-                prefs.edit().putBoolean(migrationKey, true).apply()
-                Log.d("MainActivity", "Migration marked as completed")
+    private fun cacheAllEmployeeProfiles() {
+        val merchantId = myApplication.getMerchantId()
+        if (!merchantId.isNullOrEmpty()) {
+            firebaseConfigManager.getAllEmployeeProfiles(merchantId) { profiles ->
+                ProfileSettingsManager.cacheAllProfiles(this, profiles)
             }
         }
     }
@@ -209,7 +197,7 @@ class MainActivity : AppCompatActivity() {
         // Listen for navigation changes to update side nav state
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.orderListRedesignFragment, R.id.orderHistoryFragment -> updateNavState(R.id.navList)
+                R.id.orderListRedesignFragment -> updateNavState(R.id.navList)
                 R.id.calendarFragment -> updateNavState(R.id.navCalendar)
                 R.id.settingsFragment -> updateNavState(R.id.navSettings)
                 R.id.profileSettingsFragment -> updateNavState(R.id.navProfile)
@@ -297,8 +285,19 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         
-        // Refresh theme settings when returning from profile
+        // #81: Check if employee changed (POS login)
+        val currentEmployeeId = myApplication.getEmployeeId()
+        if (currentEmployeeId != lastKnownEmployeeId) {
+            lastKnownEmployeeId = currentEmployeeId
+            // Sync from Firebase to refresh cache (in background)
+            syncProfileSettingsFromFirebase()
+        }
+        
+        // Refresh theme settings when returning from profile (from local cache)
         applyThemeSettings()
+        
+        // #81: Check settings nav visibility based on role permissions
+        checkSettingsNavVisibility()
         
         // V2: Sync widgets with Firebase if merchantId available
         // (Defaults are guaranteed by Application.onCreate)
@@ -325,6 +324,33 @@ class MainActivity : AppCompatActivity() {
                 permissionUtils.gotoSettings(this)
             }
         }
+    }
+    
+    /**
+     * #81: Check if current user can access settings based on role permissions
+     * If user doesn't have access, hide the settings nav icon
+     */
+    private fun checkSettingsNavVisibility() {
+        Thread {
+            try {
+                val employee = myApplication.getCurrentEmployee()
+                val merchantId = myApplication.getMerchantId()
+                
+                if (!merchantId.isNullOrEmpty()) {
+                    firebaseConfigManager.getAdvancedSettings(merchantId) { settings ->
+                        val canAccess = EmployeeRoleUtils.canAccessSettings(employee, settings)
+                        
+                        runOnUiThread {
+                            // Hide/show settings nav based on permission
+                            navSettings?.visibility = if (canAccess) View.VISIBLE else View.GONE
+                            navSettingsIndicator?.visibility = if (canAccess) View.VISIBLE else View.GONE
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Error checking settings permissions", e)
+            }
+        }.start()
     }
 
     /**
@@ -368,6 +394,5 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         exceptionHandler { MyApp.getInstance().disconnectConnectors() }
-        exceptionHandler { OrderHistoryFragment.isClicked = true }
     }
 }

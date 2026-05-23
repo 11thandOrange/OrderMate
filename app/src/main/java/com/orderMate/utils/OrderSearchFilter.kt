@@ -51,6 +51,10 @@ object OrderSearchFilter {
             if (email.contains(lowerQuery) || phone.contains(lowerQuery)) return true
         } catch (e: Exception) { }
 
+        // Order-level note (ORDER widgets like Pickup Date, Order Type, etc.)
+        val orderNote = order.note?.lowercase() ?: ""
+        if (orderNote.contains(lowerQuery)) return true
+
         // Line item notes and names
         val lineItemMatch = order.lineItems?.any { lineItem ->
             val note = lineItem?.note?.lowercase() ?: ""
@@ -137,28 +141,32 @@ object OrderSearchFilter {
     private fun matchesSelection(order: Order, category: String, selectedValue: String): Boolean {
         return when (category.lowercase()) {
             "payment status" -> matchesPaymentStatus(order, selectedValue)
-            "order status" -> matchesOrderStatus(order, selectedValue)
+            // "order status" removed - only using payment status now
             "payment type" -> matchesPaymentType(order, selectedValue)
             else -> matchesNoteCategory(order, category, selectedValue)
         }
     }
 
     private fun matchesPaymentStatus(order: Order, value: String): Boolean {
-        val state = order.paymentState?.name?.uppercase() ?: "OPEN"
+        val state = order.paymentState?.name?.uppercase()
+        
+        // If no payment state, only match if searching for "open" or no filter
+        if (state.isNullOrEmpty()) {
+            return value.lowercase() == "open" || value.lowercase() == "all"
+        }
+        
         return when (value.lowercase()) {
+            "open" -> state == "OPEN"
             "paid" -> state == "PAID"
-            "unpaid" -> state == "OPEN"
             "refunded" -> state == "REFUNDED" || state == "PARTIALLY_REFUNDED"
-            "partial" -> state == "PARTIALLY_PAID"
+            "partial", "partially paid" -> state == "PARTIALLY_PAID"
+            "partially refunded" -> state == "PARTIALLY_REFUNDED"
             "credited" -> state == "CREDITED"
             else -> true
         }
     }
 
-    private fun matchesOrderStatus(order: Order, value: String): Boolean {
-        val state = order.state?.lowercase() ?: ""
-        return state == value.lowercase() || value.lowercase() == "all"
-    }
+    // matchesOrderStatus REMOVED - only using payment status now
 
     private fun matchesPaymentType(order: Order, value: String): Boolean {
         val type = order.payType?.name?.lowercase() ?: ""

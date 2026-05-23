@@ -78,7 +78,11 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
         } else {
             Log.e("codeChecking", "parseIntentData: Code checking is above running lower $lineItem")
             CoroutineScope(Dispatchers.IO).launch {
-                val result = MyApp.getInstance().getOrderConnector().getOrder(data)
+                var result = MyApp.getInstance().getOrderConnector().getOrder(data)
+                
+                // #78: Enrich order with full customer data (phone/email)
+                result = CloverRepository.getInstance(this@OverlayActivity).enrichOrderWithFullCustomer(result)
+                
                 updateOrderData(result, lineItem, position)
             }
         }

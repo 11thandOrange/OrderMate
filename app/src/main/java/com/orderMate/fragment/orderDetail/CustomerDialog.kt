@@ -55,7 +55,8 @@ class CustomerDialog(
             requestFeature(Window.FEATURE_NO_TITLE)
             setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         }
-        dialog.setCanceledOnTouchOutside(true)
+        // (#77) Disable outside click - only close via Save or Cancel buttons
+        dialog.setCanceledOnTouchOutside(false)
         return dialog
     }
 

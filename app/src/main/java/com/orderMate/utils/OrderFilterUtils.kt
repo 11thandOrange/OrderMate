@@ -1,0 +1,238 @@
+package com.orderMate.utils
+
+import android.content.Context
+import com.clover.sdk.v3.order.Order
+import com.orderMate.fragment.FilterDialogFragment
+import com.orderMate.modals.NoteLevel
+import com.orderMate.modals.WidgetConfig
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+
+/**
+ * Shared filter utilities for order matching.
+ * Single source of truth used by both OrderListRedesignFragment and CalendarFragment.
+ * 
+ * Note: Calendar events still render on due date using OrderDueDateResolver's 3-tier priority.
+ * This class only handles filter MATCHING, not event date resolution.
+ */
+object OrderFilterUtils {
+
+    /**
+     * Filter and search orders - single source of truth for both List and Calendar.
+     * Combines filter matching and search matching in one operation.
+     *
+     * @param orders List of orders to filter
+     * @param filters Current filter state from FilterDialogFragment
+     * @param searchQuery Current search query (empty string if no search)
+     * @param context Context for accessing WidgetManager
+     * @return List of orders matching both filters AND search
+     */
+    fun filterAndSearchOrders(
+        orders: List<Order?>,
+        filters: FilterDialogFragment.FilterState,
+        searchQuery: String,
+        context: Context
+    ): List<Order> {
+        return orders.filterNotNull().filter { order ->
+            val filterMatch = orderMatchesFilters(order, filters, context)
+            val searchMatch = searchQuery.isEmpty() || orderMatchesSearch(order, searchQuery)
+            filterMatch && searchMatch
+        }
+    }
+
+    /**
+     * Check if an order matches the given filter state.
+     * Used by both List and Calendar pages for consistent filtering.
+     *
+     * @param order The order to check
+     * @param filters The current filter state from FilterDialogFragment
+     * @param context Context for accessing WidgetManager
+     * @return true if order matches all active filters
+     */
+    fun orderMatchesFilters(
+        order: Order?,
+        filters: FilterDialogFragment.FilterState,
+        context: Context
+    ): Boolean {
+        if (order == null) return false
+
+        // Check selection filters (multi-select chips)
+        for ((categoryId, selectedValues) in filters.selections) {
+            if (selectedValues.isEmpty()) continue
+            
+            when (categoryId) {
+                FilterCategoryBuilder.CLOVER_PAYMENT_STATUS -> {
+                    // Filter values: "OPEN", "PAID", "PARTIALLY_PAID", etc.
+                    // OPEN means unpaid (null paymentState)
+                    val orderPayment = getPaymentStateFromOrder(order) ?: "OPEN"
+                    if (!selectedValues.contains(orderPayment)) return false
+                }
+                // CLOVER_ORDER_STATUS filter REMOVED - only using payment status now
+                FilterCategoryBuilder.CLOVER_PAYMENT_TYPE -> {
+                    val paymentTypes = order.payments?.mapNotNull { 
+                        it?.tender?.label?.lowercase() 
+                    } ?: emptyList()
+                    val selectedLower = selectedValues.map { it.lowercase() }
+                    if (!paymentTypes.any { it in selectedLower }) return false
+                }
+                FilterCategoryBuilder.CLOVER_EMPLOYEE -> {
+                    val employeeName = try {
+                        order.employee?.jsonObject?.getString("name") ?: ""
+                    } catch (e: Exception) { "" }
+                    if (!selectedValues.contains(employeeName)) return false
+                }
+                else -> {
+                    // OrderMate widget filters
+                    if (FilterCategoryBuilder.isWidgetFilter(categoryId)) {
+                        val widgetId = FilterCategoryBuilder.getWidgetId(categoryId) ?: continue
+                        val widget = WidgetManager.getInstance(context).getWidgetById(widgetId) ?: continue
+                        val orderValues = extractWidgetValues(order, widget)
+                        if (!selectedValues.any { it in orderValues }) return false
+                    }
+                }
+            }
+        }
+
+        // Check date filters (date picker selections)
+        for ((categoryId, dates) in filters.dateSelections) {
+            if (dates.isEmpty()) continue
+            
+            when (categoryId) {
+                FilterCategoryBuilder.CLOVER_ORDER_DATE -> {
+                    // Filter by order creation date
+                    val orderDate = order.createdTime?.let { Date(it) } ?: return false
+                    if (!dates.any { isSameDay(orderDate, it) }) return false
+                }
+                else -> {
+                    // Widget date filters (e.g., Pickup Date, Delivery Date)
+                    if (FilterCategoryBuilder.isWidgetFilter(categoryId)) {
+                        val widgetId = FilterCategoryBuilder.getWidgetId(categoryId) ?: continue
+                        val widget = WidgetManager.getInstance(context).getWidgetById(widgetId) ?: continue
+                        val orderDateValues = extractWidgetValues(order, widget)
+                        
+                        // Check multiple date formats that might be stored in notes
+                        val matchesAny = dates.any { filterDate ->
+                            matchesDateInValues(filterDate, orderDateValues)
+                        }
+                        if (!matchesAny) return false
+                    }
+                }
+            }
+        }
+
+        return true
+    }
+
+    /**
+     * Check if an order matches a search query.
+     * Delegates to OrderSearchFilter for consistent search behavior.
+     */
+    fun orderMatchesSearch(order: Order?, query: String): Boolean {
+        if (query.isEmpty()) return true
+        return OrderSearchFilter.matchesSearch(order, query)
+    }
+
+    /**
+     * Extract widget values from an order based on widget level.
+     */
+    private fun extractWidgetValues(order: Order, widget: WidgetConfig): Set<String> {
+        return if (widget.level == NoteLevel.ORDER) {
+            extractValuesFromNote(order.note, widget.label)
+        } else {
+            // ITEM level - collect from all line items
+            order.lineItems?.flatMap { lineItem ->
+                extractValuesFromNote(lineItem?.note, widget.label)
+            }?.toSet() ?: emptySet()
+        }
+    }
+
+    /**
+     * Extract values for a specific widget from a note string.
+     * Matches by widget label (case-insensitive).
+     * Handles both formats:
+     * - Current: "Label: Value • Label2: Value2"
+     * - Legacy: "[widgetId]Label: Value • [widgetId2]Label2: Value2"
+     */
+    private fun extractValuesFromNote(note: String?, widgetLabel: String): Set<String> {
+        if (note.isNullOrBlank()) return emptySet()
+        
+        val values = mutableSetOf<String>()
+        val delimiter = if (note.contains("•")) "•" else "|"
+        val parts = note.split(delimiter).map { it.trim() }
+        
+        for (part in parts) {
+            val colonIndex = part.indexOf(':')
+            if (colonIndex > 0) {
+                var label = part.substring(0, colonIndex).trim()
+                val value = part.substring(colonIndex + 1).trim()
+                
+                // Handle legacy [widgetId]label format
+                if (label.startsWith("[") && label.contains("]")) {
+                    label = label.substring(label.indexOf(']') + 1)
+                }
+                
+                // Match by widget label (case-insensitive)
+                if (label.equals(widgetLabel, ignoreCase = true) && value.isNotBlank()) {
+                    // Handle multi-select comma-separated values
+                    value.split(",")
+                        .map { it.trim() }
+                        .filter { it.isNotEmpty() }
+                        .forEach { values.add(it) }
+                }
+            }
+        }
+        return values
+    }
+
+    /**
+     * Check if two dates are the same day (ignoring time).
+     */
+    private fun isSameDay(date1: Date, date2: Date): Boolean {
+        val cal1 = Calendar.getInstance().apply { time = date1 }
+        val cal2 = Calendar.getInstance().apply { time = date2 }
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+               cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+    }
+
+    /**
+     * Check if a filter date matches any value in the order's widget values.
+     * Tries multiple date formats to handle various storage formats.
+     */
+    private fun matchesDateInValues(filterDate: Date, orderValues: Set<String>): Boolean {
+        // All possible date formats used in the app
+        val dateFormats = listOf(
+            // DateTimePickerDialog formats (actual storage format)
+            SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault()), // May 4, 2026 3:30 PM
+            SimpleDateFormat("MMM d, yyyy", Locale.getDefault()),         // May 4, 2026
+            // Numeric formats
+            SimpleDateFormat("M/d/yyyy", Locale.getDefault()),            // 5/4/2026
+            SimpleDateFormat("M/d/yy", Locale.getDefault()),              // 5/4/26
+            SimpleDateFormat("M/d", Locale.getDefault()),                 // 5/4
+            SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()),          // 05/04/2026
+            SimpleDateFormat("MM/dd/yy", Locale.getDefault()),            // 05/04/26
+            SimpleDateFormat("MM/dd", Locale.getDefault()),               // 05/04
+            // Hyphen formats
+            SimpleDateFormat("M-d-yyyy", Locale.getDefault()),            // 5-4-2026
+            SimpleDateFormat("M-d-yy", Locale.getDefault()),              // 5-4-26
+            SimpleDateFormat("MM-dd-yyyy", Locale.getDefault()),          // 05-04-2026
+            SimpleDateFormat("MM-dd-yy", Locale.getDefault()),            // 05-04-26
+            // ISO format
+            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()),          // 2026-05-04
+            // Full month name formats
+            SimpleDateFormat("MMMM d, yyyy", Locale.getDefault()),        // May 4, 2026
+            SimpleDateFormat("MMMM d", Locale.getDefault()),              // May 4
+            SimpleDateFormat("d MMM yyyy", Locale.getDefault()),          // 4 May 2026
+            SimpleDateFormat("d MMMM yyyy", Locale.getDefault())          // 4 May 2026
+        )
+        
+        for (format in dateFormats) {
+            val dateStr = format.format(filterDate)
+            if (orderValues.any { it.contains(dateStr) }) {
+                return true
+            }
+        }
+        return false
+    }
+}

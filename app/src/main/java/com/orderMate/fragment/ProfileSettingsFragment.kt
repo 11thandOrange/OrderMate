@@ -23,6 +23,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.orderMate.R
 import com.orderMate.databinding.FragmentProfileSettingsBinding
+import com.orderMate.modals.EmployeeProfile
+import com.orderMate.utils.EmployeeRoleUtils
 import com.orderMate.utils.FirebaseConfigManager
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.ProfileSettings
@@ -32,12 +34,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Profile Settings Fragment (Issue #85)
+ * Profile Settings Fragment (Issue #85, #81)
  * 
  * Allows users to:
  * - Change theme color (flat solid color, no gradient)
  * - Change profile avatar (emoji picker)
  * - Avatar renders as profile icon in side nav
+ * 
+ * #81 additions:
+ * - Per-employee profile storage (color, avatar)
+ * - Referral button (Owner only) to enter partner who referred them
  * 
  * Default theme color: #3C4B80 (matches HTML)
  */
@@ -49,6 +55,10 @@ class ProfileSettingsFragment : Fragment() {
     private lateinit var settingsManager: ProfileSettingsManager
     private lateinit var firebaseManager: FirebaseConfigManager
     private var onAvatarChangedListener: ((String?, Uri?) -> Unit)? = null
+    
+    // #81: Cache employee info to avoid repeated Clover API calls
+    private var currentEmployeeId: String? = null
+    private var isOwner: Boolean = false
     
     // Default theme color matching HTML
     private val DEFAULT_THEME_COLOR = "#3C4B80"
@@ -92,6 +102,9 @@ class ProfileSettingsFragment : Fragment() {
         setupClickListeners()
         loadCurrentSettings()
         loadUserAndMerchantInfo()
+        
+        // #81: Check referral button visibility
+        checkReferralButtonVisibility()
     }
     
     /**
@@ -123,19 +136,76 @@ class ProfileSettingsFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // Color picker - click on preview or Change button
+        // (#77) Color picker - entire section is clickable
+        binding.colorSection.setOnClickListener { showColorPickerDialog() }
         binding.colorPreview.setOnClickListener { showColorPickerDialog() }
-        binding.btnChangeColor.setOnClickListener { showColorPickerDialog() }
         
-        // Emoji picker - click on preview or Change button
+        // (#77) Emoji picker - entire section is clickable
+        binding.avatarSection.setOnClickListener { showEmojiPickerDialog() }
         binding.avatarPreview.setOnClickListener { showEmojiPickerDialog() }
-        binding.btnChangeAvatar.setOnClickListener { showEmojiPickerDialog() }
         
         // Header avatar also opens emoji picker
         binding.headerAvatarContainer.setOnClickListener { showEmojiPickerDialog() }
         
         // Reset button
         binding.btnReset.setOnClickListener { resetSettings() }
+        
+        // #81: Referral button
+        binding.btnReferral.setOnClickListener { showReferralDialog() }
+    }
+    
+    // ==================== #81: Referral Button Logic ====================
+    
+    /**
+     * Check if referral button should be visible
+     * Only show for Owners who haven't already submitted a referral
+     */
+    private fun checkReferralButtonVisibility() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val myApp = MyApp.getInstance()
+                val employee = myApp.getCurrentEmployee()
+                val merchantId = myApp.getMerchantId()
+                
+                // Cache employee info
+                currentEmployeeId = employee?.id
+                isOwner = EmployeeRoleUtils.isOwner(employee)
+                
+                // Only owners can see the referral button
+                if (!isOwner || merchantId.isNullOrEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        binding.referralButtonContainer.visibility = View.GONE
+                    }
+                    return@launch
+                }
+                
+                // Check if merchant already has a referral
+                firebaseManager.hasAnyReferral(merchantId) { hasReferral ->
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        binding.referralButtonContainer.visibility = 
+                            if (hasReferral) View.GONE else View.VISIBLE
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    binding.referralButtonContainer.visibility = View.GONE
+                }
+            }
+        }
+    }
+    
+    /**
+     * Show referral partner dialog
+     */
+    private fun showReferralDialog() {
+        val dialog = ReferralPartnerDialog.newInstance()
+        dialog.setOnSaveListener { partnerName ->
+            // Referral saved, hide button
+            binding.referralButtonContainer.visibility = View.GONE
+            showToast("Thank you! Referral saved: $partnerName")
+        }
+        dialog.show(childFragmentManager, ReferralPartnerDialog.TAG)
     }
 
     private fun loadCurrentSettings() {
@@ -430,17 +500,20 @@ class ProfileSettingsFragment : Fragment() {
     }
     
     /**
-     * Save profile settings to Firebase
+     * Save profile settings to Firebase (#81: Per-employee storage)
      */
     private fun saveToFirebase() {
-        val merchantId = MyApp.getInstance().getMerchantId()
-        if (!merchantId.isNullOrEmpty()) {
-            val settings = ProfileSettings(
-                themeColor = settingsManager.getThemeColor(),
-                avatar = settingsManager.getAvatarEmoji()
-            )
-            firebaseManager.saveProfileSettings(merchantId, settings) { success ->
-                if (!success) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val myApp = MyApp.getInstance()
+            val merchantId = myApp.getMerchantId()
+            val employeeId = currentEmployeeId ?: myApp.getEmployeeId()
+            
+            if (!merchantId.isNullOrEmpty() && !employeeId.isNullOrEmpty()) {
+                val profile = EmployeeProfile(
+                    color = settingsManager.getThemeColor(),
+                    avatar = settingsManager.getAvatarEmoji()
+                )
+                firebaseManager.saveEmployeeProfile(merchantId, employeeId, profile) { success ->
                     // Silent fail - local settings are still saved
                 }
             }

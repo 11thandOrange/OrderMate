@@ -1,5 +1,6 @@
 package com.orderMate.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,6 +12,10 @@ import java.util.Date
  * Scoped to Activity so state persists across fragment navigation.
  */
 class SharedFilterViewModel : ViewModel() {
+    
+    companion object {
+        private const val TAG = "SharedFilterVM_DEBUG"
+    }
 
     // Filter state
     private val _filterState = MutableLiveData(FilterDialogFragment.FilterState())
@@ -40,7 +45,11 @@ class SharedFilterViewModel : ViewModel() {
      * Update the filter state
      */
     fun setFilterState(state: FilterDialogFragment.FilterState) {
+        Log.d(TAG, "setFilterState called:")
+        Log.d(TAG, "  BEFORE _filterState = ${_filterState.value?.dateSelections?.map { "${it.key}: ${it.value.size} dates" }}")
+        Log.d(TAG, "  NEW state = ${state.dateSelections.map { "${it.key}: ${it.value.size} dates" }}")
         _filterState.value = state
+        Log.d(TAG, "  AFTER _filterState = ${_filterState.value?.dateSelections?.map { "${it.key}: ${it.value.size} dates" }}")
         updateHighlightedDatesFromFilters()
     }
 

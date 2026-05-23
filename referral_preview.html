@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Button & Popup Preview - #81</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #3C4B80;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .preview-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        h2 {
+            color: white;
+            font-size: 14px;
+            margin: 30px 0 15px 0;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Profile Settings Card */
+        .profile-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .profile-info h3 {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .profile-info p {
+            color: rgba(255,255,255,0.6);
+            font-size: 12px;
+        }
+
+        /* Settings Rows */
+        .settings-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .setting-box {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .setting-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .setting-label .dot {
+            width: 8px;
+            height: 8px;
+            background: #FF9500;
+            border-radius: 50%;
+        }
+
+        .setting-label span {
+            color: rgba(255,255,255,0.5);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .color-preview {
+            width: 44px;
+            height: 44px;
+            background: #3C4B80;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .avatar-preview {
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        /* Referral Button */
+        .referral-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid #FF9500;
+            border-radius: 12px;
+            padding: 12px 20px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .referral-button:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: #FFB340;
+        }
+
+        .referral-button .icon {
+            color: #FF9500;
+        }
+
+        /* Popup Overlay */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Popup Dialog */
+        .popup-dialog {
+            background: #2A3A5C;
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .popup-overlay.active .popup-dialog {
+            transform: scale(1);
+        }
+
+        .popup-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .popup-header h2 {
+            color: white;
+            font-size: 20px;
+            font-weight: 500;
+            margin: 0 0 8px 0;
+            text-transform: none;
+            letter-spacing: 0;
+            opacity: 1;
+        }
+
+        .popup-header p {
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Input Field */
+        .input-group {
+            margin-bottom: 8px;
+        }
+
+        .input-field {
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-field::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .input-field:focus {
+            border-color: #FF9500;
+        }
+
+        .helper-text {
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        /* Footer Buttons */
+        .popup-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel {
+            background: rgba(255,255,255,0.08);
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+        .btn-save {
+            background: #FF9500;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #E68600;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 30px;
+        }
+
+        .info-box h3 {
+            color: #FF9500;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .info-box code {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <h1>📱 Referral Button & Popup Preview - Issue #81</h1>
+
+        <h2>Profile Settings Page</h2>
+        
+        <div class="profile-card">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="avatar">👨‍🍳</div>
+                <div class="profile-info">
+                    <h3>John Smith</h3>
+                    <p>Taco Palace (Owner)</p>
+                </div>
+            </div>
+
+            <!-- Settings Row -->
+            <div class="settings-row">
+                <div class="setting-box">
+                    <div class="setting-label">
+                        <span class="dot"></span>
+                        <span>Theme Color</span>
+                    </div>
+                    <div class="color-preview"></div>
+                </div>
+                <div class="setting-box">
+                    <div class="setting-label">
+                        <span class="dot"></span>
+                        <span>Profile Avatar</span>
+                    </div>
+                    <div class="avatar-preview">👨‍🍳</div>
+                </div>
+            </div>
+
+            <!-- Referral Button (Bottom Right) -->
+            <div style="display: flex; justify-content: flex-end;">
+                <button class="referral-button" onclick="openPopup()">
+                    📣 Tell Us Who Referred You
+                </button>
+            </div>
+        </div>
+
+        <!-- Visibility Info -->
+        <div class="info-box">
+            <h3>🔒 Button Visibility Rules</h3>
+            <p>
+                This button is <strong>only visible</strong> when:<br><br>
+                ✅ User is the <code>Owner</code> (employee.isOwner == true)<br>
+                ✅ Merchant has <strong>no existing referrals</strong> in Firebase<br><br>
+                <strong>Single-user merchants:</strong> Yes, they ARE the owner!<br>
+                Clover always sets <code>isOwner = true</code> for the account creator.
+            </p>
+        </div>
+    </div>
+
+    <!-- Popup Overlay -->
+    <div class="popup-overlay" id="popup">
+        <div class="popup-dialog">
+            <div class="popup-header">
+                <h2>📣 Who Referred You?</h2>
+                <p>Enter the name of the partner who referred you to OrderMate</p>
+            </div>
+
+            <div class="input-group">
+                <input type="text" class="input-field" placeholder="Partner Name">
+                <p class="helper-text">Example: Stripe, Plaid, Wise, etc.</p>
+            </div>
+
+            <div class="popup-footer">
+                <button class="btn btn-cancel" onclick="closePopup()">Cancel</button>
+                <button class="btn btn-save" onclick="saveReferral()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openPopup() {
+            document.getElementById('popup').classList.add('active');
+        }
+
+        function closePopup() {
+            document.getElementById('popup').classList.remove('active');
+        }
+
+        function saveReferral() {
+            alert('Referral saved! Button will now be hidden.');
+            closePopup();
+        }
+
+        // Close on overlay click
+        document.getElementById('popup').addEventListener('click', function(e) {
+            if (e.target === this) closePopup();
+        });
+    </script>
+</body>
+</html>

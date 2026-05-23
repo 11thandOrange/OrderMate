@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Widget toggle thumb - perfect circle (16x16) with inset to prevent stretching -->
+<!-- Widget toggle thumb - (#77) Updated to match main toggle (20x20) -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:width="16dp"
-        android:height="16dp"
+        android:width="20dp"
+        android:height="20dp"
         android:gravity="center">
         <shape android:shape="oval">
             <solid android:color="#FFFFFF" />
             <size
-                android:width="16dp"
-                android:height="16dp" />
+                android:width="20dp"
+                android:height="20dp" />
         </shape>
     </item>
 </layer-list>

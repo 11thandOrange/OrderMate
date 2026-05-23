@@ -7,21 +7,23 @@ import android.net.Uri
 import androidx.core.content.edit
 
 /**
- * Profile Settings Manager (Issue #85)
+ * Profile Settings Manager (Issue #85, #81)
  * 
  * Manages user-specific profile settings stored in SharedPreferences.
- * Singleton pattern ensures consistent data across all components.
+ * Each employee has their own separate preferences file.
  * 
  * Settings include:
  * - Theme color (any hex color via color picker)
  * - Avatar emoji (any emoji via emoji picker)
  * 
- * Each user's settings are stored separately.
+ * Storage: ordermate_profile_settings_v2_{employeeId}
  */
-class ProfileSettingsManager private constructor(context: Context) {
-
-    private val prefs: SharedPreferences = context.applicationContext.getSharedPreferences(
-        PREFS_NAME, Context.MODE_PRIVATE
+class ProfileSettingsManager private constructor(
+    private val appContext: Context,
+    private val employeeId: String
+) {
+    private val prefs: SharedPreferences = appContext.getSharedPreferences(
+        "${PREFS_NAME_PREFIX}$employeeId", Context.MODE_PRIVATE
     )
     
 
@@ -217,10 +219,62 @@ class ProfileSettingsManager private constructor(context: Context) {
     companion object {
         @Volatile
         private var INSTANCE: ProfileSettingsManager? = null
+        @Volatile
+        private var currentEmployeeId: String? = null
         
+        /**
+         * Get instance for current employee.
+         * Creates new instance if employee changes.
+         */
         fun getInstance(context: Context): ProfileSettingsManager {
-            return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: ProfileSettingsManager(context.applicationContext).also { INSTANCE = it }
+            val employeeId = MyApp.getInstance().getEmployeeId() ?: "default"
+            
+            return synchronized(this) {
+                // If employee changed, create new instance
+                if (INSTANCE == null || currentEmployeeId != employeeId) {
+                    currentEmployeeId = employeeId
+                    INSTANCE = ProfileSettingsManager(context.applicationContext, employeeId)
+                }
+                INSTANCE!!
+            }
+        }
+        
+        /**
+         * Force refresh instance (call when employee logs in/out)
+         */
+        fun refreshInstance(context: Context): ProfileSettingsManager {
+            synchronized(this) {
+                val employeeId = MyApp.getInstance().getEmployeeId() ?: "default"
+                currentEmployeeId = employeeId
+                INSTANCE = ProfileSettingsManager(context.applicationContext, employeeId)
+                return INSTANCE!!
+            }
+        }
+        
+        /**
+         * Clear current instance (call on logout)
+         */
+        fun clearInstance() {
+            synchronized(this) {
+                INSTANCE = null
+                currentEmployeeId = null
+            }
+        }
+        
+        /**
+         * Cache all employee profiles locally (#81: no flash on employee switch)
+         * Call this on app start to pre-populate all employees' SharedPreferences
+         */
+        fun cacheAllProfiles(context: Context, profiles: Map<String, com.orderMate.modals.EmployeeProfile>) {
+            val appContext = context.applicationContext
+            profiles.forEach { (employeeId, profile) ->
+                val prefs = appContext.getSharedPreferences(
+                    "$PREFS_NAME_PREFIX$employeeId", Context.MODE_PRIVATE
+                )
+                prefs.edit()
+                    .putString(KEY_THEME_COLOR, profile.color)
+                    .putString(KEY_AVATAR, profile.avatar)
+                    .apply()
             }
         }
         
@@ -229,7 +283,7 @@ class ProfileSettingsManager private constructor(context: Context) {
             return getInstance(context)
         }
         
-        private const val PREFS_NAME = "ordermate_profile_settings_v2"
+        private const val PREFS_NAME_PREFIX = "ordermate_profile_settings_v2_"
         
         // Keys
         private const val KEY_THEME_COLOR = "theme_color"
@@ -239,8 +293,8 @@ class ProfileSettingsManager private constructor(context: Context) {
         private const val KEY_THEME_TARGET_PREFIX = "theme_target_"
 
         // Defaults (matching HTML)
-        private const val DEFAULT_THEME_COLOR = "#3C4B80"  // HTML default: rgb(60, 75, 128)
-        private const val DEFAULT_AVATAR = ""  // Empty = show placeholder icon
+        const val DEFAULT_THEME_COLOR = "#3C4B80"  // HTML default: rgb(60, 75, 128)
+        const val DEFAULT_AVATAR = ""  // Empty = show placeholder icon
         private const val DEFAULT_COLOR_SCHEME = "purple"
 
         // Emoji categories for picker

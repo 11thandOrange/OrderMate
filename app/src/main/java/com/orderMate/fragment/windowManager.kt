@@ -117,7 +117,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             MyApp.getInstance().getOrderConnector().addOnOrderChangedListener { orderId, _ ->
                 Log.d("DrawerState", "OnOrderChangedListener triggered for order: $orderId")
                 if (isShowing) {
-                    getTheOrderData()
+                    getTheOrderData("OnOrderChangedListener")
                 }
             }
         } catch (e: Exception) {
@@ -141,7 +141,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             }
             binding?.container?.showView()
             binding?.transparentContainer?.visibility = View.GONE  // No dimming overlay needed
-            getTheOrderData()
+            getTheOrderData("permanentMode_onCreate")
         } else {
             // Normal mode: show floating button
             windowManager.addView(binding?.root, setTheWindowParams())
@@ -248,18 +248,28 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     @Synchronized
     private fun setupRecyclerView(result: List<ItemModal>?, order: Order? ) {
         binding?.apply {
-            // Update order title (#42)
-            val shortId = order?.id?.takeLast(4)?.uppercase() ?: ""
-            orderTitle.text = "Order #$shortId"
+            // (#76) Clear order title - order ID removed from register drawer
+            // Keep view visible (with empty text) to maintain layout spacing for button on right
+            orderTitle.text = ""
             
-            // Update customer name (#42)
-            val customerNameStr = order?.customers?.firstOrNull()?.let { customer ->
-                listOfNotNull(customer.firstName, customer.lastName)
+            // (#77) Update customer name - conditionally render row only if customer exists
+            val customer = order?.customers?.firstOrNull()
+            val customerNameStr = customer?.let { cust ->
+                listOfNotNull(cust.firstName, cust.lastName)
                     .filter { it.isNotBlank() }
                     .joinToString(" ")
                     .ifBlank { null }
-            } ?: "-"
-            customerName.text = customerNameStr
+            }
+            
+            // (#77) Only show customer row if customer is attached to order
+            if (customerNameStr.isNullOrBlank()) {
+                customerRow.hideView()
+                customerRowDivider.hideView()
+            } else {
+                customerRow.showView()
+                customerRowDivider.showView()
+                customerName.text = customerNameStr
+            }
             
             // Update order total (#42)
             val totalCents = order?.total ?: 0L
@@ -351,6 +361,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
     private fun addDynamicWidgetRow(container: android.widget.LinearLayout, label: String, value: String, widgetType: WidgetType, density: Float) {
         val color = WidgetColorUtils.getColorForWidgetType(widgetType)
         val iconRes = WidgetColorUtils.getIconForWidgetType(widgetType)
+        val iconBgRes = WidgetColorUtils.getIconBackgroundForWidgetType(widgetType)
         
         // Row container
         val rowLayout = android.widget.LinearLayout(this).apply {
@@ -359,11 +370,11 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             setPadding(0, dpToPx(8), 0, dpToPx(8))
         }
         
-        // Icon container (matches Order Details style)
+        // Icon container - use widget-specific background color
         val iconFrame = android.widget.FrameLayout(this).apply {
             val size = dpToPx(32)
             layoutParams = android.widget.LinearLayout.LayoutParams(size, size)
-            setBackgroundResource(R.drawable.bg_detail_icon)
+            setBackgroundResource(iconBgRes)
         }
         
         val icon = android.widget.ImageView(this).apply {
@@ -372,7 +383,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                 gravity = android.view.Gravity.CENTER
             }
             setImageResource(iconRes)
-            setColorFilter(ContextCompat.getColor(this@FloatingWidgetService, R.color.text_muted))
+            setColorFilter(color)
         }
         iconFrame.addView(icon)
         rowLayout.addView(iconFrame)
@@ -471,7 +482,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                 }
             } else {
                 // Always refresh the order data when data exists
-                getTheOrderData()
+                getTheOrderData("updateData")
             }
         }
 
@@ -483,7 +494,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
             Constants.notImplementedLog
         }
         if (OrderDetailFragment.isReOpenBtnClicked) {
-            getTheOrderData()
+            getTheOrderData("isReOpenBtnClicked")
         }
 
         binding?.container1?.setOnClickListener {
@@ -498,7 +509,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
                 binding?.emptyStateContainer?.showView()
             }
             if (prefManager.getString(Constants.isOrderSaved) == Constants.isFalse) {
-                getTheOrderData()
+                getTheOrderData("drawerButtonClick")
             }
             setupMinWidth(500)
 
@@ -620,17 +631,17 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         binding?.parentContainer?.minWidth = width
     }
 
-    fun getTheOrderData() {
+    fun getTheOrderData(source: String = "unknown") {
         // If already fetching, mark that a refresh is pending and return
         if (isFetchingData) {
-            Log.d("DrawerState", "getTheOrderData() called but fetch in progress, marking pendingRefresh")
+            Log.d("DrawerState", "getTheOrderData(source=$source) called but fetch in progress, marking pendingRefresh")
             pendingRefresh = true
             return
         }
         isFetchingData = true
         pendingRefresh = false  // Clear any pending flag since we're starting a fresh fetch
         
-        Log.d("DrawerState", "getTheOrderData() called")
+        Log.d("DrawerState", "getTheOrderData(source=$source) - starting fetch")
         Log.d("DrawerState", "Expected order (orderIdForReopen): ${OrderDetailFragment.orderIdForReopen}")
         
         binding?.progressLayout?.showView()
@@ -691,7 +702,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         if (pendingRefresh) {
             Log.d("DrawerState", "Pending refresh detected, fetching latest data")
             pendingRefresh = false
-            getTheOrderData()
+            getTheOrderData("pendingRefresh")
         }
     }
 

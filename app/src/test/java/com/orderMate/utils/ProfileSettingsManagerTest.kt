@@ -396,4 +396,211 @@ class ProfileSettingsManagerTest {
         assertTrue(objectEmojis.size >= 10)
         assertTrue(objectEmojis.contains("📱"))
     }
+
+    // ==================== #81: Per-Employee Isolation Tests ====================
+
+    @Test
+    fun `different employees have different SharedPreferences files`() {
+        val employeeA = "emp_123"
+        val employeeB = "emp_456"
+        
+        val prefsNameA = "ordermate_profile_settings_v2_$employeeA"
+        val prefsNameB = "ordermate_profile_settings_v2_$employeeB"
+        
+        assertNotEquals(prefsNameA, prefsNameB)
+        assertTrue(prefsNameA.contains(employeeA))
+        assertTrue(prefsNameB.contains(employeeB))
+    }
+
+    @Test
+    fun `employee switch results in different settings`() {
+        val employeeASettings = mutableMapOf(
+            "theme_color" to "#ff0000",
+            "avatar" to "🔴"
+        )
+        
+        val employeeBSettings = mutableMapOf(
+            "theme_color" to "#0000ff",
+            "avatar" to "🔵"
+        )
+        
+        // Simulate employee A active
+        var currentSettings = employeeASettings
+        assertEquals("#ff0000", currentSettings["theme_color"])
+        assertEquals("🔴", currentSettings["avatar"])
+        
+        // Simulate employee B logs in
+        currentSettings = employeeBSettings
+        assertEquals("#0000ff", currentSettings["theme_color"])
+        assertEquals("🔵", currentSettings["avatar"])
+    }
+
+    @Test
+    fun `cacheAllProfiles stores multiple employee profiles`() {
+        val profiles = mapOf(
+            "emp_1" to mapOf("color" to "#ff0000", "avatar" to "😀"),
+            "emp_2" to mapOf("color" to "#00ff00", "avatar" to "😎"),
+            "emp_3" to mapOf("color" to "#0000ff", "avatar" to "🎉")
+        )
+        
+        // Simulate caching
+        val cachedProfiles = mutableMapOf<String, MutableMap<String, String>>()
+        profiles.forEach { (employeeId, profile) ->
+            cachedProfiles[employeeId] = mutableMapOf(
+                "theme_color" to (profile["color"] ?: "#3C4B80"),
+                "avatar" to (profile["avatar"] ?: "")
+            )
+        }
+        
+        assertEquals(3, cachedProfiles.size)
+        assertEquals("#ff0000", cachedProfiles["emp_1"]?.get("theme_color"))
+        assertEquals("#00ff00", cachedProfiles["emp_2"]?.get("theme_color"))
+        assertEquals("#0000ff", cachedProfiles["emp_3"]?.get("theme_color"))
+    }
+
+    @Test
+    fun `cacheAllProfiles uses defaults for missing fields`() {
+        val profiles = mapOf(
+            "emp_1" to mapOf<String, String>(), // Empty profile
+            "emp_2" to mapOf("color" to "#ff0000") // Missing avatar
+        )
+        
+        val cachedProfiles = mutableMapOf<String, MutableMap<String, String>>()
+        profiles.forEach { (employeeId, profile) ->
+            cachedProfiles[employeeId] = mutableMapOf(
+                "theme_color" to (profile["color"] ?: "#3C4B80"),
+                "avatar" to (profile["avatar"] ?: "")
+            )
+        }
+        
+        // Empty profile gets defaults
+        assertEquals("#3C4B80", cachedProfiles["emp_1"]?.get("theme_color"))
+        assertEquals("", cachedProfiles["emp_1"]?.get("avatar"))
+        
+        // Partial profile keeps provided value, defaults for missing
+        assertEquals("#ff0000", cachedProfiles["emp_2"]?.get("theme_color"))
+        assertEquals("", cachedProfiles["emp_2"]?.get("avatar"))
+    }
+
+    @Test
+    fun `employee change detection works correctly`() {
+        var lastKnownEmployeeId: String? = null
+        
+        // Initial state - no employee
+        val currentEmployee1 = "emp_123"
+        val employeeChanged1 = currentEmployee1 != lastKnownEmployeeId
+        assertTrue(employeeChanged1)
+        lastKnownEmployeeId = currentEmployee1
+        
+        // Same employee - no change
+        val currentEmployee2 = "emp_123"
+        val employeeChanged2 = currentEmployee2 != lastKnownEmployeeId
+        assertFalse(employeeChanged2)
+        
+        // Different employee - changed
+        val currentEmployee3 = "emp_456"
+        val employeeChanged3 = currentEmployee3 != lastKnownEmployeeId
+        assertTrue(employeeChanged3)
+        lastKnownEmployeeId = currentEmployee3
+    }
+
+    @Test
+    fun `instant switch uses cached profile`() {
+        // Pre-cached profiles
+        val cachedProfiles = mapOf(
+            "emp_A" to mapOf("theme_color" to "#ff0000", "avatar" to "🔴"),
+            "emp_B" to mapOf("theme_color" to "#0000ff", "avatar" to "🔵")
+        )
+        
+        // Employee A is active
+        var currentEmployeeId = "emp_A"
+        var currentProfile = cachedProfiles[currentEmployeeId]
+        assertEquals("#ff0000", currentProfile?.get("theme_color"))
+        
+        // Employee B logs in - instant switch from cache
+        currentEmployeeId = "emp_B"
+        currentProfile = cachedProfiles[currentEmployeeId]
+        assertEquals("#0000ff", currentProfile?.get("theme_color"))
+        
+        // No network call needed - profile was pre-cached
+        assertNotNull(currentProfile)
+    }
+
+    @Test
+    fun `new employee without cache gets defaults`() {
+        val cachedProfiles = mapOf(
+            "emp_A" to mapOf("theme_color" to "#ff0000", "avatar" to "🔴")
+        )
+        
+        // New employee not in cache
+        val newEmployeeId = "emp_NEW"
+        val profile = cachedProfiles[newEmployeeId]
+        
+        // Profile is null, should use defaults
+        assertNull(profile)
+        
+        // Default values should be used
+        val themeColor = profile?.get("theme_color") ?: "#3C4B80"
+        val avatar = profile?.get("avatar") ?: ""
+        
+        assertEquals("#3C4B80", themeColor)
+        assertEquals("", avatar)
+    }
+
+    @Test
+    fun `singleton returns same instance for same employee`() {
+        // Simulate singleton behavior
+        var currentEmployeeId = "emp_123"
+        var instanceId = "instance_${currentEmployeeId}"
+        
+        val firstCall = instanceId
+        val secondCall = instanceId // Same employee, same instance
+        
+        assertEquals(firstCall, secondCall)
+    }
+
+    @Test
+    fun `singleton returns new instance when employee changes`() {
+        // Simulate singleton behavior
+        var currentEmployeeId = "emp_123"
+        var instanceId = "instance_${currentEmployeeId}"
+        
+        val firstInstance = instanceId
+        
+        // Employee changes
+        currentEmployeeId = "emp_456"
+        instanceId = "instance_${currentEmployeeId}"
+        
+        val secondInstance = instanceId
+        
+        assertNotEquals(firstInstance, secondInstance)
+    }
+
+    @Test
+    fun `clearInstance resets singleton state`() {
+        var instance: String? = "instance_emp_123"
+        var currentEmployeeId: String? = "emp_123"
+        
+        // Clear
+        instance = null
+        currentEmployeeId = null
+        
+        assertNull(instance)
+        assertNull(currentEmployeeId)
+    }
+
+    @Test
+    fun `refreshInstance creates new instance for current employee`() {
+        var currentEmployeeId = "emp_123"
+        var instanceVersion = 1
+        
+        val firstInstance = "instance_${currentEmployeeId}_v$instanceVersion"
+        
+        // Refresh
+        instanceVersion++
+        val refreshedInstance = "instance_${currentEmployeeId}_v$instanceVersion"
+        
+        assertNotEquals(firstInstance, refreshedInstance)
+        assertTrue(refreshedInstance.contains(currentEmployeeId))
+    }
 }

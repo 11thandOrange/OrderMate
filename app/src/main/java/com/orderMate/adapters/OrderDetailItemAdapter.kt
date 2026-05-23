@@ -4,8 +4,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -118,33 +116,10 @@ class OrderDetailItemAdapter(
             if (itemLevelWidgets.isEmpty()) return
             
             // Parse using widget-based approach (all 4 types including TEXT_BOX)
-            val density = context.resources.displayMetrics.density
             val parsedTags = OrderNoteParser.extractTagsFromNote(noteString, itemLevelWidgets, NoteLevel.ITEM, includeTextBox = true)
             
             parsedTags.forEach { tag ->
-                val pillView = LayoutInflater.from(context)
-                    .inflate(R.layout.item_note_pill, binding.itemNotesContainer, false) as LinearLayout
-                
-                val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-                val pillText = pillView.findViewById<TextView>(R.id.pillText)
-                
-                val color = WidgetColorUtils.getColorForWidgetType(tag.widgetType)
-                val iconRes = WidgetColorUtils.getIconForWidgetType(tag.widgetType)
-                
-                // Truncate TEXT_BOX values to 12 chars for compact display
-                val displayText = tag.value.replace("\n", " ").take(12).let {
-                    if (tag.value.length > 12) "$it..." else it
-                }
-                
-                pillText.text = displayText
-                pillText.maxLines = 1
-                pillText.setTextColor(color)
-                pillIcon.setImageResource(iconRes)
-                pillIcon.setColorFilter(color)
-                
-                pillView.background = WidgetColorUtils.createPillBackground(color, 10f, density)
-                
-                binding.itemNotesContainer.addView(pillView)
+                WidgetColorUtils.addPillToContainer(context, binding.itemNotesContainer, tag.value, tag.widgetType)
             }
         }
     }

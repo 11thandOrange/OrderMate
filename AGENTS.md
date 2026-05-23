@@ -1,7 +1,7 @@
 # OrderMate Agent Guide
 
 ## Project Overview
-OrderMate is an Android application built with Kotlin that integrates with Clover POS systems. It provides order management, calendar scheduling, and customizable notification features for merchants.
+OrderMate is an Android application built with Kotlin that integrates with Clover POS systems. It provides order management, calendar scheduling, customizable notification features, and merchant analytics for merchants.
 
 ## Agent System Architecture
 
@@ -48,13 +48,16 @@ All agent definitions are stored in `.agents/agents/`:
 | "Create Postman collections" | postman-manager |
 
 ## Tech Stack
-- **Language**: Kotlin
-- **Platform**: Android (Min SDK not specified, targets Clover devices)
+- **Language**: Kotlin (Android), TypeScript (Cloud Functions)
+- **Platform**: Android (targets Clover devices)
 - **Build System**: Gradle (Kotlin DSL)
-- **Backend**: Firebase Realtime Database for configuration storage
+- **Backend**: Firebase Realtime Database
+- **Cloud Functions**: Firebase Functions (Node.js/TypeScript)
 - **POS Integration**: Clover SDK v3
 
 ## Project Structure
+
+### Android App
 ```
 app/src/main/java/com/orderMate/
 ├── activities/       # MainActivity, OverlayActivity (register overlay)
@@ -74,7 +77,22 @@ app/src/main/java/com/orderMate/
 └── viewmodel/        # ViewModels (SharedFilterViewModel)
 ```
 
+### Cloud Functions
+```
+functions/
+├── src/
+│   ├── index.ts                 # Main entry point
+│   └── webhooks/
+│       └── cloverWebhook.ts     # Clover webhook handler
+├── package.json
+├── tsconfig.json
+├── README.md
+└── WEBHOOK_SETUP.md
+```
+
 ## Key Files
+
+### Android
 - `CommonFunctions.kt` - Utility functions including `getThePaymentState()`
 - `ProfileSettingsFragment.kt` - Theme color picker and avatar management
 - `CalendarFragment.kt` - Calendar view with day/week/month modes
@@ -84,6 +102,9 @@ app/src/main/java/com/orderMate/
 - `OrderDetailFragment.kt` - Order detail page with customer/item/history cards
 - `WidgetManager.kt` - Widget configuration management (V2 schema)
 - `FirebaseConfigManager.kt` - Firebase configuration persistence
+
+### Cloud Functions
+- `cloverWebhook.ts` - Handles Clover webhook events (install, uninstall, subscription)
 
 ## Widget System (V2)
 The app uses a V2 widget schema defined in:
@@ -98,25 +119,52 @@ Colors are defined in `res/values/colors.xml` with categories:
 - Calendar event colors (`event_pickup_bg`, `event_delivery_bg`)
 - Status colors (`status_open_bg`, `status_paid_bg`)
 
+## Firebase Database Structure
+```
+merchants/{merchantId}/
+├── merchantInfo/          # Name, email, install date, etc.
+├── subscription/          # Plan, status, billing
+├── events/                # Lifecycle events (install, uninstall, etc.)
+├── settings/              # App settings
+├── widgets/               # Widget configurations
+├── templates/             # Notification templates
+├── profiles/              # Employee profiles
+├── referrals/             # Referral data
+└── discounts/             # Discount configurations
+```
+
 ## Build Commands
+
+### Android (via Android Studio)
+- **Debug APK:** Build → Build Bundle(s) / APK(s) → Build APK(s)
+- **Release APK:** Build → Generate Signed Bundle / APK
+- **Run Tests:** Run → Run 'All Tests'
+
+Or if `gradlew` wrapper exists:
 ```bash
-# Build debug APK
-./gradlew assembleDebug
+./gradlew assembleDebug      # Build debug APK
+./gradlew assembleRelease    # Build release APK
+./gradlew test               # Run unit tests
+```
 
-# Run unit tests
-./gradlew test
-
-# Build release APK
-./gradlew assembleRelease
+### Cloud Functions
+```bash
+cd functions
+npm install                  # Install dependencies
+npm run build                # Build TypeScript
+firebase deploy --only functions:cloverWebhook  # Deploy
+firebase functions:log --only cloverWebhook     # View logs
 ```
 
 ## Testing
-Unit tests located in `app/src/test/java/com/orderMate/`
+- Android unit tests: `app/src/test/java/com/orderMate/`
+- Cloud Functions: Test with Postman or cURL (see `functions/WEBHOOK_SETUP.md`)
 
 ## Branches
 - `main` - Production branch
 - `complete_redesign_logic` - V2 redesign with iOS-style UI
 - `complete_v2_redesign_2` - Working branch for ticket implementation
+- `#98/implement-webhooks` - Webhook implementation branch
 
 ## GitHub Issues Structure
 Parent tickets organize work into 7 areas:
@@ -137,3 +185,34 @@ Parent tickets organize work into 7 areas:
 | PARTIALLY_REFUNDED | Partially Refunded |
 | REFUNDED | Refunded |
 | LOCKED | Closed |
+
+## Clover Webhook Events
+| Event | objectId Prefix | type | Action |
+|-------|-----------------|------|--------|
+| App Installed | `A:` | `CREATE` | Store merchant info, init subscription |
+| App Uninstalled | `A:` | `DELETE` | Set uninstall date, cancel subscription |
+| Subscription Changed | `A:` | `UPDATE` | Update plan, record event |
+
+## Environment Variables (Cloud Functions)
+| Variable | Description |
+|----------|-------------|
+| `CLOVER_API_TOKEN` | Clover API access token |
+| `CLOVER_BASE_URL` | `https://api.clover.com` (prod) or `https://sandbox.dev.clover.com` |
+
+## Webhook URL
+```
+https://us-central1-ordermate-53077.cloudfunctions.net/cloverWebhook
+```
+
+## Common Tasks
+
+### Add a new webhook event handler
+1. Edit `functions/src/webhooks/cloverWebhook.ts`
+2. Add handler function
+3. Update `handleCloverWebhookEvent()` switch statement
+4. Deploy: `firebase deploy --only functions:cloverWebhook`
+
+### Debug webhook issues
+1. Check logs: `firebase functions:log --only cloverWebhook`
+2. Test with Postman: POST to webhook URL with JSON body
+3. Verify Clover dashboard webhook configuration

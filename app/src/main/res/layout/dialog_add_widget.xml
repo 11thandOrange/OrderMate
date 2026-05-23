@@ -59,19 +59,34 @@
             android:paddingVertical="14dp"
             android:layout_marginBottom="8dp">
 
+            <!-- (#77) Color code widget icon: Calendar = Blue #64B5F6 -->
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:src="@drawable/ic_calendar"
-                app:tint="@color/text_light"
+                app:tint="#64B5F6"
                 android:layout_marginEnd="12dp"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Calendar"
-                android:textColor="@color/text_light"
-                android:textSize="15sp"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Calendar"
+                    android:textColor="@color/text_light"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Due dates, pick-up dates, deadlines"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -87,19 +102,34 @@
             android:paddingVertical="14dp"
             android:layout_marginBottom="8dp">
 
+            <!-- (#77) Color code widget icon: Single Select = Purple #CE93D8 -->
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:src="@drawable/ic_check_box"
-                app:tint="@color/text_light"
+                app:tint="#CE93D8"
                 android:layout_marginEnd="12dp"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Single Select"
-                android:textColor="@color/text_light"
-                android:textSize="15sp"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Single Select"
+                    android:textColor="@color/text_light"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select one note per item"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -115,19 +145,34 @@
             android:paddingVertical="14dp"
             android:layout_marginBottom="8dp">
 
+            <!-- (#77) Color code widget icon: Multi Select = Green #81C784, double checkmark -->
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@drawable/ic_list"
-                app:tint="@color/text_light"
+                android:src="@drawable/ic_check_double"
+                app:tint="#81C784"
                 android:layout_marginEnd="12dp"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Multi Select"
-                android:textColor="@color/text_light"
-                android:textSize="15sp"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Multi Select"
+                    android:textColor="@color/text_light"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select multiple notes per item"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -142,19 +187,34 @@
             android:paddingHorizontal="16dp"
             android:paddingVertical="14dp">
 
+            <!-- (#77) Color code widget icon: Text Box = Brown #A1887F -->
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:src="@drawable/ic_text_format"
-                app:tint="@color/text_light"
+                app:tint="#A1887F"
                 android:layout_marginEnd="12dp"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Text Box"
-                android:textColor="@color/text_light"
-                android:textSize="15sp"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Text Box"
+                    android:textColor="@color/text_light"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Descriptions, details, reminders"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 

@@ -88,7 +88,7 @@ class LineItemAddedReceiver : BroadcastReceiver() {
             // Refresh the drawer to show the new order that starts after save/pay
             if (FloatingWidgetService.isShowing) {
                 Log.d("DrawerState", "Refreshing drawer after save/pay")
-                FloatingWidgetService.instance?.getTheOrderData()
+                FloatingWidgetService.instance?.getTheOrderData("ORDER_SAVED_or_PAYMENT_PROCESSED")
             }
             return
         }
@@ -143,7 +143,7 @@ class LineItemAddedReceiver : BroadcastReceiver() {
                         // Refresh the drawer with the new active order
                         if (FloatingWidgetService.isShowing) {
                             Log.d("DrawerState", "FloatingWidgetService is showing, refreshing data")
-                            FloatingWidgetService.instance?.getTheOrderData()
+                            FloatingWidgetService.instance?.getTheOrderData("ACTIVE_REGISTER_ORDER")
                         } else {
                             Log.d("DrawerState", "FloatingWidgetService is NOT showing")
                         }
@@ -162,8 +162,21 @@ class LineItemAddedReceiver : BroadcastReceiver() {
 
         when (p1.action) {
             ACTION_LINE_ITEM_ADDED -> {
+                val orderId = p1.getStringExtra(EXTRA_CLOVER_ORDER_ID)
+                val itemId = p1.getStringExtra(EXTRA_CLOVER_ITEM_ID)
+                Log.d("DrawerState", "ACTION_LINE_ITEM_ADDED received - orderId: $orderId, itemId: $itemId")
+                
                 prefManager?.saveString(Constants.isOrderSaved, Constants.isFalse)
                 FloatingWidgetService.instance?.visibleRecycler()
+                
+                // Refresh the drawer to reflect the added item (#80 fix)
+                if (FloatingWidgetService.isShowing) {
+                    Log.d("DrawerState", "Refreshing drawer after item added")
+                    FloatingWidgetService.instance?.getTheOrderData("LINE_ITEM_ADDED")
+                } else {
+                    Log.d("DrawerState", "FloatingWidgetService not showing, skipping refresh")
+                }
+                
                 performAddOperation(p1, p0)
             }
 
@@ -173,7 +186,7 @@ class LineItemAddedReceiver : BroadcastReceiver() {
                 // Refresh the drawer to reflect the deleted item
                 if (FloatingWidgetService.isShowing) {
                     Log.d("DrawerState", "Refreshing drawer after item deleted")
-                    FloatingWidgetService.instance?.getTheOrderData()
+                    FloatingWidgetService.instance?.getTheOrderData("LINE_ITEM_DELETED")
                 }
             }
         }
@@ -185,33 +198,42 @@ class LineItemAddedReceiver : BroadcastReceiver() {
 
 
     private fun performAddOperation(p1: Intent, p0: Context?) {
+        val orderId = p1.getStringExtra(EXTRA_CLOVER_ORDER_ID)
+        val itemId = p1.getStringExtra(EXTRA_CLOVER_ITEM_ID)
+        Log.d("DrawerState", "performAddOperation() called - orderId: $orderId, itemId: $itemId")
+        
         addItemToPref(p1)
-        getOrderData(p1.getStringExtra(EXTRA_CLOVER_ORDER_ID)) { orderDetails ->
+        getOrderData(orderId) { orderDetails ->
 
             if(orderDetails == null){
+                Log.d("DrawerState", "performAddOperation: orderDetails is null, returning")
                 return@getOrderData
             }
 
-            if (isItemAlreadyThere)
+            if (isItemAlreadyThere) {
+                Log.d("DrawerState", "performAddOperation: item already exists, skipping popup")
                 return@getOrderData
+            }
 
             // if the admin has disabled this then the modal will be disabled.
             if (prefManager?.getBoolean(Constants.isMenuOptionEnabled) == false) {
+                Log.d("DrawerState", "performAddOperation: menu option disabled, skipping popup")
                 return@getOrderData
             }
 
             // if all the fields are disabled then we will not show the dialog
             if (prefManager?.getBoolean(Constants.isAllFieldDisabled) == true) {
+                Log.d("DrawerState", "performAddOperation: all fields disabled, skipping popup")
                 return@getOrderData
             }
+            
+            Log.d("DrawerState", "performAddOperation: launching OverlayActivity for item: $itemId")
             CoroutineScope(Dispatchers.Main).launch {
-                Log.e("codeVerification", "performAddOperation:   p1.getStringExtra(EXTRA_CLOVER_ITEM_ID) ${  p1.getStringExtra(EXTRA_CLOVER_ITEM_ID)}", )
-                Log.e("codeVerification", "performAddOperation:   orderDetails) ${  orderDetails}", )
                 val intent = Intent(p0, OverlayActivity::class.java)
                 intent.putExtra(Constants.LINE_ITEM_ADDED_ORDER_DETAILS, orderDetails)
                 intent.putExtra(
                     Constants.LINE_ITEM_ADDED_ID,
-                    p1.getStringExtra(EXTRA_CLOVER_ITEM_ID)
+                    itemId
                 )
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 p0?.startActivity(intent)

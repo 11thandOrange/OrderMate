@@ -32,6 +32,7 @@ import com.orderMate.modals.ShareSmsModal
 import com.orderMate.modals.SmsBody
 import com.orderMate.modals.Text
 import com.orderMate.services.TemplateProcessor
+import com.orderMate.repository.CloverRepository
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FirebaseConfigManager
 import com.orderMate.utils.NotificationTemplate
@@ -41,6 +42,9 @@ import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
 import com.orderMate.utils.showView
 import com.orderMate.utils.MyApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -510,15 +514,70 @@ class SendNotificationDialog(
         updateTheAdapter(result)
     }
 
+    /**
+     * #78: Always fetch full customer data from Clover on every refresh
+     * 
+     * Clover's getOrders() returns partial customer data that may not include
+     * phoneNumbers or emailAddresses. We always fetch the full customer using
+     * CustomerConnector.getCustomer() to get the latest contact information.
+     */
     private fun updateTheCustomerData() {
-        order?.customers?.forEach {
-            it?.emailAddresses?.forEach { emailAddress ->
-                customerEmailArray.add(emailAddress?.emailAddress)
-            }
-            it?.phoneNumbers?.forEach { phoneNumber ->
-                customerPhoneArray.add(phoneNumber?.phoneNumber)
-            }
+        val customerId = order?.customers?.firstOrNull()?.id
+        
+        if (!customerId.isNullOrEmpty()) {
+            // Always fetch full customer data from Clover
+            android.util.Log.d("SendNotificationDialog", "#78: Fetching full customer data for ID: $customerId")
+            fetchFullCustomerData(customerId)
+        } else {
+            // No customer on order, update with empty array
             updateThePassedArray(customerPhoneArray)
+        }
+    }
+    
+    /**
+     * #78: Fetch complete customer data from Clover using CustomerConnector
+     * This retrieves phone numbers and email addresses that may be missing from order data
+     */
+    private fun fetchFullCustomerData(customerId: String) {
+        val context = try {
+            requireContext()
+        } catch (e: Exception) {
+            updateThePassedArray(customerPhoneArray)
+            return
+        }
+        
+        val repository = CloverRepository.getInstance(context)
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val fullCustomer = repository.getCustomerById(customerId)
+                
+                if (fullCustomer != null) {
+                    android.util.Log.d("SendNotificationDialog", "#78: Full customer fetched - phones: ${fullCustomer.phoneNumbers?.size ?: 0}, emails: ${fullCustomer.emailAddresses?.size ?: 0}")
+                    
+                    fullCustomer.emailAddresses?.forEach { emailAddress ->
+                        if (!customerEmailArray.contains(emailAddress?.emailAddress)) {
+                            customerEmailArray.add(emailAddress?.emailAddress)
+                        }
+                    }
+                    fullCustomer.phoneNumbers?.forEach { phoneNumber ->
+                        if (!customerPhoneArray.contains(phoneNumber?.phoneNumber)) {
+                            customerPhoneArray.add(phoneNumber?.phoneNumber)
+                        }
+                    }
+                } else {
+                    android.util.Log.d("SendNotificationDialog", "#78: Could not fetch full customer for ID: $customerId")
+                }
+                
+                runOnMainThread {
+                    updateThePassedArray(customerPhoneArray)
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("SendNotificationDialog", "#78: Error fetching customer: ${e.message}")
+                e.printStackTrace()
+                runOnMainThread {
+                    updateThePassedArray(customerPhoneArray)
+                }
+            }
         }
     }
 

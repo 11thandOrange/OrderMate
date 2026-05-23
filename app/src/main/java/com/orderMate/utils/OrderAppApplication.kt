@@ -191,18 +191,54 @@ class MyApp : Application() {
             null
         }
     }
-
-    fun orderTax(order: Order?): Long {
-        return OrderCalc(order).tax
+    
+    /**
+     * Get the current employee's ID (#81)
+     */
+    fun getEmployeeId(): String? {
+        return try {
+            getEmployeeConnector()?.employee?.id
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+    
+    /**
+     * Get the current employee object (#81)
+     */
+    fun getCurrentEmployee() = try {
+        getEmployeeConnector()?.employee
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
     }
 
-    fun orderLineItemTotal(order: Order?): Long {
-        return OrderCalc(order).getLineSubtotal(order?.lineItems)
+    // All methods use OrderCalc to match Clover Register exactly
+    
+    fun orderSubtotal(order: Order?): Long {
+        return OrderCalc(order).getLineSubtotalWithoutDiscounts(order?.lineItems)
+    }
+
+    fun orderTaxesAndFees(order: Order?): Long {
+        val calc = OrderCalc(order)
+        return calc.getTax(order?.lineItems) + calc.getServiceCharge(order?.lineItems)
     }
 
     fun orderDiscount(order: Order?): Long {
-        return OrderCalc(order).getLineSubtotalWithoutDiscounts(order?.lineItems)
+        val calc = OrderCalc(order)
+        val subtotal = calc.getLineSubtotalWithoutDiscounts(order?.lineItems)
+        val discountedSubtotal = calc.getDiscountedSubtotal(order?.lineItems)
+        return subtotal - discountedSubtotal
     }
+
+    fun orderTotal(order: Order?): Long {
+        return OrderCalc(order).getTotal(order?.lineItems)
+    }
+
+    // Legacy method names for compatibility
+    fun orderTax(order: Order?): Long = orderTaxesAndFees(order)
+    fun orderLineItemTotal(order: Order?): Long = orderSubtotal(order)
 
     fun disconnectConnectors() {
         orderConnector?.disconnect()

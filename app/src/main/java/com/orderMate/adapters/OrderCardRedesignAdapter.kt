@@ -3,9 +3,7 @@ package com.orderMate.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -21,8 +19,16 @@ import com.orderMate.utils.WidgetColorUtils
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.exceptionHandler
 import com.orderMate.utils.formatPaymentState
-import com.orderMate.utils.formatOrderState
+import com.orderMate.utils.getPaymentTypeLabel
+import com.orderMate.utils.setupPaymentStatusPill
+import com.orderMate.utils.setupPaymentTypePill
+// formatOrderState removed - only using payment status now
+import com.orderMate.utils.getPaymentStateFromOrder
+import com.orderMate.utils.MyApp
 import com.orderMate.utils.toDoubleFloatPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * iOS-style Order Card Adapter (#80, #81 requirement)
@@ -71,10 +77,10 @@ class OrderCardRedesignAdapter(
             // Order Number
             binding.orderNumber.text = "#${order.id?.takeLast(8) ?: "---"}"
 
-            // Order Status Badge
-            setupOrderStatusBadge(order)
+            // Order Status Badge - REMOVED (only using payment status now)
+            binding.orderStatusBadge.visibility = View.GONE
 
-            // Payment Status Badge
+            // Payment Status Badge - show for ALL payment states including OPEN/UNPAID
             setupPaymentStatusBadge(order)
 
             // Order Date (Task 19)
@@ -83,8 +89,8 @@ class OrderCardRedesignAdapter(
             // Customer Name
             binding.customerName.text = getCustomerName(order)
 
-            // Employee Name
-            binding.employeeName.text = getEmployeeName(order)
+            // Employee Name (#81 QA) - use same async pattern as OrderDetailFragment
+            setupEmployeeName(order)
 
             // Payment Type
             setupPaymentType(order)
@@ -101,14 +107,15 @@ class OrderCardRedesignAdapter(
             // Item-level Notes Pills (in notes section)
             setupNotesPills(order)
 
-            // Left Status Indicator (green for paid, red for unpaid)
-            val paymentState = order.paymentState?.name ?: "OPEN"
+            // Left Status Indicator (green for paid, red for unpaid/open, orange for partial)
+            val paymentState = getPaymentStateFromOrder(order)
             val indicatorColor = when (paymentState) {
                 "PAID" -> ContextCompat.getColor(context, R.color.paid_status_color)
-                "OPEN" -> ContextCompat.getColor(context, R.color.unpaid_status_color)
                 "PARTIALLY_PAID" -> ContextCompat.getColor(context, R.color.orange_accent)
-                "REFUNDED" -> ContextCompat.getColor(context, R.color.orange_accent)
-                else -> ContextCompat.getColor(context, R.color.paid_status_color)
+                "REFUNDED", "PARTIALLY_REFUNDED" -> ContextCompat.getColor(context, R.color.orange_accent)
+                "CREDITED" -> ContextCompat.getColor(context, R.color.paid_status_color)
+                // null or OPEN means unpaid - show red indicator
+                else -> ContextCompat.getColor(context, R.color.unpaid_status_color)
             }
             binding.unpaidIndicator.setBackgroundColor(indicatorColor)
             binding.unpaidIndicator.visibility = View.VISIBLE
@@ -175,42 +182,26 @@ class OrderCardRedesignAdapter(
          * (#19) Setup custom order tags from line item notes
          * Task 15: Uses WidgetColorUtils for consistent color coding across app
          * Task 20: Includes CALENDAR type widgets
-         * Uses item_note_pill layout with icons matching item-level pills
+         * Uses shared pill utility for consistent styling
          */
         private fun setupCustomTags(order: Order) {
             val context = binding.root.context
             val tagsContainer = binding.tagsContainer
             val density = context.resources.displayMetrics.density
-            val inflater = LayoutInflater.from(context)
             
-            // Remove any previously added custom tags (keep first 2 - order status and payment status)
-            while (tagsContainer.childCount > 2) {
-                tagsContainer.removeViewAt(2)
+            // Remove any previously added custom tags (keep first 3 - order status, payment status, payment type)
+            while (tagsContainer.childCount > 3) {
+                tagsContainer.removeViewAt(3)
             }
             
             val customTags = getCustomTags(order)
             if (customTags.isEmpty()) return
             
             customTags.forEach { tag ->
-                // Use WidgetColorUtils for consistent colors and icons based on widget type
-                val tagColor = WidgetColorUtils.getColorForWidgetType(tag.widgetType)
-                val iconRes = WidgetColorUtils.getIconForWidgetType(tag.widgetType)
-                
-                // Inflate the same pill layout used by item-level widgets
-                val pillView = inflater.inflate(R.layout.item_note_pill, tagsContainer, false) as LinearLayout
-                
-                val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-                val pillText = pillView.findViewById<TextView>(R.id.pillText)
-                
-                pillText.text = tag.value
-                pillText.textSize = 11f
-                pillText.setTextColor(tagColor)
-                
-                pillIcon.setImageResource(iconRes)
-                pillIcon.setColorFilter(tagColor)
-                
-                // Unified pill background: 15% opacity + 25% border
-                pillView.background = WidgetColorUtils.createPillBackground(tagColor, 12f, density)
+                val pillView = WidgetColorUtils.createPillView(
+                    context, tagsContainer, tag.value, tag.widgetType, 
+                    cornerRadiusDp = 12f, truncate = false
+                )
                 
                 // Margin between pills
                 val params = LinearLayout.LayoutParams(
@@ -246,12 +237,8 @@ class OrderCardRedesignAdapter(
                 val uniqueKey = "${tag.label.lowercase()}:${tag.value}"
                 if (!seenValues.contains(uniqueKey)) {
                     seenValues.add(uniqueKey)
-                    // Truncate TEXT_BOX values to 20 chars for list page
-                    val displayValue = if (tag.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX && tag.value.length > 20) {
-                        tag.value.take(20) + "..."
-                    } else {
-                        tag.value
-                    }
+                    // (#77) Truncate all pill values consistently
+                    val displayValue = WidgetColorUtils.truncateForPill(tag.value)
                     tags.add(CustomTag(tag.label.lowercase(), displayValue, tag.widgetType))
                 }
             }
@@ -279,30 +266,12 @@ class OrderCardRedesignAdapter(
             return this * binding.root.context.resources.displayMetrics.density
         }
 
-        private fun setupOrderStatusBadge(order: Order) {
-            val state = order.state
-            val displayText = formatOrderState(state)
-            val density = binding.root.context.resources.displayMetrics.density
-            
-            // Use WidgetColorUtils for consistent colors - ORDER_STATUS = Red
-            val color = WidgetColorUtils.COLOR_ORDER_STATUS
-            
-            binding.orderStatusBadge.text = displayText
-            binding.orderStatusBadge.background = WidgetColorUtils.createPillBackground(color, 12f, density)
-            binding.orderStatusBadge.setTextColor(color)
-        }
+        // setupOrderStatusBadge REMOVED - only using payment status now
+        // Order status badge is hidden in bind() method
 
         private fun setupPaymentStatusBadge(order: Order) {
-            val paymentState = order.paymentState?.name ?: "OPEN"
-            val displayText = formatPaymentState(paymentState)
-            val density = binding.root.context.resources.displayMetrics.density
-            
-            // Use WidgetColorUtils for consistent colors - PAYMENT_STATUS = Yellow
-            val color = WidgetColorUtils.COLOR_PAYMENT_STATUS
-            
-            binding.paymentStatusBadge.text = displayText
-            binding.paymentStatusBadge.background = WidgetColorUtils.createPillBackground(color, 12f, density)
-            binding.paymentStatusBadge.setTextColor(color)
+            // Use shared function from CommonFunctions.kt
+            setupPaymentStatusPill(binding.paymentStatusBadge, order)
         }
 
         private fun getCustomerName(order: Order): String {
@@ -325,11 +294,35 @@ class OrderCardRedesignAdapter(
             }
         }
 
-        private fun getEmployeeName(order: Order): String {
-            return try {
-                order.employee?.jsonObject?.get(Constants.name)?.toString() ?: "-"
-            } catch (e: Exception) {
-                "-"
+        /**
+         * (#81 QA) Setup employee name using same pattern as OrderDetailFragment.
+         * 
+         * Clover's getOrders() may return partial employee data (only ID, no name).
+         * This method:
+         * 1. Tries direct access to employee.jsonObject.name (sync)
+         * 2. Falls back to MyApp.getEmployeeName(employeeId) on IO thread (async)
+         * 3. Updates UI on Main thread after async fetch
+         */
+        private fun setupEmployeeName(order: Order) {
+            val employee = order.employee
+            
+            // Try direct access first (same as OrderDetailFragment line 294-297)
+            exceptionHandler({
+                val employeeName = employee?.jsonObject?.get(Constants.name)?.toString()
+                binding.employeeName.text = if (!employeeName.isNullOrBlank() && employeeName != "null") {
+                    employeeName
+                } else {
+                    "-"
+                }
+            })
+            // Fallback: async fetch using coroutine (same as OrderDetailFragment line 300-308)
+            {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val value = MyApp.getInstance().getEmployeeName(employee?.id)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        binding.employeeName.text = value ?: "-"
+                    }
+                }
             }
         }
 
@@ -349,30 +342,30 @@ class OrderCardRedesignAdapter(
         }
 
         private fun setupPaymentType(order: Order) {
-            val context = binding.root.context
-            val payments = order.payments
-
-            if (payments.isNullOrEmpty()) {
+            val orderId = order.id?.takeLast(8) ?: "null"
+            android.util.Log.d("SetupPaymentTypeDebug", "Order #$orderId - setupPaymentType CALLED")
+            
+            // Use shared function for pill badge
+            android.util.Log.d("SetupPaymentTypeDebug", "Order #$orderId - calling setupPaymentTypePill...")
+            setupPaymentTypePill(binding.paymentTypeBadge, order)
+            android.util.Log.d("SetupPaymentTypeDebug", "Order #$orderId - pill visibility after: ${binding.paymentTypeBadge.visibility} (0=VISIBLE, 4=INVISIBLE, 8=GONE)")
+            
+            // Also update the payment type column (text + icon)
+            android.util.Log.d("SetupPaymentTypeDebug", "Order #$orderId - calling getPaymentTypeLabel...")
+            val displayLabel = getPaymentTypeLabel(order)
+            android.util.Log.d("SetupPaymentTypeDebug", "Order #$orderId - displayLabel from getPaymentTypeLabel: '$displayLabel'")
+            
+            if (displayLabel != null) {
+                binding.paymentType.text = displayLabel
+                binding.paymentIcon.setImageResource(
+                    if (displayLabel.lowercase().contains("cash")) R.drawable.ic_cash 
+                    else R.drawable.ic_credit_card
+                )
+                android.util.Log.d("SetupPaymentTypeDebug", "Order #$orderId - text column set to: '$displayLabel'")
+            } else {
                 binding.paymentType.text = "-"
                 binding.paymentIcon.setImageResource(R.drawable.ic_credit_card)
-                return
-            }
-
-            val tenderLabel = payments.firstOrNull()?.tender?.label?.lowercase() ?: ""
-            
-            when {
-                tenderLabel.contains("cash") -> {
-                    binding.paymentType.text = "Cash"
-                    binding.paymentIcon.setImageResource(R.drawable.ic_cash)
-                }
-                tenderLabel.contains("card") || tenderLabel.contains("credit") || tenderLabel.contains("debit") -> {
-                    binding.paymentType.text = "Card"
-                    binding.paymentIcon.setImageResource(R.drawable.ic_credit_card)
-                }
-                else -> {
-                    binding.paymentType.text = payments.firstOrNull()?.tender?.label ?: "-"
-                    binding.paymentIcon.setImageResource(R.drawable.ic_credit_card)
-                }
+                android.util.Log.d("SetupPaymentTypeDebug", "Order #$orderId - text column set to: '-'")
             }
         }
 
@@ -402,12 +395,8 @@ class OrderCardRedesignAdapter(
                             val pillKey = "${tag.label.lowercase()}:${tag.value}"
                             if (pillKey !in seenPills) {
                                 seenPills.add(pillKey)
-                                // Truncate TEXT_BOX values for list page item pills
-                                val displayValue = if (tag.widgetType == com.orderMate.modals.WidgetType.TEXT_BOX && tag.value.length > 20) {
-                                    tag.value.take(20) + "..."
-                                } else {
-                                    tag.value
-                                }
+                                // (#77) Truncate all pill values consistently
+                                val displayValue = WidgetColorUtils.truncateForPill(tag.value)
                                 notes.add(NoteItem(tag.label.lowercase(), displayValue, tag.widgetType))
                             }
                         }
@@ -427,36 +416,12 @@ class OrderCardRedesignAdapter(
             container.removeAllViews()
             
             val context = binding.root.context
-            val density = context.resources.displayMetrics.density
             
             notes.forEach { noteItem ->
-                val pillView = LayoutInflater.from(context)
-                    .inflate(R.layout.item_note_pill, container, false) as LinearLayout
-                
-                val pillIcon = pillView.findViewById<ImageView>(R.id.pillIcon)
-                val pillText = pillView.findViewById<TextView>(R.id.pillText)
-                
-                // Get widget color from widgetType
-                val pillColor = WidgetColorUtils.getColorForWidgetType(noteItem.widgetType)
-                
-                val iconRes = WidgetColorUtils.getIconForWidgetType(noteItem.widgetType)
-                
-                // Truncate to 12 chars, single line, no newlines
-                val displayText = noteItem.text.replace("\n", " ").take(12).let {
-                    if (noteItem.text.length > 12) "$it..." else it
-                }
-                pillText.text = displayText
-                pillText.maxLines = 1
-                
-                // Use widget color for text and icon (same as order details page)
-                pillText.setTextColor(pillColor)
-                pillIcon.setImageResource(iconRes)
-                pillIcon.setColorFilter(pillColor)
-                
-                // Unified pill background: 15% opacity + 25% border
-                pillView.background = WidgetColorUtils.createPillBackground(pillColor, 10f, density)
-                
-                container.addView(pillView)
+                // (#77) Text already truncated in extraction, use shared pill utility
+                WidgetColorUtils.addPillToContainer(
+                    context, container, noteItem.text, noteItem.widgetType, truncate = false
+                )
             }
         }
     }

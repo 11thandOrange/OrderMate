@@ -150,9 +150,9 @@
 
         </LinearLayout>
 
-        <!-- Time Section -->
+        <!-- Time Section (#77: Combination lock style scroll with 3+3 numbers) -->
         <LinearLayout
-            android:layout_width="120dp"
+            android:layout_width="140dp"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
@@ -166,160 +166,246 @@
                 android:letterSpacing="0.05"
                 android:layout_marginBottom="8dp" />
 
+            <!-- Time scroll container (inside CardView) -->
             <androidx.cardview.widget.CardView
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="@color/glass_background">
 
+                <!-- Hour and Minute with combination lock style scroll -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     android:gravity="center"
                     android:padding="8dp">
 
-                    <!-- Hour and Minute with separate controls -->
+                    <!-- Hour Column - Combination Lock Style (3 above + active + 3 below) -->
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:id="@+id/hourScrollContainer"
+                        android:layout_width="44dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:orientation="vertical"
                         android:gravity="center">
 
-                        <!-- Hour Column -->
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:gravity="center">
-
-                            <ImageView
-                                android:id="@+id/btnHourUp"
-                                android:layout_width="32dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_chevron_up"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:contentDescription="Increase hour"
-                                app:tint="@color/text_muted"
-                                xmlns:app="http://schemas.android.com/apk/res-auto" />
-
-                            <TextView
-                                android:id="@+id/hourText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="28sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/text_light"
-                                android:minWidth="40dp"
-                                android:gravity="center"
-                                android:layout_marginVertical="4dp"
-                                tools:text="02" />
-
-                            <ImageView
-                                android:id="@+id/btnHourDown"
-                                android:layout_width="32dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_chevron_down"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:contentDescription="Decrease hour"
-                                app:tint="@color/text_muted"
-                                xmlns:app="http://schemas.android.com/apk/res-auto" />
-
-                        </LinearLayout>
-
-                        <!-- Colon separator -->
+                        <!-- 3rd previous hour (most faded) -->
                         <TextView
+                            android:id="@+id/hourPrev3Text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text=":"
-                            android:textSize="24sp"
-                            android:textStyle="bold"
+                            android:textSize="12sp"
                             android:textColor="@color/text_muted"
-                            android:layout_marginHorizontal="2dp" />
+                            android:alpha="0.2"
+                            android:gravity="center"
+                            tools:text="11" />
 
-                        <!-- Minute Column -->
-                        <LinearLayout
+                        <!-- 2nd previous hour -->
+                        <TextView
+                            android:id="@+id/hourPrev2Text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:gravity="center">
+                            android:textSize="14sp"
+                            android:textColor="@color/text_muted"
+                            android:alpha="0.4"
+                            android:gravity="center"
+                            tools:text="12" />
 
-                            <ImageView
-                                android:id="@+id/btnMinuteUp"
-                                android:layout_width="32dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_chevron_up"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:contentDescription="Increase minute"
-                                app:tint="@color/text_muted"
-                                xmlns:app="http://schemas.android.com/apk/res-auto" />
+                        <!-- 1st previous hour (closest) -->
+                        <TextView
+                            android:id="@+id/hourPrev1Text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_muted"
+                            android:alpha="0.6"
+                            android:gravity="center"
+                            tools:text="01" />
 
-                            <TextView
-                                android:id="@+id/minuteText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="28sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/text_light"
-                                android:minWidth="40dp"
-                                android:gravity="center"
-                                android:layout_marginVertical="4dp"
-                                tools:text="30" />
+                        <!-- Current hour (highlighted) -->
+                        <TextView
+                            android:id="@+id/hourText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="28sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_light"
+                            android:gravity="center"
+                            android:paddingVertical="4dp"
+                            tools:text="02" />
 
-                            <ImageView
-                                android:id="@+id/btnMinuteDown"
-                                android:layout_width="32dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_chevron_down"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:contentDescription="Decrease minute"
-                                app:tint="@color/text_muted"
-                                xmlns:app="http://schemas.android.com/apk/res-auto" />
+                        <!-- 1st next hour (closest) -->
+                        <TextView
+                            android:id="@+id/hourNext1Text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_muted"
+                            android:alpha="0.6"
+                            android:gravity="center"
+                            tools:text="03" />
 
-                        </LinearLayout>
+                        <!-- 2nd next hour -->
+                        <TextView
+                            android:id="@+id/hourNext2Text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_muted"
+                            android:alpha="0.4"
+                            android:gravity="center"
+                            tools:text="04" />
+
+                        <!-- 3rd next hour (most faded) -->
+                        <TextView
+                            android:id="@+id/hourNext3Text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_muted"
+                            android:alpha="0.2"
+                            android:gravity="center"
+                            tools:text="05" />
 
                     </LinearLayout>
 
-                    <!-- AM/PM Toggle -->
-                    <LinearLayout
+                    <!-- Colon separator -->
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="12dp">
+                        android:text=":"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_muted"
+                        android:layout_marginHorizontal="4dp" />
 
+                    <!-- Minute Column - Combination Lock Style (3 above + active + 3 below) -->
+                    <LinearLayout
+                        android:id="@+id/minuteScrollContainer"
+                        android:layout_width="44dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <!-- 3rd previous minute (most faded) -->
                         <TextView
-                            android:id="@+id/btnAM"
+                            android:id="@+id/minutePrev3Text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="AM"
                             android:textSize="12sp"
-                            android:textStyle="bold"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="6dp"
-                            android:background="@drawable/bg_period_button"
-                            android:textColor="@color/text_muted" />
+                            android:textColor="@color/text_muted"
+                            android:alpha="0.2"
+                            android:gravity="center"
+                            tools:text="27" />
 
+                        <!-- 2nd previous minute -->
                         <TextView
-                            android:id="@+id/btnPM"
+                            android:id="@+id/minutePrev2Text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="PM"
-                            android:textSize="12sp"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_muted"
+                            android:alpha="0.4"
+                            android:gravity="center"
+                            tools:text="28" />
+
+                        <!-- 1st previous minute (closest) -->
+                        <TextView
+                            android:id="@+id/minutePrev1Text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_muted"
+                            android:alpha="0.6"
+                            android:gravity="center"
+                            tools:text="29" />
+
+                        <!-- Current minute (highlighted) -->
+                        <TextView
+                            android:id="@+id/minuteText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="28sp"
                             android:textStyle="bold"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="6dp"
-                            android:layout_marginStart="4dp"
-                            android:background="@drawable/bg_period_button_selected"
-                            android:textColor="@color/white" />
+                            android:textColor="@color/text_light"
+                            android:gravity="center"
+                            android:paddingVertical="4dp"
+                            tools:text="30" />
+
+                        <!-- 1st next minute (closest) -->
+                        <TextView
+                            android:id="@+id/minuteNext1Text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_muted"
+                            android:alpha="0.6"
+                            android:gravity="center"
+                            tools:text="31" />
+
+                        <!-- 2nd next minute -->
+                        <TextView
+                            android:id="@+id/minuteNext2Text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_muted"
+                            android:alpha="0.4"
+                            android:gravity="center"
+                            tools:text="32" />
+
+                        <!-- 3rd next minute (most faded) -->
+                        <TextView
+                            android:id="@+id/minuteNext3Text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_muted"
+                            android:alpha="0.2"
+                            android:gravity="center"
+                            tools:text="33" />
 
                     </LinearLayout>
 
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
+
+            <!-- (#77) AM/PM buttons OUTSIDE the time container, full rows with bg -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="12dp">
+
+                <TextView
+                    android:id="@+id/btnAM"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="AM"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:paddingVertical="10dp"
+                    android:gravity="center"
+                    android:background="@drawable/bg_period_button"
+                    android:textColor="@color/text_muted" />
+
+                <TextView
+                    android:id="@+id/btnPM"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="PM"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:paddingVertical="10dp"
+                    android:gravity="center"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_period_button_selected"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

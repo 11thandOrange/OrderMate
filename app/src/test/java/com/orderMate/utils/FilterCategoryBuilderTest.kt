@@ -134,6 +134,54 @@ class FilterCategoryBuilderTest {
         assertNull(FilterCategoryBuilder.getWidgetId("random_string"))
     }
 
+    // ==================== getWidgetId with Level Suffix Tests ====================
+
+    @Test
+    fun `getWidgetId extracts id from item-level widget filter`() {
+        assertEquals("abc123", FilterCategoryBuilder.getWidgetId("widget_abc123_item"))
+    }
+
+    @Test
+    fun `getWidgetId extracts id from order-level widget filter`() {
+        assertEquals("abc123", FilterCategoryBuilder.getWidgetId("widget_abc123_order"))
+    }
+
+    @Test
+    fun `getWidgetId extracts UUID from item-level widget filter`() {
+        assertEquals(
+            "bc396383-96c1-4940-b91d-2966b7e478b3",
+            FilterCategoryBuilder.getWidgetId("widget_bc396383-96c1-4940-b91d-2966b7e478b3_item")
+        )
+    }
+
+    @Test
+    fun `getWidgetId extracts UUID from order-level widget filter`() {
+        assertEquals(
+            "bc396383-96c1-4940-b91d-2966b7e478b3",
+            FilterCategoryBuilder.getWidgetId("widget_bc396383-96c1-4940-b91d-2966b7e478b3_order")
+        )
+    }
+
+    @Test
+    fun `isWidgetFilter returns true for item-level widget`() {
+        assertTrue(FilterCategoryBuilder.isWidgetFilter("widget_abc123_item"))
+    }
+
+    @Test
+    fun `isWidgetFilter returns true for order-level widget`() {
+        assertTrue(FilterCategoryBuilder.isWidgetFilter("widget_abc123_order"))
+    }
+
+    @Test
+    fun `isWidgetFilter returns true for UUID item-level widget`() {
+        assertTrue(FilterCategoryBuilder.isWidgetFilter("widget_bc396383-96c1-4940-b91d-2966b7e478b3_item"))
+    }
+
+    @Test
+    fun `isWidgetFilter returns true for UUID order-level widget`() {
+        assertTrue(FilterCategoryBuilder.isWidgetFilter("widget_bc396383-96c1-4940-b91d-2966b7e478b3_order"))
+    }
+
     // ==================== Filter Type Enum Tests ====================
 
     @Test

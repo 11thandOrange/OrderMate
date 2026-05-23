@@ -11,9 +11,10 @@
     <string name="dummy_id">1234567DDFKHVDFJK</string>
     <string name="dummy_date">5/8/24</string>
     <string name="dummy_name">Tester</string>
-    <string name="orders_text">Order %1$s</string>
+    <string name="orders_text">Order #%1$s</string>
     <string name="dummy_heading_dashboard">Orders (DEV)</string>
     <string name="search_orders">Search Orders</string>
+    <string name="search_placeholder">Search orders, customers, and notes…</string>
     <string name="syncing">SYNCING</string>
     <string name="nav_open">Open</string>
     <string name="nav_close">Close</string>
@@ -129,7 +130,7 @@
     <string name="enter_the_customer_email_address">Enter customer email address</string>
     <string name="enter_the_customer_number">Enter customer phone number</string>
     <string name="enter_the_subject">Enter subject line for the email</string>
-    <string name="send">send</string>
+    <string name="send">Send</string>
     <string name="choose_item_progress">Status</string>
     <string name="choose_item_type">Type</string>
     <string name="choose_item_category">Category</string>
@@ -194,7 +195,7 @@
     <string name="order_details">Order Details</string>
     <string name="order_date">Order Date</string>
     <string name="due_date">Due Date</string>
-    <string name="order_tags">Order Tags</string>
+    <string name="order_tags">Order Level Notes</string>
     <string name="description">Description</string>
     <string name="view_customer">View customer details</string>
     <string name="order_history">Order History</string>

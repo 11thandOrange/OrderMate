@@ -46,7 +46,7 @@
                 android:layout_weight="1"
                 android:layout_marginStart="12dp"
                 android:background="@null"
-                android:hint="Search orders, customers, dates..."
+                android:hint="@string/search_placeholder"
                 android:textColorHint="@color/text_muted"
                 android:textColor="@color/text_light"
                 android:textSize="14sp"
@@ -54,26 +54,8 @@
                 android:inputType="text"
                 android:maxLines="1"/>
 
-            <!-- Calendar Icon with expanded touch target -->
-            <FrameLayout
-                android:id="@+id/calendarIconContainer"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="-12dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true">
+            <!-- Calendar Icon removed - date filtering now via Filters dialog -->
 
-                <ImageView
-                    android:id="@+id/calendarIcon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_calender"
-                    android:contentDescription="Pick date"
-                    app:tint="@color/text_muted"/>
-            </FrameLayout>
         </LinearLayout>
 
         <!-- Filter Button -->

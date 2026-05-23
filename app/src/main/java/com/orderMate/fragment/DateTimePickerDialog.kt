@@ -280,35 +280,76 @@ class DateTimePickerDialog : DialogFragment() {
         }
     }
 
+    private var hourTouchStartY = 0f
+    private var minuteTouchStartY = 0f
+    private val SCROLL_THRESHOLD = 30f // Minimum scroll distance to trigger change
+
+    @android.annotation.SuppressLint("ClickableViewAccessibility")
     private fun setupTimePicker() {
         updateTimeDisplay()
         updateAmPmButtons()
 
-        // Hour controls
-        binding.btnHourUp.setOnClickListener {
-            calendar.add(Calendar.HOUR_OF_DAY, 1)
-            updateTimeDisplay()
-            updateAmPmButtons()
+        // (#77) Touch scroll support for hour column
+        binding.hourScrollContainer.setOnTouchListener { _, event ->
+            when (event.action) {
+                android.view.MotionEvent.ACTION_DOWN -> {
+                    hourTouchStartY = event.y
+                    true
+                }
+                android.view.MotionEvent.ACTION_MOVE -> {
+                    val deltaY = hourTouchStartY - event.y
+                    if (Math.abs(deltaY) > SCROLL_THRESHOLD) {
+                        if (deltaY > 0) {
+                            // Scrolled up - increase hour
+                            calendar.add(Calendar.HOUR_OF_DAY, 1)
+                        } else {
+                            // Scrolled down - decrease hour
+                            calendar.add(Calendar.HOUR_OF_DAY, -1)
+                        }
+                        hourTouchStartY = event.y
+                        updateTimeDisplay()
+                        updateAmPmButtons()
+                    }
+                    true
+                }
+                android.view.MotionEvent.ACTION_UP -> {
+                    true
+                }
+                else -> false
+            }
         }
 
-        binding.btnHourDown.setOnClickListener {
-            calendar.add(Calendar.HOUR_OF_DAY, -1)
-            updateTimeDisplay()
-            updateAmPmButtons()
+        // (#77) Touch scroll support for minute column
+        binding.minuteScrollContainer.setOnTouchListener { _, event ->
+            when (event.action) {
+                android.view.MotionEvent.ACTION_DOWN -> {
+                    minuteTouchStartY = event.y
+                    true
+                }
+                android.view.MotionEvent.ACTION_MOVE -> {
+                    val deltaY = minuteTouchStartY - event.y
+                    if (Math.abs(deltaY) > SCROLL_THRESHOLD) {
+                        if (deltaY > 0) {
+                            // Scrolled up - increase minute
+                            calendar.add(Calendar.MINUTE, 1)
+                        } else {
+                            // Scrolled down - decrease minute
+                            calendar.add(Calendar.MINUTE, -1)
+                        }
+                        minuteTouchStartY = event.y
+                        updateTimeDisplay()
+                        updateAmPmButtons()
+                    }
+                    true
+                }
+                android.view.MotionEvent.ACTION_UP -> {
+                    true
+                }
+                else -> false
+            }
         }
 
-        // Minute controls
-        binding.btnMinuteUp.setOnClickListener {
-            calendar.add(Calendar.MINUTE, 1)
-            updateTimeDisplay()
-        }
-
-        binding.btnMinuteDown.setOnClickListener {
-            calendar.add(Calendar.MINUTE, -1)
-            updateTimeDisplay()
-        }
-
-        // AM/PM toggle
+        // AM/PM toggle (full rows with background)
         binding.btnAM.setOnClickListener {
             if (calendar.get(Calendar.AM_PM) == Calendar.PM) {
                 calendar.add(Calendar.HOUR_OF_DAY, -12)
@@ -331,14 +372,46 @@ class DateTimePickerDialog : DialogFragment() {
         if (hour == 0) hour = 12
         val minute = calendar.get(Calendar.MINUTE)
 
+        // Current values
         binding.hourText.text = String.format("%02d", hour)
         binding.minuteText.text = String.format("%02d", minute)
+        
+        // (#77) Show 3 previous and 3 next hours with wrapping (1-12)
+        binding.hourPrev1Text.text = String.format("%02d", wrapHour12(hour - 1))
+        binding.hourPrev2Text.text = String.format("%02d", wrapHour12(hour - 2))
+        binding.hourPrev3Text.text = String.format("%02d", wrapHour12(hour - 3))
+        binding.hourNext1Text.text = String.format("%02d", wrapHour12(hour + 1))
+        binding.hourNext2Text.text = String.format("%02d", wrapHour12(hour + 2))
+        binding.hourNext3Text.text = String.format("%02d", wrapHour12(hour + 3))
+        
+        // (#77) Show 3 previous and 3 next minutes with wrapping (0-59)
+        binding.minutePrev1Text.text = String.format("%02d", wrapMinute(minute - 1))
+        binding.minutePrev2Text.text = String.format("%02d", wrapMinute(minute - 2))
+        binding.minutePrev3Text.text = String.format("%02d", wrapMinute(minute - 3))
+        binding.minuteNext1Text.text = String.format("%02d", wrapMinute(minute + 1))
+        binding.minuteNext2Text.text = String.format("%02d", wrapMinute(minute + 2))
+        binding.minuteNext3Text.text = String.format("%02d", wrapMinute(minute + 3))
+    }
+
+    // Wrap hour to 1-12 range
+    private fun wrapHour12(hour: Int): Int {
+        var h = hour % 12
+        if (h <= 0) h += 12
+        return h
+    }
+
+    // Wrap minute to 0-59 range
+    private fun wrapMinute(minute: Int): Int {
+        var m = minute % 60
+        if (m < 0) m += 60
+        return m
     }
 
     private fun updateAmPmButtons() {
         val isAM = calendar.get(Calendar.AM_PM) == Calendar.AM
         val context = requireContext()
 
+        // (#77) Full row styling with background colors
         if (isAM) {
             binding.btnAM.setBackgroundResource(R.drawable.bg_period_button_selected)
             binding.btnAM.setTextColor(Color.WHITE)
