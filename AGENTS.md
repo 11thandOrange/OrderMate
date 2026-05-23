@@ -3,6 +3,50 @@
 ## Project Overview
 OrderMate is an Android application built with Kotlin that integrates with Clover POS systems. It provides order management, calendar scheduling, and customizable notification features for merchants.
 
+## Agent System Architecture
+
+```
+ordermate-agent (Orchestrator)
+├── code-auditor      - Bug/tech debt discovery and code quality analysis
+├── ticket-manager    - GitHub Issues operations (create, investigate, plan, resolve)
+├── tester            - Unit, integration, and e2e testing
+├── build-release     - APK builds, version management, releases
+├── postman-manager   - API testing with Postman collections
+└── pr-reviewer       - Pull request reviews and GitHub interactions
+```
+
+### Critical Safety Rules
+
+**All agents must follow these rules:**
+
+1. **NEVER merge branches or push to main without explicit user confirmation**
+2. **NEVER approve PRs without explicit user confirmation**
+3. **NEVER create release tags without explicit user confirmation**
+4. **NEVER delete branches or force push without explicit user confirmation**
+
+### Agent Files Location
+
+All agent definitions are stored in `.agents/agents/`:
+- `ordermate-agent.md` - Main orchestrator
+- `code-auditor.md` - Code quality & bug detection
+- `ticket-manager.md` - GitHub Issues management
+- `tester.md` - Testing specialist
+- `build-release.md` - Build & release management
+- `postman-manager.md` - API testing with Postman
+- `pr-reviewer.md` - PR review & GitHub interactions
+
+### Common Agent Commands
+
+| Command | Agent |
+|---------|-------|
+| "Review the repo for bugs and tech debt" | code-auditor |
+| "Create an issue for [problem]" | ticket-manager |
+| "Investigate issue #123" | ticket-manager |
+| "Run the unit tests" | tester |
+| "Build a debug APK" | build-release |
+| "Review PR #42" | pr-reviewer |
+| "Create Postman collections" | postman-manager |
+
 ## Tech Stack
 - **Language**: Kotlin
 - **Platform**: Android (Min SDK not specified, targets Clover devices)
