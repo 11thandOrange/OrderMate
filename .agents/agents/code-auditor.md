@@ -12,9 +12,6 @@ description: >
 tools:
   - file_editor
   - terminal
-skills:
-  - github
-  - code-review
 model: inherit
 permission_mode: never_confirm
 ---
