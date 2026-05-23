@@ -16,24 +16,17 @@ export function Home() {
     <div className="min-h-screen bg-[#0a0a0b]">
       <Header />
       
-      {/* Hero Section */}
-      <section className="relative pt-24 pb-16 px-6 overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-om-orange/5 via-transparent to-transparent pointer-events-none" />
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-om-orange/8 rounded-full blur-[100px] pointer-events-none" />
-        
-        <div className="relative max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-om-orange/10 border border-om-orange/20 mb-6">
+      {/* Hero Section - pt-20 (80px) accounts for fixed header h-16 (64px) */}
+      <section className="relative px-6 pt-20 pb-16">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-om-orange/10 border border-om-orange/20 mb-8">
             <Zap className="w-4 h-4 text-om-orange" />
             <span className="text-sm text-om-orange font-medium">Clover POS Integration</span>
           </div>
           
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-[1.1]">
-            <span className="text-white">OrderMate</span>
-            <br />
-            <span className="bg-gradient-to-r from-om-orange via-orange-400 to-amber-500 bg-clip-text text-transparent">
-              Documentation
-            </span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-white">
+            OrderMate{' '}
+            <span className="text-om-orange">Documentation</span>
           </h1>
           
           <p className="text-lg text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
