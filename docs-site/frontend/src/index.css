@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@theme {
+  --color-om-orange: #FF9F43;
+  --color-om-orange-hover: #e68a2e;
+  --color-om-orange-dark: #F46809;
+  --color-om-purple: #7367F0;
+  --color-om-green: #3ccd79;
+  --color-om-dark: #1a1a2e;
+  --color-om-dark-secondary: #16213e;
+  
+  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+:root {
+  font-family: var(--font-family-sans);
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #0f0f10;
+  color: #e5e5e5;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a3a5e;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4a4a7e;
+}
+
+/* Code block styling */
+pre {
+  font-family: var(--font-family-mono);
+}
+
+code {
+  font-family: var(--font-family-mono);
+}
+
+/* Method badges - using inline styles instead of @apply for Tailwind v4 */
+.method-get { 
+  background-color: rgba(16, 185, 129, 0.2); 
+  color: #34d399; 
+  border: 1px solid rgba(16, 185, 129, 0.3); 
+}
+.method-post { 
+  background-color: rgba(59, 130, 246, 0.2); 
+  color: #60a5fa; 
+  border: 1px solid rgba(59, 130, 246, 0.3); 
+}
+.method-put { 
+  background-color: rgba(245, 158, 11, 0.2); 
+  color: #fbbf24; 
+  border: 1px solid rgba(245, 158, 11, 0.3); 
+}
+.method-delete { 
+  background-color: rgba(239, 68, 68, 0.2); 
+  color: #f87171; 
+  border: 1px solid rgba(239, 68, 68, 0.3); 
+}
+.method-patch { 
+  background-color: rgba(168, 85, 247, 0.2); 
+  color: #c084fc; 
+  border: 1px solid rgba(168, 85, 247, 0.3); 
+}
