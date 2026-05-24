@@ -473,17 +473,8 @@ function BenefitsSection() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function Home() {
-  // Reset scroll position on mount
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
-<<<<<<< HEAD
-    <div className="min-h-screen flex flex-col bg-[#0f1117]">
-=======
     <div className="min-h-screen flex flex-col">
->>>>>>> aff78b9 (feat(docs-site): Restyle to match HTML mockup — purple gradient, glass morphism, full sections)
       <Header />
       <HeroSection />
       <FeaturesSection />
