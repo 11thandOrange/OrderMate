@@ -18,7 +18,7 @@ import {
 
 export function Home() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
       {/* Hero Section */}

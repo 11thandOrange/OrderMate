@@ -7,16 +7,16 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0b] border-b border-white/5">
-      <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-background-elevated/95 backdrop-blur-md border-b border-white/5">
+      <div className="h-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-full">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-om-orange to-om-orange-dark rounded-lg flex items-center justify-center">
+          <Link to="/" className="flex items-center gap-3 flex-shrink-0">
+            <div className="w-8 h-8 bg-gradient-to-br from-brand to-brand-dark rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">OM</span>
             </div>
             <span className="text-xl font-semibold text-white">
-              Order<span className="text-om-orange">Mate</span>
+              Order<span className="text-brand">Mate</span>
               <span className="text-gray-500 font-normal ml-2">Docs</span>
             </span>
           </Link>
@@ -88,7 +88,7 @@ export function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0f0f10] border-t border-white/10">
+        <div className="md:hidden bg-background border-t border-white/10">
           <nav className="px-4 py-4 space-y-2">
             <Link
               to="/getting-started"
@@ -129,7 +129,7 @@ export function Header() {
           onClick={() => setSearchOpen(false)}
         >
           <div
-            className="w-full max-w-xl bg-[#1a1a2e] border border-white/10 rounded-xl shadow-2xl"
+            className="w-full max-w-xl mx-4 bg-background-surface border border-white/10 rounded-xl shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">

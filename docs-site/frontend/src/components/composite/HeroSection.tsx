@@ -47,8 +47,8 @@ export function HeroSection({
   return (
     <section
       className={cn(
-        // Padding: pt-24 = 96px (accounts for 64px header + 32px breathing room)
-        'relative pt-24 pb-16 md:pt-28 md:pb-20',
+        // Padding: pt-32 = 128px (accounts for 64px header + 64px breathing room)
+        'relative pt-32 pb-16 md:pt-40 md:pb-24',
         className
       )}
     >
