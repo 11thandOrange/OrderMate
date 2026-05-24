@@ -1,116 +1,66 @@
-import { Header, Footer, Container, Section, Grid } from '../components/Layout';
-import { HeroSection } from '../components/composite/HeroSection';
-import { FeatureCard } from '../components/composite/FeatureCard';
-import { SectionHeader } from '../components/composite/SectionHeader';
-import { ApiPreview } from '../components/composite/ApiPreview';
-import { DocsCTASection } from '../components/composite/CTASection';
-import { Badge } from '../components/ui/Badge';
-import { ButtonLink } from '../components/ui/Button';
-import {
-  BookOpen,
-  Code2,
-  Zap,
-  ArrowRight,
-  ShoppingBag,
-  Calendar,
-  Bell,
-} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ApiLayout } from '../components/Layout/ApiLayout';
+import { BookOpen, Code2, Zap, ShoppingBag, Calendar, Bell } from 'lucide-react';
+
+const quickLinks = [
+  { title: 'Getting Started', description: 'Install and configure OrderMate on your Clover device.', icon: BookOpen, to: '/getting-started' },
+  { title: 'Order Management', description: 'Manage orders, track status, and handle customer requests.', icon: ShoppingBag, to: '/features/orders' },
+  { title: 'Calendar View', description: 'View scheduled orders in day, week, or month format.', icon: Calendar, to: '/features/calendar' },
+  { title: 'Notifications', description: 'Send SMS and email notifications to customers.', icon: Bell, to: '/features/notifications' },
+  { title: 'API Reference', description: 'Full REST API documentation with live examples.', icon: Code2, to: '/api/orders' },
+  { title: "What's New", description: 'Latest features and improvements to OrderMate.', icon: Zap, to: '/changelog' },
+];
 
 export function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+    <ApiLayout>
+      <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+        <span className="text-gray-400">Documentation</span>
+      </nav>
 
-      {/* Hero */}
-      <HeroSection
-        badge={{ text: 'Clover POS Integration', icon: Zap }}
-        title={<>OrderMate <span className="text-orange-500">Documentation</span></>}
-        subtitle="Everything you need to integrate OrderMate with your Clover POS system. Learn about features, explore the API, and build powerful integrations."
-        ctas={[
-          { label: 'Get Started', to: '/getting-started' },
-          { label: 'API Reference', to: '/api', variant: 'secondary', icon: Code2 },
-        ]}
-      />
+      <h1 className="text-4xl font-bold text-white mb-4">OrderMate Docs</h1>
+      <p className="text-lg text-gray-400 mb-10 leading-relaxed">
+        Everything you need to integrate OrderMate with your Clover POS system. Learn about
+        features, explore the API, and build powerful integrations.
+      </p>
 
-      {/* Features Grid */}
-      <Section spacing="lg">
-        <Container>
-          <SectionHeader
-            title="Explore the Documentation"
-            description="Comprehensive guides and references to help you get the most out of OrderMate"
-          />
-          <Grid cols={4} gap="md">
-            <FeatureCard
-              title="Getting Started"
-              description="Learn how to install and configure OrderMate on your Clover device."
-              icon={BookOpen}
-              to="/getting-started"
-            />
-            <FeatureCard
-              title="Order Management"
-              description="Manage orders, track status, and handle customer requests efficiently."
-              icon={ShoppingBag}
-              to="/features/orders"
-            />
-            <FeatureCard
-              title="Calendar View"
-              description="View scheduled orders in day, week, or month format with smart filters."
-              icon={Calendar}
-              to="/features/calendar"
-            />
-            <FeatureCard
-              title="Notifications"
-              description="Send SMS and email notifications to keep customers informed."
-              icon={Bell}
-              to="/features/notifications"
-            />
-          </Grid>
-        </Container>
-      </Section>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
+        {quickLinks.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="group p-5 rounded-xl border border-white/10 hover:border-orange-500/30 transition-colors"
+              style={{ background: 'rgba(255,255,255,0.03)' }}
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(249, 115, 22, 0.1)' }}>
+                  <Icon className="w-5 h-5 text-orange-500" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">{item.title}</h3>
+                  <p className="text-sm text-gray-400 leading-relaxed">{item.description}</p>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
 
-      {/* API Section */}
-      <Section spacing="lg" background="elevated">
-        <Container>
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-            <div className="lg:sticky lg:top-24">
-              <Badge variant="success" size="md" className="mb-6">
-                <span className="w-2 h-2 bg-status-success rounded-full animate-pulse mr-2" />
-                Live Examples
-              </Badge>
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                Powerful API Reference
-              </h2>
-              <p className="text-gray-400 mb-8 leading-relaxed">
-                Interactive documentation with live examples. Test API endpoints
-                directly in your browser with our sandbox environment.
-              </p>
-              <ul className="space-y-4 mb-10">
-                {[
-                  'Orders, Line Items, Customers, Payments',
-                  'Webhooks for real-time notifications',
-                  'Code examples in cURL, Python, Kotlin',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-gray-400">
-                    <span className="w-5 h-5 rounded-full bg-status-success/20 flex items-center justify-center mt-0.5 shrink-0">
-                      <span className="w-2 h-2 bg-status-success rounded-full" />
-                    </span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <ButtonLink to="/api" variant="secondary" rightIcon={<ArrowRight className="w-4 h-4" />}>
-                Explore API Reference
-              </ButtonLink>
-            </div>
-            <ApiPreview />
-          </div>
-        </Container>
-      </Section>
-
-      {/* CTA */}
-      <DocsCTASection />
-
-      <Footer />
-    </div>
+      <section className="p-6 rounded-xl border border-white/10" style={{ background: 'rgba(255,255,255,0.03)' }}>
+        <h2 className="text-lg font-semibold text-white mb-2">Quick Start</h2>
+        <p className="text-sm text-gray-400 mb-4">
+          Get up and running with OrderMate in minutes. Follow the installation guide to set up
+          the app on your Clover device and start managing orders.
+        </p>
+        <Link
+          to="/getting-started"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg bg-orange-500 hover:bg-orange-600 transition-colors"
+        >
+          Get Started
+        </Link>
+      </section>
+    </ApiLayout>
   );
 }
