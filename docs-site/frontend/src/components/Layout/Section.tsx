@@ -3,31 +3,18 @@ import type { ReactNode } from 'react';
 
 interface SectionProps {
   children: ReactNode;
-  /** Vertical padding size */
   spacing?: 'sm' | 'md' | 'lg';
-  /** Background variant */
-  background?: 'default' | 'elevated' | 'gradient';
-  /** Additional class names */
+  background?: 'default' | 'elevated' | 'gradient' | 'dark-navy';
   className?: string;
-  /** HTML id for anchor links */
   id?: string;
 }
 
 const spacingClasses = {
   sm: 'py-12 md:py-16',
   md: 'py-16 md:py-20',
-  lg: 'py-20 md:py-28',
+  lg: 'py-[120px]',
 };
 
-const backgroundClasses = {
-  default: 'bg-background',
-  elevated: 'bg-background-elevated',
-  gradient: 'bg-gradient-to-b from-transparent via-surface/50 to-transparent',
-};
-
-/**
- * Section component for consistent vertical spacing and backgrounds
- */
 export function Section({
   children,
   spacing = 'md',
@@ -38,12 +25,14 @@ export function Section({
   return (
     <section
       id={id}
-      className={cn(
-        spacingClasses[spacing],
-        backgroundClasses[background],
-        'relative',
-        className
-      )}
+      className={cn(spacingClasses[spacing], 'relative', className)}
+      style={
+        background === 'dark-navy'
+          ? { background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%)' }
+          : background === 'elevated'
+          ? { background: 'rgba(0,0,0,0.15)' }
+          : undefined
+      }
     >
       {children}
     </section>
