@@ -1,20 +1,15 @@
 import { cn } from '../../lib/cn';
 
 interface SectionHeaderProps {
-  /** Section title */
+  label?: string;
   title: string;
-  /** Section description */
   description?: string;
-  /** Text alignment */
   align?: 'left' | 'center';
-  /** Additional class names */
   className?: string;
 }
 
-/**
- * Section Header component for consistent section titles
- */
 export function SectionHeader({
+  label,
   title,
   description,
   align = 'center',
@@ -23,21 +18,28 @@ export function SectionHeader({
   return (
     <div
       className={cn(
-        'mb-12',
-        align === 'center' && 'text-center',
+        'mb-20',
+        align === 'center' && 'text-center max-w-[700px] mx-auto',
         className
       )}
     >
-      <h2 className="text-2xl md:text-3xl font-bold text-content mb-4">
+      {label && (
+        <span
+          className="inline-block px-5 py-2 rounded-full text-[13px] font-semibold uppercase tracking-widest mb-5"
+          style={{
+            background: 'rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            color: '#FF9F43',
+          }}
+        >
+          {label}
+        </span>
+      )}
+      <h2 className="text-[44px] font-bold text-content mb-5 tracking-tight">
         {title}
       </h2>
       {description && (
-        <p
-          className={cn(
-            'text-content-secondary',
-            align === 'center' && 'max-w-2xl mx-auto'
-          )}
-        >
+        <p className={cn('text-lg text-content-secondary leading-relaxed', align === 'center' && 'max-w-2xl mx-auto')}>
           {description}
         </p>
       )}

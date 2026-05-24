@@ -41,10 +41,17 @@ export default {
         },
         // Text colors
         content: {
-          DEFAULT: '#ffffff',
-          secondary: '#a1a1aa',
-          muted: '#71717a',
+          DEFAULT: 'rgba(255,255,255,0.95)',
+          secondary: 'rgba(255,255,255,0.7)',
+          muted: 'rgba(255,255,255,0.5)',
           inverse: '#0f0f10',
+        },
+        // Glass surface colors (for cards on gradient bg)
+        glass: {
+          bg: 'rgba(255,255,255,0.1)',
+          border: 'rgba(255,255,255,0.2)',
+          'bg-dark': 'rgba(0,0,0,0.2)',
+          'bg-hover': 'rgba(255,255,255,0.15)',
         },
         // Status colors
         status: {
@@ -154,6 +161,9 @@ export default {
         'gradient-brand': 'linear-gradient(135deg, #FF9F43 0%, #F46809 100%)',
         'gradient-surface': 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
         'gradient-glow': 'radial-gradient(circle at center, rgba(255,159,67,0.15) 0%, transparent 70%)',
+        'gradient-purple': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'gradient-dark-navy': 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%)',
+        'gradient-hero-glow': 'radial-gradient(circle, rgba(255,159,67,0.15) 0%, transparent 60%)',
       },
     },
   },

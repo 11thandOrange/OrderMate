@@ -18,25 +18,22 @@ interface ButtonBaseProps {
 
 type ButtonProps = ButtonBaseProps & ButtonHTMLAttributes<HTMLButtonElement>;
 
-const baseStyles = 'inline-flex items-center justify-center gap-2 font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-50 disabled:pointer-events-none';
+const baseStyles = 'inline-flex items-center justify-center gap-2 font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-brand hover:bg-brand-hover text-content-inverse shadow-button hover:shadow-button-hover',
-  secondary: 'bg-surface hover:bg-surface-hover text-content border border-surface-border hover:border-surface-border-hover',
-  ghost: 'hover:bg-surface text-content-secondary hover:text-content',
-  outline: 'border border-surface-border-hover hover:bg-surface text-content',
+  primary: 'bg-brand hover:bg-brand-hover text-white shadow-[0_4px_16px_rgba(255,159,67,0.4)] hover:shadow-[0_8px_24px_rgba(255,159,67,0.5)] hover:-translate-y-0.5',
+  secondary: 'bg-transparent text-content border-2 border-glass-border hover:bg-glass-bg',
+  ghost: 'hover:bg-glass-bg text-content-secondary hover:text-content',
+  outline: 'border border-glass-border hover:bg-glass-bg text-content',
   danger: 'bg-accent-red/15 hover:bg-accent-red/25 text-accent-red border border-accent-red/30',
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'h-9 px-3 text-sm rounded-button',
-  md: 'h-11 px-5 text-sm rounded-button',
-  lg: 'h-12 px-6 text-base rounded-button',
+  sm: 'h-9 px-4 text-sm rounded-full',
+  md: 'h-11 px-6 text-sm rounded-full',
+  lg: 'h-12 px-8 text-base rounded-full',
 };
 
-/**
- * Button component with multiple variants and sizes
- */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children, variant = 'primary', size = 'md', leftIcon, rightIcon, className, fullWidth, ...props }, ref) => {
     return (
@@ -61,9 +58,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = 'Button';
 
-/**
- * Button as React Router Link
- */
 interface ButtonLinkProps extends ButtonBaseProps {
   to: string;
 }
@@ -87,9 +81,6 @@ export function ButtonLink({ children, variant = 'primary', size = 'md', leftIco
   );
 }
 
-/**
- * Button as anchor tag for external links
- */
 interface ButtonAnchorProps extends ButtonBaseProps {
   href: string;
   target?: string;
