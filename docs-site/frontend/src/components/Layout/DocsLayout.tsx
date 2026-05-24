@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
-import { Footer } from './Footer';
 import { navigation } from '../../data/navigation';
 
 interface DocsLayoutProps {
@@ -14,7 +13,7 @@ export function DocsLayout({ children }: DocsLayoutProps) {
       <Header />
 
       <div className="flex-1 flex pt-16">
-        <div className="flex-1 flex max-w-[1400px] w-full mx-auto">
+        <div className="flex-1 flex max-w-[1800px] w-full mx-auto">
           <Sidebar
             navigation={navigation}
             className="hidden lg:flex flex-col w-64 flex-shrink-0 py-6 pl-6 border-r border-white/5"
@@ -27,8 +26,6 @@ export function DocsLayout({ children }: DocsLayoutProps) {
           </main>
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }
