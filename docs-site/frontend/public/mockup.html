@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrderMate API Docs - Layout Mockup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            background: '#0f1117',
+            'background-elevated': '#1a1d27',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #0f1117; color: #ffffff; }
+    .code-block { background: #1e2028; border-radius: 0.75rem; font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- Fixed Header -->
+  <header class="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/5" style="background: rgba(15, 17, 23, 0.95); backdrop-filter: blur(12px);">
+    <div class="flex items-center justify-between h-full px-6 max-w-[1800px] mx-auto">
+      <div class="flex items-center gap-8">
+        <a href="/" class="flex items-center gap-1 text-xl font-bold">
+          <span class="text-orange-500">Order</span><span class="text-white">Mate</span><span class="text-gray-400 font-normal ml-1">Docs</span>
+        </a>
+        <nav class="hidden md:flex items-center gap-6 text-sm">
+          <a href="#" class="text-gray-400 hover:text-white transition">Getting Started</a>
+          <a href="#" class="text-gray-400 hover:text-white transition">Features</a>
+          <a href="#" class="text-white font-medium">API Reference</a>
+          <a href="#" class="text-gray-400 hover:text-white transition">Guides</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-4">
+        <button class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-gray-400 border border-white/10" style="background: rgba(255,255,255,0.05);">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          Search... <span class="text-xs ml-2">⌘K</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="flex-1 flex pt-16">
+    <div class="flex-1 flex max-w-[1800px] w-full mx-auto">
+      
+      <!-- Left Sidebar -->
+      <aside class="hidden lg:flex flex-col w-64 flex-shrink-0 border-r border-white/5" style="background: #0f1117;">
+        <nav class="flex-1 py-6 px-4">
+          <!-- API Reference Section -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <span>API Reference</span>
+              <svg class="w-4 h-4 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </div>
+            <div class="mt-1 space-y-1">
+              <a href="#" class="block px-3 py-2 text-sm rounded-lg text-orange-500 font-medium" style="background: rgba(249, 115, 22, 0.1);">Orders</a>
+              <a href="#" class="block px-3 py-2 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-white/5">Line Items</a>
+              <a href="#" class="block px-3 py-2 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-white/5">Customers</a>
+              <a href="#" class="block px-3 py-2 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-white/5">Payments</a>
+              <a href="#" class="block px-3 py-2 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-white/5">Webhooks</a>
+            </div>
+          </div>
+
+          <!-- Resources Section -->
+          <div class="pt-4 border-t border-white/5">
+            <div class="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <span>Resources</span>
+              <svg class="w-4 h-4 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </div>
+            <div class="mt-1 space-y-1">
+              <a href="#" class="block px-3 py-2 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-white/5">Authentication</a>
+              <a href="#" class="block px-3 py-2 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-white/5">Error Handling</a>
+              <a href="#" class="block px-3 py-2 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-white/5">Rate Limits</a>
+            </div>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1 min-w-0 overflow-y-auto">
+        <div class="py-8 px-6 lg:px-10">
+          <div class="max-w-3xl">
+            <!-- Breadcrumb -->
+            <nav class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+              <a href="#" class="hover:text-white transition">Docs</a>
+              <span>/</span>
+              <a href="#" class="hover:text-white transition">API Reference</a>
+              <span>/</span>
+              <span class="text-gray-400">Orders</span>
+            </nav>
+
+            <!-- Page Title -->
+            <h1 class="text-4xl font-bold text-white mb-4">Orders</h1>
+            <p class="text-lg text-gray-400 mb-10 leading-relaxed">
+              The Orders API allows you to create, read, update, and delete orders for a merchant.
+              Orders contain line items, customer information, and payment details.
+            </p>
+
+            <!-- On This Page -->
+            <div class="mb-10 p-4 border border-white/10 rounded-xl" style="background: rgba(255,255,255,0.05);">
+              <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">On this page</h3>
+              <div class="grid grid-cols-2 gap-2">
+                <a href="#list-orders" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition">
+                  <span class="text-xs px-1.5 py-0.5 rounded bg-emerald-500 text-white font-medium">GET</span>
+                  <span>List Orders</span>
+                </a>
+                <a href="#get-order" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition">
+                  <span class="text-xs px-1.5 py-0.5 rounded bg-emerald-500 text-white font-medium">GET</span>
+                  <span>Get Order</span>
+                </a>
+                <a href="#create-order" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition">
+                  <span class="text-xs px-1.5 py-0.5 rounded bg-blue-500 text-white font-medium">POST</span>
+                  <span>Create Order</span>
+                </a>
+                <a href="#update-order" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition">
+                  <span class="text-xs px-1.5 py-0.5 rounded bg-amber-500 text-white font-medium">PUT</span>
+                  <span>Update Order</span>
+                </a>
+                <a href="#delete-order" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition">
+                  <span class="text-xs px-1.5 py-0.5 rounded bg-red-500 text-white font-medium">DELETE</span>
+                  <span>Delete Order</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- The Order Object -->
+            <section class="mb-12">
+              <h2 class="text-2xl font-semibold text-white mb-4">The Order Object</h2>
+              <div class="overflow-hidden rounded-xl border border-white/10">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="border-b border-white/10" style="background: rgba(255,255,255,0.05);">
+                      <th class="text-left px-4 py-3 font-medium text-gray-400">Attribute</th>
+                      <th class="text-left px-4 py-3 font-medium text-gray-400">Type</th>
+                      <th class="text-left px-4 py-3 font-medium text-gray-400">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5">
+                    <tr>
+                      <td class="px-4 py-3 font-mono text-orange-400">id</td>
+                      <td class="px-4 py-3 text-gray-400">string</td>
+                      <td class="px-4 py-3 text-gray-400">Unique identifier for the order</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-3 font-mono text-orange-400">currency</td>
+                      <td class="px-4 py-3 text-gray-400">string</td>
+                      <td class="px-4 py-3 text-gray-400">Three-letter ISO currency code</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-3 font-mono text-orange-400">total</td>
+                      <td class="px-4 py-3 text-gray-400">integer</td>
+                      <td class="px-4 py-3 text-gray-400">Total amount in cents</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-3 font-mono text-orange-400">paymentState</td>
+                      <td class="px-4 py-3 text-gray-400">string</td>
+                      <td class="px-4 py-3 text-gray-400">OPEN, PAID, PARTIALLY_PAID, etc.</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-3 font-mono text-orange-400">title</td>
+                      <td class="px-4 py-3 text-gray-400">string</td>
+                      <td class="px-4 py-3 text-gray-400">Order title/name</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- List Orders Endpoint -->
+            <section id="list-orders" class="mb-12 scroll-mt-20">
+              <div class="flex items-center gap-3 mb-4">
+                <span class="px-2 py-1 rounded text-xs font-bold bg-emerald-500 text-white">GET</span>
+                <code class="text-sm text-gray-400 font-mono">/v3/merchants/{mId}/orders</code>
+              </div>
+              <h2 class="text-2xl font-semibold text-white mb-4">List Orders</h2>
+              <p class="text-gray-400 mb-6">Retrieves a list of orders for the specified merchant.</p>
+
+              <!-- Parameters -->
+              <div class="mb-6">
+                <h3 class="text-lg font-semibold text-white mb-4">Parameters</h3>
+                <div class="space-y-3">
+                  <div class="p-4 rounded-lg border border-white/10" style="background: rgba(255,255,255,0.05);">
+                    <div class="flex items-center gap-2 mb-1">
+                      <code class="text-orange-400 font-mono">mId</code>
+                      <span class="text-xs text-gray-500">string</span>
+                      <span class="text-xs px-1.5 py-0.5 rounded" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">required</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Unique identifier of the merchant</p>
+                  </div>
+                  <div class="p-4 rounded-lg border border-white/10" style="background: rgba(255,255,255,0.05);">
+                    <div class="flex items-center gap-2 mb-1">
+                      <code class="text-orange-400 font-mono">limit</code>
+                      <span class="text-xs text-gray-500">integer</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Maximum results to return (default: 100)</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Response -->
+              <div class="mb-6">
+                <h3 class="text-lg font-semibold text-white mb-4">Response</h3>
+                <div class="code-block overflow-hidden">
+                  <div class="flex items-center justify-between px-4 py-2 border-b border-white/10" style="background: rgba(255,255,255,0.05);">
+                    <span class="text-xs text-gray-500">Example Response</span>
+                  </div>
+                  <pre class="p-4 overflow-x-auto"><code class="text-sm text-gray-300">{
+  "elements": [
+    {
+      "id": "ABC123",
+      "total": 2499,
+      "paymentState": "PAID"
+    }
+  ]
+}</code></pre>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Panel -->
+      <aside class="hidden xl:flex flex-col w-[400px] flex-shrink-0 border-l border-white/5" style="background: rgba(26, 29, 39, 0.5);">
+        <div class="sticky top-16 overflow-y-auto max-h-[calc(100vh-4rem)] py-8 px-6">
+          <h3 class="text-lg font-semibold text-white mb-6">Try it out</h3>
+          
+          <!-- Endpoint URL -->
+          <div class="mb-6">
+            <div class="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/10 font-mono text-sm" style="background: rgba(255,255,255,0.05);">
+              <span class="px-1.5 py-0.5 rounded text-xs font-bold bg-emerald-500 text-white">GET</span>
+              <span class="text-gray-400 truncate">/v3/merchants/{mId}/orders</span>
+            </div>
+          </div>
+
+          <!-- Input Fields -->
+          <div class="space-y-4 mb-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-400 mb-2">API Key</label>
+              <input type="text" placeholder="Enter your Clover API key" class="w-full px-3 py-2 rounded-lg text-sm text-white placeholder-gray-500 border border-white/10 focus:outline-none focus:ring-2 focus:ring-orange-500/50" style="background: rgba(255,255,255,0.05);">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-400 mb-2">Merchant ID</label>
+              <input type="text" placeholder="Enter merchant ID" class="w-full px-3 py-2 rounded-lg text-sm text-white placeholder-gray-500 border border-white/10 focus:outline-none focus:ring-2 focus:ring-orange-500/50" style="background: rgba(255,255,255,0.05);">
+            </div>
+          </div>
+
+          <!-- Try it button -->
+          <button class="w-full py-2.5 px-4 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
+            Try it
+          </button>
+
+          <!-- Code Examples -->
+          <div class="mt-8">
+            <h4 class="text-sm font-medium text-gray-400 mb-3">Code Examples</h4>
+            <div class="flex gap-2 mb-4">
+              <button class="px-3 py-1.5 text-sm text-white rounded-lg" style="background: rgba(255,255,255,0.1);">cURL</button>
+              <button class="px-3 py-1.5 text-sm text-gray-400 hover:text-white rounded-lg">Python</button>
+            </div>
+            <div class="code-block p-4 text-xs">
+              <pre><code class="text-gray-300"><span class="text-purple-400">curl</span> <span class="text-emerald-400">"https://api.clover.com/v3/merchants/{mId}/orders"</span> \
+  -H <span class="text-emerald-400">"Authorization: Bearer TOKEN"</span></code></pre>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</body>
+</html>
