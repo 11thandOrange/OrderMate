@@ -11,40 +11,55 @@ const quickLinks = [
 ];
 
 const methodColors: Record<string, string> = {
-  GET: 'bg-emerald-500',
-  POST: 'bg-blue-500',
-  PUT: 'bg-amber-500',
-  DELETE: 'bg-red-500',
+  GET: '#10b981',
+  POST: '#3b82f6',
+  PUT: '#f59e0b',
+  DELETE: '#ef4444',
 };
+
+const codeBlockStyle = {
+  background: '#1e2028',
+  borderRadius: '0.75rem',
+  fontFamily: "'Monaco', 'Menlo', monospace",
+  fontSize: '13px',
+};
+
+const endpoints = [
+  { name: 'Orders', href: '/api/orders', description: 'Create, read, update, and delete orders' },
+  { name: 'Line Items', href: '/api/line-items', description: 'Manage items within orders' },
+  { name: 'Customers', href: '/api/customers', description: 'Access customer information' },
+  { name: 'Payments', href: '/api/payments', description: 'View payment transactions' },
+  { name: 'Webhooks', href: '/api/webhooks', description: 'Receive real-time notifications' },
+];
 
 export function ApiOverview() {
   return (
     <ApiLayout>
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link to="/" className="hover:text-white transition">Docs</Link>
+      <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>
+        <Link to="/" style={{ color: '#6b7280', textDecoration: 'none' }}>Docs</Link>
         <span>/</span>
-        <span className="text-gray-400">API Reference</span>
+        <span style={{ color: '#9ca3af' }}>API Reference</span>
       </nav>
 
       {/* Page Title */}
-      <h1 className="text-4xl font-bold text-white mb-4">API Reference</h1>
-      <p className="text-lg text-gray-400 mb-10 leading-relaxed">
+      <h1 style={{ fontSize: '36px', fontWeight: 700, color: '#ffffff', marginBottom: '16px' }}>API Reference</h1>
+      <p style={{ fontSize: '18px', color: '#9ca3af', marginBottom: '40px', lineHeight: 1.6 }}>
         The Clover API allows you to programmatically access and manage merchant data 
         including orders, customers, payments, and more.
       </p>
 
-      {/* On This Page / Quick Links */}
-      <div className="mb-10 p-4 border border-white/10 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Quick Links</h3>
-        <div className="grid grid-cols-2 gap-2">
+      {/* Quick Links */}
+      <div style={{ marginBottom: '40px', padding: '16px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(255,255,255,0.05)' }}>
+        <h3 style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280', marginBottom: '12px' }}>Quick Links</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
           {quickLinks.map((link) => (
             <Link
               key={link.href}
               to={link.href}
-              className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition"
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', fontSize: '14px', borderRadius: '8px', color: '#9ca3af', textDecoration: 'none' }}
             >
-              <span className={`text-xs px-1.5 py-0.5 rounded text-white font-medium ${methodColors[link.method]}`}>
+              <span style={{ fontSize: '12px', padding: '2px 6px', borderRadius: '4px', color: '#ffffff', fontWeight: 500, background: methodColors[link.method] }}>
                 {link.method}
               </span>
               <span>{link.title}</span>
@@ -54,99 +69,77 @@ export function ApiOverview() {
       </div>
 
       {/* Base URL */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-white mb-4">Base URL</h2>
-        <div className="overflow-hidden rounded-xl border border-white/10">
-          <div className="p-4" style={{ background: 'rgba(255,255,255,0.05)' }}>
-            <code className="text-lg text-emerald-400">https://api.clover.com/v3</code>
+      <section style={{ marginBottom: '48px' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#ffffff', marginBottom: '16px' }}>Base URL</h2>
+        <div style={{ overflow: 'hidden', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <div style={{ padding: '16px', background: 'rgba(255,255,255,0.05)' }}>
+            <code style={{ fontSize: '18px', color: '#34d399' }}>https://api.clover.com/v3</code>
           </div>
         </div>
-        <p className="text-sm text-gray-500 mt-3">
-          For sandbox/development, use: <code className="text-gray-400">https://sandbox.dev.clover.com/v3</code>
+        <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '12px' }}>
+          For sandbox/development, use: <code style={{ color: '#9ca3af' }}>https://sandbox.dev.clover.com/v3</code>
         </p>
       </section>
 
       {/* Authentication */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-white mb-4">Authentication</h2>
-        <p className="text-gray-400 mb-4">
+      <section style={{ marginBottom: '48px' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#ffffff', marginBottom: '16px' }}>Authentication</h2>
+        <p style={{ color: '#9ca3af', marginBottom: '16px' }}>
           All API requests require authentication using an OAuth 2.0 Bearer token. 
           Include your API token in the Authorization header:
         </p>
-        <div className="rounded-xl overflow-hidden" style={{ background: '#1e2028' }}>
-          <div className="flex items-center justify-between px-4 py-2 border-b border-white/10" style={{ background: 'rgba(255,255,255,0.05)' }}>
-            <span className="text-xs text-gray-500">Authorization Header</span>
-            <button className="text-gray-500 hover:text-white">
-              <Copy className="w-4 h-4" />
+        <div style={{ ...codeBlockStyle, overflow: 'hidden' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)' }}>
+            <span style={{ fontSize: '12px', color: '#6b7280' }}>Authorization Header</span>
+            <button style={{ color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer' }}>
+              <Copy style={{ width: '16px', height: '16px' }} />
             </button>
           </div>
-          <pre className="p-4 overflow-x-auto text-sm"><code className="text-gray-300">{`curl -H "Authorization: Bearer YOUR_API_TOKEN" \\
+          <pre style={{ padding: '16px', margin: 0, overflowX: 'auto' }}><code style={{ fontSize: '14px', color: '#d1d5db' }}>{`curl -H "Authorization: Bearer YOUR_API_TOKEN" \\
   https://api.clover.com/v3/merchants/{mId}/orders`}</code></pre>
         </div>
       </section>
 
       {/* Endpoints */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-white mb-4">Endpoints</h2>
-        <div className="overflow-hidden rounded-xl border border-white/10">
-          <table className="w-full text-sm">
+      <section style={{ marginBottom: '48px' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#ffffff', marginBottom: '16px' }}>Endpoints</h2>
+        <div style={{ overflow: 'hidden', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <table style={{ width: '100%', fontSize: '14px', borderCollapse: 'collapse' }}>
             <thead>
-              <tr className="border-b border-white/10" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                <th className="text-left px-4 py-3 font-medium text-gray-400">Resource</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-400">Description</th>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)' }}>
+                <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 500, color: '#9ca3af' }}>Resource</th>
+                <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 500, color: '#9ca3af' }}>Description</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
-              <tr>
-                <td className="px-4 py-3">
-                  <Link to="/api/orders" className="text-orange-400 hover:text-orange-300 font-medium">Orders</Link>
-                </td>
-                <td className="px-4 py-3 text-gray-400">Create, read, update, and delete orders</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-3">
-                  <Link to="/api/line-items" className="text-orange-400 hover:text-orange-300 font-medium">Line Items</Link>
-                </td>
-                <td className="px-4 py-3 text-gray-400">Manage items within orders</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-3">
-                  <Link to="/api/customers" className="text-orange-400 hover:text-orange-300 font-medium">Customers</Link>
-                </td>
-                <td className="px-4 py-3 text-gray-400">Access customer information</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-3">
-                  <Link to="/api/payments" className="text-orange-400 hover:text-orange-300 font-medium">Payments</Link>
-                </td>
-                <td className="px-4 py-3 text-gray-400">View payment transactions</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-3">
-                  <Link to="/api/webhooks" className="text-orange-400 hover:text-orange-300 font-medium">Webhooks</Link>
-                </td>
-                <td className="px-4 py-3 text-gray-400">Receive real-time notifications</td>
-              </tr>
+            <tbody>
+              {endpoints.map((ep, i) => (
+                <tr key={ep.name} style={{ borderBottom: i < endpoints.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+                  <td style={{ padding: '12px 16px' }}>
+                    <Link to={ep.href} style={{ color: '#fb923c', textDecoration: 'none', fontWeight: 500 }}>{ep.name}</Link>
+                  </td>
+                  <td style={{ padding: '12px 16px', color: '#9ca3af' }}>{ep.description}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </section>
 
       {/* Response Format */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-white mb-4">Response Format</h2>
-        <p className="text-gray-400 mb-4">
+      <section style={{ marginBottom: '48px' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#ffffff', marginBottom: '16px' }}>Response Format</h2>
+        <p style={{ color: '#9ca3af', marginBottom: '16px' }}>
           All API responses are returned in JSON format. List endpoints return an 
-          object with an <code className="text-orange-400">elements</code> array:
+          object with an <code style={{ color: '#fb923c' }}>elements</code> array:
         </p>
-        <div className="rounded-xl overflow-hidden" style={{ background: '#1e2028' }}>
-          <div className="flex items-center justify-between px-4 py-2 border-b border-white/10" style={{ background: 'rgba(255,255,255,0.05)' }}>
-            <span className="text-xs text-gray-500">Example Response</span>
-            <button className="text-gray-500 hover:text-white">
-              <Copy className="w-4 h-4" />
+        <div style={{ ...codeBlockStyle, overflow: 'hidden' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)' }}>
+            <span style={{ fontSize: '12px', color: '#6b7280' }}>Example Response</span>
+            <button style={{ color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer' }}>
+              <Copy style={{ width: '16px', height: '16px' }} />
             </button>
           </div>
-          <pre className="p-4 overflow-x-auto text-sm"><code className="text-gray-300">{`{
+          <pre style={{ padding: '16px', margin: 0, overflowX: 'auto' }}><code style={{ fontSize: '14px', color: '#d1d5db' }}>{`{
   "elements": [
     {
       "id": "ABC123",
