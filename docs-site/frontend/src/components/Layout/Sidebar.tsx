@@ -6,10 +6,9 @@ import { useState } from 'react';
 interface SidebarProps {
   navigation: NavItem[];
   className?: string;
-  style?: React.CSSProperties;
 }
 
-export function Sidebar({ navigation, className = '', style }: SidebarProps) {
+export function Sidebar({ navigation, className = '' }: SidebarProps) {
   const location = useLocation();
   const [expanded, setExpanded] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
@@ -30,7 +29,7 @@ export function Sidebar({ navigation, className = '', style }: SidebarProps) {
   };
 
   return (
-    <aside className={className} style={style}>
+    <aside className={className}>
       {/* Scrollable navigation container */}
       <div className="flex-1 overflow-y-auto pr-4">
         <nav className="sticky top-20 space-y-1">
