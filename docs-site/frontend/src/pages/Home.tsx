@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Header, Footer, Container, Section, Grid } from '../components/Layout';
 import { HeroSection } from '../components/composite/HeroSection';
 import { FeatureCard } from '../components/composite/FeatureCard';
@@ -17,8 +18,13 @@ import {
 } from 'lucide-react';
 
 export function Home() {
+  // Reset scroll position on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-[#0f1117]">
       <Header />
       
       {/* Hero Section */}
