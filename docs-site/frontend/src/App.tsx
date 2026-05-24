@@ -1,12 +1,36 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Home } from './pages/Home';
 import { GettingStarted } from './pages/GettingStarted';
 import { Features } from './pages/Features';
 import { ApiOverview, OrdersApi } from './pages/Api';
 
+// Scroll to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    // Scroll window to top
+    window.scrollTo(0, 0);
+    
+    // Reset all overflow-y-auto containers
+    document.querySelectorAll('.overflow-y-auto, [data-scroll-reset]').forEach(el => {
+      (el as HTMLElement).scrollTop = 0;
+    });
+    
+    // Also scroll main and aside elements
+    document.querySelectorAll('main, aside, nav').forEach(el => {
+      (el as HTMLElement).scrollTop = 0;
+    });
+  }, [pathname]);
+  
+  return null;
+}
+
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/getting-started" element={<GettingStarted />} />
