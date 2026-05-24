@@ -24,63 +24,78 @@ const resourceItems = [
 
 export function ApiLayout({ children, rightPanel }: ApiLayoutProps) {
   const location = useLocation();
-  const isActive = (href: string) => location.pathname === href;
+  const isActive = (href: string) => location.pathname === href || (href === '/api/orders' && location.pathname === '/api');
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#0f1117', color: '#ffffff' }}>
-      {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/5" style={{ background: 'rgba(15, 17, 23, 0.95)', backdropFilter: 'blur(12px)' }}>
-        <div className="flex items-center justify-between h-full px-6 max-w-[1800px] mx-auto">
-          <div className="flex items-center gap-8">
-            <Link to="/" className="flex items-center gap-1 text-xl font-bold">
-              <span className="text-orange-500">Order</span>
-              <span className="text-white">Mate</span>
-              <span className="text-gray-400 font-normal ml-1">Docs</span>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#0f1117', color: '#ffffff' }}>
+      {/* Fixed Header - EXACT MATCH TO MOCKUP */}
+      <header style={{ 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        zIndex: 50, 
+        height: '64px', 
+        borderBottom: '1px solid rgba(255,255,255,0.05)',
+        background: 'rgba(15, 17, 23, 0.95)', 
+        backdropFilter: 'blur(12px)' 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '100%', padding: '0 24px', maxWidth: '1800px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '20px', fontWeight: 'bold', textDecoration: 'none' }}>
+              <span style={{ color: '#f97316' }}>Order</span>
+              <span style={{ color: '#ffffff' }}>Mate</span>
+              <span style={{ color: '#9ca3af', fontWeight: 'normal', marginLeft: '4px' }}>Docs</span>
             </Link>
-            <nav className="hidden md:flex items-center gap-6 text-sm">
-              <Link to="/getting-started" className="text-gray-400 hover:text-white transition">Getting Started</Link>
-              <Link to="/features" className="text-gray-400 hover:text-white transition">Features</Link>
-              <Link to="/api/orders" className="text-white font-medium">API Reference</Link>
-              <Link to="/guides" className="text-gray-400 hover:text-white transition">Guides</Link>
+            <nav style={{ display: 'flex', alignItems: 'center', gap: '24px', fontSize: '14px' }}>
+              <Link to="/getting-started" style={{ color: '#9ca3af', textDecoration: 'none' }}>Getting Started</Link>
+              <Link to="/features" style={{ color: '#9ca3af', textDecoration: 'none' }}>Features</Link>
+              <Link to="/api/orders" style={{ color: '#ffffff', fontWeight: 500, textDecoration: 'none' }}>API Reference</Link>
+              <Link to="/guides" style={{ color: '#9ca3af', textDecoration: 'none' }}>Guides</Link>
             </nav>
           </div>
-          <div className="flex items-center gap-4">
-            <button className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-gray-400 border border-white/10" style={{ background: 'rgba(255,255,255,0.05)' }}>
-              <Search className="w-4 h-4" />
-              Search... <span className="text-xs ml-2">⌘K</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px', borderRadius: '8px', fontSize: '14px', color: '#9ca3af', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', cursor: 'pointer' }}>
+              <Search style={{ width: '16px', height: '16px' }} />
+              Search... <span style={{ fontSize: '12px', marginLeft: '8px' }}>⌘K</span>
             </button>
           </div>
         </div>
       </header>
 
-      {/* Main Layout - below fixed header */}
-      <div className="flex-1 flex pt-16">
-        <div className="flex-1 flex max-w-[1800px] w-full mx-auto">
+      {/* Main Layout - EXACT MATCH TO MOCKUP */}
+      <div style={{ flex: 1, display: 'flex', paddingTop: '64px' }}>
+        <div style={{ flex: 1, display: 'flex', maxWidth: '1800px', width: '100%', margin: '0 auto' }}>
           
-          {/* Left Sidebar */}
-          <aside className="hidden lg:flex flex-col w-64 flex-shrink-0 border-r border-white/5" style={{ background: '#0f1117' }}>
-            <nav className="flex-1 py-6 px-4">
+          {/* Left Sidebar - NO overflow-y-auto */}
+          <aside style={{ display: 'flex', flexDirection: 'column', width: '256px', flexShrink: 0, borderRight: '1px solid rgba(255,255,255,0.05)', background: '#0f1117' }}>
+            <nav style={{ flex: 1, padding: '24px 16px' }}>
               {/* API Reference Section */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <div style={{ marginBottom: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280' }}>
                   <span>API Reference</span>
-                  <ChevronRight className="w-4 h-4 rotate-90" />
+                  <ChevronRight style={{ width: '16px', height: '16px', transform: 'rotate(90deg)' }} />
                 </div>
-                <div className="mt-1 space-y-1">
+                <div style={{ marginTop: '4px' }}>
                   {apiNavItems.map((item) => (
                     <Link
                       key={item.href}
                       to={item.href}
-                      className={`block px-3 py-2 text-sm rounded-lg transition-colors ${
-                        isActive(item.href)
-                          ? 'text-orange-500 font-medium'
-                          : 'text-gray-400 hover:text-white hover:bg-white/5'
-                      }`}
-                      style={isActive(item.href) ? { background: 'rgba(249, 115, 22, 0.1)' } : {}}
+                      style={{
+                        display: 'block',
+                        padding: '8px 12px',
+                        fontSize: '14px',
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        marginBottom: '4px',
+                        color: isActive(item.href) ? '#f97316' : '#9ca3af',
+                        fontWeight: isActive(item.href) ? 500 : 400,
+                        background: isActive(item.href) ? 'rgba(249, 115, 22, 0.1)' : 'transparent',
+                      }}
                     >
                       {item.title}
                     </Link>
@@ -89,22 +104,27 @@ export function ApiLayout({ children, rightPanel }: ApiLayoutProps) {
               </div>
 
               {/* Resources Section */}
-              <div className="pt-4 border-t border-white/5">
-                <div className="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <div style={{ paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280' }}>
                   <span>Resources</span>
-                  <ChevronRight className="w-4 h-4 rotate-90" />
+                  <ChevronRight style={{ width: '16px', height: '16px', transform: 'rotate(90deg)' }} />
                 </div>
-                <div className="mt-1 space-y-1">
+                <div style={{ marginTop: '4px' }}>
                   {resourceItems.map((item) => (
                     <Link
                       key={item.href}
                       to={item.href}
-                      className={`block px-3 py-2 text-sm rounded-lg transition-colors ${
-                        isActive(item.href)
-                          ? 'text-orange-500 font-medium'
-                          : 'text-gray-400 hover:text-white hover:bg-white/5'
-                      }`}
-                      style={isActive(item.href) ? { background: 'rgba(249, 115, 22, 0.1)' } : {}}
+                      style={{
+                        display: 'block',
+                        padding: '8px 12px',
+                        fontSize: '14px',
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        marginBottom: '4px',
+                        color: isActive(item.href) ? '#f97316' : '#9ca3af',
+                        fontWeight: isActive(item.href) ? 500 : 400,
+                        background: isActive(item.href) ? 'rgba(249, 115, 22, 0.1)' : 'transparent',
+                      }}
                     >
                       {item.title}
                     </Link>
@@ -114,10 +134,10 @@ export function ApiLayout({ children, rightPanel }: ApiLayoutProps) {
             </nav>
           </aside>
           
-          {/* Main Content */}
-          <main className="flex-1 min-w-0 overflow-y-auto">
-            <div className="py-8 px-6 lg:px-10">
-              <div className="max-w-3xl">
+          {/* Main Content - overflow-y-auto ONLY here */}
+          <main style={{ flex: 1, minWidth: 0, overflowY: 'auto' }}>
+            <div style={{ padding: '32px 24px', paddingLeft: '40px', paddingRight: '40px' }}>
+              <div style={{ maxWidth: '768px' }}>
                 {children}
               </div>
             </div>
@@ -125,8 +145,8 @@ export function ApiLayout({ children, rightPanel }: ApiLayoutProps) {
           
           {/* Right Panel - Try it out */}
           {rightPanel && (
-            <aside className="hidden xl:flex flex-col w-[400px] flex-shrink-0 border-l border-white/5" style={{ background: 'rgba(26, 29, 39, 0.5)' }}>
-              <div className="sticky top-16 overflow-y-auto max-h-[calc(100vh-4rem)] py-8 px-6">
+            <aside style={{ display: 'flex', flexDirection: 'column', width: '400px', flexShrink: 0, borderLeft: '1px solid rgba(255,255,255,0.05)', background: 'rgba(26, 29, 39, 0.5)' }}>
+              <div style={{ position: 'sticky', top: '64px', overflowY: 'auto', maxHeight: 'calc(100vh - 64px)', padding: '32px 24px' }}>
                 {rightPanel}
               </div>
             </aside>
