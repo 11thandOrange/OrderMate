@@ -14,33 +14,35 @@ const quickLinks = [
 export function Home() {
   return (
     <ApiLayout>
-      <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <span className="text-gray-400">Documentation</span>
+      {/* Breadcrumb */}
+      <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>
+        <span style={{ color: '#9ca3af' }}>Documentation</span>
       </nav>
 
-      <h1 className="text-4xl font-bold text-white mb-4">OrderMate Docs</h1>
-      <p className="text-lg text-gray-400 mb-10 leading-relaxed">
+      {/* Page Title */}
+      <h1 style={{ fontSize: '36px', fontWeight: 700, color: '#ffffff', marginBottom: '16px' }}>OrderMate Docs</h1>
+      <p style={{ fontSize: '18px', color: '#9ca3af', marginBottom: '40px', lineHeight: 1.6 }}>
         Everything you need to integrate OrderMate with your Clover POS system. Learn about
         features, explore the API, and build powerful integrations.
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
+      {/* Quick Links Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '48px' }}>
         {quickLinks.map((item) => {
           const Icon = item.icon;
           return (
             <Link
               key={item.to}
               to={item.to}
-              className="group p-5 rounded-xl border border-white/10 hover:border-orange-500/30 transition-colors"
-              style={{ background: 'rgba(255,255,255,0.03)' }}
+              style={{ padding: '20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', textDecoration: 'none' }}
             >
-              <div className="flex items-start gap-4">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(249, 115, 22, 0.1)' }}>
-                  <Icon className="w-5 h-5 text-orange-500" />
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'rgba(249, 115, 22, 0.1)' }}>
+                  <Icon style={{ width: '20px', height: '20px', color: '#f97316' }} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">{item.title}</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">{item.description}</p>
+                  <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#ffffff', marginBottom: '4px' }}>{item.title}</h3>
+                  <p style={{ fontSize: '14px', color: '#9ca3af', lineHeight: 1.5, margin: 0 }}>{item.description}</p>
                 </div>
               </div>
             </Link>
@@ -48,15 +50,16 @@ export function Home() {
         })}
       </div>
 
-      <section className="p-6 rounded-xl border border-white/10" style={{ background: 'rgba(255,255,255,0.03)' }}>
-        <h2 className="text-lg font-semibold text-white mb-2">Quick Start</h2>
-        <p className="text-sm text-gray-400 mb-4">
+      {/* Quick Start Section */}
+      <section style={{ padding: '24px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)' }}>
+        <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', marginBottom: '8px' }}>Quick Start</h2>
+        <p style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '16px' }}>
           Get up and running with OrderMate in minutes. Follow the installation guide to set up
           the app on your Clover device and start managing orders.
         </p>
         <Link
           to="/getting-started"
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg bg-orange-500 hover:bg-orange-600 transition-colors"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 16px', fontSize: '14px', fontWeight: 500, color: '#ffffff', borderRadius: '8px', background: '#f97316', textDecoration: 'none' }}
         >
           Get Started
         </Link>

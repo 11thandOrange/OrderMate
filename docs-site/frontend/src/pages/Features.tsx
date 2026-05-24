@@ -8,11 +8,18 @@ import {
   Palette
 } from 'lucide-react';
 
+const iconColors: Record<string, string> = {
+  orders: '#34d399',
+  calendar: '#60a5fa',
+  notifications: '#fbbf24',
+  widgets: '#a78bfa',
+  'custom-fields': '#f472b6',
+};
+
 const featuresContent: Record<string, {
   title: string;
   description: string;
   icon: React.ElementType;
-  color: string;
   sections: {
     title: string;
     content: string;
@@ -23,7 +30,6 @@ const featuresContent: Record<string, {
     title: 'Order Management',
     description: 'Efficiently manage all your orders in one place with powerful filtering and search capabilities.',
     icon: ShoppingBag,
-    color: 'text-emerald-400',
     sections: [
       {
         title: 'Overview',
@@ -63,7 +69,6 @@ const featuresContent: Record<string, {
     title: 'Calendar View',
     description: 'Visualize your scheduled orders in day, week, or month view with smart color coding.',
     icon: Calendar,
-    color: 'text-blue-400',
     sections: [
       {
         title: 'Overview',
@@ -94,7 +99,6 @@ const featuresContent: Record<string, {
     title: 'Notifications',
     description: 'Keep your customers informed with automated SMS and email notifications.',
     icon: Bell,
-    color: 'text-amber-400',
     sections: [
       {
         title: 'Overview',
@@ -126,7 +130,6 @@ const featuresContent: Record<string, {
     title: 'Widgets & Custom Fields',
     description: 'Capture additional information with customizable widgets and fields.',
     icon: Settings2,
-    color: 'text-purple-400',
     sections: [
       {
         title: 'Overview',
@@ -159,7 +162,6 @@ const featuresContent: Record<string, {
     title: 'Custom Fields',
     description: 'Define custom data fields to track order-specific information.',
     icon: Palette,
-    color: 'text-pink-400',
     sections: [
       {
         title: 'Overview',
@@ -187,37 +189,38 @@ export function Features() {
   if (!feature) {
     return (
       <DocsLayout>
-        <div className="max-w-3xl">
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
-            <Link to="/" className="hover:text-white">Docs</Link>
-            <span>/</span>
-            <span className="text-gray-300">Features</span>
-          </div>
+        {/* Breadcrumb */}
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>
+          <Link to="/" style={{ color: '#6b7280', textDecoration: 'none' }}>Docs</Link>
+          <span>/</span>
+          <span style={{ color: '#9ca3af' }}>Features</span>
+        </nav>
 
-          <h1 className="text-4xl font-bold text-white mb-4">Features</h1>
-          <p className="text-xl text-gray-400 mb-8">
-            Explore the powerful features that make OrderMate the best order management solution for Clover merchants.
-          </p>
+        {/* Page Title */}
+        <h1 style={{ fontSize: '36px', fontWeight: 700, color: '#ffffff', marginBottom: '16px' }}>Features</h1>
+        <p style={{ fontSize: '18px', color: '#9ca3af', marginBottom: '40px', lineHeight: 1.6 }}>
+          Explore the powerful features that make OrderMate the best order management solution for Clover merchants.
+        </p>
 
-          <div className="grid gap-4">
-            {Object.entries(featuresContent).map(([key, value]) => (
-              <Link
-                key={key}
-                to={`/features/${key}`}
-                className="group flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all"
-              >
-                <div className={`p-3 rounded-lg bg-white/5`}>
-                  <value.icon className={`w-6 h-6 ${value.color}`} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-medium text-white group-hover:text-om-orange transition-colors">
-                    {value.title}
-                  </h3>
-                  <p className="text-sm text-gray-400">{value.description}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
+        {/* Features Grid */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {Object.entries(featuresContent).map(([key, value]) => (
+            <Link
+              key={key}
+              to={`/features/${key}`}
+              style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', textDecoration: 'none' }}
+            >
+              <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }}>
+                <value.icon style={{ width: '24px', height: '24px', color: iconColors[key] }} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 500, color: '#ffffff', marginBottom: '4px' }}>
+                  {value.title}
+                </h3>
+                <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0 }}>{value.description}</p>
+              </div>
+            </Link>
+          ))}
         </div>
       </DocsLayout>
     );
@@ -228,9 +231,9 @@ export function Features() {
   if (!content) {
     return (
       <DocsLayout>
-        <div className="text-center py-12">
-          <h1 className="text-2xl font-bold text-white mb-4">Feature not found</h1>
-          <Link to="/features" className="text-om-orange hover:underline">
+        <div style={{ textAlign: 'center', padding: '48px 0' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#ffffff', marginBottom: '16px' }}>Feature not found</h1>
+          <Link to="/features" style={{ color: '#f97316', textDecoration: 'underline' }}>
             Back to Features
           </Link>
         </div>
@@ -242,46 +245,44 @@ export function Features() {
 
   return (
     <DocsLayout>
-      <div className="max-w-3xl">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
-          <Link to="/" className="hover:text-white">Docs</Link>
-          <span>/</span>
-          <Link to="/features" className="hover:text-white">Features</Link>
-          <span>/</span>
-          <span className="text-gray-300">{content.title}</span>
-        </div>
+      {/* Breadcrumb */}
+      <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>
+        <Link to="/" style={{ color: '#6b7280', textDecoration: 'none' }}>Docs</Link>
+        <span>/</span>
+        <Link to="/features" style={{ color: '#6b7280', textDecoration: 'none' }}>Features</Link>
+        <span>/</span>
+        <span style={{ color: '#9ca3af' }}>{content.title}</span>
+      </nav>
 
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <div className={`p-3 rounded-xl bg-white/5`}>
-            <Icon className={`w-8 h-8 ${content.color}`} />
-          </div>
-          <div>
-            <h1 className="text-4xl font-bold text-white">{content.title}</h1>
-          </div>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+        <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)' }}>
+          <Icon style={{ width: '32px', height: '32px', color: iconColors[feature] }} />
         </div>
-        <p className="text-xl text-gray-400 mb-12">{content.description}</p>
+        <div>
+          <h1 style={{ fontSize: '36px', fontWeight: 700, color: '#ffffff', margin: 0 }}>{content.title}</h1>
+        </div>
+      </div>
+      <p style={{ fontSize: '18px', color: '#9ca3af', marginBottom: '48px', lineHeight: 1.6 }}>{content.description}</p>
 
-        {/* Sections */}
-        <div className="space-y-12">
-          {content.sections.map((section, index) => (
-            <section key={index}>
-              <h2 className="text-2xl font-semibold text-white mb-4">{section.title}</h2>
-              <p className="text-gray-400 mb-4">{section.content}</p>
-              {section.features && (
-                <ul className="space-y-2">
-                  {section.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3 text-gray-300">
-                      <span className="w-1.5 h-1.5 bg-om-orange rounded-full mt-2 shrink-0"></span>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          ))}
-        </div>
+      {/* Sections */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+        {content.sections.map((section, index) => (
+          <section key={index}>
+            <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#ffffff', marginBottom: '16px' }}>{section.title}</h2>
+            <p style={{ color: '#9ca3af', marginBottom: '16px' }}>{section.content}</p>
+            {section.features && (
+              <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px', listStyle: 'none', padding: 0, margin: 0 }}>
+                {section.features.map((feat, i) => (
+                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', color: '#d1d5db' }}>
+                    <span style={{ width: '6px', height: '6px', background: '#f97316', borderRadius: '50%', marginTop: '8px', flexShrink: 0 }}></span>
+                    <span>{feat}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        ))}
       </div>
     </DocsLayout>
   );
