@@ -60,14 +60,14 @@ export function ApiOverview() {
     <ApiLayout>
       <div className="max-w-3xl">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
-          <Link to="/" className="hover:text-white">Docs</Link>
+        <nav className="flex items-center gap-2 text-sm text-content-muted mb-6">
+          <Link to="/" className="hover:text-content transition-colors">Docs</Link>
           <span>/</span>
-          <span className="text-gray-300">API Reference</span>
-        </div>
+          <span className="text-content-secondary">API Reference</span>
+        </nav>
 
-        <h1 className="text-4xl font-bold text-white mb-4">API Reference</h1>
-        <p className="text-xl text-gray-400 mb-8">
+        <h1 className="text-4xl font-bold text-content mb-4">API Reference</h1>
+        <p className="text-lg text-content-secondary mb-10 leading-relaxed">
           The Clover API allows you to programmatically access and manage merchant data 
           including orders, customers, payments, and more.
         </p>

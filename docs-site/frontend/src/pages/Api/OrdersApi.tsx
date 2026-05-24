@@ -12,23 +12,23 @@ export function OrdersApi() {
     <ApiLayout
       rightPanel={
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white">Try it out</h3>
+          <h3 className="text-lg font-semibold text-content">Try it out</h3>
           <RequestBuilder endpoint={selectedEndpoint} />
         </div>
       }
     >
       <div className="max-w-3xl">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
-          <Link to="/" className="hover:text-white">Docs</Link>
+        <nav className="flex items-center gap-2 text-sm text-content-muted mb-6">
+          <Link to="/" className="hover:text-content transition-colors">Docs</Link>
           <span>/</span>
-          <Link to="/api" className="hover:text-white">API Reference</Link>
+          <Link to="/api" className="hover:text-content transition-colors">API Reference</Link>
           <span>/</span>
-          <span className="text-gray-300">Orders</span>
-        </div>
+          <span className="text-content-secondary">Orders</span>
+        </nav>
 
-        <h1 className="text-4xl font-bold text-white mb-4">Orders</h1>
-        <p className="text-xl text-gray-400 mb-8">
+        <h1 className="text-4xl font-bold text-content mb-4">Orders</h1>
+        <p className="text-lg text-content-secondary mb-10 leading-relaxed">
           The Orders API allows you to create, read, update, and delete orders for a merchant.
           Orders contain line items, customer information, and payment details.
         </p>
