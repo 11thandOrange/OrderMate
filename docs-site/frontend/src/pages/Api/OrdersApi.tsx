@@ -19,62 +19,68 @@ const quickLinks = [
 ];
 
 const methodColors: Record<string, string> = {
-  GET: 'bg-emerald-500',
-  POST: 'bg-blue-500',
-  PUT: 'bg-amber-500',
-  DELETE: 'bg-red-500',
+  GET: '#10b981',
+  POST: '#3b82f6',
+  PUT: '#f59e0b',
+  DELETE: '#ef4444',
+};
+
+// Code block styles matching mockup exactly
+const codeBlockStyle = {
+  background: '#1e2028',
+  borderRadius: '0.75rem',
+  fontFamily: "'Monaco', 'Menlo', monospace",
+  fontSize: '13px',
 };
 
 function TryItOutPanel() {
   return (
     <>
-      <h3 className="text-lg font-semibold text-white mb-6">Try it out</h3>
+      <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', marginBottom: '24px' }}>Try it out</h3>
       
       {/* Endpoint URL */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/10 font-mono text-sm" style={{ background: 'rgba(255,255,255,0.05)' }}>
-          <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-emerald-500 text-white">GET</span>
-          <span className="text-gray-400 truncate">/v3/merchants/{'{mId}'}/orders</span>
+      <div style={{ marginBottom: '24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontFamily: 'monospace', fontSize: '14px', background: 'rgba(255,255,255,0.05)' }}>
+          <span style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '12px', fontWeight: 700, background: '#10b981', color: '#ffffff' }}>GET</span>
+          <span style={{ color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>/v3/merchants/{'{mId}'}/orders</span>
         </div>
       </div>
 
       {/* Input Fields */}
-      <div className="space-y-4 mb-6">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
         <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">API Key</label>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#9ca3af', marginBottom: '8px' }}>API Key</label>
           <input 
             type="text" 
             placeholder="Enter your Clover API key" 
-            className="w-full px-3 py-2 rounded-lg text-sm text-white placeholder-gray-500 border border-white/10 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
-            style={{ background: 'rgba(255,255,255,0.05)' }}
+            style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', fontSize: '14px', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', outline: 'none' }}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">Merchant ID</label>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#9ca3af', marginBottom: '8px' }}>Merchant ID</label>
           <input 
             type="text" 
             placeholder="Enter merchant ID" 
-            className="w-full px-3 py-2 rounded-lg text-sm text-white placeholder-gray-500 border border-white/10 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
-            style={{ background: 'rgba(255,255,255,0.05)' }}
+            style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', fontSize: '14px', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', outline: 'none' }}
           />
         </div>
       </div>
 
       {/* Try it button */}
-      <button className="w-full py-2.5 px-4 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition flex items-center justify-center gap-2">
-        <Play className="w-4 h-4" />
+      <button style={{ width: '100%', padding: '10px 16px', background: '#f97316', color: '#ffffff', fontWeight: 500, borderRadius: '8px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+        <Play style={{ width: '16px', height: '16px' }} />
         Try it
       </button>
 
       {/* Code Examples */}
-      <div className="mt-8">
-        <h4 className="text-sm font-medium text-gray-400 mb-3">Code Examples</h4>
-        <div className="flex gap-2 mb-4">
-          <button className="px-3 py-1.5 text-sm text-white rounded-lg" style={{ background: 'rgba(255,255,255,0.1)' }}>cURL</button>
-          <button className="px-3 py-1.5 text-sm text-gray-400 hover:text-white rounded-lg">Python</button>
+      <div style={{ marginTop: '32px' }}>
+        <h4 style={{ fontSize: '14px', fontWeight: 500, color: '#9ca3af', marginBottom: '12px' }}>Code Examples</h4>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+          <button style={{ padding: '6px 12px', fontSize: '14px', color: '#ffffff', borderRadius: '8px', background: 'rgba(255,255,255,0.1)', border: 'none', cursor: 'pointer' }}>cURL</button>
+          <button style={{ padding: '6px 12px', fontSize: '14px', color: '#9ca3af', borderRadius: '8px', background: 'transparent', border: 'none', cursor: 'pointer' }}>Python</button>
         </div>
-        <div className="p-4 rounded-xl text-xs font-mono" style={{ background: '#1e2028' }}>
-          <pre className="text-gray-300"><code><span className="text-purple-400">curl</span> <span className="text-emerald-400">"https://api.clover.com/v3/merchants/{'{mId}'}/orders"</span> \{'\n'}  -H <span className="text-emerald-400">"Authorization: Bearer TOKEN"</span></code></pre>
+        <div style={{ ...codeBlockStyle, padding: '16px' }}>
+          <pre style={{ margin: 0 }}><code style={{ color: '#d1d5db', fontSize: '12px' }}><span style={{ color: '#a78bfa' }}>curl</span> <span style={{ color: '#34d399' }}>"https://api.clover.com/v3/merchants/{'{mId}'}/orders"</span> \{'\n'}  -H <span style={{ color: '#34d399' }}>"Authorization: Bearer TOKEN"</span></code></pre>
         </div>
       </div>
     </>
@@ -85,35 +91,32 @@ export function OrdersApi() {
   return (
     <ApiLayout rightPanel={<TryItOutPanel />}>
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link to="/" className="hover:text-white transition">Docs</Link>
+      <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>
+        <Link to="/" style={{ color: '#6b7280', textDecoration: 'none' }}>Docs</Link>
         <span>/</span>
-        <Link to="/api" className="hover:text-white transition">API Reference</Link>
+        <Link to="/api" style={{ color: '#6b7280', textDecoration: 'none' }}>API Reference</Link>
         <span>/</span>
-        <span className="text-gray-400">Orders</span>
+        <span style={{ color: '#9ca3af' }}>Orders</span>
       </nav>
 
       {/* Page Title */}
-      <h1 className="text-4xl font-bold text-white mb-4">Orders</h1>
-      <p className="text-lg text-gray-400 mb-10 leading-relaxed">
+      <h1 style={{ fontSize: '36px', fontWeight: 700, color: '#ffffff', marginBottom: '16px' }}>Orders</h1>
+      <p style={{ fontSize: '18px', color: '#9ca3af', marginBottom: '40px', lineHeight: 1.6 }}>
         The Orders API allows you to create, read, update, and delete orders for a merchant.
         Orders contain line items, customer information, and payment details.
       </p>
 
       {/* On This Page */}
-      <div className="mb-10 p-4 border border-white/10 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">On this page</h3>
-        <div className="grid grid-cols-2 gap-2">
+      <div style={{ marginBottom: '40px', padding: '16px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(255,255,255,0.05)' }}>
+        <h3 style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280', marginBottom: '12px' }}>On this page</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
           {quickLinks.map((link) => (
             <a 
               key={link.href}
               href={link.href} 
-              className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg text-gray-400 hover:text-white transition"
-              style={{ background: 'transparent' }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', fontSize: '14px', borderRadius: '8px', color: '#9ca3af', textDecoration: 'none' }}
             >
-              <span className={`text-xs px-1.5 py-0.5 rounded text-white font-medium ${methodColors[link.method]}`}>
+              <span style={{ fontSize: '12px', padding: '2px 6px', borderRadius: '4px', color: '#ffffff', fontWeight: 500, background: methodColors[link.method] }}>
                 {link.method}
               </span>
               <span>{link.title}</span>
@@ -123,23 +126,23 @@ export function OrdersApi() {
       </div>
 
       {/* The Order Object */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-white mb-4">The Order Object</h2>
-        <div className="overflow-hidden rounded-xl border border-white/10">
-          <table className="w-full text-sm">
+      <section style={{ marginBottom: '48px' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#ffffff', marginBottom: '16px' }}>The Order Object</h2>
+        <div style={{ overflow: 'hidden', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <table style={{ width: '100%', fontSize: '14px', borderCollapse: 'collapse' }}>
             <thead>
-              <tr className="border-b border-white/10" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                <th className="text-left px-4 py-3 font-medium text-gray-400">Attribute</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-400">Type</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-400">Description</th>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)' }}>
+                <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 500, color: '#9ca3af' }}>Attribute</th>
+                <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 500, color: '#9ca3af' }}>Type</th>
+                <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 500, color: '#9ca3af' }}>Description</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
-              {orderAttributes.map((attr) => (
-                <tr key={attr.name}>
-                  <td className="px-4 py-3 font-mono text-orange-400">{attr.name}</td>
-                  <td className="px-4 py-3 text-gray-400">{attr.type}</td>
-                  <td className="px-4 py-3 text-gray-400">{attr.description}</td>
+            <tbody>
+              {orderAttributes.map((attr, i) => (
+                <tr key={attr.name} style={{ borderBottom: i < orderAttributes.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+                  <td style={{ padding: '12px 16px', fontFamily: 'monospace', color: '#fb923c' }}>{attr.name}</td>
+                  <td style={{ padding: '12px 16px', color: '#9ca3af' }}>{attr.type}</td>
+                  <td style={{ padding: '12px 16px', color: '#9ca3af' }}>{attr.description}</td>
                 </tr>
               ))}
             </tbody>
@@ -148,49 +151,49 @@ export function OrdersApi() {
       </section>
 
       {/* List Orders Endpoint */}
-      <section id="list-orders" className="mb-12 scroll-mt-20">
-        <div className="flex items-center gap-3 mb-4">
-          <span className="px-2 py-1 rounded text-xs font-bold bg-emerald-500 text-white">GET</span>
-          <code className="text-sm text-gray-400 font-mono">/v3/merchants/{'{mId}'}/orders</code>
+      <section id="list-orders" style={{ marginBottom: '48px', scrollMarginTop: '80px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+          <span style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 700, background: '#10b981', color: '#ffffff' }}>GET</span>
+          <code style={{ fontSize: '14px', color: '#9ca3af', fontFamily: 'monospace' }}>/v3/merchants/{'{mId}'}/orders</code>
         </div>
-        <h2 className="text-2xl font-semibold text-white mb-4">List Orders</h2>
-        <p className="text-gray-400 mb-6">
+        <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#ffffff', marginBottom: '16px' }}>List Orders</h2>
+        <p style={{ color: '#9ca3af', marginBottom: '24px' }}>
           Retrieves a list of orders for the specified merchant.
         </p>
 
         {/* Parameters */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Parameters</h3>
-          <div className="space-y-3">
-            <div className="p-4 rounded-lg border border-white/10" style={{ background: 'rgba(255,255,255,0.05)' }}>
-              <div className="flex items-center gap-2 mb-1">
-                <code className="text-orange-400 font-mono">mId</code>
-                <span className="text-xs text-gray-500">string</span>
-                <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#f87171' }}>required</span>
+        <div style={{ marginBottom: '24px' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', marginBottom: '16px' }}>Parameters</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ padding: '16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <code style={{ color: '#fb923c', fontFamily: 'monospace' }}>mId</code>
+                <span style={{ fontSize: '12px', color: '#6b7280' }}>string</span>
+                <span style={{ fontSize: '12px', padding: '2px 6px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.2)', color: '#f87171' }}>required</span>
               </div>
-              <p className="text-sm text-gray-400">Unique identifier of the merchant</p>
+              <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0 }}>Unique identifier of the merchant</p>
             </div>
-            <div className="p-4 rounded-lg border border-white/10" style={{ background: 'rgba(255,255,255,0.05)' }}>
-              <div className="flex items-center gap-2 mb-1">
-                <code className="text-orange-400 font-mono">limit</code>
-                <span className="text-xs text-gray-500">integer</span>
+            <div style={{ padding: '16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <code style={{ color: '#fb923c', fontFamily: 'monospace' }}>limit</code>
+                <span style={{ fontSize: '12px', color: '#6b7280' }}>integer</span>
               </div>
-              <p className="text-sm text-gray-400">Maximum results to return (default: 100)</p>
+              <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0 }}>Maximum results to return (default: 100)</p>
             </div>
           </div>
         </div>
 
         {/* Response */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Response</h3>
-          <div className="rounded-xl overflow-hidden" style={{ background: '#1e2028' }}>
-            <div className="flex items-center justify-between px-4 py-2 border-b border-white/10" style={{ background: 'rgba(255,255,255,0.05)' }}>
-              <span className="text-xs text-gray-500">Example Response</span>
-              <button className="text-gray-500 hover:text-white">
-                <Copy className="w-4 h-4" />
+        <div style={{ marginBottom: '24px' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', marginBottom: '16px' }}>Response</h3>
+          <div style={{ ...codeBlockStyle, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)' }}>
+              <span style={{ fontSize: '12px', color: '#6b7280' }}>Example Response</span>
+              <button style={{ color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer' }}>
+                <Copy style={{ width: '16px', height: '16px' }} />
               </button>
             </div>
-            <pre className="p-4 overflow-x-auto text-sm"><code className="text-gray-300">{`{
+            <pre style={{ padding: '16px', margin: 0, overflowX: 'auto' }}><code style={{ fontSize: '14px', color: '#d1d5db' }}>{`{
   "elements": [
     {
       "id": "ABC123",
