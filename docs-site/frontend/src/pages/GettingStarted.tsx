@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 export function GettingStarted() {
   return (
     <DocsLayout>
-      <div className="prose prose-invert max-w-none">
+      <div className="prose prose-invert">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
           <Link to="/" className="hover:text-white">Docs</Link>

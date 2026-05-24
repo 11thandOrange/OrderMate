@@ -29,60 +29,63 @@ export function Sidebar({ navigation, className = '' }: SidebarProps) {
   };
 
   return (
-    <aside className={`w-64 shrink-0 ${className}`}>
-      <nav className="sticky top-20 space-y-1 pr-4">
-        {navigation.map((item) => (
-          <div key={item.href}>
-            {item.children ? (
-              <>
-                <button
-                  onClick={() => toggleExpanded(item.href)}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+    <aside className={className}>
+      {/* Scrollable navigation container */}
+      <div className="flex-1 overflow-y-auto pr-4">
+        <nav className="sticky top-20 space-y-1">
+          {navigation.map((item) => (
+            <div key={item.href}>
+              {item.children ? (
+                <>
+                  <button
+                    onClick={() => toggleExpanded(item.href)}
+                    className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      isActive(item.href)
+                        ? 'text-white bg-white/10'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <span>{item.title}</span>
+                    <ChevronRight
+                      className={`w-4 h-4 transition-transform ${
+                        expanded[item.href] ? 'rotate-90' : ''
+                      }`}
+                    />
+                  </button>
+                  {expanded[item.href] && (
+                    <div className="ml-3 mt-1 space-y-1 border-l border-white/10 pl-3">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          to={child.href}
+                          className={`block px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                            location.pathname === child.href
+                              ? 'text-brand bg-brand/10'
+                              : 'text-gray-400 hover:text-white hover:bg-white/5'
+                          }`}
+                        >
+                          {child.title}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <Link
+                  to={item.href}
+                  className={`block px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                     isActive(item.href)
                       ? 'text-white bg-white/10'
                       : 'text-gray-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <span>{item.title}</span>
-                  <ChevronRight
-                    className={`w-4 h-4 transition-transform ${
-                      expanded[item.href] ? 'rotate-90' : ''
-                    }`}
-                  />
-                </button>
-                {expanded[item.href] && (
-                  <div className="ml-3 mt-1 space-y-1 border-l border-white/10 pl-3">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.href}
-                        to={child.href}
-                        className={`block px-3 py-1.5 text-sm rounded-lg transition-colors ${
-                          location.pathname === child.href
-                            ? 'text-om-orange bg-om-orange/10'
-                            : 'text-gray-400 hover:text-white hover:bg-white/5'
-                        }`}
-                      >
-                        {child.title}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </>
-            ) : (
-              <Link
-                to={item.href}
-                className={`block px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  isActive(item.href)
-                    ? 'text-white bg-white/10'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                {item.title}
-              </Link>
-            )}
-          </div>
-        ))}
-      </nav>
+                  {item.title}
+                </Link>
+              )}
+            </div>
+          ))}
+        </nav>
+      </div>
     </aside>
   );
 }
