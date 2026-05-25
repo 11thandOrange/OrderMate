@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - OrderMate Help & Support</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --orange-accent: #FF9F43;
+            --orange-hover: #e68a2e;
+            --text-primary: #1a1a2e;
+            --text-secondary: #6c757d;
+            --text-light: rgba(255,255,255,0.95);
+            --text-muted: rgba(255,255,255,0.7);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --border-radius-lg: 24px;
+            --border-radius-md: 16px;
+            --border-radius-sm: 12px;
+            --shadow-card: 0 8px 32px rgba(0,0,0,0.1);
+            --backdrop-blur: blur(20px);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 16px 40px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: var(--backdrop-blur);
+            -webkit-backdrop-filter: var(--backdrop-blur);
+            border-bottom: 1px solid var(--glass-border);
+            transition: var(--transition);
+        }
+
+        .navbar.scrolled {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 12px 40px;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-light);
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--orange-accent);
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(255,159,67,0.4);
+            overflow: hidden;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: var(--orange-accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--text-light);
+        }
+
+        .cta-btn {
+            background: var(--orange-accent);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: var(--transition);
+            box-shadow: 0 4px 16px rgba(255,159,67,0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cta-btn:hover {
+            background: var(--orange-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255,159,67,0.5);
+        }
+
+        /* Main Content */
+        .faq-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 120px 40px 80px;
+        }
+
+        .faq-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .faq-header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .faq-header h1 span {
+            background: linear-gradient(135deg, var(--orange-accent), #ffcc80);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .faq-header p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* FAQ Categories */
+        .faq-category {
+            margin-bottom: 40px;
+        }
+
+        .faq-category-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .faq-category-title i {
+            color: var(--orange-accent);
+            font-size: 20px;
+        }
+
+        /* Accordion */
+        .accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .accordion-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            backdrop-filter: var(--backdrop-blur);
+            transition: var(--transition);
+        }
+
+        .accordion-item:hover {
+            border-color: var(--orange-accent);
+        }
+
+        .accordion-header {
+            padding: 20px 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .accordion-header:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .accordion-header i {
+            font-size: 14px;
+            transition: var(--transition);
+            color: var(--orange-accent);
+        }
+
+        .accordion-item.active .accordion-header i {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 1000px;
+        }
+
+        .accordion-body {
+            padding: 0 24px 20px;
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .accordion-body ul {
+            margin: 12px 0;
+            padding-left: 24px;
+        }
+
+        .accordion-body li {
+            margin-bottom: 8px;
+        }
+
+        .accordion-body strong {
+            color: var(--text-light);
+        }
+
+        .accordion-body code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+        }
+
+        /* Back to Home Link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 40px;
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            color: var(--text-light);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 40px;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo .logo-icon {
+            width: 36px;
+            height: 36px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--text-light);
+        }
+
+        .footer-copy {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 20px;
+            }
+
+            .nav-links {
+                gap: 16px;
+            }
+
+            .nav-links a:not(.cta-btn) {
+                display: none;
+            }
+
+            .faq-container {
+                padding: 100px 20px 60px;
+            }
+
+            .faq-header h1 {
+                font-size: 32px;
+            }
+
+            .faq-category-title {
+                font-size: 20px;
+            }
+
+            .accordion-header {
+                padding: 16px 20px;
+                font-size: 15px;
+            }
+
+            .accordion-body {
+                padding: 0 20px 16px;
+                font-size: 14px;
+            }
+
+            .footer-links {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <img src="../app/src/main/res/drawable/app_icon.png" alt="OrderMate">
+                </div>
+                <span class="logo-text">Order<span>Mate</span></span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html#features">Features</a>
+                <a href="index.html#demos">Demos</a>
+                <a href="index.html#benefits">Why OrderMate?</a>
+                <a href="faq.html">FAQ</a>
+                <a href="https://www.clover.com/appmarket/apps/WWTF1AKT87VJ8" target="_blank" class="cta-btn">
+                    Install Now!
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- FAQ Content -->
+    <div class="faq-container">
+        <div class="faq-header">
+            <h1>Frequently Asked <span>Questions</span></h1>
+            <p>Learn how to use OrderMate's features to streamline your order management and keep your team and customers in sync.</p>
+        </div>
+
+        <!-- Item Level Notes -->
+        <div class="faq-category">
+            <h2 class="faq-category-title">
+                <i class="fas fa-sticky-note"></i>
+                Item Level Notes
+            </h2>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        How do I add notes to individual items?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>To add item-level notes:</p>
+                            <ul>
+                                <li>Open an order from the order list or calendar view</li>
+                                <li>Tap on any line item in the order</li>
+                                <li>The item popup will appear with customizable widget fields</li>
+                                <li>Fill in single-select, multi-select, or text fields as needed</li>
+                                <li>Tap <strong>Save</strong> to apply the notes to that item</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        Where do item-level notes appear?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>Item-level notes appear in several places:</p>
+                            <ul>
+                                <li><strong>Order Detail Page:</strong> Notes display as colored pill badges beneath each line item</li>
+                                <li><strong>Order List:</strong> Key notes show as pill badges on order cards for quick reference</li>
+                                <li><strong>Printed Receipts:</strong> Item notes print directly under each item when receipt printing is enabled</li>
+                                <li><strong>Register Overlay:</strong> When accessed from Clover Register, item notes are visible in the order summary</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        What types of widgets can I use for item notes?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>OrderMate supports several widget types for item-level notes:</p>
+                            <ul>
+                                <li><strong>Single-Select:</strong> Choose one option from a list (e.g., Size: Small, Medium, Large)</li>
+                                <li><strong>Multi-Select:</strong> Choose multiple options (e.g., Toppings: Nuts, Sprinkles, Chocolate)</li>
+                                <li><strong>Text Box:</strong> Free-form text for special instructions or allergies</li>
+                                <li><strong>Calendar/Date Picker:</strong> Schedule dates for item-specific deadlines</li>
+                            </ul>
+                            <p>Configure these widgets in <strong>Settings → Item Widgets</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Level Notes -->
+        <div class="faq-category">
+            <h2 class="faq-category-title">
+                <i class="fas fa-clipboard-list"></i>
+                Order Level Notes
+            </h2>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        How do I add notes to an entire order?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>To add order-level notes:</p>
+                            <ul>
+                                <li>Open an order from the order list or calendar</li>
+                                <li>Look for the <strong>Order Notes</strong> section in the order detail page</li>
+                                <li>Tap on any widget field to add information</li>
+                                <li>Use the calendar picker to schedule pickup or delivery dates</li>
+                                <li>Add text notes for delivery addresses, gift messages, or special instructions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        Where do order-level notes appear?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>Order-level notes are displayed in:</p>
+                            <ul>
+                                <li><strong>Order Cards:</strong> Key notes show as pill badges in the order list for quick scanning</li>
+                                <li><strong>Order Detail Header:</strong> Full notes display at the top of the order detail page</li>
+                                <li><strong>Calendar View:</strong> Orders with scheduled dates appear on the visual calendar</li>
+                                <li><strong>Printed Receipts:</strong> Order notes print in the header or footer of receipts</li>
+                                <li><strong>Customer Notifications:</strong> Order notes can be included in SMS/email templates</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        Can I schedule orders for pickup or delivery?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>Yes! Use the calendar widget in order-level notes to schedule orders:</p>
+                            <ul>
+                                <li>Add a <strong>Date/Time</strong> widget to your order-level configuration</li>
+                                <li>Select the pickup or delivery date when editing an order</li>
+                                <li>The order will automatically appear on the calendar view</li>
+                                <li>Color-code pickup vs delivery orders in widget settings</li>
+                                <li>Schedule automatic email reminders before the due date</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="faq-category">
+            <h2 class="faq-category-title">
+                <i class="fas fa-search"></i>
+                Search & Filter
+            </h2>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        How do I search for orders?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>Use the search bar at the top of the order list to find orders quickly:</p>
+                            <ul>
+                                <li>Search by <strong>customer name</strong> or phone number</li>
+                                <li>Search by <strong>order number</strong> (e.g., #1042)</li>
+                                <li>Search by <strong>custom field values</strong> from your widgets</li>
+                                <li>Results update in real-time as you type</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        What filters are available?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>OrderMate provides powerful filtering options:</p>
+                            <ul>
+                                <li><strong>Payment Status:</strong> Open, Paid, Partially Paid, Partially Refunded, Refunded, Closed</li>
+                                <li><strong>Order Type:</strong> Filter by order types defined in Clover</li>
+                                <li><strong>Date Range:</strong> Today, This Week, This Month, or custom date range</li>
+                                <li><strong>Custom Fields:</strong> Filter by any single-select or multi-select widget values</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        How do I customize which filters appear?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>Customize your filters in Settings:</p>
+                            <ul>
+                                <li>Go to <strong>Settings → Filters</strong></li>
+                                <li>Toggle which filters appear in the filter bar</li>
+                                <li>Enable <strong>"Show in Filters"</strong> for any widget to make it filterable</li>
+                                <li>Reorder filters by drag-and-drop to prioritize the ones you use most</li>
+                                <li>Hide filters you don't need to keep the interface clean</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="faq-category">
+            <h2 class="faq-category-title">
+                <i class="fas fa-cog"></i>
+                Settings
+            </h2>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        How do I create and manage notification templates?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p><strong>Creating Templates:</strong></p>
+                            <ul>
+                                <li>Go to <strong>Settings → Templates</strong></li>
+                                <li>Tap <strong>+ New Template</strong></li>
+                                <li>Enter a template name (e.g., "Order Ready", "Reminder")</li>
+                                <li>Write your message using available data variables</li>
+                                <li>Save the template for quick reuse</li>
+                            </ul>
+                            <p><strong>Available Data Variables:</strong></p>
+                            <ul>
+                                <li><code>{customer_name}</code> - Customer's name</li>
+                                <li><code>{order_number}</code> - Order ID/number</li>
+                                <li><code>{order_total}</code> - Total amount</li>
+                                <li><code>{pickup_date}</code> - Scheduled pickup date</li>
+                                <li><code>{store_name}</code> - Your business name</li>
+                            </ul>
+                            <p><strong>Deleting Templates:</strong> Swipe left on any template and tap Delete, or tap Edit and select templates to remove.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        What are default templates?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>OrderMate comes with pre-configured default templates:</p>
+                            <ul>
+                                <li><strong>Order Ready:</strong> Notify customers their order is ready for pickup</li>
+                                <li><strong>Order Reminder:</strong> Send a reminder before the scheduled pickup/delivery</li>
+                                <li><strong>Thank You:</strong> Send a thank you message after order completion</li>
+                            </ul>
+                            <p>Default templates can be edited but not deleted. Create custom templates for your specific needs.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        How do I configure widgets?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>Configure widgets for both item-level and order-level notes:</p>
+                            <ul>
+                                <li>Go to <strong>Settings → Item Widgets</strong> or <strong>Settings → Order Widgets</strong></li>
+                                <li>Tap <strong>+ Add Widget</strong> to create a new widget</li>
+                                <li>Choose the widget type (Single-Select, Multi-Select, Text, Calendar)</li>
+                                <li>Enter a label and options (for select widgets)</li>
+                                <li>Choose colors for each option to make them visually distinct</li>
+                                <li>Toggle <strong>Required</strong> if the field must be filled</li>
+                                <li>Toggle <strong>Show in Filters</strong> to make widget values filterable</li>
+                                <li>Drag widgets to reorder them</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        How do I set up scheduled reminders and receipt printing?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p><strong>Scheduled Email Reminders:</strong></p>
+                            <ul>
+                                <li>Go to <strong>Settings → Notifications</strong></li>
+                                <li>Enable <strong>Scheduled Reminders</strong></li>
+                                <li>Set how many days/hours before the due date to send reminders</li>
+                                <li>Choose the reminder template to use</li>
+                                <li>Reminders are sent to the merchant email on file</li>
+                            </ul>
+                            <p><strong>Automatic Receipt Printing:</strong></p>
+                            <ul>
+                                <li>Go to <strong>Settings → Printing</strong></li>
+                                <li>Enable <strong>Auto-Print Before Due</strong></li>
+                                <li>Set how many minutes before the scheduled time to print</li>
+                                <li>Select which printer to use</li>
+                                <li>Receipts print automatically for upcoming orders</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Integration -->
+        <div class="faq-category">
+            <h2 class="faq-category-title">
+                <i class="fas fa-cash-register"></i>
+                Register Integration
+            </h2>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        How does the Register overlay work?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>The Register overlay provides quick access to OrderMate from Clover Register:</p>
+                            <ul>
+                                <li>A floating button appears on Clover Register</li>
+                                <li>Tap the button to open the OrderMate overlay</li>
+                                <li>Add notes and schedule orders without leaving the checkout flow</li>
+                                <li>Changes sync immediately with the main OrderMate app</li>
+                                <li>Close the overlay to return to Register</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        How do I enable the Register overlay?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>To enable the Register overlay:</p>
+                            <ul>
+                                <li>Open OrderMate and go to <strong>Settings → Register Integration</strong></li>
+                                <li>Toggle <strong>Enable Register Overlay</strong></li>
+                                <li>Grant the required overlay permission when prompted</li>
+                                <li>Open Clover Register - the OrderMate button will appear</li>
+                                <li>Drag the button to reposition it on screen if needed</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        Does OrderMate sync with Clover in real-time?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>Yes! OrderMate syncs directly with your Clover POS:</p>
+                            <ul>
+                                <li>New orders from Clover Register appear instantly in OrderMate</li>
+                                <li>Payment status updates (Paid, Refunded, etc.) sync automatically</li>
+                                <li>Customer information is pulled from Clover's customer database</li>
+                                <li>Order modifications are reflected across all devices</li>
+                                <li>No manual refresh needed - data updates in real-time</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Settings -->
+        <div class="faq-category">
+            <h2 class="faq-category-title">
+                <i class="fas fa-user-circle"></i>
+                Profile Settings
+            </h2>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        How do I customize my profile?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>Personalize your OrderMate experience:</p>
+                            <ul>
+                                <li>Go to <strong>Settings → Profile</strong></li>
+                                <li>Tap on your avatar to choose a new image or select from preset avatars</li>
+                                <li>Choose an <strong>accent color</strong> that matches your brand</li>
+                                <li>Your accent color is used for buttons, highlights, and UI elements</li>
+                                <li>Profile settings sync across all devices using the same account</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        What accent colors are available?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>OrderMate offers multiple accent color options:</p>
+                            <ul>
+                                <li><strong>Orange</strong> (default) - Warm and inviting</li>
+                                <li><strong>Purple</strong> - Professional and modern</li>
+                                <li><strong>Green</strong> - Fresh and natural</li>
+                                <li><strong>Blue</strong> - Calm and trustworthy</li>
+                                <li><strong>Red</strong> - Bold and energetic</li>
+                                <li><strong>Pink</strong> - Fun and friendly</li>
+                            </ul>
+                            <p>The accent color applies to buttons, selection highlights, calendar events, and interactive elements throughout the app.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        Do my settings sync across devices?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>Yes, your configuration syncs across all devices:</p>
+                            <ul>
+                                <li><strong>Widget configurations</strong> - Item and order widgets sync automatically</li>
+                                <li><strong>Templates</strong> - Notification templates are available on all devices</li>
+                                <li><strong>Profile settings</strong> - Avatar and accent color preferences sync</li>
+                                <li><strong>Filter preferences</strong> - Your filter configuration is saved</li>
+                            </ul>
+                            <p>Settings are stored securely and persist across app reinstalls and device changes when using the same Clover merchant account.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-logo">
+                <div class="logo-icon">
+                    <img src="../app/src/main/res/drawable/app_icon.png" alt="OrderMate">
+                </div>
+                <span class="logo-text">Order<span>Mate</span></span>
+            </div>
+            <div class="footer-links">
+                <a href="index.html#features">Features</a>
+                <a href="index.html#demos">Demos</a>
+                <a href="index.html#benefits">Why OrderMate?</a>
+                <a href="faq.html">FAQ</a>
+                <a href="mailto:support@11thandorange.com">Support</a>
+            </div>
+            <div class="footer-copy">
+                &copy; 2026 OrderMate. Built for Clover Merchants.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Accordion functionality
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const item = this.parentElement;
+                const isActive = item.classList.contains('active');
+                
+                // Close all other items in the same accordion
+                const accordion = item.parentElement;
+                accordion.querySelectorAll('.accordion-item').forEach(i => {
+                    i.classList.remove('active');
+                });
+                
+                // Toggle current item
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
