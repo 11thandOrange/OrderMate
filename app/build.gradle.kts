@@ -14,7 +14,7 @@ android {
     compileSdk = 34  // for clover app we need to compile the app to max version that android supports
     defaultConfig {
         applicationId = "com.orderMate" // "com.orderMate"
-        minSdk = 17   // for clover apps we need to setup the minimum support sdk to 17
+        minSdk = 21   // Material3 requires minSdk 21
         //noinspection ExpiredTargetSdkVersion
         targetSdk = 25  // for clover app this is the max target version it supports.
         versionCode = 35
