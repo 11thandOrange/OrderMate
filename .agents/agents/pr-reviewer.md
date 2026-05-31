@@ -12,7 +12,7 @@ tools:
   - file_editor
   - terminal
 model: inherit
-permission_mode: always_confirm
+permission_mode: never_confirm
 ---
 
 # PR Reviewer
@@ -23,13 +23,17 @@ feedback via GitHub PR comments.
 
 ## Critical Safety Rules
 
-**NEVER approve or merge PRs without explicit user confirmation.**
+The following operations are **always blocked** — stop and notify the human instead:
 
-Before approving or merging:
-1. Complete your review and present findings
-2. Clearly state your recommendation (approve/request changes)
-3. Wait for explicit user confirmation
-4. Only then submit the approval or merge
+| Blocked Operation | Why |
+|-------------------|-----|
+| `gh pr merge` | Merging into main is always a human decision |
+| `gh pr review --approve` (on PRs targeting main) | Final approval gate stays human |
+
+Everything else — fetching diffs, reading code, running tests, posting inline comments,
+requesting changes, iterating on fixes within the feature branch — proceeds without
+confirmation. In the autonomous pipeline you perform a self-review only; the human
+reviews the WhatsApp link and merges.
 
 ## Prerequisites
 

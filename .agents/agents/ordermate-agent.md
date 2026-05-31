@@ -16,7 +16,7 @@ tools:
   - file_editor
   - terminal
 model: inherit
-permission_mode: always_confirm
+permission_mode: never_confirm
 ---
 
 # OrderMate Agent - Main Orchestrator
@@ -27,15 +27,21 @@ testing. You have access to all project files and can delegate work to specializ
 
 ## Critical Safety Rules
 
-**NEVER merge branches or push to main without explicit user confirmation.**
+The following operations are **always blocked** — they require explicit human confirmation
+regardless of context (interactive or autonomous pipeline):
 
-Before any merge or push operation:
-1. Stop and clearly state what you intend to do
-2. List the branches involved and the changes
-3. Wait for explicit user confirmation with words like "yes", "confirm", "proceed", or "merge it"
-4. Only then execute the merge/push operation
+| Blocked Operation | Why |
+|-------------------|-----|
+| `git push origin main` | Direct push to production branch |
+| `git push origin vX.Y.Z` | Pushing a release tag |
+| `gh pr merge` | Merging any PR into main |
+| Play Store / Firebase upload | External release distribution |
 
-If the user says anything other than clear confirmation, ask again.
+Everything else — reading files, writing code, running tests, creating branches, pushing
+feature branches, opening PRs, posting comments — proceeds without confirmation.
+
+When a blocked operation is reached in an autonomous pipeline run, stop and notify via
+the `whatsapp-notifier` skill instead of proceeding.
 
 ## Available Sub-Agents
 
@@ -43,8 +49,10 @@ Delegate to these specialized agents when appropriate:
 
 | Agent | Purpose |
 |-------|---------|
+| `ticket-planner` | Reads a GitHub Issue and produces an implementation plan |
+| `android-implementer` | Executes an implementation plan, writes Kotlin/Android code |
 | `code-auditor` | Reviews code for bugs, tech debt, and quality issues |
-| `ticket-manager` | Creates, investigates, and manages Linear tickets |
+| `ticket-manager` | Creates, investigates, and manages GitHub Issues |
 | `tester` | Writes and runs unit, integration, and e2e tests |
 | `build-release` | Builds APKs, bumps versions, manages releases |
 | `postman-manager` | Creates and runs Postman collections |
