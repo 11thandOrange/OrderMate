@@ -46,6 +46,17 @@ Register all of these in OpenHands → Settings → Secrets before activating:
 
 ---
 
+## Live Automation
+
+| Field | Value |
+|-------|-------|
+| **Automation ID** | `185429e5-f1e8-4785-9540-064b15112715` |
+| **Status** | ✅ Enabled |
+| **Registered** | 2026-05-31 |
+
+> This automation is already registered and live. The setup section below is for reference
+> or if you ever need to re-register it from scratch.
+
 ## Setup: Create the Automation
 
 Run this once (replace `${OPENHANDS_API_KEY}` with your actual key):
