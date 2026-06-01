@@ -31,7 +31,7 @@ Before deployment:
 ## Project Structure
 
 ```
-docs-site/
+docs/
 ├── frontend/
 │   ├── src/           # Source code
 │   ├── dist/          # Built output (generated)
@@ -44,7 +44,7 @@ docs-site/
 
 ### Install Dependencies
 ```bash
-cd docs-site/frontend
+cd docs/frontend
 npm install
 ```
 
@@ -76,13 +76,13 @@ Before deploying, verify:
 ### Verification Commands
 ```bash
 # Check build output
-ls -la docs-site/frontend/dist/
+ls -la docs/frontend/dist/
 
 # Verify index.html exists
-test -f docs-site/frontend/dist/index.html && echo "✅ index.html exists"
+test -f docs/frontend/dist/index.html && echo "✅ index.html exists"
 
 # Check asset size (should be reasonable)
-du -sh docs-site/frontend/dist/
+du -sh docs/frontend/dist/
 ```
 
 ## GitHub Pages Deployment
@@ -103,7 +103,7 @@ gh workflow run deploy-docs.yml
 ### Method 2: Manual Deployment (gh-pages branch)
 
 ```bash
-cd docs-site/frontend
+cd docs/frontend
 
 # Build the site
 npm run build
@@ -117,7 +117,7 @@ npx gh-pages -d dist -m "Deploy docs site"
 ```bash
 # From repository root
 git checkout gh-pages
-cp -r docs-site/frontend/dist/* .
+cp -r docs/frontend/dist/* .
 git add .
 git commit -m "Deploy docs site"
 git push origin gh-pages
@@ -152,7 +152,7 @@ git pull origin main
 
 ### Step 2: Build
 ```bash
-cd docs-site/frontend
+cd docs/frontend
 npm ci              # Clean install
 npm run build       # Production build
 ```
@@ -187,10 +187,10 @@ If deployment fails or has issues:
 ### Option 1: Redeploy Previous Version
 ```bash
 # Find the previous good commit
-git log --oneline docs-site/frontend/
+git log --oneline docs/frontend/
 
 # Checkout that version
-git checkout <commit-hash> -- docs-site/frontend/
+git checkout <commit-hash> -- docs/frontend/
 
 # Rebuild and redeploy
 npm run build

@@ -74,7 +74,7 @@ suspend fun updateOrder(...)
 ## Generated TypeScript Schema
 
 ```typescript
-// docs-site/frontend/src/data/endpoints.ts
+// docs/frontend/src/data/endpoints.ts
 
 import { Endpoint, Parameter } from '../types/api';
 
@@ -142,7 +142,7 @@ export const ordersEndpoints: Endpoint[] = [
 #!/bin/bash
 # extract-endpoints.sh
 
-OUTPUT_FILE="docs-site/frontend/src/data/extracted-endpoints.json"
+OUTPUT_FILE="docs/frontend/src/data/extracted-endpoints.json"
 
 echo "Extracting API endpoints from Kotlin source..."
 

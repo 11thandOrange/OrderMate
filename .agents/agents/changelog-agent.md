@@ -56,7 +56,7 @@ OrderMate follows Conventional Commits:
 ```
 OrderMate/
 ├── CHANGELOG.md                    # Main changelog file
-└── docs-site/frontend/src/
+└── docs/frontend/src/
     └── pages/
         └── Changelog.tsx           # Docs site changelog page
 ```
@@ -148,7 +148,7 @@ Create formatted changelog with:
 
 ### Step 5: Update Files
 - Prepend to CHANGELOG.md
-- Update docs-site changelog page
+- Update docs/ changelog page
 
 ## Template: Changelog.tsx Page
 
@@ -200,7 +200,7 @@ export function Changelog() {
 
 ### Files Updated
 - `CHANGELOG.md`: Added [version] section
-- `docs-site/.../Changelog.tsx`: Updated
+- `docs/.../Changelog.tsx`: Updated
 
 ### Notable Changes
 - [Highlight 1]
