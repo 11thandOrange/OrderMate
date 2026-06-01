@@ -187,7 +187,7 @@ class RegisterTriggerTest {
         // Simulate rapid toggling
         var currentValue = settings.showOMButtonInRegister
         
-        repeat(10) {
+        repeat(9) { // 9 (odd) = final value is opposite of initial
             currentValue = !currentValue
             settings = settings.copy(showOMButtonInRegister = currentValue)
         }

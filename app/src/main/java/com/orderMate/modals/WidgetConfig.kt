@@ -40,7 +40,7 @@ data class WidgetConfig(
         "isEnabled" to isEnabled,
         "isRequired" to isRequired,
         "showInFilter" to showInFilter,
-        "order" to order,
+        "order" to order.toLong(),
         "level" to level.name,
         "options" to options.map { it.toMap() }
     )
