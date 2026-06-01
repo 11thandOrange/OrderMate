@@ -20,8 +20,16 @@ Issue labelled "complex-logic"
         ↓
 submit-winning-approach  opens PR from winning branch with decision doc
         ↓
-  [HUMAN reviews and merges]
+ whatsapp-notifier       ✅ PR #N is ready for your review. Link: PR_URL  [USER LEVEL]
+        ↓
+  mark-pr-ready          removes draft status, triggers smoke CI           [USER LEVEL]
 ```
+
+## Approach Plans
+
+Plans are stored as GitHub Issue comments so they persist across restarts and
+are visible before implementation starts. The approach-reviewer reads them back
+via `gh issue view --json comments`.
 
 ## Pipeline Agent Sources
 
@@ -34,22 +42,29 @@ The pipeline agents are user-level and live in `HeyItsChloe/.agents`:
 | `approach-reviewer` | `HeyItsChloe/.agents/agents/approach-reviewer.md` |
 | `submit-winning-approach` | `HeyItsChloe/.agents/skills/submit-winning-approach.md` |
 
-## OpenHands Automation Setup
+## Required Label
 
 ```bash
-OPENHANDS_HOST="https://app.all-hands.dev"
+gh label create "complex-logic" \
+  --color "e4e669" \
+  --description "Ticket requires three approaches before implementation" \
+  --repo 11thandOrange/OrderMate
+```
 
-curl -X POST "${OPENHANDS_HOST}/api/automation/v1/preset/prompt" \
+## Register the Automation
+
+```bash
+curl -X POST "https://app.all-hands.dev/api/automation/v1/preset/prompt" \
   -H "Authorization: Bearer ${OPENHANDS_API_KEY}" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "OrderMate Complex Logic Pipeline",
-    "prompt": "A GitHub Issue has been labelled complex-logic on OrderMate.\n\n1. Run approach-planner: explore Kotlin codebase, post 3 approach comments on the issue\n2. Run approach-implementer for approach 1 on branch feat/issue-N-approach-1\n3. Run approach-implementer for approach 2 on branch feat/issue-N-approach-2\n4. Run approach-implementer for approach 3 on branch feat/issue-N-approach-3\n5. Run approach-reviewer: score all 3 branches, post decision comment\n6. Run submit-winning-approach skill: open PR from winning branch\n\nReport the winning PR URL.",
+    "name": "OrderMate — Complex Logic Pipeline",
+    "prompt": "You are the complex-logic pipeline for OrderMate (https://github.com/11thandOrange/OrderMate).\n\nA GitHub Issue has been labelled complex-logic. Find it: gh issue list --repo 11thandOrange/OrderMate --label complex-logic --state open --json number,title,body --limit 1\n\nExecute each step. On unrecoverable failure post the error as an issue comment and go to STEP 8.\n\nSTEP 1 - approach-planner: Follow HeyItsChloe/.agents/agents/approach-planner.md. Read the issue, explore the Kotlin codebase (MVVM/Hilt/Coroutines patterns), post 3 approach comments on the issue. Each comment must include branch name, files to change, key design decision, complexity, and trade-offs.\n\nSTEP 2 - approach-implementer (approach 1): Follow HeyItsChloe/.agents/agents/approach-implementer.md. Implement on feat/issue-NUMBER-approach-1 using .agents/agents/implementer.md patterns. Run ./gradlew testDebugUnitTest before every commit. Post completion comment.\n\nSTEP 3 - approach-implementer (approach 2): Implement on feat/issue-NUMBER-approach-2.\n\nSTEP 4 - approach-implementer (approach 3): Implement on feat/issue-NUMBER-approach-3.\n\nSTEP 5 - approach-reviewer: Follow HeyItsChloe/.agents/agents/approach-reviewer.md. Check out all 3 branches, run tests on each, score approaches (correctness, Kotlin idiom, testability, complexity). Post decision comment naming the winner with justification.\n\nSTEP 6 - submit-winning-approach: Follow HeyItsChloe/.agents/skills/submit-winning-approach.md. Open PR from winning branch. Link to issue. Record PR number and URL.\n\nSTEP 7 - whatsapp-notifier: Follow HeyItsChloe/.agents/skills/whatsapp-notifier.md. Message: ✅ PR #NUMBER is ready for your review. Link: PR_URL\n\nSTEP 8 - mark-pr-ready: Follow HeyItsChloe/.agents/skills/mark-pr-ready.md. Remove draft status from the winning PR.",
     "trigger": {
       "type": "event",
       "source": "github",
       "on": "issues.labeled",
-      "filter": "contains(issue.labels[].name, \'complex-logic\') && glob(repository.full_name, \'11thandOrange/OrderMate\')"
+      "filter": "event.label.name == '\''complex-logic'\'' && glob(repository.full_name, '\''11thandOrange/OrderMate'\'')"
     },
     "timeout": 3600,
     "repos": [
@@ -58,11 +73,10 @@ curl -X POST "${OPENHANDS_HOST}/api/automation/v1/preset/prompt" \
   }'
 ```
 
-## Trigger Configuration
+## Verify
 
-| Setting | Value |
-|---------|-------|
-| Source | GitHub |
-| Event | `issues.labeled` |
-| Filter | `contains(issue.labels[].name, 'complex-logic') && glob(repository.full_name, '11thandOrange/OrderMate')` |
-| Timeout | 3600 seconds (1 hour) |
+```bash
+curl -s "https://app.all-hands.dev/api/automation/v1" \
+  -H "Authorization: Bearer ${OPENHANDS_API_KEY}" \
+  | python3 -c "import json,sys; [print(a['id'], a['name'], a['enabled']) for a in json.load(sys.stdin)['automations']]"
+```
