@@ -42,7 +42,7 @@ Stripe's documentation style.
 ## File Locations
 
 ```
-docs-site/frontend/src/
+docs/frontend/src/
 ├── pages/
 │   ├── Home.tsx           # Landing page
 │   ├── GettingStarted.tsx # Quick start guide

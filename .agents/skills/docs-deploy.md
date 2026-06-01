@@ -6,12 +6,12 @@ Deploy the OrderMate documentation site to GitHub Pages using GitHub Actions.
 
 ### Build Site
 ```bash
-cd docs-site/frontend && npm ci && npm run build
+cd docs/frontend && npm ci && npm run build
 ```
 
 ### Deploy via gh-pages
 ```bash
-cd docs-site/frontend && npx gh-pages -d dist
+cd docs/frontend && npx gh-pages -d dist
 ```
 
 ### Trigger GitHub Action
@@ -35,7 +35,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'docs-site/**'
+      - 'docs/**'
   workflow_dispatch:
 
 permissions:
@@ -59,14 +59,14 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: docs-site/frontend/package-lock.json
+          cache-dependency-path: docs/frontend/package-lock.json
 
       - name: Install dependencies
-        working-directory: docs-site/frontend
+        working-directory: docs/frontend
         run: npm ci
 
       - name: Build
-        working-directory: docs-site/frontend
+        working-directory: docs/frontend
         run: npm run build
 
       - name: Setup Pages
@@ -75,7 +75,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs-site/frontend/dist
+          path: docs/frontend/dist
 
   deploy:
     needs: build
@@ -91,7 +91,7 @@ jobs:
 
 ## Vite Configuration
 
-Ensure `docs-site/frontend/vite.config.ts` has:
+Ensure `docs/frontend/vite.config.ts` has:
 
 ```typescript
 import { defineConfig } from 'vite';
@@ -137,7 +137,7 @@ If GitHub Actions is not available:
 
 ```bash
 # 1. Build the site
-cd docs-site/frontend
+cd docs/frontend
 npm ci
 npm run build
 
@@ -148,7 +148,7 @@ git checkout --orphan gh-pages
 git rm -rf .
 
 # 4. Copy dist contents
-cp -r docs-site/frontend/dist/* .
+cp -r docs/frontend/dist/* .
 
 # 5. Add .nojekyll to bypass Jekyll processing
 touch .nojekyll

@@ -17,7 +17,7 @@ model: inherit
 # Docs Agent - Documentation Orchestrator
 
 You are the main orchestrating agent for the OrderMate documentation site located in
-`docs-site/`. You coordinate specialized sub-agents to maintain, update, and deploy
+`docs/`. You coordinate specialized sub-agents to maintain, update, and deploy
 the Stripe-style API documentation.
 
 ## Critical Safety Rules
@@ -33,7 +33,7 @@ Before any deployment:
 ## Documentation Site Structure
 
 ```
-docs-site/
+docs/
 ├── frontend/           # React + TypeScript + Tailwind
 │   ├── src/
 │   │   ├── components/ # UI components
@@ -64,7 +64,7 @@ When triggered by a merge to main:
 
 2. **If Kotlin code changed** → Delegate to `api-spec-generator`
    - Scan `/app/src/` for API changes
-   - Update `docs-site/frontend/src/data/endpoints.ts`
+   - Update `docs/frontend/src/data/endpoints.ts`
 
 3. **If features added** → Delegate to `docs-writer`
    - Update relevant documentation pages
@@ -83,7 +83,7 @@ When triggered by a merge to main:
 ### For Documentation Updates
 1. Delegate to `docs-writer` with the topic/feature name
 2. Review generated content
-3. Commit changes to the docs-site
+3. Commit changes to the docs/ site
 
 ### For API Documentation
 1. Delegate to `api-spec-generator` to scan Kotlin code

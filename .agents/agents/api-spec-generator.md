@@ -32,7 +32,7 @@ app/src/main/java/com/orderMate/
 
 Generate definitions for:
 ```
-docs-site/frontend/src/data/endpoints.ts
+docs/frontend/src/data/endpoints.ts
 ```
 
 ## Endpoint Definition Schema
@@ -199,7 +199,7 @@ git diff HEAD~1 --name-only | grep -E "(ApiService|Repository)\.kt"
 | POST | /v3/merchants/{mId}/orders | ApiService.kt:52 |
 
 ### Files Updated
-- `docs-site/frontend/src/data/endpoints.ts`: Added [N] endpoints
+- `docs/frontend/src/data/endpoints.ts`: Added [N] endpoints
 
 ### New Endpoints
 - `orders-list`: List Orders
