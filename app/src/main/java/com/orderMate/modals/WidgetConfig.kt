@@ -32,8 +32,9 @@ data class WidgetConfig(
         label = "",
         level = NoteLevel.ITEM
     )
-    
+
     fun toMap(): Map<String, Any?> = mapOf(
+        "id" to id,
         "type" to type.name,
         "label" to label,
         "isEnabled" to isEnabled,
@@ -41,8 +42,34 @@ data class WidgetConfig(
         "showInFilter" to showInFilter,
         "order" to order,
         "level" to level.name,
-        "options" to options.associate { it.id to it.toMap() }
+        "options" to options.map { it.toMap() }
     )
+
+    companion object {
+        @Suppress("UNCHECKED_CAST")
+        fun fromMap(map: Map<String, Any?>): WidgetConfig {
+            val rawOptions = map["options"]
+            val options: MutableList<WidgetOption> = when (rawOptions) {
+                is List<*> -> (rawOptions as List<Map<String, Any?>>)
+                    .map { WidgetOption.fromMap(it) }.toMutableList()
+                is Map<*, *> -> (rawOptions as Map<String, Map<String, Any?>>)
+                    .values.map { WidgetOption.fromMap(it) }.toMutableList()
+                else -> mutableListOf()
+            }
+            return WidgetConfig(
+                id = map["id"] as? String ?: UUID.randomUUID().toString(),
+                type = WidgetType.fromString(map["type"] as? String),
+                label = map["label"] as? String ?: "",
+                isEnabled = map["isEnabled"] as? Boolean ?: true,
+                isRequired = map["isRequired"] as? Boolean ?: false,
+                showInFilter = map["showInFilter"] as? Boolean ?: true,
+                options = options,
+                order = (map["order"] as? Long)?.toInt() ?: map["order"] as? Int ?: 0,
+                level = NoteLevel.values().firstOrNull { it.name == map["level"] as? String }
+                    ?: NoteLevel.ITEM
+            )
+        }
+    }
 }
 
 /**
@@ -60,24 +87,35 @@ data class WidgetOption(
         label = "",
         value = ""
     )
-    
+
     fun toMap(): Map<String, Any?> = mapOf(
+        "id" to id,
         "label" to label,
         "value" to value,
         "isDefault" to isDefault,
         "color" to color
     )
+
+    companion object {
+        fun fromMap(map: Map<String, Any?>): WidgetOption = WidgetOption(
+            id = map["id"] as? String ?: UUID.randomUUID().toString(),
+            label = map["label"] as? String ?: "",
+            value = map["value"] as? String ?: "",
+            isDefault = map["isDefault"] as? Boolean ?: false,
+            color = map["color"] as? String
+        )
+    }
 }
 
 /**
  * 4 widget types for pop-up editor
  */
 enum class WidgetType(val displayName: String) {
-    SINGLE_SELECT("Single Select"),
-    MULTI_SELECT("Multi Select"),
-    TEXT_BOX("Text Box"),
-    CALENDAR("Calendar");
-    
+    SINGLE_SELECT("Category"),
+    MULTI_SELECT("Tags"),
+    TEXT_BOX("Description"),
+    CALENDAR("Due Date");
+
     companion object {
         @JvmStatic
         fun fromString(value: String?): WidgetType {
