@@ -19,10 +19,13 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v3
         with:
-          cache-read-only: false
+          gradle-version: '8.5'
+
+      - name: Write local.properties
+        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
 
       - name: Run unit tests
-        run: ./gradlew testDebugUnitTest
+        run: gradle testDebugUnitTest
 
       - name: Upload test results
         if: always()
@@ -46,10 +49,13 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v3
         with:
-          cache-read-only: false
+          gradle-version: '8.5'
+
+      - name: Write local.properties
+        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
 
       - name: Assemble debug APK
-        run: ./gradlew assembleDebug
+        run: gradle assembleDebug
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
@@ -71,10 +77,13 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v3
         with:
-          cache-read-only: false
+          gradle-version: '8.5'
+
+      - name: Write local.properties
+        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
 
       - name: Run Android lint
-        run: ./gradlew lint
+        run: gradle lint
 
       - name: Upload lint report
         if: always()
@@ -100,7 +109,10 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v3
         with:
-          cache-read-only: false
+          gradle-version: '8.5'
+
+      - name: Write local.properties
+        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
 
       - name: Enable KVM (hardware acceleration)
         run: |
@@ -120,7 +132,7 @@ jobs:
           disable-animations: true
           script: |
             adb shell mkdir -p /sdcard/screenshots
-            ./gradlew connectedDebugAndroidTest
+            gradle connectedDebugAndroidTest
             adb pull /sdcard/screenshots .smoke-results/ 2>/dev/null || true
 
       - name: Upload smoke screenshots
