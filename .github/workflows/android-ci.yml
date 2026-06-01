@@ -163,6 +163,17 @@ jobs:
             const icon   = passed ? '✅' : '❌';
             const status = passed ? 'PASSED' : 'FAILED';
             const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            const { data } = await github.rest.actions.listWorkflowRunArtifacts({
+              owner:   context.repo.owner,
+              repo:    context.repo.repo,
+              run_id:  context.runId,
+            });
+            const artifact = data.artifacts.find(a => a.name === 'smoke-screenshots');
+            const artifactLine = artifact
+              ? `Download the **[smoke-screenshots](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/artifacts/${artifact.id})** artifact to view AC screenshots captured on the Android emulator (API 34 / Pixel 3a).`
+              : `Download the **smoke-screenshots** artifact from the [CI run](${runUrl}) to view AC screenshots captured on the Android emulator (API 34 / Pixel 3a).`;
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo:  context.repo.repo,
@@ -170,8 +181,7 @@ jobs:
               body: [
                 `## ${icon} Smoke Tests — ${status}`,
                 '',
-                `Download the **smoke-screenshots** artifact from the [CI run](${runUrl}) `,
-                `to view AC screenshots captured on the Android emulator (API 34 / Pixel 3a).`,
+                artifactLine,
                 '',
                 `> Instrumented tests run via Espresso on \`reactivecircus/android-emulator-runner\`.`,
               ].join('\n'),
