@@ -1,0 +1,173 @@
+name: Node.js CI
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  # ── Job 1: Unit + Integration Tests ────────────────────────────────────────
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            extensions/cart-transformer/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install web dependencies
+        run: npm install
+        working-directory: web
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: web/frontend
+
+      - name: Install extension dependencies
+        run: npm ci
+        working-directory: extensions/cart-transformer
+
+      - name: Run backend tests
+        run: npx vitest run
+        working-directory: web/backend
+
+      - name: Run frontend tests
+        run: npm test
+        working-directory: web/frontend
+
+      - name: Run extension tests
+        run: npm test
+        working-directory: extensions/cart-transformer
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-coverage
+          path: |
+            web/coverage/
+            web/frontend/coverage/
+
+  # ── Job 2: Build ───────────────────────────────────────────────────────────
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: web/frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: web/frontend
+        env:
+          CI: true
+
+  # ── Job 3: Lint ─────────────────────────────────────────────────────────────
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: web/frontend
+
+      - name: Install stylelint peer deps
+        run: npm install stylelint-scss@4 postcss-scss --no-save --legacy-peer-deps
+        working-directory: web/frontend
+
+      - name: Stylelint — Polaris CSS compliance
+        run: npx stylelint "**/*.css" --allow-empty-input
+        working-directory: web/frontend
+
+  # ── Job 4: Smoke — Playwright (non-draft only) ─────────────────────────────
+  smoke:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: web/frontend
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+        working-directory: web/frontend
+
+      - name: Start mock backend on port 3001
+        run: |
+          python3 -c "
+          import http.server, threading
+          class H(http.server.BaseHTTPRequestHandler):
+              def do_GET(self): self.send_response(200); self.send_header('Content-Type','application/json'); self.end_headers(); self.wfile.write(b'{}')
+              def do_POST(self): self.send_response(200); self.send_header('Content-Type','application/json'); self.end_headers(); self.wfile.write(b'{}')
+              def log_message(self, *a): pass
+          http.server.HTTPServer(('', 3001), H).serve_forever()
+          " &
+          sleep 1
+
+      - name: Run smoke tests
+        run: npm run smoke
+        working-directory: web/frontend
+        env:
+          CI: true
+          SHOPIFY_API_KEY: smoke-test-key
+
+      - name: Upload smoke screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-screenshots
+          path: .smoke-results/
+          if-no-files-found: warn
+
+      - name: Post PR comment
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const passed = '${{ job.status }}' === 'success';
+            const icon   = passed ? '✅' : '❌';
+            const status = passed ? 'PASSED' : 'FAILED';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.createComment({
+              owner:        context.repo.owner,
+              repo:         context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                `## ${icon} Smoke Tests — ${status}`,
+                '',
+                `Download the **smoke-screenshots** artifact from the [CI run](${runUrl}) `,
+                `to view full-page AC screenshots captured in headless Chromium.`,
+              ].join('\n'),
+            });
