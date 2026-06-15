@@ -54,6 +54,7 @@ object FirebasePaths {
     const val SCHEMA_VERSION = "schemaVersion"
     const val CREATED_AT = "createdAt"
     const val UPDATED_AT = "updatedAt"
+    const val TIER = "tier"
     
     // ==================== Path Builders ====================
     

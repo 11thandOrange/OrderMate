@@ -62,6 +62,65 @@ class FirebaseConfigManager private constructor() {
             .setValue(ServerValue.TIMESTAMP)
     }
     
+    // ==================== Merchant Tier (Whitelisting) ====================
+    
+    /**
+     * Get merchant tier from Firebase
+     * @param merchantId The merchant ID
+     * @param callback Returns the tier string (default: "FREE")
+     */
+    fun getMerchantTier(merchantId: String, callback: (String) -> Unit) {
+        db.getReference(FirebasePaths.meta(merchantId))
+            .child(FirebasePaths.TIER)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val tier = snapshot.getValue(String::class.java) ?: com.orderMate.modals.MerchantTier.DEFAULT_TIER
+                callback(tier)
+            }
+            .addOnFailureListener {
+                callback(com.orderMate.modals.MerchantTier.DEFAULT_TIER)
+            }
+    }
+    
+    /**
+     * Set merchant tier in Firebase
+     * @param merchantId The merchant ID
+     * @param tier The tier to set
+     * @param callback Returns success status
+     */
+    fun setMerchantTier(merchantId: String, tier: String, callback: (Boolean) -> Unit) {
+        val updates = mapOf<String, Any>(
+            FirebasePaths.TIER to tier,
+            FirebasePaths.UPDATED_AT to ServerValue.TIMESTAMP
+        )
+        db.getReference(FirebasePaths.meta(merchantId))
+            .updateChildren(updates)
+            .addOnSuccessListener { callback(true) }
+            .addOnFailureListener { callback(false) }
+    }
+    
+    /**
+     * Get full merchant meta including tier
+     * @param merchantId The merchant ID
+     * @param callback Returns MerchantMeta object
+     */
+    fun getMerchantMeta(merchantId: String, callback: (MerchantMeta) -> Unit) {
+        db.getReference(FirebasePaths.meta(merchantId))
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val meta = MerchantMeta(
+                    schemaVersion = snapshot.child(FirebasePaths.SCHEMA_VERSION).getValue(Int::class.java) ?: MerchantMeta.CURRENT_SCHEMA_VERSION,
+                    createdAt = snapshot.child(FirebasePaths.CREATED_AT).getValue(Long::class.java) ?: System.currentTimeMillis(),
+                    updatedAt = snapshot.child(FirebasePaths.UPDATED_AT).getValue(Long::class.java) ?: System.currentTimeMillis(),
+                    tier = snapshot.child(FirebasePaths.TIER).getValue(String::class.java) ?: com.orderMate.modals.MerchantTier.DEFAULT_TIER
+                )
+                callback(meta)
+            }
+            .addOnFailureListener {
+                callback(MerchantMeta())
+            }
+    }
+    
     // ==================== Settings ====================
     
     fun getSettings(merchantId: String, callback: (PopupSettings) -> Unit) {
