@@ -1,0 +1,36 @@
+name: OpenHands Automation Trigger
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  trigger-openhands:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger OpenHands Cloud
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: 'https://app.all-hands.dev/api/v1/app-conversations'
+          method: 'POST'
+          bearerToken: ${{ secrets.OPENHANDS_API_KEY }}
+          contentType: 'application/json'
+          data: >-
+            {
+              "initial_message": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Issue #${{ github.event.issue.number }} has been labeled with '${{ github.event.label.name }}'. Please analyze this issue and implement the required changes. Issue URL: ${{ github.event.issue.html_url }}"
+                  }
+                ]
+              },
+              "selected_repository": "${{ github.repository }}"
+            }
+        if: ${{ github.event.label.name == 'ready-to-implement' || github.event.label.name == 'complex-logic' }}
+
+      - name: Add comment to issue
+        if: ${{ github.event.label.name == 'ready-to-implement' || github.event.label.name == 'complex-logic' }}
+        run: gh issue comment "${{ github.event.issue.number }}" --body "🤖 OpenHands has been triggered to work on this issue. Check progress here: https://app.all-hands.dev"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
