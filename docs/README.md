@@ -67,10 +67,18 @@ API docs at http://localhost:8000/docs
 
 ## API Sandbox
 
-The sandbox supports two modes:
+The "Try it" panel on each endpoint page (`RequestBuilder.tsx`) calls the backend at
+`import.meta.env.VITE_DOCS_API_URL` (defaults to `http://localhost:8000`):
 
-1. **Live Mode**: Proxy requests to real Clover API (requires API key)
-2. **Mock Mode**: Returns realistic mock data for testing
+1. **Live Mode**: if an API key is entered, POSTs to `backend/app/routes/proxy.py`,
+   which forwards the request to the real Clover API with that key
+2. **Mock Mode**: with no API key, POSTs to `backend/app/routes/mock.py`, which
+   returns realistic mock data for testing
+
+If the backend isn't reachable at all (a network error - e.g. the deployed static
+GitHub Pages build, which has no backend behind it), the panel falls back to a
+canned response built from the endpoint's `exampleResponse` in `endpoints.ts`, so
+"Try it" still shows something rather than failing.
 
 ## Development
 

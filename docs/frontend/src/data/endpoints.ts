@@ -225,6 +225,52 @@ export const endpoints: Endpoint[] = [
       note: 'No onions',
     },
   },
+  {
+    id: 'update-line-item',
+    method: 'POST',
+    path: '/v3/merchants/{mId}/orders/{orderId}/line_items/{lineItemId}',
+    title: 'Update Line Item',
+    description: 'Updates the quantity, price, or note of an existing line item.',
+    category: 'Line Items',
+    parameters: [
+      { name: 'mId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the merchant' },
+      { name: 'orderId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the order' },
+      { name: 'lineItemId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the line item' },
+    ],
+    requestBody: {
+      type: 'object',
+      description: 'Line item fields to update',
+      example: {
+        quantity: 3,
+        note: 'Extra cheese',
+      },
+    },
+    responseSchema: {
+      type: 'object',
+    },
+    exampleResponse: {
+      id: 'LI004',
+      name: 'Pizza',
+      price: 1499,
+      quantity: 3,
+      note: 'Extra cheese',
+    },
+  },
+  {
+    id: 'delete-line-item',
+    method: 'DELETE',
+    path: '/v3/merchants/{mId}/orders/{orderId}/line_items/{lineItemId}',
+    title: 'Delete Line Item',
+    description: 'Removes a line item from an order.',
+    category: 'Line Items',
+    parameters: [
+      { name: 'mId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the merchant' },
+      { name: 'orderId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the order' },
+      { name: 'lineItemId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the line item' },
+    ],
+    responseSchema: {},
+    exampleResponse: {},
+  },
 
   // Customers
   {
@@ -287,6 +333,77 @@ export const endpoints: Endpoint[] = [
       orders: { href: '/v3/merchants/{mId}/customers/CUST001/orders' },
     },
   },
+  {
+    id: 'create-customer',
+    method: 'POST',
+    path: '/v3/merchants/{mId}/customers',
+    title: 'Create Customer',
+    description: 'Creates a new customer record for the merchant.',
+    category: 'Customers',
+    parameters: [
+      { name: 'mId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the merchant' },
+    ],
+    requestBody: {
+      type: 'object',
+      description: 'Customer object to create',
+      example: {
+        firstName: 'Alex',
+        lastName: 'Rivera',
+        emailAddresses: [{ emailAddress: 'alex@example.com' }],
+      },
+    },
+    responseSchema: {
+      type: 'object',
+    },
+    exampleResponse: {
+      id: 'CUST003',
+      firstName: 'Alex',
+      lastName: 'Rivera',
+      emailAddresses: [{ emailAddress: 'alex@example.com' }],
+    },
+  },
+  {
+    id: 'update-customer',
+    method: 'POST',
+    path: '/v3/merchants/{mId}/customers/{customerId}',
+    title: 'Update Customer',
+    description: 'Updates an existing customer\'s contact information.',
+    category: 'Customers',
+    parameters: [
+      { name: 'mId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the merchant' },
+      { name: 'customerId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the customer' },
+    ],
+    requestBody: {
+      type: 'object',
+      description: 'Customer fields to update',
+      example: {
+        phoneNumbers: [{ phoneNumber: '555-0199' }],
+      },
+    },
+    responseSchema: {
+      type: 'object',
+    },
+    exampleResponse: {
+      id: 'CUST001',
+      firstName: 'John',
+      lastName: 'Doe',
+      phoneNumbers: [{ phoneNumber: '555-0199' }],
+    },
+  },
+  {
+    id: 'delete-customer',
+    method: 'DELETE',
+    path: '/v3/merchants/{mId}/customers/{customerId}',
+    title: 'Delete Customer',
+    description: 'Deletes a customer record. Orders previously linked to this customer are not affected.',
+    category: 'Customers',
+    parameters: [
+      { name: 'mId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the merchant' },
+      { name: 'customerId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the customer' },
+    ],
+    responseSchema: {},
+    exampleResponse: {},
+  },
 
   // Payments
   {
@@ -320,6 +437,89 @@ export const endpoints: Endpoint[] = [
           createdTime: 1699900500000,
         },
       ],
+    },
+  },
+  {
+    id: 'get-payment',
+    method: 'GET',
+    path: '/v3/merchants/{mId}/payments/{paymentId}',
+    title: 'Get Payment',
+    description: 'Retrieves a single payment by its unique identifier.',
+    category: 'Payments',
+    parameters: [
+      { name: 'mId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the merchant' },
+      { name: 'paymentId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the payment' },
+    ],
+    responseSchema: {
+      type: 'object',
+    },
+    exampleResponse: {
+      id: 'PAY001',
+      amount: 2499,
+      result: 'SUCCESS',
+      cardTransaction: {
+        last4: '4242',
+        cardType: 'VISA',
+      },
+      createdTime: 1699900500000,
+      order: { id: 'ABC123' },
+    },
+  },
+  {
+    id: 'refund-payment',
+    method: 'POST',
+    path: '/v3/merchants/{mId}/payments/{paymentId}/refunds',
+    title: 'Refund Payment',
+    description: 'Issues a full or partial refund for a payment. Omit `amount` for a full refund.',
+    category: 'Payments',
+    parameters: [
+      { name: 'mId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the merchant' },
+      { name: 'paymentId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the payment' },
+    ],
+    requestBody: {
+      type: 'object',
+      description: 'Refund details',
+      example: {
+        amount: 500,
+        reason: 'Customer requested partial refund',
+      },
+    },
+    responseSchema: {
+      type: 'object',
+    },
+    exampleResponse: {
+      id: 'REF001',
+      payment: { id: 'PAY001' },
+      amount: 500,
+      status: 'SUCCESS',
+      createdTime: 1699903000000,
+    },
+  },
+  {
+    id: 'void-payment',
+    method: 'POST',
+    path: '/v3/merchants/{mId}/payments/{paymentId}/voids',
+    title: 'Void Payment',
+    description: 'Voids a payment before it settles. Once a payment has settled, use Refund Payment instead.',
+    category: 'Payments',
+    parameters: [
+      { name: 'mId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the merchant' },
+      { name: 'paymentId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the payment' },
+    ],
+    requestBody: {
+      type: 'object',
+      description: 'Void reason',
+      example: {
+        voidReason: 'MERCHANT_INITIATED',
+      },
+    },
+    responseSchema: {
+      type: 'object',
+    },
+    exampleResponse: {
+      id: 'PAY001',
+      result: 'VOIDED',
+      voidReason: 'MERCHANT_INITIATED',
     },
   },
 
@@ -380,7 +580,100 @@ export const endpoints: Endpoint[] = [
       secret: 'whsec_xxxxxxxxxxxxx',
     },
   },
+  {
+    id: 'update-webhook',
+    method: 'POST',
+    path: '/v3/merchants/{mId}/webhooks/{webhookId}',
+    title: 'Update Webhook',
+    description: 'Updates a webhook subscription\'s URL, subscribed events, or active state.',
+    category: 'Webhooks',
+    parameters: [
+      { name: 'mId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the merchant' },
+      { name: 'webhookId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the webhook' },
+    ],
+    requestBody: {
+      type: 'object',
+      description: 'Webhook fields to update',
+      example: {
+        events: ['ORDER_CREATED', 'ORDER_UPDATED', 'PAYMENT_PROCESSED'],
+        active: false,
+      },
+    },
+    responseSchema: {
+      type: 'object',
+    },
+    exampleResponse: {
+      id: 'WH001',
+      url: 'https://myapp.com/webhooks/clover',
+      events: ['ORDER_CREATED', 'ORDER_UPDATED', 'PAYMENT_PROCESSED'],
+      active: false,
+    },
+  },
+  {
+    id: 'delete-webhook',
+    method: 'DELETE',
+    path: '/v3/merchants/{mId}/webhooks/{webhookId}',
+    title: 'Delete Webhook',
+    description: 'Deletes a webhook subscription. Events already queued for delivery may still be sent.',
+    category: 'Webhooks',
+    parameters: [
+      { name: 'mId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the merchant' },
+      { name: 'webhookId', in: 'path', type: 'string', required: true, description: 'Unique identifier of the webhook' },
+    ],
+    responseSchema: {},
+    exampleResponse: {},
+  },
 ];
+
+/**
+ * Webhooks are signed with an HMAC-SHA256 signature so you can verify a
+ * request actually came from Clover before trusting its payload. The
+ * `secret` returned once from Create Webhook (`whsec_...`) is the HMAC key -
+ * store it securely; it is never returned again.
+ */
+export const webhookSignatureVerification = {
+  header: 'X-Clover-Signature',
+  algorithm: 'HMAC-SHA256',
+  description:
+    'Compute an HMAC-SHA256 digest of the raw request body using your webhook\'s secret as the key, hex-encode it, and compare it to the X-Clover-Signature header using a constant-time comparison. Reject the request if they don\'t match.',
+  verifyExample: `const crypto = require('crypto');
+
+function isValidSignature(rawBody, signatureHeader, secret) {
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(rawBody)
+    .digest('hex');
+
+  return crypto.timingSafeEqual(
+    Buffer.from(expected),
+    Buffer.from(signatureHeader)
+  );
+}`,
+};
+
+/**
+ * Example payloads for each event type a webhook can subscribe to.
+ */
+export const webhookEventPayloads: Record<string, object> = {
+  ORDER_CREATED: {
+    type: 'ORDER_CREATED',
+    merchantId: 'MERCH001',
+    objectId: 'ABC123',
+    ts: 1699900000000,
+  },
+  ORDER_UPDATED: {
+    type: 'ORDER_UPDATED',
+    merchantId: 'MERCH001',
+    objectId: 'ABC123',
+    ts: 1699900500000,
+  },
+  PAYMENT_PROCESSED: {
+    type: 'PAYMENT_PROCESSED',
+    merchantId: 'MERCH001',
+    objectId: 'PAY001',
+    ts: 1699900600000,
+  },
+};
 
 export const categories = [
   { id: 'orders', title: 'Orders', icon: 'ShoppingBag' },

@@ -53,3 +53,10 @@ export interface CodeLanguage {
   label: string;
   prismLanguage: string;
 }
+
+export interface ChangelogEntry {
+  date: string;
+  added: string[];
+  changed: string[];
+  fixed: string[];
+}

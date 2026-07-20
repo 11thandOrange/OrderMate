@@ -127,25 +127,66 @@ client.newCall(request).execute().use { response ->
   const handleSubmit = async () => {
     setLoading(true);
     setActiveTab('response');
-    
-    // Simulate API call with mock response
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    
-    const mockResponse: ApiResponse = {
-      status: 200,
-      statusText: 'OK',
-      headers: {
-        'content-type': 'application/json',
-        'x-request-id': 'req_' + Math.random().toString(36).substr(2, 9),
-      },
-      data: endpoint.exampleResponse,
-      time: Math.floor(Math.random() * 200) + 100,
-    };
-    
-    setResponse(mockResponse);
-    onResponse?.(mockResponse);
+
+    const liveResponse = await callDocsBackend();
+    const result = liveResponse ?? simulateResponse();
+
+    setResponse(result);
+    onResponse?.(result);
     setLoading(false);
   };
+
+  // The static GitHub Pages build has no backend behind it - callDocsBackend
+  // returns null (network error, or no VITE_DOCS_API_URL configured) and
+  // handleSubmit falls back to a canned response so "Try it" still works
+  // there. When docs/backend is actually running (local dev, or a future
+  // hosted deployment), this hits the real FastAPI mock/proxy endpoints.
+  const callDocsBackend = async (): Promise<ApiResponse | null> => {
+    const base = import.meta.env.VITE_DOCS_API_URL || 'http://localhost:8000';
+    const useProxy = apiKey.trim().length > 0;
+    const requestBody = endpoint.requestBody && body ? JSON.parse(body) : undefined;
+
+    try {
+      const res = await fetch(`${base}/api/${useProxy ? 'proxy' : 'mock'}/request`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(useProxy ? { Authorization: `Bearer ${apiKey}` } : {}),
+        },
+        body: JSON.stringify({
+          method: endpoint.method,
+          path: buildUrl(),
+          body: requestBody,
+        }),
+      });
+
+      if (!res.ok) return null;
+
+      const payload = await res.json();
+      return {
+        status: payload.status,
+        statusText: payload.status_text,
+        headers: payload.headers ?? {},
+        data: payload.data,
+        time: payload.time_ms,
+      };
+    } catch {
+      // docs/backend isn't reachable (not running locally, or blocked from
+      // the deployed static site) - caller falls back to a simulated response
+      return null;
+    }
+  };
+
+  const simulateResponse = (): ApiResponse => ({
+    status: 200,
+    statusText: 'OK',
+    headers: {
+      'content-type': 'application/json',
+      'x-request-id': 'req_' + Math.random().toString(36).substr(2, 9),
+    },
+    data: endpoint.exampleResponse,
+    time: Math.floor(Math.random() * 200) + 100,
+  });
 
   const pathParams = endpoint.parameters.filter((p) => p.in === 'path' && p.name !== 'mId');
   const queryParamsList = endpoint.parameters.filter((p) => p.in === 'query');
