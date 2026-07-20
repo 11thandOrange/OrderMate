@@ -71,6 +71,8 @@ export const apiNavigation: NavItem[] = [
     children: [
       { title: 'List Line Items', href: '/api/line-items#list-line-items' },
       { title: 'Create Line Item', href: '/api/line-items#create-line-item' },
+      { title: 'Update Line Item', href: '/api/line-items#update-line-item' },
+      { title: 'Delete Line Item', href: '/api/line-items#delete-line-item' },
     ],
   },
   {
@@ -79,6 +81,9 @@ export const apiNavigation: NavItem[] = [
     children: [
       { title: 'List Customers', href: '/api/customers#list-customers' },
       { title: 'Get Customer', href: '/api/customers#get-customer' },
+      { title: 'Create Customer', href: '/api/customers#create-customer' },
+      { title: 'Update Customer', href: '/api/customers#update-customer' },
+      { title: 'Delete Customer', href: '/api/customers#delete-customer' },
     ],
   },
   {
@@ -86,6 +91,9 @@ export const apiNavigation: NavItem[] = [
     href: '/api/payments',
     children: [
       { title: 'List Payments', href: '/api/payments#list-payments' },
+      { title: 'Get Payment', href: '/api/payments#get-payment' },
+      { title: 'Refund Payment', href: '/api/payments#refund-payment' },
+      { title: 'Void Payment', href: '/api/payments#void-payment' },
     ],
   },
   {
@@ -94,6 +102,8 @@ export const apiNavigation: NavItem[] = [
     children: [
       { title: 'List Webhooks', href: '/api/webhooks#list-webhooks' },
       { title: 'Create Webhook', href: '/api/webhooks#create-webhook' },
+      { title: 'Update Webhook', href: '/api/webhooks#update-webhook' },
+      { title: 'Delete Webhook', href: '/api/webhooks#delete-webhook' },
     ],
   },
 ];

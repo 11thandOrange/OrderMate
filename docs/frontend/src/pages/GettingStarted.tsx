@@ -47,14 +47,38 @@ export function GettingStarted() {
       {/* Installation */}
       <section style={{ marginBottom: '48px' }}>
         <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#ffffff', marginBottom: '16px' }}>Installation</h2>
-        
+        <p style={{ color: '#9ca3af', marginBottom: '24px' }}>
+          OrderMate is a native Android app built for Clover devices via Gradle, not a web app - installing it means
+          building, signing, and publishing an APK, then connecting it to a merchant's Clover account.
+        </p>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div style={{ padding: '24px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: 500, color: '#ffffff', marginBottom: '12px' }}>
-              1. Install from Clover App Market
+              1. Build and sign the release APK
             </h3>
             <p style={{ color: '#9ca3af', marginBottom: '16px' }}>
-              The easiest way to install OrderMate is through the Clover App Market.
+              Build a release APK (<code style={{ color: '#fb923c' }}>./gradlew assembleRelease</code>), then sign it
+              with V1 signing - the Clover App Market requires it, and V2/V3 signing must be explicitly disabled:
+            </p>
+            <div style={{ ...codeBlockStyle, overflow: 'hidden' }}>
+              <pre style={{ padding: '16px', margin: 0, overflowX: 'auto' }}><code style={{ fontSize: '13px', color: '#d1d5db' }}>{`apksigner sign \\
+  --ks path/to/your.keystore \\
+  --v1-signing-enabled=true \\
+  --v2-signing-enabled=false \\
+  --v3-signing-enabled=false \\
+  --v1-signer-name Cert \\
+  app/release/app-release.apk`}</code></pre>
+            </div>
+          </div>
+
+          <div style={{ padding: '24px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 500, color: '#ffffff', marginBottom: '12px' }}>
+              2. Publish to the Clover App Market
+            </h3>
+            <p style={{ color: '#9ca3af', marginBottom: '16px' }}>
+              Upload the signed APK through Clover's developer dashboard. Once listed, install it onto a merchant's
+              device the way any Clover app is installed.
             </p>
             <a
               href="https://www.clover.com/appmarket/apps/WWTF1AKT87VJ8"
@@ -62,33 +86,20 @@ export function GettingStarted() {
               rel="noopener noreferrer"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: '#f97316', color: '#ffffff', fontWeight: 500, borderRadius: '8px', textDecoration: 'none' }}
             >
-              Open Clover App Market
+              View on Clover App Market
               <ArrowRight style={{ width: '16px', height: '16px' }} />
             </a>
           </div>
 
           <div style={{ padding: '24px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: 500, color: '#ffffff', marginBottom: '12px' }}>
-              2. Grant Permissions
-            </h3>
-            <p style={{ color: '#9ca3af', marginBottom: '16px' }}>
-              OrderMate requires the following permissions to function:
-            </p>
-            <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px', listStyle: 'none', padding: 0, margin: 0, color: '#d1d5db' }}>
-              <li>• <strong>Orders</strong> - Read and write access to orders</li>
-              <li>• <strong>Customers</strong> - Read and write access to customer data</li>
-              <li>• <strong>Inventory</strong> - Read access to inventory items</li>
-              <li>• <strong>Payments</strong> - Read access to payment information</li>
-            </ul>
-          </div>
-
-          <div style={{ padding: '24px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 500, color: '#ffffff', marginBottom: '12px' }}>
-              3. Launch OrderMate
+              3. Connect the app before launching
             </h3>
             <p style={{ color: '#9ca3af', margin: 0 }}>
-              After installation, find OrderMate in your Clover app drawer and tap to launch. 
-              The app will sync with your existing orders automatically.
+              OrderMate reads orders and merchant data through Clover's on-device SDK connectors, not a remote login.
+              Those connectors return no data until the app instance is connected: in the App Market listing, open{' '}
+              <strong>Preview → Connect the app</strong> before launching OrderMate on the device for the first time.
+              Skipping this step is the most common cause of an app that installs but shows no orders.
             </p>
           </div>
         </div>
@@ -144,7 +155,15 @@ export function GettingStarted() {
       <section style={{ marginBottom: '48px' }}>
         <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#ffffff', marginBottom: '16px' }}>API Access</h2>
         <p style={{ color: '#9ca3af', marginBottom: '16px' }}>
-          To use the Clover API with OrderMate, you'll need to obtain an API token from your Clover developer account.
+          OrderMate itself doesn't authenticate with a bearer token - running on the device, it reads orders and
+          merchant info through Clover's local SDK connectors (<code style={{ color: '#fb923c' }}>OrderConnector</code>,{' '}
+          <code style={{ color: '#fb923c' }}>MerchantConnector</code>), scoped to whichever account is signed into that
+          device, once the app has been connected per step 3 above.
+        </p>
+        <p style={{ color: '#9ca3af', marginBottom: '16px' }}>
+          If you're integrating with Clover's REST API directly (as documented in{' '}
+          <Link to="/api" style={{ color: '#f97316' }}>API Reference</Link>) rather than building on OrderMate's SDK
+          connectors, that surface does use OAuth bearer tokens from your Clover developer account:
         </p>
 
         <div style={{ ...codeBlockStyle, overflow: 'hidden' }}>

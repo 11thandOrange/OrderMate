@@ -3,7 +3,11 @@ import { useEffect } from 'react';
 import { Home } from './pages/Home';
 import { GettingStarted } from './pages/GettingStarted';
 import { Features } from './pages/Features';
-import { ApiOverview, OrdersApi } from './pages/Api';
+import { ApiOverview, OrdersApi, LineItemsApi, CustomersApi, PaymentsApi, WebhooksApi } from './pages/Api';
+import { Guides } from './pages/Guides';
+import { Changelog } from './pages/Changelog';
+import { Faq } from './pages/Faq';
+import { Support } from './pages/Support';
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -39,16 +43,15 @@ function App() {
         <Route path="/features/:feature" element={<Features />} />
         <Route path="/api" element={<ApiOverview />} />
         <Route path="/api/orders" element={<OrdersApi />} />
-        {/* Placeholder routes - will be implemented similarly to OrdersApi */}
-        <Route path="/api/line-items" element={<ApiOverview />} />
-        <Route path="/api/customers" element={<ApiOverview />} />
-        <Route path="/api/payments" element={<ApiOverview />} />
-        <Route path="/api/webhooks" element={<ApiOverview />} />
-        <Route path="/guides" element={<GettingStarted />} />
-        <Route path="/guides/:guide" element={<GettingStarted />} />
-        <Route path="/changelog" element={<GettingStarted />} />
-        <Route path="/faq" element={<GettingStarted />} />
-        <Route path="/support" element={<GettingStarted />} />
+        <Route path="/api/line-items" element={<LineItemsApi />} />
+        <Route path="/api/customers" element={<CustomersApi />} />
+        <Route path="/api/payments" element={<PaymentsApi />} />
+        <Route path="/api/webhooks" element={<WebhooksApi />} />
+        <Route path="/guides" element={<Guides />} />
+        <Route path="/guides/:guide" element={<Guides />} />
+        <Route path="/changelog" element={<Changelog />} />
+        <Route path="/faq" element={<Faq />} />
+        <Route path="/support" element={<Support />} />
       </Routes>
     </BrowserRouter>
   );
