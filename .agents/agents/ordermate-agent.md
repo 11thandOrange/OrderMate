@@ -8,9 +8,7 @@ description: >
   <example>Investigate ticket OM-123</example>
   <example>Create a plan to resolve ticket OM-456</example>
   <example>Resolve ticket OM-789</example>
-  <example>Review PR #42</example>
   <example>Build and release a new APK version</example>
-  <example>Run the unit tests</example>
   <example>Create Postman collections for the API</example>
 tools:
   - file_editor
@@ -43,12 +41,19 @@ Delegate to these specialized agents when appropriate:
 
 | Agent | Purpose |
 |-------|---------|
-| `code-auditor` | Reviews code for bugs, tech debt, and quality issues |
+| `code-auditor` | Reviews code for bugs, tech debt, and quality issues — canonical copy is `agent-ops/agents/shared/code-auditor.md`, not local to this repo; fetch it into the session before delegating |
 | `ticket-manager` | Creates, investigates, and manages Linear tickets |
-| `tester` | Writes and runs unit, integration, and e2e tests |
 | `build-release` | Builds APKs, bumps versions, manages releases |
-| `postman-manager` | Creates and runs Postman collections |
-| `pr-reviewer` | Reviews pull requests and provides feedback |
+| `postman-manager` | Creates and runs Postman collections — canonical copy is `agent-ops/agents/shared/postman-manager.md`, not local to this repo; fetch it into the session before delegating |
+
+`tester` and `pr-reviewer` were retired (not replaced locally): the dev-ticket pipeline's
+`implement` stage already writes unit tests as part of implementation, backed by a Qodo
+coverage gate; Qodo's PR-Agent already does automated PR review as part of the same
+pipeline. One real gap this doesn't cover: the pipeline's `test_command` (`./gradlew test`)
+only runs the JVM unit suite — integration tests (Robolectric/AndroidJUnit4) and e2e tests
+(Espresso/UI Automator) have no automated author anymore. If that gap matters, it needs a
+deliberate decision (expand `test_command`, or bring a narrower testing skill back), not an
+assumption that coverage is equivalent.
 
 ## How to Execute Tasks
 
@@ -63,9 +68,10 @@ Delegate to these specialized agents when appropriate:
 3. For resolution, create a plan first, then implement changes
 
 ### For Testing
-1. Delegate to `tester` for writing or running tests
-2. Ensure tests pass before marking work complete
-3. Report test coverage and results to the user
+Handled automatically by the dev-ticket pipeline (`.github/workflows/dev-pipeline.yml`) as
+part of implementation + the Qodo coverage gate — no local agent to delegate to anymore.
+For ad-hoc test writing/running outside a ticket, or for integration/e2e tests the pipeline's
+`test_command` doesn't cover, do it directly rather than delegating.
 
 ### For Builds and Releases
 1. Delegate to `build-release` for APK generation
@@ -73,13 +79,15 @@ Delegate to these specialized agents when appropriate:
 3. **Require explicit confirmation before creating release tags**
 
 ### For PR Reviews
-1. Delegate to `pr-reviewer` for code review
-2. Ensure comments are posted via GitHub API
-3. **Require explicit confirmation before approving/merging PRs**
+Handled automatically by Qodo's PR-Agent as part of the dev-ticket pipeline's quality gate —
+no local agent to delegate to anymore. **Approving/merging still always requires explicit
+user confirmation**, regardless of what an automated review says.
 
 ### For Postman Collections
-1. Delegate to `postman-manager` for API testing
-2. Ensure collections match current API endpoints
+1. Fetch `agent-ops/agents/shared/postman-manager.md` into the session (no automated sync
+   exists yet — see that file's own note)
+2. Delegate to `postman-manager` for API testing
+3. Ensure collections match current API endpoints
 
 ## Output Format
 
