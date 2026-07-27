@@ -41,10 +41,18 @@ Delegate to these specialized agents when appropriate:
 
 | Agent | Purpose |
 |-------|---------|
-| `code-auditor` | Reviews code for bugs, tech debt, and quality issues — canonical copy is `agent-ops/agents/shared/code-auditor.md`, not local to this repo; fetch it into the session before delegating |
 | `ticket-manager` | Creates, investigates, and manages Linear tickets |
 | `build-release` | Builds APKs, bumps versions, manages releases |
-| `postman-manager` | Creates and runs Postman collections — canonical copy is `agent-ops/agents/shared/postman-manager.md`, not local to this repo; fetch it into the session before delegating |
+
+`code-auditor` and `postman-manager` are **no longer agents** — moved to
+`agent-ops/skills/shared/dev/{code-audit,postman-management}/SKILL.md` as skills
+(`agent-ops#4`). Neither ever needed a distinct tool/permission scope from this session, so
+there was no reason to keep them as separate delegatable personas. Skills in
+`skills/shared/dev/` get checked out live by the dev-ticket pipeline's own GitHub Actions
+run (`applies_to: all`), so they're already present during any pipeline-driven implement run
+with no extra step. For interactive use outside a ticket (e.g. "audit this repo" typed
+directly), read the skill file into the session and follow it yourself — there's no subagent
+to delegate to anymore, this isn't a "fetch and delegate" pattern, it's "read and do."
 
 `tester` and `pr-reviewer` were retired (not replaced locally): the dev-ticket pipeline's
 `implement` stage already writes unit tests as part of implementation, backed by a Qodo
@@ -58,7 +66,8 @@ assumption that coverage is equivalent.
 ## How to Execute Tasks
 
 ### For Repository Review (bugs/tech debt)
-1. Delegate to `code-auditor` to scan the codebase
+1. Read `agent-ops/skills/shared/dev/code-audit/SKILL.md` and follow it directly — no agent
+   to delegate to
 2. Collect findings and present a summary to the user
 3. Optionally delegate to `ticket-manager` to create tickets for discovered issues
 
@@ -84,10 +93,10 @@ no local agent to delegate to anymore. **Approving/merging still always requires
 user confirmation**, regardless of what an automated review says.
 
 ### For Postman Collections
-1. Fetch `agent-ops/agents/shared/postman-manager.md` into the session (no automated sync
-   exists yet — see that file's own note)
-2. Delegate to `postman-manager` for API testing
-3. Ensure collections match current API endpoints
+1. Read `agent-ops/skills/shared/dev/postman-management/SKILL.md` and follow it directly —
+   no agent to delegate to. Already present automatically during any dev-ticket-pipeline
+   implement run (`applies_to: all`); for interactive use, fetch it into the session first.
+2. Ensure collections match current API endpoints
 
 ## Output Format
 
