@@ -1,0 +1,42 @@
+name: dev-pipeline
+
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+  repository_dispatch:
+    types: [agent-trigger]
+jobs:
+  dispatch:
+    # Reusable-workflow permissions are the intersection of what this caller job
+    # grants and what dev-pipeline-reusable.yml's own jobs request — id-token: write
+    # must be granted here too, or the callee's own id-token: write (needed by
+    # anthropics/claude-code-action@v1's OIDC request) has no effect.
+    permissions:
+      contents: read
+      packages: read
+      id-token: write
+    uses: HeyItsChloe/pipeline-orchestrator/.github/workflows/dev-pipeline-reusable.yml@main
+    with:
+      skills_repo_owner: 11thandOrange
+      skills_repo_name: agent-ops
+      skills_repo_branch: main
+      project_language: kotlin
+      test_command: "./gradlew test"
+      coverage_type: jacoco
+      desired_coverage: 40
+      reviewer: heyitschloe
+      action: >-
+        ${{
+          (github.event.label.name == 'approach-ready' && 'plan') ||
+          (github.event.label.name == 'approved' && 'implement') ||
+          (contains(github.event.comment.body, '@dev-agent plan') && 'plan') ||
+          (contains(github.event.comment.body, '@dev-agent implement') && 'implement') ||
+          github.event.client_payload.action
+        }}
+    secrets:
+      LITELLM_PROXY_URL: ${{ secrets.LITELLM_PROXY_URL }}
+      LITELLM_VIRTUAL_KEY: ${{ secrets.LITELLM_VIRTUAL_KEY }}
+      GH_APP_ID: ${{ secrets.GH_APP_ID }}
+      GH_APP_PRIVATE_KEY: ${{ secrets.GH_APP_PRIVATE_KEY }}
