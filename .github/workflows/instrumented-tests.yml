@@ -1,0 +1,32 @@
+# Thin caller for the shared e2e pipeline (BusyBuddy_v2#285 Phase 6).
+#
+# NOTE: app/src/androidTest currently has exactly one file — the default
+# Android Studio boilerplate (ExampleInstrumentedTest.kt, asserts the
+# package name). This workflow provides the harness; it doesn't create
+# test coverage that doesn't exist yet. Writing real Espresso/Robolectric
+# tests for actual app flows is separate follow-up work.
+
+name: Instrumented Tests (Espresso/Robolectric)
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      record_video:
+        description: 'Capture screen recording of the emulator during the test run'
+        type: boolean
+        default: false
+
+jobs:
+  espresso:
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: 11thandOrange/agent-ops/.github/workflows/e2e-pipeline-reusable.yml@main
+    with:
+      working_directory: app
+      test_command: "./gradlew connectedDebugAndroidTest"
+      needs_emulator: true
+      emulator_api_level: 30
+      record_video: ${{ inputs.record_video || false }}
