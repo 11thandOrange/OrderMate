@@ -426,8 +426,15 @@ class CalendarFragment : Fragment() {
             }
 
             runOnMainThread {
+                // runOnBackgroundThread/runOnMainThread aren't tied to the fragment's view
+                // lifecycle, so this block can still run after the fragment has been
+                // navigated away from and detached - updateViewModeButtonVisuals() calls
+                // requireContext() and crashed the process in that case (confirmed via a
+                // real emulator CI run). Same guard applyFiltersSync() already uses below.
+                if (!isAdded || view == null) return@runOnMainThread
+
                 ordersLoaded = true
-                
+
                 // Restore selected date from shared state FIRST
                 sharedFilterViewModel.selectedDate.value?.let { date ->
                     currentDate.time = date
