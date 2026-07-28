@@ -14,6 +14,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.orderMate.R
+import org.hamcrest.Matchers.allOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -104,6 +105,11 @@ class MainActivityNavigationTest {
         // doesn't crash the activity and the nav host content area is still present.
         onView(withId(R.id.navProfile)).perform(click())
 
-        onView(withId(R.id.nav_host_fragment)).check(matches(isDisplayed()))
+        // withId(R.id.nav_host_fragment) alone threw AmbiguousViewMatcherException on a real
+        // emulator run - two FragmentContainerView instances matched the id (a real one and
+        // an inert leftover). isDisplayed() narrows the *search* itself to the actual
+        // currently-shown one, not just the check afterward - the standard Espresso pattern
+        // for disambiguating a genuinely-displayed view from a stale/invisible match.
+        onView(allOf(withId(R.id.nav_host_fragment), isDisplayed())).check(matches(isDisplayed()))
     }
 }
