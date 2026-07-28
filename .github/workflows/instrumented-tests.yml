@@ -25,7 +25,10 @@ jobs:
     uses: 11thandOrange/agent-ops/.github/workflows/e2e-pipeline-reusable.yml@main
     with:
       working_directory: app
-      test_command: "./gradlew connectedDebugAndroidTest"
+      # gradlew lives at the repo root, one level above working_directory -
+      # confirmed on a real CI run that "./gradlew" 404s here since the
+      # shell's cwd is app/, not the repo root.
+      test_command: "../gradlew connectedDebugAndroidTest"
       needs_emulator: true
       emulator_api_level: 30
       record_video: ${{ inputs.record_video || false }}
