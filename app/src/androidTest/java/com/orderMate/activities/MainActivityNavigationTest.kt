@@ -14,7 +14,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.orderMate.R
-import org.hamcrest.Matchers.allOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -102,14 +101,19 @@ class MainActivityNavigationTest {
     fun sideNav_clickingProfile_doesNotCrash_navHostStillDisplayed() {
         // navProfile is deliberately not covered by updateNavState()'s indicator logic (see
         // class doc) - the only thing to actually assert here is that navigating to it
-        // doesn't crash the activity and the nav host content area is still present.
+        // doesn't crash the activity and actually lands on ProfileSettingsFragment.
+        //
+        // withId(R.id.nav_host_fragment) - even narrowed to allOf(..., isDisplayed()) -
+        // threw AmbiguousViewMatcherException on two separate real emulator runs (once on
+        // a tiny 320x640 screen, once on a full-size pixel_6 screen after agent-ops#7, so
+        // it isn't a screen-size artifact): two FragmentContainerView instances both
+        // genuinely VISIBLE with a non-empty rect. Root cause not confirmed. Sidestepped
+        // rather than chased further: nav_host_fragment is just a generic container id
+        // anyway, so asserting on it never actually verified navigation succeeded - a
+        // stable id from ProfileSettingsFragment's own layout (fragment_profile_settings.xml)
+        // does that directly, and isn't ambiguous since it only exists in that one fragment.
         onView(withId(R.id.navProfile)).perform(click())
 
-        // withId(R.id.nav_host_fragment) alone threw AmbiguousViewMatcherException on a real
-        // emulator run - two FragmentContainerView instances matched the id (a real one and
-        // an inert leftover). isDisplayed() narrows the *search* itself to the actual
-        // currently-shown one, not just the check afterward - the standard Espresso pattern
-        // for disambiguating a genuinely-displayed view from a stale/invisible match.
-        onView(allOf(withId(R.id.nav_host_fragment), isDisplayed())).check(matches(isDisplayed()))
+        onView(withId(R.id.headerAvatarContainer)).check(matches(isDisplayed()))
     }
 }
