@@ -257,10 +257,16 @@ class MainActivity : AppCompatActivity() {
                 navController.navigate(R.id.settingsFragment)
             }
             R.id.navProfile -> {
-                navController.navigate(R.id.profileSettingsFragment)
+                Log.e("NavDebug", "onNavItemClicked: about to navigate to profileSettingsFragment, currentDestination=${navController.currentDestination?.id}")
+                try {
+                    navController.navigate(R.id.profileSettingsFragment)
+                    Log.e("NavDebug", "onNavItemClicked: navigate() returned, currentDestination=${navController.currentDestination?.id}")
+                } catch (e: Throwable) {
+                    Log.e("NavDebug", "onNavItemClicked: navigate() threw", e)
+                }
             }
         }
-        
+
         updateNavState(itemId)
     }
     

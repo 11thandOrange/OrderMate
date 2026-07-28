@@ -62,16 +62,25 @@ class ProfileSettingsFragment : Fragment() {
         "objects" to listOf("⌚","📱","💻","⌨️","🖥️","🖨️","🖱️","💽","💾","💿","📀","📷","📸","📹","🎥","📞","☎️","📺","📻","🎙️","🎚️","🎛️","⏱️","⏲️","⏰","🕰️","⌛","⏳","📡","🔋","🔌","💡","🔦","🕯️","💸","💵","💴","💶","💷","💰","💳","💎","⚖️","🧰","🔧","🔨","🛠️","⚙️","🔩","🧱","🔫","💣","🔪","🗡️","⚔️","🛡️","🔮","📿","🧿","💈","⚗️","🔭","🔬","💊","💉")
     )
 
+    init {
+        android.util.Log.e("NavDebug", "ProfileSettingsFragment: constructed")
+    }
+
     // Image picker launcher
-    private val imagePickerLauncher = registerForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            settingsManager.setCustomAvatarUri(it)
-            updateAvatarDisplay()
-            onAvatarChangedListener?.invoke(null, it)
-            showToast("Avatar updated!")
-        }
+    private val imagePickerLauncher = try {
+        registerForActivityResult(
+            ActivityResultContracts.GetContent()
+        ) { uri: Uri? ->
+            uri?.let {
+                settingsManager.setCustomAvatarUri(it)
+                updateAvatarDisplay()
+                onAvatarChangedListener?.invoke(null, it)
+                showToast("Avatar updated!")
+            }
+        }.also { android.util.Log.e("NavDebug", "ProfileSettingsFragment: registerForActivityResult succeeded") }
+    } catch (e: Throwable) {
+        android.util.Log.e("NavDebug", "ProfileSettingsFragment: registerForActivityResult threw", e)
+        throw e
     }
 
     override fun onCreateView(
@@ -79,13 +88,16 @@ class ProfileSettingsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        android.util.Log.e("NavDebug", "ProfileSettingsFragment.onCreateView: entered")
         _binding = FragmentProfileSettingsBinding.inflate(inflater, container, false)
+        android.util.Log.e("NavDebug", "ProfileSettingsFragment.onCreateView: binding inflated")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        android.util.Log.e("NavDebug", "ProfileSettingsFragment.onViewCreated: entered")
         super.onViewCreated(view, savedInstanceState)
-        
+
         settingsManager = ProfileSettingsManager.getInstance(requireContext())
         firebaseManager = FirebaseConfigManager.getInstance()
         
