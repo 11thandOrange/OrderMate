@@ -1,3 +1,6 @@
+import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+import org.gradle.testing.jacoco.tasks.JacocoReport
+
 plugins {
     id("com.android.application")  // describe the this is an android application
     id("org.jetbrains.kotlin.android")
@@ -5,6 +8,7 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")  // plugin for the navigation
     id("com.google.gms.google-services")  // firebase
     id("com.google.firebase.crashlytics")   // crashlytics
+    id("jacoco")  // dev-ticket pipeline's coverage_type: jacoco gate (dev-pipeline.yml, desired_coverage: 40)
 }
 
 android {
@@ -132,4 +136,46 @@ dependencies {
     
     // WorkManager for scheduled notifications and printing (#83 requirement)
     implementation("androidx.work:work-runtime-ktx:2.7.1")
+}
+
+// Wires up the dev-ticket pipeline's coverage gate (dev-pipeline.yml:
+// coverage_type: jacoco, desired_coverage: 40, test_command: "./gradlew test").
+// Without this, `./gradlew test` produced no coverage report file at all - the
+// gate had nothing to read. jacocoTestReport is bound to the `test` lifecycle
+// task via finalizedBy so the existing test_command keeps working unchanged.
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+tasks.withType<Test> {
+    configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val fileFilter = listOf(
+        "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
+        "**/*Test*.*", "android/**/*.*"
+    )
+    val debugTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+    val mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(fileTree(project.buildDir) { include("**/*.exec", "**/*.ec") })
+}
+
+tasks.named("test") {
+    finalizedBy("jacocoTestReport")
 }
