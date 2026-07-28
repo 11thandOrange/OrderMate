@@ -346,7 +346,13 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                debugSnackBar(getString(R.string.there_is_issue_with_your_account))
+                // runOnBackgroundThread isn't tied to the fragment's lifecycle, so this
+                // catch block can still run after the fragment has been navigated away
+                // from and detached - getString() requires a context and crashes the
+                // process in that case (confirmed via a real emulator CI run).
+                if (isAdded) {
+                    debugSnackBar(getString(R.string.there_is_issue_with_your_account))
+                }
             }
 
             runOnMainThread {
