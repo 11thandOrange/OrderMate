@@ -237,14 +237,21 @@ class MainActivity : AppCompatActivity() {
         navList?.setOnClickListener { onNavItemClicked(R.id.navList) }
         navCalendar?.setOnClickListener { onNavItemClicked(R.id.navCalendar) }
         navSettings?.setOnClickListener { onNavItemClicked(R.id.navSettings) }
-        navProfile?.setOnClickListener { onNavItemClicked(R.id.navProfile) }
+        navProfile?.setOnClickListener {
+            Log.e("NavDebug", "navProfile click listener lambda fired")
+            onNavItemClicked(R.id.navProfile)
+        }
         
         // Set initial state
         updateNavState(R.id.navList)
     }
     
     private fun onNavItemClicked(itemId: Int) {
-        if (currentNavItem == itemId) return
+        Log.e("NavDebug", "onNavItemClicked: entered with itemId=$itemId (navProfile=${R.id.navProfile}), currentNavItem=$currentNavItem")
+        if (currentNavItem == itemId) {
+            Log.e("NavDebug", "onNavItemClicked: early-return, currentNavItem == itemId")
+            return
+        }
         
         when (itemId) {
             R.id.navList -> {
