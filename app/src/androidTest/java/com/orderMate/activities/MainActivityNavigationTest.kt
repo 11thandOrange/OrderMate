@@ -1,9 +1,15 @@
 package com.orderMate.activities
 
+import android.view.InputDevice
+import android.view.MotionEvent
 import android.view.View
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.NoMatchingRootException
 import androidx.test.espresso.NoMatchingViewException
+import androidx.test.espresso.action.GeneralClickAction
+import androidx.test.espresso.action.GeneralLocation
+import androidx.test.espresso.action.Press
+import androidx.test.espresso.action.Tap
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isDialog
@@ -18,7 +24,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.orderMate.R
 import org.hamcrest.Matcher
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -101,50 +106,50 @@ class MainActivityNavigationTest {
         onView(withId(R.id.navSettingsIndicator)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
     }
 
-    @Ignore(
-        "Espresso's click() reports success but never actually delivers a touch event to " +
-        "navProfile in CI. Confirmed with a raw View.OnTouchListener logging every " +
-        "MotionEvent (down/up/cancel) directly on navProfile, independent of click " +
-        "detection: zero events logged across multiple real CI runs, while the identical " +
-        "click-handling code fires correctly for navCalendar/navSettings in this same test " +
-        "class (their own touch/click logs appear normally). Manually verified on a real " +
-        "device/emulator that tapping the profile avatar navigates to ProfileSettingsFragment " +
-        "correctly every time - this is a real, working feature, not a product bug. Ruled out " +
-        "as candidate root causes: the navigation code itself (identical for all four side-nav " +
-        "buttons, three of which pass), touch target size (was 40dp vs the others' 48dp, " +
-        "matched to 48dp with no change in behavior), an intercepting ancestor view (no " +
-        "ScrollView/DrawerLayout/gesture-consuming container in activity_main_redesign.xml), " +
-        "and a fragment-lifecycle crash that was intermittently interrupting these runs " +
-        "(separately fixed - see OrderListRedesignFragment's loadOrders() guard). Left " +
-        "unskipped: sideNav_allFourItemsAreDisplayedOnLaunch still verifies navProfile is " +
-        "displayed and clickable at the view-hierarchy level, which is the part that's " +
-        "actually testable from CI without emulator-input-injection reliability."
-    )
     @Test
     fun sideNav_clickingProfile_doesNotCrash_navHostStillDisplayed() {
-        onView(withId(R.id.navProfile)).perform(click())
-
-        waitForView(withId(R.id.headerAvatarContainer))
+        // A single click() reported success but never actually delivered a MotionEvent to
+        // navProfile on real CI runs (confirmed with a raw OnTouchListener logging every
+        // event on the view - zero fired), while the same navigation is verified working on
+        // a real device. That points at Espresso's default tap (Press.FINGER, a simulated
+        // fingertip contact area) occasionally failing to register on this specific button
+        // without throwing. clickUntilNavigated re-issues the tap itself - not just the
+        // check - using Press.PINPOINT (an exact single point, no simulated finger-size
+        // jitter) and retries the whole click+verify cycle if the first tap doesn't land.
+        clickUntilNavigated(withId(R.id.navProfile), withId(R.id.headerAvatarContainer))
     }
 
     /**
-     * Retries [matcher] until it matches a displayed view or [timeoutMs] elapses, sleeping
-     * [intervalMs] between attempts. See sideNav_clickingProfile_doesNotCrash_navHostStillDisplayed
-     * for why a single idle-then-check isn't enough here.
+     * Re-issues [clickTarget]'s tap (not just the follow-up check) until [verifyMatcher] is
+     * displayed or [timeoutMs] elapses. See sideNav_clickingProfile_doesNotCrash_navHostStillDisplayed
+     * for why retrying only the check isn't enough here - the tap itself can fail to land.
      */
-    private fun waitForView(matcher: Matcher<View>, timeoutMs: Long = 5000, intervalMs: Long = 250) {
+    private fun clickUntilNavigated(
+        clickTarget: Matcher<View>,
+        verifyMatcher: Matcher<View>,
+        timeoutMs: Long = 10000,
+        intervalMs: Long = 400
+    ) {
+        val pinpointClick = GeneralClickAction(
+            Tap.SINGLE,
+            GeneralLocation.CENTER,
+            Press.PINPOINT,
+            InputDevice.SOURCE_UNKNOWN,
+            MotionEvent.BUTTON_PRIMARY
+        )
         val deadline = System.currentTimeMillis() + timeoutMs
         var lastError: Throwable? = null
         do {
             try {
-                onView(matcher).check(matches(isDisplayed()))
+                InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+                onView(clickTarget).perform(pinpointClick)
+                onView(verifyMatcher).check(matches(isDisplayed()))
                 return
             } catch (e: NoMatchingViewException) {
                 lastError = e
             } catch (e: AssertionError) {
                 lastError = e
             }
-            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
             Thread.sleep(intervalMs)
         } while (System.currentTimeMillis() < deadline)
         throw lastError!!
