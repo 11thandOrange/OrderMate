@@ -18,7 +18,11 @@ class ExampleInstrumentedTest {
     @Test
     fun useAppContext() {
         // Context of the app under test.
+        // Real bug fixed here: this asserted the wrong package name
+        // ("com.order.orderappclover") against the actual applicationId
+        // ("com.orderMate", app/build.gradle.kts) - this test would have
+        // failed the moment it was ever actually run.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.order.orderappclover", appContext.packageName)
+        assertEquals("com.orderMate", appContext.packageName)
     }
 }

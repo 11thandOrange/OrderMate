@@ -1,0 +1,20 @@
+# Critical-flow manifest for e2e-pipeline-reusable.yml's coverage_manifest_path check
+# (agent-ops's check-flow-coverage.mjs, BusyBuddy_v2#285 Phase 6).
+#
+# Convention: each flow string must be a literal substring (case-insensitive) of a
+# PASSING JUnit testcase name from connectedDebugAndroidTest's report (Espresso test
+# method names, e.g. sideNav_allFourItemsAreDisplayedOnLaunch). If a test method is
+# renamed, update the matching flow here too - the check has no other way to know the
+# flow still has coverage.
+
+flows:
+  # MainActivityNavigationTest.kt - side-nav flow
+  - sideNav_allFourItemsAreDisplayed
+  - sideNav_listIsTheActiveItem
+  - clickingCalendar_activatesCalendarIndicator
+  - clickingSettings_activatesSettingsIndicator
+  - clickingProfile_doesNotCrash
+
+  # OrderListFlowTest.kt - default order list destination
+  - isTheDefaultDestination_headerControlsAreDisplayed
+  - clickingFilterButton_opensFilterDialog

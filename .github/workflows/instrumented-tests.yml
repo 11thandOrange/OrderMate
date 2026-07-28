@@ -1,10 +1,9 @@
 # Thin caller for the shared e2e pipeline (BusyBuddy_v2#285 Phase 6).
 #
-# NOTE: app/src/androidTest currently has exactly one file — the default
-# Android Studio boilerplate (ExampleInstrumentedTest.kt, asserts the
-# package name). This workflow provides the harness; it doesn't create
-# test coverage that doesn't exist yet. Writing real Espresso/Robolectric
-# tests for actual app flows is separate follow-up work.
+# app/src/androidTest has real Espresso coverage (MainActivityNavigationTest.kt,
+# OrderListFlowTest.kt) for the side-nav and default order-list flows, tracked
+# against app/e2e-coverage.yaml via coverage_manifest_path below. Not yet
+# covered: checkout, settings, calendar flows - separate follow-up work.
 
 name: Instrumented Tests (Espresso/Robolectric)
 
@@ -26,7 +25,11 @@ jobs:
     uses: 11thandOrange/agent-ops/.github/workflows/e2e-pipeline-reusable.yml@main
     with:
       working_directory: app
-      test_command: "./gradlew connectedDebugAndroidTest"
+      # gradlew lives at the repo root, one level above working_directory -
+      # confirmed on a real CI run that "./gradlew" 404s here since the
+      # shell's cwd is app/, not the repo root.
+      test_command: "../gradlew connectedDebugAndroidTest"
       needs_emulator: true
       emulator_api_level: 30
       record_video: ${{ inputs.record_video || false }}
+      coverage_manifest_path: e2e-coverage.yaml
