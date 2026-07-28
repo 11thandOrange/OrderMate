@@ -928,6 +928,13 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun updateFilterOptions() {
+        // Called from loadOrders()'s CoroutineScope(Dispatchers.Default).launch, which
+        // isn't tied to the fragment's lifecycle - loadNotesFiltersV2() below calls
+        // getString()/requireContext() and crashed the process after the fragment was
+        // navigated away from and detached (confirmed via a real emulator CI run). Same
+        // guard applyFiltersSync() already uses.
+        if (!isAdded || view == null) return
+
         orderPaymentStatusType.clear()
         orderPaymentStatusType.add(Constants.all_orders)
         
