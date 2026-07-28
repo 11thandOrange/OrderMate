@@ -1,5 +1,6 @@
 package com.orderMate.activities
 
+import android.view.View
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.NoMatchingRootException
 import androidx.test.espresso.NoMatchingViewException
@@ -15,6 +16,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.orderMate.R
+import org.hamcrest.Matcher
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -115,14 +117,36 @@ class MainActivityNavigationTest {
         // does that directly, and isn't ambiguous since it only exists in that one fragment.
         onView(withId(R.id.navProfile)).perform(click())
 
-        // NoMatchingViewException on headerAvatarContainer on a real CI run right after
-        // switching to this assertion (#110): navController.navigate() commits the
-        // FragmentTransaction via a posted Runnable, which Espresso's default UI-thread-idle
-        // wait doesn't always catch before the next onView() runs. waitForIdleSync() blocks
-        // until the main thread (including posted messages) is actually idle, which the
-        // plain click()-then-onView() sequence doesn't guarantee here.
-        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        // NoMatchingViewException on headerAvatarContainer on two separate real CI runs after
+        // switching to this assertion (#110), even after adding a single
+        // waitForIdleSync() call (#111) - that made no measurable difference (same exception,
+        // same ~23s timing), which rules out a plain main-thread-idle-detection gap and points
+        // to the FragmentTransaction genuinely still being in flight (cold CI emulator) when
+        // the single check ran. Polling briefly is the standard defense for that: retry the
+        // assertion instead of trusting one idle-then-check snapshot.
+        waitForView(withId(R.id.headerAvatarContainer))
+    }
 
-        onView(withId(R.id.headerAvatarContainer)).check(matches(isDisplayed()))
+    /**
+     * Retries [matcher] until it matches a displayed view or [timeoutMs] elapses, sleeping
+     * [intervalMs] between attempts. See sideNav_clickingProfile_doesNotCrash_navHostStillDisplayed
+     * for why a single idle-then-check isn't enough here.
+     */
+    private fun waitForView(matcher: Matcher<View>, timeoutMs: Long = 5000, intervalMs: Long = 250) {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        var lastError: Throwable? = null
+        do {
+            try {
+                onView(matcher).check(matches(isDisplayed()))
+                return
+            } catch (e: NoMatchingViewException) {
+                lastError = e
+            } catch (e: AssertionError) {
+                lastError = e
+            }
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+            Thread.sleep(intervalMs)
+        } while (System.currentTimeMillis() < deadline)
+        throw lastError!!
     }
 }
