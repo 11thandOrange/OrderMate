@@ -13,6 +13,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.orderMate.R
 import org.junit.Before
 import org.junit.Rule
@@ -113,6 +114,14 @@ class MainActivityNavigationTest {
         // stable id from ProfileSettingsFragment's own layout (fragment_profile_settings.xml)
         // does that directly, and isn't ambiguous since it only exists in that one fragment.
         onView(withId(R.id.navProfile)).perform(click())
+
+        // NoMatchingViewException on headerAvatarContainer on a real CI run right after
+        // switching to this assertion (#110): navController.navigate() commits the
+        // FragmentTransaction via a posted Runnable, which Espresso's default UI-thread-idle
+        // wait doesn't always catch before the next onView() runs. waitForIdleSync() blocks
+        // until the main thread (including posted messages) is actually idle, which the
+        // plain click()-then-onView() sequence doesn't guarantee here.
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
 
         onView(withId(R.id.headerAvatarContainer)).check(matches(isDisplayed()))
     }
