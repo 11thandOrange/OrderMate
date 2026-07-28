@@ -356,8 +356,10 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             }
 
             runOnMainThread {
+                if (!isAdded || view == null) return@runOnMainThread
+
                 showLoading(false)
-                
+
                 // Apply any pending shared state after orders are loaded
                 val sharedState = sharedFilterViewModel.filterState.value
                 if (sharedState != null && sharedState.hasActiveFilters()) {
