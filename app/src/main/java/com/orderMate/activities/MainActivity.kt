@@ -238,7 +238,11 @@ class MainActivity : AppCompatActivity() {
         navCalendar?.setOnClickListener { onNavItemClicked(R.id.navCalendar) }
         navSettings?.setOnClickListener { onNavItemClicked(R.id.navSettings) }
         navProfile?.setOnClickListener { onNavItemClicked(R.id.navProfile) }
-        
+        navProfile?.setOnTouchListener { v, event ->
+            Log.e("NavDebug", "navProfile raw touch: action=${event.actionMasked} x=${event.x} y=${event.y} rawX=${event.rawX} rawY=${event.rawY} viewW=${v.width} viewH=${v.height}")
+            false
+        }
+
         // Set initial state
         updateNavState(R.id.navList)
     }
