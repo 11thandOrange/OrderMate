@@ -137,17 +137,17 @@
         <!-- Profile Avatar at bottom (shows emoji when selected) -->
         <FrameLayout
             android:id="@+id/navProfile"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="@drawable/bg_nav_profile"
             android:clickable="true"
             android:focusable="true">
-            
+
             <!-- Default user icon (hidden when emoji is set) -->
             <ImageView
                 android:id="@+id/navProfileIcon"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_nav_user"
                 app:tint="@color/white"/>
