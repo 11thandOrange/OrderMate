@@ -442,6 +442,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             }
 
             runOnMainThread {
+                if (!isAdded || view == null) return@runOnMainThread
+
                 updateResultsInfo()
                 notifyAdapter()
                 updateEmptyState()
@@ -534,6 +536,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             }
 
             runOnMainThread {
+                if (!isAdded || view == null) return@runOnMainThread
+
                 updateResultsInfo()
                 notifyAdapter()
                 updateEmptyState()
@@ -582,6 +586,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             }
 
             runOnMainThread {
+                if (!isAdded || view == null) return@runOnMainThread
+
                 updateResultsInfo()
                 notifyAdapter()
                 updateEmptyState()
@@ -669,6 +675,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             android.util.Log.d("FILTER_DEBUG", "=== applyDialogFilters END ===")
 
             runOnMainThread {
+                if (!isAdded || view == null) return@runOnMainThread
+
                 updateResultsInfo()
                 notifyAdapter()
                 updateEmptyState()
@@ -1012,6 +1020,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             }
 
             runOnMainThread {
+                if (!isAdded || view == null) return@runOnMainThread
+
                 updateResultsInfo()
                 notifyAdapter()
                 updateEmptyState()

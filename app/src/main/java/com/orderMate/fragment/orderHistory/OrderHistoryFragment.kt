@@ -646,6 +646,7 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
             }
             CoroutineScope(Dispatchers.Default).launch {
                 runOnMainThread {
+                    if (!isAdded || view == null) return@runOnMainThread
                     if(!isFromOrderDetail){
                         binding.progressLayoutNoData.hideView()
                     }
@@ -704,6 +705,7 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
                 }
             }
         runOnMainThread {
+            if (!isAdded || view == null) return@runOnMainThread
             setupSpinners(
                 binding.recyclerHeader.orderBookingTypeSpinner,
                 orderBookingType?.toMutableList() ?: emptyList()

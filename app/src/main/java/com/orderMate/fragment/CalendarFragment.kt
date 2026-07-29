@@ -648,6 +648,7 @@ class CalendarFragment : Fragment() {
             filteredEvents = convertOrdersToEvents(filteredOrders)
 
             runOnMainThread {
+                if (!isAdded || view == null) return@runOnMainThread
                 renderCalendar()
             }
         }
@@ -740,6 +741,7 @@ class CalendarFragment : Fragment() {
             filteredEvents = convertOrdersToEvents(filteredOrders)
 
             runOnMainThread {
+                if (!isAdded || view == null) return@runOnMainThread
                 renderCalendar()
             }
         }
