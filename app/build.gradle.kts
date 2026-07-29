@@ -176,6 +176,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     executionData.setFrom(fileTree(project.buildDir) { include("**/*.exec", "**/*.ec") })
 }
 
-tasks.named("test") {
+tasks.register("test") {
+    dependsOn("testDebugUnitTest")
     finalizedBy("jacocoTestReport")
 }
