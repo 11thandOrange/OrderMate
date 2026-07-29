@@ -124,7 +124,9 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         setUpObserver()
         setupOrderDetailsCardConstraints()
         runOnBackgroundThread {
-            appConnector = AppsConnector(requireContext(), myApp.getCloverAccount())
+            exceptionHandler {
+                appConnector = AppsConnector(requireContext(), myApp.getCloverAccount())
+            }
         }
     }
     
@@ -1086,17 +1088,30 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         if (isFromResume) {
             delay(8000)
         }
-        val data = myApp.getOrderConnector().getOrders(mutableListOf())
-        orderArguments = getTheRequiredData(data)
-        runOnMainThread {
-            binding.syncingText.hideView()
-            data?.let {
-                setDataOnScreenWithArgs()
-                binding.syncButton.isClickable = true
+        // getOrderConnector() throws when there's no Clover account on the device (e.g. a
+        // bare CI emulator, or transiently on a real device) - unguarded, this crashed the
+        // process, since onResume() calls refreshUI() unconditionally on every open of this
+        // screen. exceptionHandler{} can't wrap this (its lambda isn't suspend-compatible,
+        // and this whole function is), so a plain try/catch here instead.
+        try {
+            val data = myApp.getOrderConnector().getOrders(mutableListOf())
+            orderArguments = getTheRequiredData(data)
+            runOnMainThread {
+                binding.syncingText.hideView()
+                data?.let {
+                    setDataOnScreenWithArgs()
+                    binding.syncButton.isClickable = true
+                }
+                isPaymentBtnClicked = false
+                isReOpenBtnClicked = false
+                binding.progressLayout.hideView()
             }
-            isPaymentBtnClicked = false
-            isReOpenBtnClicked = false
-            binding.progressLayout.hideView()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            runOnMainThread {
+                binding.syncingText.hideView()
+                binding.progressLayout.hideView()
+            }
         }
     }
 
