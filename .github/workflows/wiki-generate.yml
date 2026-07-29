@@ -32,4 +32,5 @@ jobs:
     with:
       site_dir: docs
       config_path: wiki.config.yaml
+      author_content: true
     secrets: inherit

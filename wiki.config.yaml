@@ -72,6 +72,12 @@ extractors:
   appList:
     enabled: false
 
+  # Authored (not derived) - drafted via wiki-author.mjs from
+  # wiki-content/authoring.yaml when author_content: true is set on the
+  # caller, then read verbatim from docs/src/content/features/*.md here.
+  features:
+    enabled: true
+
 output:
   dataDir: "src/data"
   contentDir: "src/content"
