@@ -5,6 +5,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.NoMatchingRootException
 import androidx.test.espresso.NoMatchingViewException
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -65,7 +66,10 @@ class SettingsFlowTest {
 
     @Test
     fun clickingFilterTab_showsFilterPanel_hidesGeneralPanel() {
-        onView(withId(R.id.tabFilter)).perform(click())
+        // tabFilter sits inside subtabsContainer's HorizontalScrollView, past General/Item
+        // Level Notes/Order Level Notes - it's off-screen on the emulator's width until
+        // scrolled into view, so a bare click() fails Espresso's 90%-visible constraint.
+        onView(withId(R.id.tabFilter)).perform(scrollTo(), click())
 
         onView(withId(R.id.panelFilter)).check(matches(isDisplayed()))
         onView(withId(R.id.panelGeneral)).check { view, _ ->
