@@ -15,6 +15,7 @@ export const topNav: { title: string; href: string }[] = [
   { title: "CI/CD", href: '/ci-cd' },
   { title: "Automation", href: '/automation' },
   { title: "Test Coverage", href: '/tests' },
+  { title: "Dependencies & Integrations", href: '/dependencies' },
   { title: "Changelog", href: '/changelog' },
 ];
 
@@ -24,6 +25,7 @@ export const sidebarSections: Record<string, NavSection> = {
   'ci-cd': { title: "CI/CD", href: '/ci-cd', children: workflows.map((w) => ({ title: w.title, href: `/ci-cd/${w.slug}` })) },
   'automation': { title: "Automation", href: '/automation', children: automation.map((a) => ({ title: a.name, href: `/automation/${a.slug}` })) },
   'tests': { title: "Test Coverage", href: '/tests', children: testSuites.map((t) => ({ title: t.name, href: `/tests/${t.slug}` })) },
+  'dependencies': { title: "Dependencies & Integrations", href: '/dependencies', children: [] },
   'changelog': { title: "Changelog", href: '/changelog', children: markdownPages.filter((p) => p.navSection === "Changelog").map((p) => ({ title: p.title, href: `/changelog/${p.slug}` })) },
 };
 

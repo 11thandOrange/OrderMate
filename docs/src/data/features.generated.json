@@ -1,1 +1,102 @@
-[]
+[
+  {
+    "slug": "order-detail",
+    "title": "Order Detail",
+    "summary": "The order-detail and checkout screen: view an order pulled from the Clover SDK, refresh it, and share it with the customer by email or SMS.",
+    "order": 1,
+    "status": "stable",
+    "implements": {
+      "workflows": [
+        "instrumented-tests"
+      ],
+      "skills": [],
+      "dependencies": [],
+      "integrations": [
+        "clover-android-sdk",
+        "messagebird-conversations"
+      ]
+    },
+    "runWith": [
+      "Open an order from the order list; OrderDetailFragment receives the Order through the navigation Bundle.",
+      "Pull to refresh to re-fetch the order via AppsConnector/getOrderConnector().",
+      "Share the order with the customer over email or SMS through the Conversations API."
+    ],
+    "tradeoffs": [
+      "The Order is passed in as a Clover SDK type via a Bundle rather than re-fetched by id on open, so the screen depends on the caller handing it a valid Order and refreshes on demand.",
+      "Customer messaging goes through the external Conversations API, which is the only network dependency on this screen; everything else is in-process Clover data."
+    ],
+    "notes": [
+      {
+        "kind": "note",
+        "body": "Most of the order data here comes from the Clover Android SDK in-process (AIDL), not a REST call. The only REST surface on this screen is the message-share action."
+      }
+    ],
+    "contentFile": "features/order-detail.md",
+    "_sourceHash": "287858f36570b0a35b3547c9130ed953b2f99255"
+  },
+  {
+    "slug": "calendar",
+    "title": "Calendar",
+    "summary": "A calendar screen for scheduling and previewing time-based orders, with custom date/time pickers and an event preview dialog.",
+    "order": 2,
+    "status": "stable",
+    "implements": {
+      "workflows": [
+        "instrumented-tests"
+      ],
+      "skills": [],
+      "dependencies": [],
+      "integrations": [
+        "clover-android-sdk"
+      ]
+    },
+    "runWith": [
+      "Open the Calendar tab to browse scheduled items by date.",
+      "Pick a date or time with the custom date picker and date-time picker dialog.",
+      "Tap an entry to open the event preview dialog."
+    ],
+    "tradeoffs": [
+      "The calendar uses bespoke picker dialogs (CustomDatePickerFragment, DateTimePickerDialog) rather than the platform pickers, which gives a consistent look at the cost of maintaining custom UI."
+    ],
+    "notes": [
+      {
+        "kind": "note",
+        "body": "Calendar UI is composed of several cooperating fragments and dialogs rather than a single view, so behavior is spread across CalendarFragment and its picker/preview helpers."
+      }
+    ],
+    "contentFile": "features/calendar.md",
+    "_sourceHash": "59ac4ace745eadbaba1ba576206f7bb3e0b306c0"
+  },
+  {
+    "slug": "settings",
+    "title": "Settings",
+    "summary": "App and profile settings for OrderMate, covering the main settings screen and the profile settings screen.",
+    "order": 3,
+    "status": "stable",
+    "implements": {
+      "workflows": [
+        "instrumented-tests"
+      ],
+      "skills": [],
+      "dependencies": [],
+      "integrations": [
+        "clover-android-sdk"
+      ]
+    },
+    "runWith": [
+      "Open Settings to adjust app-level preferences.",
+      "Open Profile Settings to manage the merchant/profile details."
+    ],
+    "tradeoffs": [
+      "Settings is split into a general SettingsFragment and a dedicated ProfileSettingsFragment, keeping profile concerns separate from app preferences at the cost of two screens to navigate."
+    ],
+    "notes": [
+      {
+        "kind": "note",
+        "body": "Profile details are tied to the connected Clover merchant, so some settings reflect state from the Clover SDK rather than local-only preferences."
+      }
+    ],
+    "contentFile": "features/settings.md",
+    "_sourceHash": "52ed10d9133ffde5a1a9d269375c3c98d9013fd9"
+  }
+]
