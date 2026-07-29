@@ -1,5 +1,6 @@
 package com.orderMate.fragment.orderDetail
 
+import android.os.Bundle
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -17,8 +18,16 @@ import org.junit.runner.RunWith
  * Real instrumented coverage for the order-detail/"checkout" screen
  * (fragment/orderDetail/OrderDetailFragment.kt), launched in isolation via FragmentScenario
  * instead of through real navigation - there's no synced Clover order to click through to on a
- * bare CI emulator, so this constructs a minimal Order and passes it the same way SafeArgs nav
- * does (OrderDetailFragmentArgs.Builder(order).build().toBundle()).
+ * bare CI emulator, so this constructs a minimal Order and passes it as arguments the same way
+ * a raw Bundle().apply { putParcelable("orderData", order) } is built in real production code
+ * at the one real navigate-to-OrderDetailFragment call site (OrderListRedesignFragment.kt,
+ * around line 1146) - deliberately not using the SafeArgs-generated OrderDetailFragmentArgs
+ * constructor/Builder API directly, since that API can't be verified without a real Gradle
+ * build (androidx.navigation.safeargs.kotlin's codegen isn't reachable from this sandbox: a
+ * first attempt using an assumed Builder() API failed to compile - "Unresolved reference:
+ * Builder" - since the kotlin-flavored SafeArgs plugin doesn't generate a Builder class at all,
+ * only the Java-flavored one does). onViewCreated() reads the same "orderData" key back out via
+ * OrderDetailFragmentArgs.fromBundle(it), so this is exactly what real navigation delivers.
  *
  * Order() is a no-arg constructor with chainable setters, confirmed against the real
  * com.clover.sdk:clover-android-sdk:304 classes (Maven Central) rather than assumed.
@@ -41,7 +50,7 @@ class OrderDetailFlowTest {
 
     @Test
     fun orderDetail_rendersOrderIdAndKeyFields_fromNavArgs() {
-        val args = OrderDetailFragmentArgs.Builder(buildTestOrder()).build().toBundle()
+        val args = Bundle().apply { putParcelable("orderData", buildTestOrder()) }
 
         launchFragmentInContainer<OrderDetailFragment>(
             fragmentArgs = args,
