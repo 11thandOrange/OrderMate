@@ -18,3 +18,11 @@ flows:
   # OrderListFlowTest.kt - default order list destination
   - isTheDefaultDestination_headerControlsAreDisplayed
   - clickingFilterButton_opensFilterDialog
+
+  # CalendarFlowTest.kt - calendar destination content
+  - calendar_headerAndMonthViewControlsAreDisplayed
+  - clickingNextMonth_changesMonthYearTitle
+
+  # SettingsFlowTest.kt - settings destination content
+  - settings_generalPanelIsDisplayedByDefault
+  - clickingFilterTab_showsFilterPanel
