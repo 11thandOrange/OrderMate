@@ -62,6 +62,7 @@ class CustomFieldsFragment : Fragment() {
     fun updateCustomData(value: CustomItemJson) {
         customData = value
         runOnMainThread {
+            if (!isAdded || view == null) return@runOnMainThread
             setUpRecyclerView()
         }
     }
@@ -146,8 +147,8 @@ class CustomFieldsFragment : Fragment() {
             ) {
                 OrderHistoryFragment.getInstance().updateTheSpinners(isSuccess)
                 runOnMainThread {
+                    if (!isAdded || view == null) return@runOnMainThread
                     findNavController().popBackStack()
-
                 }
             }
 
