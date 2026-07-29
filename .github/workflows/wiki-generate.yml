@@ -1,8 +1,13 @@
 # Thin caller for agent-ops's shared wiki generator (issue #286). Real logic
-# lives once, centrally, in HeyItsChloe/agent-ops's
-# .github/workflows/wiki-generate-reusable.yml - see that file's own header
-# comment for the full flow (checkout target + control repo -> run
+# lives once, centrally, in wiki-generate-reusable.yml - see that file's own
+# header comment for the full flow (checkout target + control repo -> run
 # wiki-generate.mjs -> commit generated changes -> build -> deploy to Pages).
+#
+# Points at the 11thandOrange/agent-ops fork, not HeyItsChloe/agent-ops
+# directly: secrets: inherit only propagates within the calling repo's own
+# org/enterprise, and this fork exists precisely so 11thandOrange-owned
+# repos can consume agent-ops content - including this reusable workflow -
+# from a same-org source (see that fork's CONTRIBUTING.md).
 
 name: wiki-generate
 
@@ -23,7 +28,7 @@ jobs:
       contents: write
       pages: write
       id-token: write
-    uses: HeyItsChloe/agent-ops/.github/workflows/wiki-generate-reusable.yml@main
+    uses: 11thandOrange/agent-ops/.github/workflows/wiki-generate-reusable.yml@main
     with:
       site_dir: docs
       config_path: wiki.config.yaml
