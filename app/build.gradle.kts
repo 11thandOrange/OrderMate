@@ -176,7 +176,11 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     executionData.setFrom(fileTree(project.buildDir) { include("**/*.exec", "**/*.ec") })
 }
 
-tasks.register("test") {
-    dependsOn("testDebugUnitTest")
+// tasks.named("test") throws UnknownTaskException here (too early in this script's
+// evaluation for the Kotlin/Android toolchain's own "test" lifecycle task to be visible
+// yet), but tasks.register("test") then collides with that same task once it does get
+// created later ("Cannot add task 'test' as a task with that name already exists").
+// tasks.matching sidesteps both: it configures the task lazily, whenever it appears.
+tasks.matching { it.name == "test" }.configureEach {
     finalizedBy("jacocoTestReport")
 }
