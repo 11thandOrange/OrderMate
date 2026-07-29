@@ -1,13 +1,17 @@
 package com.orderMate.fragment
 
 import android.view.View
+import android.widget.HorizontalScrollView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.NoMatchingRootException
 import androidx.test.espresso.NoMatchingViewException
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isDialog
+import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
+import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -15,6 +19,8 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.orderMate.R
 import com.orderMate.activities.MainActivity
+import org.hamcrest.Matcher
+import org.hamcrest.Matchers.allOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -68,12 +74,39 @@ class SettingsFlowTest {
     fun clickingFilterTab_showsFilterPanel_hidesGeneralPanel() {
         // tabFilter sits inside subtabsContainer's HorizontalScrollView, past General/Item
         // Level Notes/Order Level Notes - it's off-screen on the emulator's width until
-        // scrolled into view, so a bare click() fails Espresso's 90%-visible constraint.
-        onView(withId(R.id.tabFilter)).perform(scrollTo(), click())
+        // scrolled into view. Espresso's own scrollTo() drives this through
+        // requestRectangleOnScreen()/an animated scroll and checks visibility before that
+        // settles, so it fails here too ("the view is not displayed"). Scrolling the
+        // HorizontalScrollView's scrollX directly is synchronous and deterministic.
+        onView(
+            allOf(
+                isAssignableFrom(HorizontalScrollView::class.java),
+                hasDescendant(withId(R.id.subtabsContainer))
+            )
+        ).perform(scrollHorizontalScrollViewToShow(R.id.tabFilter))
+        onView(withId(R.id.tabFilter)).perform(click())
 
         onView(withId(R.id.panelFilter)).check(matches(isDisplayed()))
         onView(withId(R.id.panelGeneral)).check { view, _ ->
             org.junit.Assert.assertEquals(View.GONE, view.visibility)
+        }
+    }
+
+    private fun scrollHorizontalScrollViewToShow(targetId: Int): ViewAction = object : ViewAction {
+        override fun getConstraints(): Matcher<View> = isAssignableFrom(HorizontalScrollView::class.java)
+
+        override fun getDescription() = "Scroll the tab bar so the given child is fully visible"
+
+        override fun perform(uiController: UiController, view: View) {
+            val scrollView = view as HorizontalScrollView
+            val target = scrollView.findViewById<View>(targetId)
+            val desiredScrollX = when {
+                target.left < scrollView.scrollX -> target.left
+                target.right > scrollView.scrollX + scrollView.width -> target.right - scrollView.width
+                else -> scrollView.scrollX
+            }
+            scrollView.scrollTo(desiredScrollX.coerceAtLeast(0), 0)
+            uiController.loopMainThreadUntilIdle()
         }
     }
 }
