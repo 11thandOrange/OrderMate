@@ -1,0 +1,35 @@
+# wiki-content/authoring.yaml - authoring manifest for scripts/wiki-author.mjs
+# (agent-ops issue #286). Lists features to auto-draft via the LiteLLM
+# "documentation" alias when author_content: true is set on the
+# wiki-generate.yml caller. facts: are the only ground truth passed to the
+# model - real file/route names confirmed in this repo, nothing invented.
+# wiki-author.mjs never overwrites an existing docs/src/content/features/*.md
+# file, so re-runs are safe.
+
+features:
+  - slug: order-detail
+    title: "Order Detail"
+    order: 1
+    facts: |
+      app/src/main/java/com/orderMate/fragment/orderDetail/ - the
+      order-detail/checkout screen. OrderDetailFragment reads order data via
+      a Bundle-passed Order (Clover Android SDK type), refreshes via
+      AppsConnector/getOrderConnector(). Covered by instrumented UI tests:
+      app/src/androidTest/java/com/orderMate/fragment/orderDetail/OrderDetailFlowTest.kt.
+
+  - slug: calendar
+    title: "Calendar"
+    order: 2
+    facts: |
+      app/src/main/java/com/orderMate/fragment/CalendarFragment.kt, with
+      supporting CustomDatePickerFragment, DateTimePickerDialog, and
+      EventPreviewDialog. Instrumented coverage under
+      app/src/androidTest/java/com/orderMate/fragment/.
+
+  - slug: settings
+    title: "Settings"
+    order: 3
+    facts: |
+      app/src/main/java/com/orderMate/fragment/SettingsFragment.kt and
+      ProfileSettingsFragment.kt. Covered by
+      app/src/androidTest/java/com/orderMate/fragment/SettingsFlowTest.kt.
