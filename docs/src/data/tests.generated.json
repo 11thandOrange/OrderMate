@@ -1,0 +1,11 @@
+[
+  {
+    "slug": "instrumented-ui-tests-espresso",
+    "name": "Instrumented UI tests (Espresso)",
+    "framework": "espresso",
+    "path": "app/src/androidTest/**/*.kt",
+    "fileCount": 6,
+    "description": "6 file(s) matching app/src/androidTest/**/*.kt.",
+    "_sourceHash": "b2fe83a7baed10e4bac33ad9237d04e8436e718b"
+  }
+]

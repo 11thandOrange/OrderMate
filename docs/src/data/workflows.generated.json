@@ -1,0 +1,47 @@
+[
+  {
+    "slug": "dev-pipeline",
+    "title": "dev-pipeline",
+    "file": ".github/workflows/dev-pipeline.yml",
+    "trigger": "issues (types: [labeled])  ·  issue_comment (types: [created])  ·  repository_dispatch (types: [agent-trigger])",
+    "description": "Reusable-workflow permissions are the intersection of what this caller job\ngrants and what dev-pipeline-reusable.yml's own jobs request — id-token: write\nmust be granted here too, or the callee's own id-token: write (needed by\nanthropics/claude-code-action@v1's OIDC request) has no effect.",
+    "jobs": [
+      {
+        "name": "dispatch",
+        "runsOn": "unknown",
+        "steps": []
+      }
+    ],
+    "_sourceHash": "bc405058e4e9a84cf82bb335e6f470b8ad03fbe8"
+  },
+  {
+    "slug": "instrumented-tests",
+    "title": "Instrumented Tests (Espresso/Robolectric)",
+    "file": ".github/workflows/instrumented-tests.yml",
+    "trigger": "pull_request (branches: [main])  ·  workflow_dispatch",
+    "description": "Thin caller for the shared e2e pipeline (BusyBuddy_v2#285 Phase 6).\n\napp/src/androidTest has real Espresso coverage (MainActivityNavigationTest.kt,\nOrderListFlowTest.kt) for the side-nav and default order-list flows, tracked\nagainst app/e2e-coverage.yaml via coverage_manifest_path below. Not yet\ncovered: checkout, settings, calendar flows - separate follow-up work.",
+    "jobs": [
+      {
+        "name": "espresso",
+        "runsOn": "unknown",
+        "steps": []
+      }
+    ],
+    "_sourceHash": "ef47c911462fbf2beb85860f8e1d94e44f136ffc"
+  },
+  {
+    "slug": "wiki-generate",
+    "title": "wiki-generate",
+    "file": ".github/workflows/wiki-generate.yml",
+    "trigger": "push (branches: [main], paths: [wiki.config.yaml, app/src/main/java/com/orderMate/networkManager/**, app/src/androidTest/**, CHANGELOG.md, .github/workflows/*.yml])  ·  workflow_dispatch",
+    "description": "Thin caller for agent-ops's shared wiki generator (issue #286). Real logic\nlives once, centrally, in wiki-generate-reusable.yml - see that file's own\nheader comment for the full flow (checkout target + control repo -> run\nwiki-generate.mjs -> commit generated changes -> build -> deploy to Pages).\n\nPoints at the 11thandOrange/agent-ops fork, not HeyItsChloe/agent-ops\ndirectly: secrets: inherit only propagates within the calling repo's own\norg/enterprise, and this fork exists precisely so 11thandOrange-owned\nrepos can consume agent-ops content - including this reusable workflow -\nfrom a same-org source (see that fork's CONTRIBUTING.md).",
+    "jobs": [
+      {
+        "name": "generate",
+        "runsOn": "unknown",
+        "steps": []
+      }
+    ],
+    "_sourceHash": "f0f7fdc4a9051ae329205e7a071416bdd2900193"
+  }
+]
