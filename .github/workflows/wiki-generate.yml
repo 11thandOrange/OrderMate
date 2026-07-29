@@ -1,0 +1,30 @@
+# Thin caller for agent-ops's shared wiki generator (issue #286). Real logic
+# lives once, centrally, in HeyItsChloe/agent-ops's
+# .github/workflows/wiki-generate-reusable.yml - see that file's own header
+# comment for the full flow (checkout target + control repo -> run
+# wiki-generate.mjs -> commit generated changes -> build -> deploy to Pages).
+
+name: wiki-generate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "wiki.config.yaml"
+      - "app/src/main/java/com/orderMate/networkManager/**"
+      - "app/src/androidTest/**"
+      - "CHANGELOG.md"
+      - ".github/workflows/*.yml"
+  workflow_dispatch: {}
+
+jobs:
+  generate:
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    uses: HeyItsChloe/agent-ops/.github/workflows/wiki-generate-reusable.yml@main
+    with:
+      site_dir: docs
+      config_path: wiki.config.yaml
+    secrets: inherit

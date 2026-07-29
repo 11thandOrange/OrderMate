@@ -1,0 +1,77 @@
+# wiki.config.yaml - per-repo configuration for the shared wiki generator
+# (agent-ops issue #286). Read by agent-ops's scripts/wiki-generate.mjs via
+# the thin caller at .github/workflows/wiki-generate.yml.
+#
+# Every path/glob below was verified against this repo's real tree before
+# being written (not copied blind from agent-ops's
+# templates/wiki-site/wiki.config.example.yaml) - see that file's own
+# header comment for the general field reference.
+
+site:
+  title: "OrderMate Docs"
+  description: "API reference, guides, and features for Clover POS order management."
+  # Matches docs/frontend/src/index.css's --color-brand/--color-brand-hover
+  # from the old hand-built site.
+  theme:
+    accent: "#FF9F43"
+    accentHover: "#e68a2e"
+    accentMuted: "rgba(255, 159, 67, 0.1)"
+  favicon: "/favicon.svg"
+  githubUrl: "https://github.com/11thandOrange/OrderMate"
+  # Matches docs/CNAME's existing value - this domain is already live.
+  customDomain: "ordermate.dev"
+
+# No wiki-backend instance (templates/wiki-backend) is deployed yet for
+# this new generated site, so the Sandbox ("Try it") panel has nothing to
+# proxy through until one is. Left as placeholders rather than guessed real
+# values. Note: docs/backend (a hand-built FastAPI proxy predating the
+# shared template - see templates/wiki-backend/README.md's own comparison)
+# is intentionally left in place and undeleted; it's out of scope for this
+# site regeneration and may still be serving the old frontend's sandbox.
+backend:
+  proxyBaseUrl: "https://ordermate-wiki-backend.example.com"
+  targetApiBaseUrl: "https://api.clover.com"
+
+extractors:
+  endpointsExpress:
+    enabled: false
+
+  # OrderMate's real Retrofit interface (MessageBird conversations API) -
+  # confirmed the only file in this package matching @GET/@POST/interface
+  # patterns. Most of the app's real "API surface" is the Clover Android
+  # SDK (AIDL/in-process, not a REST API), so this section is intentionally
+  # small - that's accurate to the app's real shape, not an extractor gap.
+  endpointsKotlin:
+    enabled: true
+    interfaceGlob:
+      - "app/src/main/java/com/orderMate/networkManager/*.kt"
+
+  workflows:
+    enabled: true
+    glob:
+      - ".github/workflows/*.yml"
+
+  automation:
+    enabled: true
+    pipelinesYamlPath: "orchestrator/src/registry/pipelines.yaml"
+    repoMatch: "11thandOrange/OrderMate"
+
+  tests:
+    enabled: true
+    suites:
+      - name: "Instrumented UI tests (Espresso)"
+        framework: espresso
+        glob: "app/src/androidTest/**/*.kt"
+
+  markdown:
+    enabled: true
+    sources:
+      - glob: "CHANGELOG.md"
+        navSection: "Changelog"
+
+  appList:
+    enabled: false
+
+output:
+  dataDir: "src/data"
+  contentDir: "src/content"
