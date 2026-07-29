@@ -26,3 +26,6 @@ flows:
   # SettingsFlowTest.kt - settings destination content
   - settings_generalPanelIsDisplayedByDefault
   - clickingFilterTab_showsFilterPanel
+
+  # OrderDetailFlowTest.kt - order-detail/checkout screen content
+  - orderDetail_rendersOrderIdAndKeyFields

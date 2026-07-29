@@ -98,6 +98,10 @@ dependencies {
     testImplementation("junit:junit:${junitVersion}")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    // Lets OrderDetailFragment be launched in isolation with a constructed Order, bypassing
+    // real navigation/a synced order list (debugImplementation: FragmentScenario needs its
+    // EmptyFragmentActivity present in the debug-variant manifest under test).
+    debugImplementation("androidx.fragment:fragment-testing:1.6.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
