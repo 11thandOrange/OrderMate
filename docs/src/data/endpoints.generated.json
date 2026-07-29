@@ -2,14 +2,14 @@
   {
     "slug": "messages",
     "title": "Messages",
-    "description": "Messages endpoints (ApiCall.kt).",
+    "description": "Retrofit calls involving \"messages\", extracted from ApiCall.kt.",
     "endpoints": [
       {
         "slug": "share-email",
         "method": "POST",
-        "path": "/workspaces/:merchantId/channels/:channelId/messages",
+        "path": "//workspaces/:merchantId/channels/:channelId/messages",
         "title": "Share Email",
-        "description": "POST /workspaces/:merchantId/channels/:channelId/messages — Share Email.",
+        "description": "Retrofit call shareEmail() in app/src/main/java/com/orderMate/networkManager/ApiCall.kt.",
         "auth": "bearer",
         "authNote": "Requires a Clover/OrderMate API bearer token. Supply it in the sandbox before sending.",
         "params": [
@@ -35,18 +35,18 @@
             "in": "body"
           }
         ],
-        "requestExample": "{\n  \"body\": {\n    \"html\": {\n      \"html\": \"string\",\n      \"metadata\": {\n        \"subject\": \"string\"\n      },\n      \"text\": \"string\"\n    },\n    \"type\": \"string\"\n  },\n  \"receiver\": {\n    \"contacts\": [\n      {\n        \"identifierKey\": \"string\",\n        \"identifierValue\": \"string\"\n      }\n    ]\n  },\n  \"reference\": \"string\",\n  \"meta\": {\n    \"extraInformation\": {\n      \"key\": \"string\"\n    }\n  }\n}",
-        "responseExample": "{ /* Any */ }",
+        "requestExample": "{ /* ShareMessageJson */ }",
+        "responseExample": "{ }",
         "liveTestable": true,
         "sourceFile": "app/src/main/java/com/orderMate/networkManager/ApiCall.kt",
-        "_sourceHash": "8eb7cbfb5fec4271105fbcbd5be899b624e14710"
+        "_sourceHash": "f78ca76d48d535040d236da3d7097e87445748a9"
       },
       {
         "slug": "share-sms",
         "method": "POST",
-        "path": "/workspaces/:merchantId/channels/:channelId/messages",
+        "path": "//workspaces/:merchantId/channels/:channelId/messages",
         "title": "Share Sms",
-        "description": "POST /workspaces/:merchantId/channels/:channelId/messages — Share Sms.",
+        "description": "Retrofit call shareSms() in app/src/main/java/com/orderMate/networkManager/ApiCall.kt.",
         "auth": "bearer",
         "authNote": "Requires a Clover/OrderMate API bearer token. Supply it in the sandbox before sending.",
         "params": [
@@ -72,18 +72,18 @@
             "in": "body"
           }
         ],
-        "requestExample": "{\n  \"body\": {\n    \"text\": {\n      \"text\": \"string\"\n    },\n    \"type\": \"string\"\n  },\n  \"receiver\": {\n    \"contacts\": [\n      {\n        \"identifierKey\": \"string\",\n        \"identifierValue\": \"string\"\n      }\n    ]\n  },\n  \"reference\": \"string\",\n  \"meta\": {\n    \"extraInformation\": {\n      \"key\": \"string\"\n    }\n  }\n}",
-        "responseExample": "{ /* Any */ }",
+        "requestExample": "{ /* ShareSmsModal */ }",
+        "responseExample": "{ }",
         "liveTestable": true,
         "sourceFile": "app/src/main/java/com/orderMate/networkManager/ApiCall.kt",
-        "_sourceHash": "c89b7e689edfd04ebd6d797100992b88c1077a72"
+        "_sourceHash": "6ae5653afc611c7c6586777801386b76a459949b"
       },
       {
         "slug": "get-conversation-messages",
         "method": "GET",
-        "path": "/workspaces/:workspaceId/conversations/:conversationId/messages",
+        "path": "//workspaces/:workspaceId/conversations/:conversationId/messages",
         "title": "Get Conversation Messages",
-        "description": "GET /workspaces/:workspaceId/conversations/:conversationId/messages — Get Conversation Messages. Returns MessagesResponse.",
+        "description": "Retrofit call getConversationMessages() in app/src/main/java/com/orderMate/networkManager/ApiCall.kt.",
         "auth": "bearer",
         "authNote": "Requires a Clover/OrderMate API bearer token. Supply it in the sandbox before sending.",
         "params": [
@@ -102,24 +102,24 @@
             "in": "path"
           }
         ],
-        "responseExample": "{\n  \"results\": [\n    {\n      \"id\": \"string\",\n      \"conversationId\": \"string\",\n      \"reference\": \"string\",\n      \"status\": \"string\",\n      \"source\": \"string\",\n      \"body\": {\n        \"type\": \"string\",\n        \"text\": {\n          \"text\": null\n        },\n        \"html\": {\n          \"text\": null,\n          \"html\": null\n        }\n      },\n      \"recipients\": [\n        {\n          \"type\": null,\n          \"identifierKey\": null,\n          \"identifierValue\": null\n        }\n      ],\n      \"sender\": {\n        \"id\": \"string\",\n        \"type\": \"string\",\n        \"displayName\": \"string\"\n      },\n      \"createdAt\": \"string\",\n      \"updatedAt\": \"string\",\n      \"meta\": {\n        \"extraInformation\": {\n          \"key\": null\n        }\n      }\n    }\n  ],\n  \"nextPageToken\": \"string\"\n}",
+        "responseExample": "{ }",
         "liveTestable": true,
         "sourceFile": "app/src/main/java/com/orderMate/networkManager/ApiCall.kt",
-        "_sourceHash": "960dd446ffcb90e8bed62c1786e37603f99b1f00"
+        "_sourceHash": "38bb39c74792c9d7722583c0d8ccf84b1816596b"
       }
     ]
   },
   {
     "slug": "conversations",
     "title": "Conversations",
-    "description": "Conversations endpoints (ApiCall.kt).",
+    "description": "Retrofit calls involving \"conversations\", extracted from ApiCall.kt.",
     "endpoints": [
       {
         "slug": "get-conversations-by-order",
         "method": "GET",
-        "path": "/workspaces/:workspaceId/conversations",
+        "path": "//workspaces/:workspaceId/conversations",
         "title": "Get Conversations By Order",
-        "description": "GET /workspaces/:workspaceId/conversations — Get Conversations By Order. Returns ConversationsResponse.",
+        "description": "Retrofit call getConversationsByOrder() in app/src/main/java/com/orderMate/networkManager/ApiCall.kt.",
         "auth": "bearer",
         "authNote": "Requires a Clover/OrderMate API bearer token. Supply it in the sandbox before sending.",
         "params": [
@@ -138,10 +138,10 @@
             "in": "query"
           }
         ],
-        "responseExample": "{\n  \"results\": [\n    {\n      \"id\": \"string\",\n      \"name\": \"string\",\n      \"status\": \"string\",\n      \"channelId\": \"string\",\n      \"featuredParticipants\": [\n        {\n          \"id\": null,\n          \"type\": null,\n          \"displayName\": null,\n          \"contact\": null\n        }\n      ],\n      \"lastMessage\": {\n        \"id\": \"string\",\n        \"type\": \"string\",\n        \"preview\": {\n          \"text\": null\n        },\n        \"status\": \"string\",\n        \"createdAt\": \"string\"\n      },\n      \"createdAt\": \"string\",\n      \"updatedAt\": \"string\",\n      \"resource\": {\n        \"type\": \"string\",\n        \"id\": \"string\"\n      }\n    }\n  ],\n  \"nextPageToken\": \"string\",\n  \"total\": 0\n}",
+        "responseExample": "{ }",
         "liveTestable": true,
         "sourceFile": "app/src/main/java/com/orderMate/networkManager/ApiCall.kt",
-        "_sourceHash": "c734cf8bb36f476601f5f746ebf1bbbbad190fa0"
+        "_sourceHash": "3487e268e52cb129da5a278afeb2c6a5902aee23"
       }
     ]
   }
