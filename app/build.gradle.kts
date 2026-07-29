@@ -159,6 +159,10 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
     reports {
         xml.required.set(true)
+        // pipeline-orchestrator's dev-pipeline-reusable.yml passes this exact path
+        // (relative to project_root, the repo root) to qodo-cover's
+        // code_coverage_report_path - the gate has nothing to read otherwise.
+        xml.outputLocation.set(file("${rootProject.projectDir}/coverage/cobertura-coverage.xml"))
         html.required.set(true)
     }
 
