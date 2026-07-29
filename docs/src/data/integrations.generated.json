@@ -1,1 +1,62 @@
-[]
+[
+  {
+    "slug": "clover-android-sdk",
+    "name": "Clover Android SDK",
+    "kind": "sdk",
+    "summary": "The app's primary data surface: orders, merchants, and connectors come from the Clover SDK in-process (AIDL), not a REST API.",
+    "auth": "Clover app connection (connect the app from the App Market preview)",
+    "url": "https://docs.clover.com/docs/using-the-android-sdk",
+    "notes": [
+      {
+        "kind": "important",
+        "body": "You must connect the app from the App Market preview before any Clover data is available - see README.md."
+      }
+    ],
+    "_sourceHash": "6a9305af0e7f99f6f04ff106af9f25402c60832e"
+  },
+  {
+    "slug": "messagebird-conversations",
+    "name": "MessageBird Conversations API",
+    "kind": "api",
+    "summary": "The app's only REST interface (Retrofit) - sends order emails/SMS and reads customer conversations by order.",
+    "auth": "Bearer token (Retrofit auth instance)",
+    "url": "https://developers.messagebird.com/api/conversations/",
+    "notes": [
+      {
+        "kind": "note",
+        "body": "Defined in app/src/main/java/com/orderMate/networkManager/ApiCall.kt; this is the surface the Kotlin endpoints extractor documents."
+      }
+    ],
+    "_sourceHash": "0927580d3fbc9edd0210b64e13b5a9259e5632c1"
+  },
+  {
+    "slug": "openhands-cloud",
+    "name": "OpenHands Cloud",
+    "kind": "service",
+    "summary": "Autonomous-dev and complex-logic automations that pick up GitHub issues for this repo and open pull requests.",
+    "auth": "API key (OPENHANDS_API_KEY)",
+    "url": "https://app.all-hands.dev/",
+    "notes": [
+      {
+        "kind": "note",
+        "body": "Triggered via the shared Postman collection; the same collection covers BusyBuddy_v2 and Orbit."
+      }
+    ],
+    "_sourceHash": "5813feca38f3b6b9bf89fa649257243bd546a4b9"
+  },
+  {
+    "slug": "pipeline-orchestrator",
+    "name": "Pipeline Orchestrator (agent-ops)",
+    "kind": "service",
+    "summary": "The agent-ops control repo whose pipelines.yaml registers this repo's automation entry and whose shared workflow generates this docs site.",
+    "auth": "GitHub App / repo secrets (secrets: inherit)",
+    "url": "https://github.com/11thandOrange/agent-ops",
+    "notes": [
+      {
+        "kind": "note",
+        "body": "The Automation page is generated from this repo's entry in agent-ops's orchestrator/src/registry/pipelines.yaml."
+      }
+    ],
+    "_sourceHash": "256e7ce5fcb89fdac7d1eb2025cf8949ba4f96ca"
+  }
+]
