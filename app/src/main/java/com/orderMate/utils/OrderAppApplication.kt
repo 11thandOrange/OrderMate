@@ -200,8 +200,20 @@ class MyApp : Application() {
         return OrderCalc(order).getLineSubtotal(order?.lineItems)
     }
 
+    /**
+     * Returns the actual discount amount applied to the order's line items, in cents.
+     *
+     * Clover's [OrderCalc.getLineSubtotalWithoutDiscounts] returns the line subtotal *before*
+     * any discounts are applied, while [OrderCalc.getLineSubtotal] returns the subtotal *after*
+     * discounts. The discount amount is therefore the difference between the two. Previously this
+     * method returned the pre-discount subtotal, which caused the "Discount" row on the order
+     * detail screen to display the subtotal instead of the amount discounted (#136).
+     */
     fun orderDiscount(order: Order?): Long {
-        return OrderCalc(order).getLineSubtotalWithoutDiscounts(order?.lineItems)
+        val calc = OrderCalc(order)
+        val subtotalWithoutDiscounts = calc.getLineSubtotalWithoutDiscounts(order?.lineItems)
+        val subtotalWithDiscounts = calc.getLineSubtotal(order?.lineItems)
+        return (subtotalWithoutDiscounts - subtotalWithDiscounts).coerceAtLeast(Constants.defaultLong)
     }
 
     fun disconnectConnectors() {
