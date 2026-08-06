@@ -172,8 +172,7 @@ class CloverRepository private constructor(private val context: Context) {
      */
     private fun searchCustomersFromOrders(query: String): List<Customer> {
         return try {
-            val orderConnector = myApp.getOrderConnector()
-            val orders = orderConnector.getOrders(mutableListOf()) ?: return emptyList()
+            val orders = myApp.getAllOrders() ?: return emptyList()
             
             val lowerQuery = query.lowercase()
             val customersMap = mutableMapOf<String, Customer>()

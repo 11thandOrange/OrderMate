@@ -409,7 +409,7 @@ class CalendarFragment : Fragment() {
         
         runOnBackgroundThread {
             try {
-                val orderData = myApp.getOrderConnector().getOrders(mutableListOf())
+                val orderData = myApp.getAllOrders()
                 allOrders.clear()
                 filteredOrders.clear()
                 

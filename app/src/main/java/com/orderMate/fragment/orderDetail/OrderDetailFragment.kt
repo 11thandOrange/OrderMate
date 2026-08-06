@@ -1094,7 +1094,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         // screen. exceptionHandler{} can't wrap this (its lambda isn't suspend-compatible,
         // and this whole function is), so a plain try/catch here instead.
         try {
-            val data = myApp.getOrderConnector().getOrders(mutableListOf())
+            val data = myApp.getAllOrders()
             orderArguments = getTheRequiredData(data)
             runOnMainThread {
                 binding.syncingText.hideView()

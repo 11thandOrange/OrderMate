@@ -336,7 +336,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         
         runOnBackgroundThread {
             try {
-                val orderData = myApp.getOrderConnector().getOrders(mutableListOf())
+                val orderData = myApp.getAllOrders()
                 orderItems.clear()
                 allItemList.clear()
                 

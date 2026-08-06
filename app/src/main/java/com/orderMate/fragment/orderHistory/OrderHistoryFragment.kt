@@ -629,7 +629,7 @@ class OrderHistoryFragment : Fragment(), IOrderItemClickListener, InterCommunica
         runOnBackgroundThread {
             getTheEmployeeDataForAdminRole()
             try {
-                val orderData = myApp.getOrderConnector().getOrders(mutableListOf())
+                val orderData = myApp.getAllOrders()
                 orderItems.clear()
                 allItemList.clear()
                 orderData?.forEach {

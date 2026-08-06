@@ -79,6 +79,17 @@ class MyApp : Application() {
 
     }
 
+    /**
+     * Loads every order for the merchant from the Clover SDK (unfiltered, no page size).
+     *
+     * Centralized here instead of each caller invoking `getOrderConnector().getOrders(...)`
+     * directly, so there is a single place to add pagination/filters if the Clover SDK is
+     * ever found to cap results (#138).
+     */
+    fun getAllOrders(): List<Order>? {
+        return getOrderConnector().getOrders(mutableListOf())
+    }
+
     fun getEmployeeConnector(): EmployeeConnector? {
         return try {
             employeeConnector ?: synchronized(this) {
