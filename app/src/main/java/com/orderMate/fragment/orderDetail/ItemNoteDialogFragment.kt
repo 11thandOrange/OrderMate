@@ -215,6 +215,9 @@ class ItemNoteDialogFragment : DialogFragment() {
                 WidgetType.CALENDAR -> addCalendarSection(widget)
                 WidgetType.TEXT_BOX -> addTextBoxSection(widget)
                 WidgetType.QUANTITY -> addQuantitySection(widget)
+                // Customer assignment applies to the whole order, not a line item - the
+                // "Add Widget" picker doesn't offer it at the item level (#140).
+                WidgetType.CUSTOMER -> Unit
             }
         }
     }
@@ -515,6 +518,7 @@ class ItemNoteDialogFragment : DialogFragment() {
                     // param and written to LineItem.unitQty directly - it's never part of
                     // the note string.
                 }
+                WidgetType.CUSTOMER -> Unit
             }
         }
 
@@ -560,6 +564,7 @@ class ItemNoteDialogFragment : DialogFragment() {
                             textSelections[it.id] = value
                         }
                         WidgetType.QUANTITY -> Unit
+                        WidgetType.CUSTOMER -> Unit
                     }
                 }
             }

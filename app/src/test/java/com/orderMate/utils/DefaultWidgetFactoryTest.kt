@@ -16,11 +16,13 @@ import org.junit.Test
 class DefaultWidgetFactoryTest {
 
     @Test
-    fun `quantity widgets default to excluded from filter, like text box`() {
+    fun `quantity and customer widgets default to excluded from filter, like text box`() {
         val quantity = DefaultWidgetFactory.createEmpty(WidgetType.QUANTITY, order = 0)
-        val textBox = DefaultWidgetFactory.createEmpty(WidgetType.TEXT_BOX, order = 1)
+        val customer = DefaultWidgetFactory.createEmpty(WidgetType.CUSTOMER, order = 1, level = NoteLevel.ORDER)
+        val textBox = DefaultWidgetFactory.createEmpty(WidgetType.TEXT_BOX, order = 2)
 
         assertFalse(quantity.showInFilter)
+        assertFalse(customer.showInFilter)
         assertFalse(textBox.showInFilter)
     }
 
@@ -41,6 +43,18 @@ class DefaultWidgetFactoryTest {
             type = WidgetType.QUANTITY,
             label = "Quantity",
             level = NoteLevel.ITEM
+        )
+
+        assertTrue(widget.options.isEmpty())
+        assertFalse(widget.showInFilter)
+    }
+
+    @Test
+    fun `createWidget for customer has no options and is excluded from filter by default`() {
+        val widget = DefaultWidgetFactory.createWidget(
+            type = WidgetType.CUSTOMER,
+            label = "Customer",
+            level = NoteLevel.ORDER
         )
 
         assertTrue(widget.options.isEmpty())

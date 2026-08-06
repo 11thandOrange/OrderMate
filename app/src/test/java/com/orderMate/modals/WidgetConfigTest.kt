@@ -15,6 +15,7 @@ class WidgetConfigTest {
         assertEquals("Tags", WidgetType.MULTI_SELECT.displayName)
         assertEquals("Description", WidgetType.TEXT_BOX.displayName)
         assertEquals("Quantity", WidgetType.QUANTITY.displayName)
+        assertEquals("Customer", WidgetType.CUSTOMER.displayName)
     }
 
     @Test
@@ -24,6 +25,7 @@ class WidgetConfigTest {
         assertEquals(WidgetType.MULTI_SELECT, WidgetType.fromString("MULTI_SELECT"))
         assertEquals(WidgetType.TEXT_BOX, WidgetType.fromString("TEXT_BOX"))
         assertEquals(WidgetType.QUANTITY, WidgetType.fromString("QUANTITY"))
+        assertEquals(WidgetType.CUSTOMER, WidgetType.fromString("CUSTOMER"))
     }
 
     @Test

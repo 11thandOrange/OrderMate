@@ -151,11 +151,12 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
      */
     private fun showOrderNoteDialog() {
         val existingNote = orderData?.note
-        
+
         OrderNoteDialogFragment.newInstance(
             orderId = orderData?.id,
             existingNote = existingNote
         ).apply {
+            setCurrentCustomer(orderData?.customers?.firstOrNull())
             setListener(object : OrderNoteDialogFragment.OrderNoteListener {
                 override fun onOrderNoteSaved(orderId: String?, note: String) {
                     if (orderId != null) {

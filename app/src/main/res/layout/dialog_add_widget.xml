@@ -168,7 +168,8 @@
             android:gravity="center_vertical"
             android:background="@drawable/bg_filter_option"
             android:paddingHorizontal="16dp"
-            android:paddingVertical="14dp">
+            android:paddingVertical="14dp"
+            android:layout_marginBottom="8dp">
 
             <ImageView
                 android:layout_width="20dp"
@@ -181,6 +182,33 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Quantity"
+                android:textColor="@color/text_light"
+                android:textSize="15sp"/>
+
+        </LinearLayout>
+
+        <!-- Customer Option - order-level only (#140), hidden for item-level widgets in code -->
+        <LinearLayout
+            android:id="@+id/optionCustomer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_filter_option"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="14dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_user_circle"
+                app:tint="@color/text_light"
+                android:layout_marginEnd="12dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Customer"
                 android:textColor="@color/text_light"
                 android:textSize="15sp"/>
 

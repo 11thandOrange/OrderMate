@@ -41,6 +41,7 @@ object WidgetColorUtils {
     const val COLOR_MULTI_SELECT = 0xFF81C784.toInt()  // Green
     const val COLOR_TEXT_BOX = 0xFFA1887F.toInt()      // Brown
     const val COLOR_QUANTITY = 0xFF4DB6AC.toInt()      // Teal
+    const val COLOR_CUSTOMER = 0xFFFF8A65.toInt()       // Coral
     
     // Clover filter colors
     const val COLOR_PAYMENT_STATUS = 0xFFFFB74D.toInt()  // Yellow
@@ -59,6 +60,7 @@ object WidgetColorUtils {
             WidgetType.MULTI_SELECT -> COLOR_MULTI_SELECT
             WidgetType.TEXT_BOX -> COLOR_TEXT_BOX
             WidgetType.QUANTITY -> COLOR_QUANTITY
+            WidgetType.CUSTOMER -> COLOR_CUSTOMER
         }
     }
 
@@ -72,6 +74,7 @@ object WidgetColorUtils {
             WidgetType.MULTI_SELECT -> R.drawable.ic_label
             WidgetType.TEXT_BOX -> R.drawable.ic_edit
             WidgetType.QUANTITY -> R.drawable.ic_add_circle
+            WidgetType.CUSTOMER -> R.drawable.ic_user_circle
         }
     }
     

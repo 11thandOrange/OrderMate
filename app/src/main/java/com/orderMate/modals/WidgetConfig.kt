@@ -77,7 +77,8 @@ enum class WidgetType(val displayName: String) {
     MULTI_SELECT("Multi Select"),
     TEXT_BOX("Text Box"),
     CALENDAR("Calendar"),
-    QUANTITY("Quantity");
+    QUANTITY("Quantity"),
+    CUSTOMER("Customer");
     
     companion object {
         @JvmStatic

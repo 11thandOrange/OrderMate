@@ -1046,6 +1046,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             orderId = orderArguments?.id,
             existingNote = existingNote
         ).apply {
+            setCurrentCustomer(orderArguments?.customers?.firstOrNull())
             setListener(object : OrderNoteDialogFragment.OrderNoteListener {
                 override fun onOrderNoteSaved(orderId: String?, note: String) {
                     if (orderId != null) {
