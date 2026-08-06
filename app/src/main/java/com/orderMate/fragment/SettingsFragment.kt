@@ -849,6 +849,17 @@ class SettingsFragment : Fragment() {
         dialogView.findViewById<View>(R.id.optionTextBox)?.setOnClickListener {
             addWidgetOfType(FirebaseWidgetType.TEXT_BOX)
         }
+        // Quantity edits a line item's actual quantity, so it only makes sense at the item
+        // level - hide the option entirely when adding an order-level widget (#139).
+        val optionQuantity = dialogView.findViewById<View>(R.id.optionQuantity)
+        if (level == NoteLevel.ITEM) {
+            optionQuantity?.visibility = View.VISIBLE
+            optionQuantity?.setOnClickListener {
+                addWidgetOfType(FirebaseWidgetType.QUANTITY)
+            }
+        } else {
+            optionQuantity?.visibility = View.GONE
+        }
         dialogView.findViewById<View>(R.id.btnCancel)?.setOnClickListener {
             dialog.dismiss()
         }
@@ -1392,11 +1403,12 @@ class SettingsFragment : Fragment() {
             com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
             com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
             com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
+            com.orderMate.modals.WidgetType.QUANTITY -> Triple(R.drawable.ic_add_circle, R.drawable.bg_widget_icon_quantity, WidgetColorUtils.COLOR_QUANTITY)
         }
         widgetIcon.setImageResource(iconRes)
         widgetIcon.setColorFilter(tintColor)
         widgetIconContainer.setBackgroundResource(bgRes)
-        
+
         // Set toggle state
         widgetToggle.isChecked = widget.showInFilter
         widgetToggle.setOnCheckedChangeListener { _, isChecked ->
@@ -1940,6 +1952,7 @@ class FirebaseWidgetEditorAdapter(
                 com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
                 com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
                 com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
+                com.orderMate.modals.WidgetType.QUANTITY -> Triple(R.drawable.ic_add_circle, R.drawable.bg_widget_icon_quantity, WidgetColorUtils.COLOR_QUANTITY)
             }
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)
@@ -2323,6 +2336,7 @@ class FilterWidgetAdapter(
                 com.orderMate.modals.WidgetType.SINGLE_SELECT -> Triple(R.drawable.ic_list, R.drawable.bg_widget_icon_select, WidgetColorUtils.COLOR_SINGLE_SELECT)
                 com.orderMate.modals.WidgetType.MULTI_SELECT -> Triple(R.drawable.ic_check_box, R.drawable.bg_widget_icon_multiselect, WidgetColorUtils.COLOR_MULTI_SELECT)
                 com.orderMate.modals.WidgetType.TEXT_BOX -> Triple(R.drawable.ic_text_format, R.drawable.bg_widget_icon_text, WidgetColorUtils.COLOR_TEXT_BOX)
+                com.orderMate.modals.WidgetType.QUANTITY -> Triple(R.drawable.ic_add_circle, R.drawable.bg_widget_icon_quantity, WidgetColorUtils.COLOR_QUANTITY)
             }
             widgetIcon.setImageResource(iconRes)
             widgetIcon.setColorFilter(tintColor)

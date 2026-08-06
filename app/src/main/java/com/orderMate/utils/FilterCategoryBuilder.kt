@@ -115,7 +115,8 @@ object FilterCategoryBuilder {
             .filter { 
                 it.isEnabled && 
                 it.showInFilter && 
-                it.type != WidgetType.TEXT_BOX && 
+                it.type != WidgetType.TEXT_BOX &&
+                it.type != WidgetType.QUANTITY &&
                 it.level == NoteLevel.ITEM 
             }
             .sortedBy { it.order }
@@ -129,7 +130,8 @@ object FilterCategoryBuilder {
             .filter { 
                 it.isEnabled && 
                 it.showInFilter && 
-                it.type != WidgetType.TEXT_BOX && 
+                it.type != WidgetType.TEXT_BOX &&
+                it.type != WidgetType.QUANTITY &&
                 it.level == NoteLevel.ORDER 
             }
             .sortedBy { it.order }

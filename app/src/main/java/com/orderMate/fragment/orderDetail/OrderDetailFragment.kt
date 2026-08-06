@@ -1152,33 +1152,35 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             itemQuantity = itemQuantity
         ).apply {
             setListener(object : ItemNoteDialogFragment.ItemNoteListener {
-                override fun onNoteSaved(itemId: String?, note: String) {
+                override fun onNoteSaved(itemId: String?, note: String, quantity: Int) {
                     try {
                         android.util.Log.d("ItemNoteReceivedDebug", "========== NOTE RECEIVED FROM DIALOG ==========")
                         android.util.Log.d("ItemNoteReceivedDebug", "itemId: $itemId")
                         android.util.Log.d("ItemNoteReceivedDebug", "note received: '$note'")
+                        android.util.Log.d("ItemNoteReceivedDebug", "quantity received: $quantity")
                         android.util.Log.d("ItemNoteReceivedDebug", "orderPosition: $orderPosition")
                         android.util.Log.d("ItemNoteReceivedDebug", "================================================")
-                        
+
                         // Update the line item note in UI
                         updateNoteInTheLineItemOfOrder(itemId, note, orderPosition)
-                        
+
                         // Save to Clover via OrderConnector
                         runOnBackgroundThread {
                             exceptionHandler {
                                 val orderId = orderArguments?.id ?: return@exceptionHandler
                                 val allLineItems = orderArguments?.lineItems ?: return@exceptionHandler
-                                
+
                                 android.util.Log.d("ItemNoteReceivedDebug", "Saving to Clover - orderId: $orderId")
-                                
-                                // Update note for matching line items
+
+                                // Update note and quantity for matching line items (#139)
                                 allLineItems.forEach { lineItem ->
                                     if (lineItem?.item?.id == itemId) {
                                         android.util.Log.d("ItemNoteReceivedDebug", "Setting note on lineItem: ${lineItem.id}")
                                         lineItem.note = note
+                                        lineItem.unitQty = quantity.toLong()
                                     }
                                 }
-                                
+
                                 // Save to Clover
                                 myApp.getOrderConnector().updateLineItems(orderId, allLineItems)
                                 android.util.Log.d("ItemNoteReceivedDebug", "Saved to Clover!")

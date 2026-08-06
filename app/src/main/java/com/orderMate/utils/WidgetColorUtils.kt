@@ -40,6 +40,7 @@ object WidgetColorUtils {
     const val COLOR_SINGLE_SELECT = 0xFFCE93D8.toInt() // Purple
     const val COLOR_MULTI_SELECT = 0xFF81C784.toInt()  // Green
     const val COLOR_TEXT_BOX = 0xFFA1887F.toInt()      // Brown
+    const val COLOR_QUANTITY = 0xFF4DB6AC.toInt()      // Teal
     
     // Clover filter colors
     const val COLOR_PAYMENT_STATUS = 0xFFFFB74D.toInt()  // Yellow
@@ -57,9 +58,10 @@ object WidgetColorUtils {
             WidgetType.SINGLE_SELECT -> COLOR_SINGLE_SELECT
             WidgetType.MULTI_SELECT -> COLOR_MULTI_SELECT
             WidgetType.TEXT_BOX -> COLOR_TEXT_BOX
+            WidgetType.QUANTITY -> COLOR_QUANTITY
         }
     }
-    
+
     /**
      * Get icon resource for a widget type - centralized to avoid duplicate functions
      */
@@ -69,6 +71,7 @@ object WidgetColorUtils {
             WidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
             WidgetType.MULTI_SELECT -> R.drawable.ic_label
             WidgetType.TEXT_BOX -> R.drawable.ic_edit
+            WidgetType.QUANTITY -> R.drawable.ic_add_circle
         }
     }
     

@@ -70,13 +70,14 @@ data class WidgetOption(
 }
 
 /**
- * 4 widget types for pop-up editor
+ * Widget types for pop-up editor
  */
 enum class WidgetType(val displayName: String) {
     SINGLE_SELECT("Single Select"),
     MULTI_SELECT("Multi Select"),
     TEXT_BOX("Text Box"),
-    CALENDAR("Calendar");
+    CALENDAR("Calendar"),
+    QUANTITY("Quantity");
     
     companion object {
         @JvmStatic
