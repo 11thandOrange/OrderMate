@@ -14,6 +14,9 @@
     <string name="orders_text">Order %1$s</string>
     <string name="dummy_heading_dashboard">Orders (DEV)</string>
     <string name="search_orders">Search Orders</string>
+    <string name="load_older_orders">Load older orders</string>
+    <string name="loading_older_orders">Loading…</string>
+    <string name="no_older_orders_found">No older orders found</string>
     <string name="syncing">SYNCING</string>
     <string name="nav_open">Open</string>
     <string name="nav_close">Close</string>

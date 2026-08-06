@@ -1,17 +1,21 @@
 package com.orderMate.repository
 
 import android.content.Context
+import com.clover.sdk.util.CloverAuth
 import com.clover.sdk.v3.customers.Customer
 import com.clover.sdk.v3.customers.EmailAddress
 import com.clover.sdk.v3.customers.PhoneNumber
 import com.orderMate.modals.ShareMessageJson
 import com.orderMate.modals.ShareSmsModal
+import com.orderMate.networkManager.CloverOrdersApiClient
 import com.orderMate.networkManager.RetrofitInstanceWithAuth
 import com.orderMate.services.ScheduledTaskManager
 import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONObject
 import com.clover.sdk.v1.customer.Customer as V1Customer
 
 
@@ -44,6 +48,9 @@ class CloverRepository private constructor(private val context: Context) {
         }
 
         private val apiWithAuth = RetrofitInstanceWithAuth.getApiService()
+
+        private const val TAG = "CloverRepository"
+        const val DEFAULT_OLDER_ORDERS_PAGE_SIZE = 50
     }
 
     // ==================== Messaging API ====================
@@ -172,8 +179,7 @@ class CloverRepository private constructor(private val context: Context) {
      */
     private fun searchCustomersFromOrders(query: String): List<Customer> {
         return try {
-            val orderConnector = myApp.getOrderConnector()
-            val orders = orderConnector.getOrders(mutableListOf()) ?: return emptyList()
+            val orders = myApp.getAllOrders() ?: return emptyList()
             
             val lowerQuery = query.lowercase()
             val customersMap = mutableMapOf<String, Customer>()
@@ -490,13 +496,75 @@ class CloverRepository private constructor(private val context: Context) {
         try {
             val orderConnector = myApp.getOrderConnector()
             val order = orderConnector.getOrder(orderId) ?: return@withContext false
-            
+
             order.setNote(null)
             orderConnector.updateOrder(order)
             true
         } catch (e: Exception) {
             e.printStackTrace()
             false
+        }
+    }
+
+    // ==================== Order History Backfill (REST fallback, #138) ====================
+
+    /**
+     * Fetches a page of orders via Clover's REST Orders API, for orders that have aged out of
+     * the local on-device cache that [MyApp.getAllOrders] reads from (see its doc for why that
+     * cache is bounded). Never throws - returns an empty list on any auth or network failure,
+     * since this backs a "Load older orders" affordance rather than a critical path.
+     *
+     * [offset]/[limit] map directly to Clover's REST pagination
+     * (https://docs.clover.com/dev/docs/paginating-elements): `offset` is how many of the
+     * merchant's orders (most-recent-first) to skip, `limit` is the page size (Clover caps
+     * this at 1000 server-side).
+     */
+    suspend fun loadOlderOrders(
+        offset: Int,
+        limit: Int = DEFAULT_OLDER_ORDERS_PAGE_SIZE
+    ): List<com.clover.sdk.v3.order.Order> = withContext(Dispatchers.IO) {
+        try {
+            val authResult = CloverAuth.authenticate(context)
+            val authToken = authResult.authToken
+            val baseUrl = authResult.baseUrl
+            val merchantId = authResult.merchantId
+            if (authToken.isNullOrEmpty() || baseUrl.isNullOrEmpty() || merchantId.isNullOrEmpty()) {
+                android.util.Log.e(
+                    TAG,
+                    "loadOlderOrders: Clover auth failed - ${authResult.errorMessage}"
+                )
+                return@withContext emptyList()
+            }
+
+            val api = CloverOrdersApiClient.create(baseUrl)
+            val response = api.getOrders(
+                merchantId = merchantId,
+                limit = limit,
+                offset = offset,
+                authorization = "Bearer $authToken"
+            )
+
+            if (!response.isSuccessful) {
+                android.util.Log.e(
+                    TAG,
+                    "loadOlderOrders: REST call failed - HTTP ${response.code()}"
+                )
+                return@withContext emptyList()
+            }
+
+            val body = response.body()?.string() ?: return@withContext emptyList()
+            val elements = JSONObject(body).optJSONArray("elements") ?: JSONArray()
+            (0 until elements.length()).mapNotNull { index ->
+                try {
+                    com.clover.sdk.v3.order.Order(elements.getJSONObject(index))
+                } catch (e: Exception) {
+                    android.util.Log.e(TAG, "loadOlderOrders: failed to parse order at index $index", e)
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "loadOlderOrders: unexpected error", e)
+            emptyList()
         }
     }
 }

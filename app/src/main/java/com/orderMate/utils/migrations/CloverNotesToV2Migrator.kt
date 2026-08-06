@@ -159,12 +159,11 @@ object CloverNotesToV2Migrator {
     private fun readCloverOrders(context: Context, callback: (List<Order>?) -> Unit) {
         try {
             val app = context.applicationContext as MyApp
-            val orderConnector = app.getOrderConnector()
-            
+
             // Run on background thread
             Thread {
                 try {
-                    val orders = orderConnector.getOrders(mutableListOf())
+                    val orders = app.getAllOrders()
                     callback(orders)
                 } catch (e: Exception) {
                     Log.e(TAG, "Error fetching orders: ${e.message}")

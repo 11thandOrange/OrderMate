@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.clover.sdk.v3.order.LineItem
 import com.clover.sdk.v3.order.Order
@@ -22,6 +23,7 @@ import com.orderMate.R
 import com.orderMate.adapters.OrderCardRedesignAdapter
 import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.databinding.FragmentOrderListRedesignBinding
+import com.orderMate.repository.CloverRepository
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FilterCategories
 import com.orderMate.utils.FilterCategoryBuilder
@@ -120,6 +122,10 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     // Current filter state for dialog (synced with shared ViewModel)
     private var currentFilterState = FilterDialogFragment.FilterState()
     private var currentSearchQuery = ""
+
+    // "Load older orders" REST backfill state (#138) - see CloverRepository.loadOlderOrders
+    private var olderOrdersOffset = 0
+    private var isLoadingOlderOrders = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -266,6 +272,11 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             }
         }
 
+        // Load older orders - REST API backfill beyond Clover's local retention window (#138)
+        binding.loadOlderOrdersButton.setOnClickListener {
+            loadOlderOrders()
+        }
+
         // Date pills removed - date filtering now handled through Filter dialog
     }
 
@@ -333,13 +344,17 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     @SuppressLint("NotifyDataSetChanged")
     private fun loadOrders(onComplete: (() -> Unit)? = null) {
         showLoading(true)
-        
+        // A fresh load re-establishes the local-cache baseline, so any previously loaded
+        // REST backfill offset/state is no longer valid (#138).
+        olderOrdersOffset = 0
+        binding.loadOlderOrdersButton.visibility = View.GONE
+
         runOnBackgroundThread {
             try {
-                val orderData = myApp.getOrderConnector().getOrders(mutableListOf())
+                val orderData = myApp.getAllOrders()
                 orderItems.clear()
                 allItemList.clear()
-                
+
                 orderData?.forEach {
                     allItemList.add(it)
                     orderItems.add(it)
@@ -359,6 +374,11 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 if (!isAdded || view == null) return@runOnMainThread
 
                 showLoading(false)
+                // Offer the REST backfill once there's a local list to append to - we can't
+                // know client-side whether the local cache is actually truncated, so this is
+                // shown whenever there's data rather than only when a boundary is detected (#138).
+                binding.loadOlderOrdersButton.visibility =
+                    if (allItemList.isNotEmpty()) View.VISIBLE else View.GONE
 
                 // Apply any pending shared state after orders are loaded
                 val sharedState = sharedFilterViewModel.filterState.value
@@ -402,6 +422,63 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             )
             binding.header.syncButton.isEnabled = true
             Toast.makeText(requireContext(), "Orders synced", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Fetches the next page of orders older than what Clover's on-device cache retains, via
+     * Clover's REST Orders API (#138 - see MyApp.getAllOrders()/CloverRepository.loadOlderOrders
+     * for why this is needed). Appends any new orders (deduped by id) to the existing list and
+     * re-applies whatever view (filtered/search/plain) is currently active.
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    private fun loadOlderOrders() {
+        if (isLoadingOlderOrders || !isAdded) return
+        isLoadingOlderOrders = true
+        binding.loadOlderOrdersButton.isEnabled = false
+        binding.loadOlderOrdersButton.text = getString(R.string.loading_older_orders)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val olderOrders = try {
+                CloverRepository.getInstance(requireContext()).loadOlderOrders(olderOrdersOffset)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emptyList()
+            }
+
+            if (!isAdded || view == null) return@launch
+
+            isLoadingOlderOrders = false
+            binding.loadOlderOrdersButton.isEnabled = true
+            binding.loadOlderOrdersButton.text = getString(R.string.load_older_orders)
+
+            if (olderOrders.isEmpty()) {
+                Toast.makeText(requireContext(), getString(R.string.no_older_orders_found), Toast.LENGTH_SHORT).show()
+                binding.loadOlderOrdersButton.visibility = View.GONE
+                return@launch
+            }
+
+            // Clover's offset is "how many of the merchant's orders to skip", independent of
+            // how many were new to us - always advance by the page size actually returned so
+            // repeated taps keep paging forward instead of re-fetching the same page.
+            olderOrdersOffset += olderOrders.size
+
+            val existingIds = allItemList.mapNotNull { it?.id }.toSet()
+            val newOrders = olderOrders.filter { it.id !in existingIds }
+            allItemList.addAll(newOrders)
+
+            val sharedState = sharedFilterViewModel.filterState.value
+            when {
+                sharedState != null && sharedState.hasActiveFilters() -> applyDialogFilters(sharedState)
+                currentSearchQuery.isNotEmpty() -> searchOrders(currentSearchQuery)
+                else -> {
+                    orderItems.clear()
+                    orderItems.addAll(allItemList)
+                    updateResultsInfo()
+                    orderAdapter?.notifyDataSetChanged()
+                    updateEmptyState()
+                }
+            }
         }
     }
 

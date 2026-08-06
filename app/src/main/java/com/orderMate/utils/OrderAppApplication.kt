@@ -79,6 +79,22 @@ class MyApp : Application() {
 
     }
 
+    /**
+     * Loads every locally-cached order for the merchant from the Clover SDK (unfiltered).
+     *
+     * IMPORTANT (#138): this only returns what Clover's on-device order sync has retained
+     * locally - per Clover's own docs that's a retention-windowed slice (guaranteed 7 days,
+     * up to ~100 days best-effort), not the merchant's full order history. Orders older than
+     * that window will not appear here even though they still exist in Clover's cloud.
+     * Callers that need full history should combine this with
+     * CloverRepository.loadOlderOrders(), which fetches beyond the local window via Clover's
+     * REST Orders API. Centralized here (rather than seven call sites each invoking
+     * `getOrderConnector().getOrders(...)` directly) so there is one place for that merge.
+     */
+    fun getAllOrders(): List<Order>? {
+        return getOrderConnector().getOrders(mutableListOf())
+    }
+
     fun getEmployeeConnector(): EmployeeConnector? {
         return try {
             employeeConnector ?: synchronized(this) {
