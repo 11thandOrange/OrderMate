@@ -128,7 +128,7 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
                             allLineItems.forEach { lineItem ->
                                 if (lineItem?.item?.id == itemId) {
                                     lineItem.note = note
-                                    lineItem.unitQty = quantity.toLong()
+                                    lineItem.unitQty = quantity
                                 }
                             }
 
