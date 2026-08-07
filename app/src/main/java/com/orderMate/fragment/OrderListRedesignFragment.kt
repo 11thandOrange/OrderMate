@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.clover.sdk.v3.order.LineItem
 import com.clover.sdk.v3.order.Order
 import com.clover.sdk.v3.payments.Payment
@@ -69,8 +70,12 @@ import java.util.Locale
 class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     companion object {
+        // How many items from the end of the list to trigger the next infinite-scroll page
+        // fetch (#150), so the next page is ready before the user hits the literal bottom.
+        private const val SCROLL_LOAD_THRESHOLD = 5
+
         private var instance: OrderListRedesignFragment? = null
-        
+
         fun getInstance(): OrderListRedesignFragment {
             return instance ?: synchronized(this) {
                 OrderListRedesignFragment().also { instance = it }
@@ -123,9 +128,11 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     private var currentFilterState = FilterDialogFragment.FilterState()
     private var currentSearchQuery = ""
 
-    // "Load older orders" REST backfill state (#138) - see CloverRepository.loadOlderOrders
+    // Infinite-scroll REST backfill state (#138/#150) - see CloverRepository.loadOlderOrders.
+    // Triggered by scrolling near the bottom of the list rather than a "Load more" button.
     private var olderOrdersOffset = 0
     private var isLoadingOlderOrders = false
+    private var hasMoreOlderOrders = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -237,8 +244,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     // ==================== Initialization ====================
 
     private fun initializeRecyclerView() {
+        val layoutManager = LinearLayoutManager(requireContext())
         binding.ordersRecycler.apply {
-            layoutManager = LinearLayoutManager(requireContext())
+            this.layoutManager = layoutManager
             // Reuse existing adapter to avoid rebinding all items on back navigation
             if (orderAdapter == null) {
                 orderAdapter = OrderCardRedesignAdapter(orderItems, this@OrderListRedesignFragment)
@@ -246,6 +254,26 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             } else if (adapter !== orderAdapter) {
                 adapter = orderAdapter
             }
+
+            clearOnScrollListeners()
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (dy <= 0) return // only care about scrolling down
+                    if (isLoadingOlderOrders || !hasMoreOlderOrders) return
+
+                    val visibleItemCount = layoutManager.childCount
+                    val totalItemCount = layoutManager.itemCount
+                    val firstVisiblePosition = layoutManager.findFirstVisibleItemPosition()
+
+                    // Fetch the next page a little before the literal bottom so it's ready
+                    // by the time the user reaches it (#150 - replaces the old "Load older
+                    // orders" button with automatic infinite scroll).
+                    if (firstVisiblePosition + visibleItemCount + SCROLL_LOAD_THRESHOLD >= totalItemCount) {
+                        loadOlderOrders()
+                    }
+                }
+            })
         }
     }
 
@@ -270,11 +298,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             if (!isSyncing) {
                 syncOrders()
             }
-        }
-
-        // Load older orders - REST API backfill beyond Clover's local retention window (#138)
-        binding.loadOlderOrdersButton.setOnClickListener {
-            loadOlderOrders()
         }
 
         // Date pills removed - date filtering now handled through Filter dialog
@@ -347,7 +370,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
         // A fresh load re-establishes the local-cache baseline, so any previously loaded
         // REST backfill offset/state is no longer valid (#138).
         olderOrdersOffset = 0
-        binding.loadOlderOrdersButton.visibility = View.GONE
+        hasMoreOlderOrders = true
 
         runOnBackgroundThread {
             try {
@@ -374,11 +397,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 if (!isAdded || view == null) return@runOnMainThread
 
                 showLoading(false)
-                // Offer the REST backfill once there's a local list to append to - we can't
-                // know client-side whether the local cache is actually truncated, so this is
-                // shown whenever there's data rather than only when a boundary is detected (#138).
-                binding.loadOlderOrdersButton.visibility =
-                    if (allItemList.isNotEmpty()) View.VISIBLE else View.GONE
 
                 // Apply any pending shared state after orders are loaded
                 val sharedState = sharedFilterViewModel.filterState.value
@@ -427,16 +445,17 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     /**
      * Fetches the next page of orders older than what Clover's on-device cache retains, via
-     * Clover's REST Orders API (#138 - see MyApp.getAllOrders()/CloverRepository.loadOlderOrders
-     * for why this is needed). Appends any new orders (deduped by id) to the existing list and
-     * re-applies whatever view (filtered/search/plain) is currently active.
+     * Clover's REST Orders API, triggered by scrolling near the bottom of the list rather than
+     * a "Load more" button (#150). Appends any new orders (deduped by id) to the existing list,
+     * re-applies whatever view (filtered/search/plain) is currently active, and - since that
+     * re-application recomputes updateResultsInfo() from the merged list - the order
+     * count/total shown at the top of the screen reflects every loaded order, not just the
+     * first page.
      */
     @SuppressLint("NotifyDataSetChanged")
     private fun loadOlderOrders() {
-        if (isLoadingOlderOrders || !isAdded) return
+        if (isLoadingOlderOrders || !hasMoreOlderOrders || !isAdded) return
         isLoadingOlderOrders = true
-        binding.loadOlderOrdersButton.isEnabled = false
-        binding.loadOlderOrdersButton.text = getString(R.string.loading_older_orders)
 
         viewLifecycleOwner.lifecycleScope.launch {
             val olderOrders = try {
@@ -449,18 +468,16 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             if (!isAdded || view == null) return@launch
 
             isLoadingOlderOrders = false
-            binding.loadOlderOrdersButton.isEnabled = true
-            binding.loadOlderOrdersButton.text = getString(R.string.load_older_orders)
 
             if (olderOrders.isEmpty()) {
-                Toast.makeText(requireContext(), getString(R.string.no_older_orders_found), Toast.LENGTH_SHORT).show()
-                binding.loadOlderOrdersButton.visibility = View.GONE
+                hasMoreOlderOrders = false
                 return@launch
             }
 
             // Clover's offset is "how many of the merchant's orders to skip", independent of
             // how many were new to us - always advance by the page size actually returned so
-            // repeated taps keep paging forward instead of re-fetching the same page.
+            // the next scroll-triggered fetch keeps paging forward instead of re-fetching the
+            // same page.
             olderOrdersOffset += olderOrders.size
 
             val existingIds = allItemList.mapNotNull { it?.id }.toSet()
