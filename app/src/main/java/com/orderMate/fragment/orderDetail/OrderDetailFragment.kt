@@ -1177,7 +1177,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                                     if (lineItem?.item?.id == itemId) {
                                         android.util.Log.d("ItemNoteReceivedDebug", "Setting note on lineItem: ${lineItem.id}")
                                         lineItem.note = note
-                                        lineItem.unitQty = quantity.toLong()
+                                        lineItem.unitQty = quantity
                                     }
                                 }
 
