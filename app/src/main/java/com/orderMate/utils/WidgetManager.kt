@@ -224,17 +224,19 @@ class WidgetManager private constructor(private val context: Context) {
     }
     
     /**
-     * Get filterable item-level widgets (enabled, excluding TEXT_BOX).
+     * Get filterable item-level widgets (enabled, and of a type that supports filtering -
+     * see WidgetType.isFilterable).
      */
     fun getFilterableItemWidgets(): List<WidgetConfig> {
-        return getItemWidgets().filter { it.isEnabled && it.type != WidgetType.TEXT_BOX }
+        return getItemWidgets().filter { it.isEnabled && it.type.isFilterable }
     }
-    
+
     /**
-     * Get filterable order-level widgets (enabled, excluding TEXT_BOX).
+     * Get filterable order-level widgets (enabled, and of a type that supports filtering -
+     * see WidgetType.isFilterable).
      */
     fun getFilterableOrderWidgets(): List<WidgetConfig> {
-        return getOrderWidgets().filter { it.isEnabled && it.type != WidgetType.TEXT_BOX }
+        return getOrderWidgets().filter { it.isEnabled && it.type.isFilterable }
     }
     
     /**

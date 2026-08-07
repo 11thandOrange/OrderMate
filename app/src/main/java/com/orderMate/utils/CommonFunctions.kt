@@ -152,6 +152,17 @@ fun Context.getThePaymentState(order: Order?): String {
     return if (state != null) formatPaymentState(state) else getString(R.string.dash)
 }
 
+/**
+ * Whether an order can still be edited (quantity changed, etc.) - true only while it's fully
+ * unpaid ("OPEN"). Once any payment, partial payment, or refund has touched the order, it's
+ * locked: PAID, PARTIALLY_PAID, PARTIALLY_REFUNDED, REFUNDED, and CREDITED all return false
+ * (#139 feedback - "you can't add to an order if it's paid").
+ */
+fun isOrderOpenForEditing(order: Order?): Boolean {
+    val state = order?.paymentState?.name ?: order?.state
+    return state.equals("OPEN", ignoreCase = true)
+}
+
 
 fun isHeading(item: String): Boolean {
     return (item.equals(Constants.fbStatus, true)

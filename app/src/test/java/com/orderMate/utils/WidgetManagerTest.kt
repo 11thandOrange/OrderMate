@@ -81,13 +81,34 @@ class WidgetManagerTest {
 
     @Test
     fun `filterableWidgets returns single and multi select only`() {
-        val filterableWidgets = testWidgets.filter { 
-            it.type == WidgetType.SINGLE_SELECT || it.type == WidgetType.MULTI_SELECT 
+        val filterableWidgets = testWidgets.filter {
+            it.type == WidgetType.SINGLE_SELECT || it.type == WidgetType.MULTI_SELECT
         }
-        
+
         assertEquals(2, filterableWidgets.size)
         assertTrue(filterableWidgets.any { it.type == WidgetType.SINGLE_SELECT })
         assertTrue(filterableWidgets.any { it.type == WidgetType.MULTI_SELECT })
+    }
+
+    @Test
+    fun `getFilterableItemWidgets excludes QUANTITY - regression for PR 148 feedback`() {
+        // Mirrors WidgetManager.getFilterableItemWidgets()'s real predicate: enabled and
+        // WidgetType.isFilterable. Previously this only excluded TEXT_BOX, so an enabled
+        // QUANTITY widget incorrectly showed up as a toggle in Settings > Filter.
+        val withQuantity = testWidgets + WidgetConfig(
+            id = "widget5",
+            type = WidgetType.QUANTITY,
+            label = "Quantity",
+            isEnabled = true,
+            order = 4
+        )
+
+        val filterable = withQuantity.filter { it.isEnabled && it.type.isFilterable }
+
+        assertFalse(filterable.any { it.type == WidgetType.QUANTITY })
+        assertFalse(filterable.any { it.type == WidgetType.TEXT_BOX })
+        assertTrue(filterable.any { it.type == WidgetType.CALENDAR })
+        assertTrue(filterable.any { it.type == WidgetType.SINGLE_SELECT })
     }
 
     @Test

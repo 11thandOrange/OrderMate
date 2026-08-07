@@ -15,6 +15,7 @@ import com.orderMate.repository.CloverRepository
 import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.exceptionHandler
+import com.orderMate.utils.isOrderOpenForEditing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -114,7 +115,8 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
             existingNote = existingNote,
             itemName = itemName,
             itemModifiers = modifiersString,
-            itemQuantity = itemQuantity
+            itemQuantity = itemQuantity,
+            isOrderEditable = isOrderOpenForEditing(orderData)
         ).apply {
             setListener(object : ItemNoteDialogFragment.ItemNoteListener {
                 override fun onNoteSaved(itemId: String?, note: String, quantity: Int) {

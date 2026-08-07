@@ -47,6 +47,7 @@ import com.orderMate.utils.formatOrderState
 import com.orderMate.utils.getCustomerContactDetails
 import com.orderMate.utils.getThePaymentState
 import com.orderMate.utils.hideView
+import com.orderMate.utils.isOrderOpenForEditing
 import com.orderMate.utils.onBackPressed
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
@@ -1149,7 +1150,8 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             existingNote = existingNote,
             itemName = itemName,
             itemModifiers = modifiersString,
-            itemQuantity = itemQuantity
+            itemQuantity = itemQuantity,
+            isOrderEditable = isOrderOpenForEditing(orderArguments)
         ).apply {
             setListener(object : ItemNoteDialogFragment.ItemNoteListener {
                 override fun onNoteSaved(itemId: String?, note: String, quantity: Int) {

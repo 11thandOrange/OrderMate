@@ -27,6 +27,24 @@ class WidgetConfigTest {
     }
 
     @Test
+    fun `isFilterable excludes TEXT_BOX and QUANTITY`() {
+        assertFalse(WidgetType.TEXT_BOX.isFilterable)
+        assertFalse(WidgetType.QUANTITY.isFilterable)
+        assertTrue(WidgetType.SINGLE_SELECT.isFilterable)
+        assertTrue(WidgetType.MULTI_SELECT.isFilterable)
+        assertTrue(WidgetType.CALENDAR.isFilterable)
+    }
+
+    @Test
+    fun `savesToNotes is false only for QUANTITY`() {
+        assertFalse(WidgetType.QUANTITY.savesToNotes)
+        assertTrue(WidgetType.SINGLE_SELECT.savesToNotes)
+        assertTrue(WidgetType.MULTI_SELECT.savesToNotes)
+        assertTrue(WidgetType.CALENDAR.savesToNotes)
+        assertTrue(WidgetType.TEXT_BOX.savesToNotes)
+    }
+
+    @Test
     fun `widget type fromString defaults to TEXT_BOX for unknown`() {
         assertEquals(WidgetType.TEXT_BOX, WidgetType.fromString("UNKNOWN_TYPE"))
         assertEquals(WidgetType.TEXT_BOX, WidgetType.fromString(""))
