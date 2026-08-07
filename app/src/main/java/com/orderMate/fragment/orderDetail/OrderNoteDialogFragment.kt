@@ -49,6 +49,7 @@ class OrderNoteDialogFragment : DialogFragment() {
     private var currentCustomer: Customer? = null
     private var customerNameView: TextView? = null
     private var customerActionView: TextView? = null
+    private var onCustomerChanged: ((Customer?) -> Unit)? = null
 
     private val singleSelections = mutableMapOf<String, String?>()
     private val multiSelections = mutableMapOf<String, MutableSet<String>>()
@@ -278,12 +279,18 @@ class OrderNoteDialogFragment : DialogFragment() {
     }
 
     private fun openCustomerDialog() {
+        // Identical CustomerDialog invocation to OrderDetailFragment's existing hardcoded
+        // customerRow (#140 feedback: confirmed same customer/orderId/onCustomerUpdated
+        // contract) - the only addition is notifying the caller via onCustomerChanged so a
+        // screen open behind this popup (e.g. OrderDetailFragment) can refresh itself the
+        // same way the hardcoded row's own onCustomerUpdated already does.
         CustomerDialog.newInstance(
             customer = currentCustomer,
             orderId = orderId,
             onCustomerUpdated = { updatedCustomer ->
                 currentCustomer = updatedCustomer
                 renderCustomer()
+                onCustomerChanged?.invoke(updatedCustomer)
             }
         ).show(parentFragmentManager, CustomerDialog.TAG)
     }
@@ -524,6 +531,15 @@ class OrderNoteDialogFragment : DialogFragment() {
     /** Seeds the CUSTOMER widget with the order's currently assigned customer, if any (#140). */
     fun setCurrentCustomer(customer: Customer?) {
         this.currentCustomer = customer
+    }
+
+    /**
+     * Notified whenever the CUSTOMER widget assigns/changes the order's customer, so a caller
+     * showing its own order data behind this popup (e.g. OrderDetailFragment) can refresh -
+     * matching what the existing hardcoded customerRow's onCustomerUpdated already does (#140).
+     */
+    fun setOnCustomerChanged(listener: ((Customer?) -> Unit)?) {
+        this.onCustomerChanged = listener
     }
 
     companion object {

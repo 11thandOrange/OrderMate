@@ -132,7 +132,7 @@ object DefaultWidgetFactory {
         label: String,
         level: NoteLevel = NoteLevel.ITEM,
         isEnabled: Boolean = true,
-        showInFilter: Boolean = type != WidgetType.TEXT_BOX && type != WidgetType.QUANTITY && type != WidgetType.CUSTOMER,
+        showInFilter: Boolean = type.isFilterable,
         order: Int = 0,
         options: List<Pair<String, String>> = emptyList()
     ): WidgetConfig {
@@ -166,7 +166,7 @@ object DefaultWidgetFactory {
             label = type.displayName,
             isEnabled = true,
             isRequired = false,
-            showInFilter = type != WidgetType.TEXT_BOX && type != WidgetType.QUANTITY && type != WidgetType.CUSTOMER,
+            showInFilter = type.isFilterable,
             order = order,
             level = level,
             options = mutableListOf()

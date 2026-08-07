@@ -91,6 +91,27 @@ class WidgetManagerTest {
     }
 
     @Test
+    fun `getFilterableOrderWidgets excludes CUSTOMER - regression for PR 149 feedback`() {
+        // Mirrors WidgetManager.getFilterableOrderWidgets()'s real predicate: enabled and
+        // WidgetType.isFilterable. Previously this only excluded TEXT_BOX, so an enabled
+        // CUSTOMER widget incorrectly showed up as a toggle in Settings > Filter.
+        val withCustomer = testWidgets + WidgetConfig(
+            id = "widget5",
+            type = WidgetType.CUSTOMER,
+            label = "Customer",
+            isEnabled = true,
+            order = 4
+        )
+
+        val filterable = withCustomer.filter { it.isEnabled && it.type.isFilterable }
+
+        assertFalse(filterable.any { it.type == WidgetType.CUSTOMER })
+        assertFalse(filterable.any { it.type == WidgetType.TEXT_BOX })
+        assertTrue(filterable.any { it.type == WidgetType.CALENDAR })
+        assertTrue(filterable.any { it.type == WidgetType.SINGLE_SELECT })
+    }
+
+    @Test
     fun `enabledWidgets sorted by order`() {
         // Shuffle the order
         testWidgets[0].order = 3

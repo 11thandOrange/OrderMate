@@ -79,7 +79,16 @@ enum class WidgetType(val displayName: String) {
     CALENDAR("Calendar"),
     QUANTITY("Quantity"),
     CUSTOMER("Customer");
-    
+
+    /**
+     * Whether this widget type has discrete values a merchant could filter the order list
+     * by. TEXT_BOX (free text), QUANTITY (a live number), and CUSTOMER (assigned via search/
+     * create, not a fixed option set) don't - they're excluded from the order-list filter
+     * dialog and from the "Filter" toggle list in Settings entirely, not just defaulted off.
+     */
+    val isFilterable: Boolean
+        get() = this != TEXT_BOX && this != QUANTITY && this != CUSTOMER
+
     companion object {
         @JvmStatic
         fun fromString(value: String?): WidgetType {

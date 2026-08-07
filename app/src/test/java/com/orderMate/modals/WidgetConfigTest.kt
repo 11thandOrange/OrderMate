@@ -29,6 +29,16 @@ class WidgetConfigTest {
     }
 
     @Test
+    fun `isFilterable excludes TEXT_BOX, QUANTITY, and CUSTOMER`() {
+        assertFalse(WidgetType.TEXT_BOX.isFilterable)
+        assertFalse(WidgetType.QUANTITY.isFilterable)
+        assertFalse(WidgetType.CUSTOMER.isFilterable)
+        assertTrue(WidgetType.SINGLE_SELECT.isFilterable)
+        assertTrue(WidgetType.MULTI_SELECT.isFilterable)
+        assertTrue(WidgetType.CALENDAR.isFilterable)
+    }
+
+    @Test
     fun `widget type fromString defaults to TEXT_BOX for unknown`() {
         assertEquals(WidgetType.TEXT_BOX, WidgetType.fromString("UNKNOWN_TYPE"))
         assertEquals(WidgetType.TEXT_BOX, WidgetType.fromString(""))
