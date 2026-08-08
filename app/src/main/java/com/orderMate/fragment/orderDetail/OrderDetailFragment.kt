@@ -1234,30 +1234,23 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                                 // different, weight-based concept), so changing it means actually
                                 // adding or deleting line items (#139).
                                 val delta = quantity - itemQuantity
-                                if (delta > 0 && !itemId.isNullOrEmpty()) {
-                                    val template = existingGroupItems.firstOrNull()
-                                    val binName = template?.binName ?: ""
-                                    val newItems = orderConnector.addFixedPriceLineItems(
-                                        orderId, itemId, binName, "", delta
-                                    )
-                                    if (!newItems.isNullOrEmpty()) {
-                                        // Match every field CommonFunctions.getTheUniqueOrderItemKey()
-                                        // groups by (name/price/item are already identical since these
-                                        // came from the same catalog itemId) - a mismatch on any of
-                                        // these means the new copies won't merge into the same row and
-                                        // show up as a separate item instead (#139). Setting note
-                                        // unconditionally (not just when non-blank) matters: an unset
-                                        // note defaults to null on a freshly created item, which is a
-                                        // different key string than the existing group's explicit "".
-                                        newItems.forEach {
-                                            it?.note = note
-                                            it?.unitQty = template?.unitQty
-                                            it?.unitName = template?.unitName
-                                            it?.modifications = template?.modifications
+                                if (delta > 0) {
+                                    // Duplicate an actual existing (already note-updated, already
+                                    // grouped) line item via createLineItemsFrom rather than
+                                    // reconstructing one from catalog defaults. A rebuilt item
+                                    // (addFixedPriceLineItems) only guarantees name/price/item
+                                    // identity - note/unitQty/unitName/modifications all have to be
+                                    // reconciled by hand and still didn't reliably match on the
+                                    // second increase in a row, so a real duplicate is used instead:
+                                    // whatever the source item's true persisted field values are,
+                                    // the copy gets the same ones, by construction (#139).
+                                    val sourceId = existingGroupItems.firstOrNull()?.id
+                                    if (!sourceId.isNullOrEmpty()) {
+                                        repeat(delta) {
+                                            orderConnector.createLineItemsFrom(orderId, orderId, listOf(sourceId))
                                         }
-                                        orderConnector.updateLineItems(orderId, newItems)
                                     }
-                                    android.util.Log.d("ItemNoteReceivedDebug", "Added $delta line item(s)")
+                                    android.util.Log.d("ItemNoteReceivedDebug", "Added $delta line item(s) via createLineItemsFrom")
                                 } else if (delta < 0) {
                                     val idsToRemove = lineItemGroup?.lineItemDifferentId
                                         ?.filterNotNull()

@@ -147,26 +147,16 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
                             // different, weight-based concept), so changing it means actually
                             // adding or deleting line items (#139).
                             val delta = quantity - itemQuantity
-                            if (delta > 0 && !itemId.isNullOrEmpty()) {
-                                val template = existingGroupItems.firstOrNull()
-                                val binName = template?.binName ?: ""
-                                val newItems = orderConnector.addFixedPriceLineItems(
-                                    orderId, itemId, binName, "", delta
-                                )
-                                if (!newItems.isNullOrEmpty()) {
-                                    // Match every field CommonFunctions.getTheUniqueOrderItemKey()
-                                    // groups by, or the new copies won't merge into the same row and
-                                    // show up as a separate item instead (#139). Setting note
-                                    // unconditionally (not just when non-blank) matters: an unset
-                                    // note defaults to null on a freshly created item, which is a
-                                    // different key string than the existing group's explicit "".
-                                    newItems.forEach {
-                                        it?.note = note
-                                        it?.unitQty = template?.unitQty
-                                        it?.unitName = template?.unitName
-                                        it?.modifications = template?.modifications
+                            if (delta > 0) {
+                                // Duplicate an actual existing (already note-updated, already
+                                // grouped) line item via createLineItemsFrom rather than
+                                // reconstructing one from catalog defaults - see
+                                // OrderDetailFragment.onOrderItemClick for why (#139).
+                                val sourceId = existingGroupItems.firstOrNull()?.id
+                                if (!sourceId.isNullOrEmpty()) {
+                                    repeat(delta) {
+                                        orderConnector.createLineItemsFrom(orderId, orderId, listOf(sourceId))
                                     }
-                                    orderConnector.updateLineItems(orderId, newItems)
                                 }
                             } else if (delta < 0) {
                                 val idsToRemove = existingGroupItems.mapNotNull { it?.id }.take(-delta)
