@@ -31,6 +31,7 @@ import com.orderMate.utils.FilterCategoryBuilder
 import com.orderMate.modals.NoteLevel
 import com.orderMate.utils.ModalDialogCategories
 import com.orderMate.utils.MyApp
+import com.orderMate.utils.OrderHistoryStore
 import com.orderMate.utils.OrderSearchFilter
 import com.orderMate.utils.MyApp.Companion.filterArray
 import com.orderMate.utils.PreferenceManager
@@ -384,6 +385,14 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 // again (#138).
                 val freshIds = allItemList.mapNotNull { it?.id }.toSet()
                 allItemList.addAll(backfilledOlderOrders.filter { it?.id !in freshIds })
+
+                // Also re-merge every order OrderMate has ever locally observed, regardless of
+                // whether the REST backfill above is working - this is what keeps orders from
+                // disappearing even when the REST path is blocked (e.g. a permission grant that
+                // hasn't synced to this install - see #138 PR discussion).
+                val knownIds = allItemList.mapNotNull { it?.id }.toSet()
+                val rememberedOrders = OrderHistoryStore.getInstance(requireContext()).getAll()
+                allItemList.addAll(rememberedOrders.filter { it.id !in knownIds })
             } catch (e: Exception) {
                 e.printStackTrace()
                 // runOnBackgroundThread isn't tied to the fragment's lifecycle, so this
