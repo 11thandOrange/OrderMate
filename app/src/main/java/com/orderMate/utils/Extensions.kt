@@ -15,7 +15,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
 import com.orderMate.BuildConfig
 import com.orderMate.R
-import com.orderMate.activities.MainActivity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -257,11 +256,14 @@ fun Fragment.onBackPressed(task: () -> Unit) {
             task()
         }
     }
-    if (activity != null)
-        (activity as MainActivity).onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            onBackPressedCallback
-        )
+    // onBackPressedDispatcher is a ComponentActivity property, not something specific to
+    // MainActivity - the cast this used to do here crashed with a ClassCastException whenever
+    // a fragment was hosted by anything else (e.g. FragmentScenario's EmptyFragmentActivity in
+    // instrumented tests).
+    activity?.onBackPressedDispatcher?.addCallback(
+        viewLifecycleOwner,
+        onBackPressedCallback
+    )
 }
 
 

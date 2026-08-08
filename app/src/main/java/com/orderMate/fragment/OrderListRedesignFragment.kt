@@ -600,17 +600,24 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             }
 
             runOnMainThread {
+                // Safety check before modifying UI - this coroutine isn't tied to the
+                // fragment's lifecycle and can still run after the fragment has been
+                // navigated away from and detached. Same guard used elsewhere in this file.
+                if (!isAdded || _binding == null) {
+                    return@runOnMainThread
+                }
+
                 // All list modifications on main thread to avoid RecyclerView inconsistency
                 orderItems.clear()
                 orderItems.addAll(tempResults)
-                
+
                 updateResultsInfo()
                 notifyAdapter()
                 updateEmptyState()
             }
         }
     }
-    
+
     /**
      * Add a date to the current filter state (matches HTML behavior)
      * Creates a pill for the date in the filter pills row
@@ -894,6 +901,13 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun updateFilterOptions() {
+        // Called from CoroutineScope(Dispatchers.Default).launch, which isn't tied to the
+        // fragment's lifecycle - loadNotesFiltersV2() below calls getString()/requireContext()
+        // and would crash the process if the fragment has been navigated away from and
+        // detached by the time this runs. Guarding here covers loadNotesFiltersV2() too
+        // rather than guarding each individually. Same guard used elsewhere in this file.
+        if (!isAdded || _binding == null) return
+
         orderPaymentStatusType.clear()
         orderPaymentStatusType.add(Constants.all_orders)
         

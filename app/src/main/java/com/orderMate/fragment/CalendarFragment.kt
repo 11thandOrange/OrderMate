@@ -802,6 +802,13 @@ class CalendarFragment : Fragment() {
             val tempFilteredEvents = convertOrdersToEvents(tempFilteredOrders)
 
             runOnMainThread {
+                // runOnBackgroundThread/runOnMainThread aren't tied to the fragment's view
+                // lifecycle, so this block can still run after the fragment has been
+                // navigated away from and detached - renderCalendar() calls requireContext()
+                // and would crash the process in that case. Same guard used elsewhere in
+                // this file (loadOrders(), applyFiltersSync()).
+                if (!isAdded || view == null) return@runOnMainThread
+
                 // All list modifications on main thread to avoid RecyclerView inconsistency
                 filteredOrders.clear()
                 filteredOrders.addAll(tempFilteredOrders)
