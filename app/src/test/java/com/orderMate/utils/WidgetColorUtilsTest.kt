@@ -7,7 +7,8 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
 /**
- * Unit tests for WidgetColorUtils' per-widget-type color/icon lookups (#139 adds QUANTITY).
+ * Unit tests for WidgetColorUtils' per-widget-type color/icon lookups (#139 adds QUANTITY,
+ * #140 adds CUSTOMER).
  */
 class WidgetColorUtilsTest {
 
@@ -18,6 +19,7 @@ class WidgetColorUtilsTest {
         assertEquals(WidgetColorUtils.COLOR_MULTI_SELECT, WidgetColorUtils.getColorForWidgetType(WidgetType.MULTI_SELECT))
         assertEquals(WidgetColorUtils.COLOR_TEXT_BOX, WidgetColorUtils.getColorForWidgetType(WidgetType.TEXT_BOX))
         assertEquals(WidgetColorUtils.COLOR_QUANTITY, WidgetColorUtils.getColorForWidgetType(WidgetType.QUANTITY))
+        assertEquals(WidgetColorUtils.COLOR_CUSTOMER, WidgetColorUtils.getColorForWidgetType(WidgetType.CUSTOMER))
     }
 
     @Test
@@ -27,10 +29,11 @@ class WidgetColorUtilsTest {
         assertEquals(WidgetColorUtils.BG_COLOR_MULTI_SELECT, WidgetColorUtils.getBgColorForWidgetType(WidgetType.MULTI_SELECT))
         assertEquals(WidgetColorUtils.BG_COLOR_TEXT_BOX, WidgetColorUtils.getBgColorForWidgetType(WidgetType.TEXT_BOX))
         assertEquals(WidgetColorUtils.BG_COLOR_QUANTITY, WidgetColorUtils.getBgColorForWidgetType(WidgetType.QUANTITY))
+        assertEquals(WidgetColorUtils.BG_COLOR_CUSTOMER, WidgetColorUtils.getBgColorForWidgetType(WidgetType.CUSTOMER))
     }
 
     @Test
-    fun `quantity color is distinct from every other widget color`() {
+    fun `quantity and customer colors are distinct from every other widget color`() {
         val otherColors = listOf(
             WidgetColorUtils.COLOR_CALENDAR,
             WidgetColorUtils.COLOR_SINGLE_SELECT,
@@ -39,6 +42,8 @@ class WidgetColorUtilsTest {
         )
 
         otherColors.forEach { assertNotEquals(it, WidgetColorUtils.COLOR_QUANTITY) }
+        otherColors.forEach { assertNotEquals(it, WidgetColorUtils.COLOR_CUSTOMER) }
+        assertNotEquals(WidgetColorUtils.COLOR_QUANTITY, WidgetColorUtils.COLOR_CUSTOMER)
     }
 
     @Test
@@ -48,5 +53,6 @@ class WidgetColorUtilsTest {
         assertEquals(R.drawable.ic_check_double, WidgetColorUtils.getIconForWidgetType(WidgetType.MULTI_SELECT))
         assertEquals(R.drawable.ic_text_format, WidgetColorUtils.getIconForWidgetType(WidgetType.TEXT_BOX))
         assertEquals(R.drawable.ic_add_circle, WidgetColorUtils.getIconForWidgetType(WidgetType.QUANTITY))
+        assertEquals(R.drawable.ic_user_circle, WidgetColorUtils.getIconForWidgetType(WidgetType.CUSTOMER))
     }
 }

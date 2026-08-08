@@ -77,27 +77,30 @@ enum class WidgetType(val displayName: String) {
     MULTI_SELECT("Multi Select"),
     TEXT_BOX("Text Box"),
     CALENDAR("Calendar"),
-    QUANTITY("Quantity");
+    QUANTITY("Quantity"),
+    CUSTOMER("Customer");
 
     /**
      * Whether this widget type has discrete values a merchant could filter the order list
-     * by. TEXT_BOX (free text) and QUANTITY (a live number, not a value with a fixed set of
-     * options) don't - they're excluded from the order-list filter dialog and from the
-     * "Filter" toggle list in Settings entirely, not just defaulted off.
+     * by. TEXT_BOX (free text), QUANTITY (a live number), and CUSTOMER (assigned via
+     * search/create, not a fixed option set) don't - they're excluded from the order-list
+     * filter dialog and from the "Filter" toggle list in Settings entirely, not just
+     * defaulted off.
      */
     val isFilterable: Boolean
-        get() = this != TEXT_BOX && this != QUANTITY
+        get() = this != TEXT_BOX && this != QUANTITY && this != CUSTOMER
 
     /**
      * Whether this widget's value is stored in the item/order note (Order.note /
      * LineItem.note, synced to Firebase-configured widgets) versus written directly to a
      * live Clover field with no note/DB storage at all. QUANTITY reads and writes
-     * LineItem.unitQty directly - it has no note representation. Widgets that are
+     * LineItem.unitQty directly; CUSTOMER assigns Order.customers via the existing
+     * CustomerDialog save/assign flow - neither has a note representation. Widgets that are
      * `!savesToNotes` render outside the notes section in the popup (see
-     * ItemNoteDialogFragment) since they aren't "notes."
+     * ItemNoteDialogFragment/OrderNoteDialogFragment) since they aren't "notes."
      */
     val savesToNotes: Boolean
-        get() = this != QUANTITY
+        get() = this != QUANTITY && this != CUSTOMER
 
     companion object {
         @JvmStatic

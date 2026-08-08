@@ -15,6 +15,7 @@ class WidgetConfigTest {
         assertEquals("Tags", WidgetType.MULTI_SELECT.displayName)
         assertEquals("Description", WidgetType.TEXT_BOX.displayName)
         assertEquals("Quantity", WidgetType.QUANTITY.displayName)
+        assertEquals("Customer", WidgetType.CUSTOMER.displayName)
     }
 
     @Test
@@ -24,20 +25,23 @@ class WidgetConfigTest {
         assertEquals(WidgetType.MULTI_SELECT, WidgetType.fromString("MULTI_SELECT"))
         assertEquals(WidgetType.TEXT_BOX, WidgetType.fromString("TEXT_BOX"))
         assertEquals(WidgetType.QUANTITY, WidgetType.fromString("QUANTITY"))
+        assertEquals(WidgetType.CUSTOMER, WidgetType.fromString("CUSTOMER"))
     }
 
     @Test
-    fun `isFilterable excludes TEXT_BOX and QUANTITY`() {
+    fun `isFilterable excludes TEXT_BOX, QUANTITY, and CUSTOMER`() {
         assertFalse(WidgetType.TEXT_BOX.isFilterable)
         assertFalse(WidgetType.QUANTITY.isFilterable)
+        assertFalse(WidgetType.CUSTOMER.isFilterable)
         assertTrue(WidgetType.SINGLE_SELECT.isFilterable)
         assertTrue(WidgetType.MULTI_SELECT.isFilterable)
         assertTrue(WidgetType.CALENDAR.isFilterable)
     }
 
     @Test
-    fun `savesToNotes is false only for QUANTITY`() {
+    fun `savesToNotes is false only for QUANTITY and CUSTOMER`() {
         assertFalse(WidgetType.QUANTITY.savesToNotes)
+        assertFalse(WidgetType.CUSTOMER.savesToNotes)
         assertTrue(WidgetType.SINGLE_SELECT.savesToNotes)
         assertTrue(WidgetType.MULTI_SELECT.savesToNotes)
         assertTrue(WidgetType.CALENDAR.savesToNotes)

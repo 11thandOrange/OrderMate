@@ -1103,6 +1103,13 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
             orderId = orderArguments?.id,
             existingNote = existingNote
         ).apply {
+            setCurrentCustomer(orderArguments?.customers?.firstOrNull())
+            // Same refresh behavior as the existing hardcoded customerRow's onCustomerUpdated -
+            // keeps this screen in sync when the customer is changed via the widget instead
+            // (#140 feedback).
+            setOnCustomerChanged {
+                CoroutineScope(Dispatchers.IO).launch { refreshUI() }
+            }
             setListener(object : OrderNoteDialogFragment.OrderNoteListener {
                 override fun onOrderNoteSaved(orderId: String?, note: String) {
                     if (orderId != null) {
