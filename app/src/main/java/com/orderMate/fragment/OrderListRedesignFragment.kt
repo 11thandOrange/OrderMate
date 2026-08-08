@@ -401,6 +401,12 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 showLoading(false)
                 applyCurrentViewToOrderItems()
                 onComplete?.invoke()
+
+                // Eagerly pull in the merchant's full order history in the background,
+                // rather than waiting for the user to scroll (#138) - this is a no-op once
+                // hasMoreOlderOrders is false, i.e. after the first time it's run to
+                // completion, since that flag persists across reloads.
+                loadOlderOrders()
             }
 
             // Update filter options
@@ -455,13 +461,18 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     /**
-     * Fetches the next page of orders older than what Clover's on-device cache retains, via
-     * Clover's REST Orders API, triggered by scrolling near the bottom of the list rather than
-     * a "Load more" button (#150). Appends any new orders (deduped by id) to the existing list,
-     * re-applies whatever view (filtered/search/plain) is currently active, and - since that
-     * re-application recomputes updateResultsInfo() from the merged list - the order
-     * count/total shown at the top of the screen reflects every loaded order, not just the
-     * first page.
+     * Fetches the merchant's full order history beyond what Clover's on-device cache retains,
+     * via Clover's REST Orders API - one page per call, chaining itself to fetch the next page
+     * immediately after a successful one, until the API returns an empty page (#138). Runs
+     * automatically in the background right after every loadOrders() completes, so the whole
+     * history is pulled in without the user needing to scroll for it; the RecyclerView scroll
+     * listener also calls this as a redundant nudge in case the eager chain hasn't caught up
+     * yet, but is normally a same-page no-op by the time the user reaches the bottom.
+     *
+     * Appends any new orders (deduped by id) to the existing list, re-applies whatever view
+     * (filtered/search/plain) is currently active, and - since that re-application recomputes
+     * updateResultsInfo() from the merged list - the order count/total shown at the top of the
+     * screen reflects every loaded order, not just the first page.
      */
     private fun loadOlderOrders() {
         if (isLoadingOlderOrders || !hasMoreOlderOrders || !isAdded) return
@@ -486,8 +497,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
             // Clover's offset is "how many of the merchant's orders to skip", independent of
             // how many were new to us - always advance by the page size actually returned so
-            // the next scroll-triggered fetch keeps paging forward instead of re-fetching the
-            // same page.
+            // the next fetch keeps paging forward instead of re-fetching the same page.
             olderOrdersOffset += olderOrders.size
 
             val existingIds = allItemList.mapNotNull { it?.id }.toSet()
@@ -499,6 +509,12 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             backfilledOlderOrders.addAll(newOrders)
 
             applyCurrentViewToOrderItems()
+
+            // Keep going until the API signals there's nothing left (#138 - "just return all
+            // orders" rather than one page at a time).
+            if (hasMoreOlderOrders) {
+                loadOlderOrders()
+            }
         }
     }
 

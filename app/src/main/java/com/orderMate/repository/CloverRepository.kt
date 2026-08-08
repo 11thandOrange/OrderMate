@@ -50,7 +50,10 @@ class CloverRepository private constructor(private val context: Context) {
         private val apiWithAuth = RetrofitInstanceWithAuth.getApiService()
 
         private const val TAG = "CloverRepository"
-        const val DEFAULT_OLDER_ORDERS_PAGE_SIZE = 50
+        // Clover's REST Orders API caps requests at 1000 records - used as the page size since
+        // the app now eagerly backfills a merchant's entire order history in the background
+        // rather than one small page per scroll event (#138), so fewer round trips is better.
+        const val DEFAULT_OLDER_ORDERS_PAGE_SIZE = 1000
     }
 
     // ==================== Messaging API ====================
