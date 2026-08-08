@@ -287,15 +287,13 @@ After webhook events are processed, check Firebase Realtime Database:
 
 ### Verify Webhook Origin
 
-Clover includes an `X-Clover-Auth` header with each webhook request. You can verify this matches your app's auth code.
+Clover includes an `X-Clover-Auth` header with each webhook request. `cloverWebhook.ts` verifies this matches `CLOVER_AUTH_CODE` (env var) before processing any real event - requests without a matching header get a `401`. This does **not** apply to the verification handshake (`{verificationCode: "..."}`), since that's the one-time setup step used before `CLOVER_AUTH_CODE` is even configured.
 
-```typescript
-const cloverAuthCode = req.headers['x-clover-auth'];
-if (cloverAuthCode !== process.env.CLOVER_AUTH_CODE) {
-  res.status(401).send('Unauthorized');
-  return;
-}
+Set the env var before deploying:
+```bash
+firebase functions:config:set clover.auth_code="your-app-auth-code"
 ```
+(or `CLOVER_AUTH_CODE` directly in `.env`/`.runtimeconfig.json` for local emulation - see your app's Clover Developer Dashboard for the auth code value.)
 
 ### HTTPS Only
 
