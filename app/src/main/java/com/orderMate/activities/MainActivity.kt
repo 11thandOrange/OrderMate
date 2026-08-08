@@ -27,6 +27,7 @@ import com.orderMate.utils.ProfileSettingsManager
 import com.orderMate.utils.WidgetManager
 import com.orderMate.utils.createAndShowDialog
 import com.orderMate.utils.exceptionHandler
+import com.orderMate.utils.migrations.CloverNotesToV2Migrator
 import com.orderMate.utils.runOnBackgroundThread
 import com.orderMate.utils.runOnMainThread
 import kotlinx.coroutines.CoroutineScope
@@ -304,6 +305,7 @@ class MainActivity : AppCompatActivity() {
         val merchantId = MyApp.getInstance().getMerchantId()
         if (!merchantId.isNullOrEmpty()) {
             syncWidgetsFromFirebase(merchantId)
+            runCloverNotesMigration(merchantId)
         }
 
         // this permission is required for the Devices above api level 23
@@ -326,6 +328,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
+    /**
+     * Run migration from legacy Clover order notes to V2 widgets, once per merchant.
+     * Reads orders, parses any freeform "label:value" notes left over from before the
+     * widget system existed, and creates matching V2 widgets in Firebase. Notes already in
+     * V2 format ("[widgetId]label:value") are left untouched by the migrator itself.
+     * Tracked in SharedPreferences so it only runs once per merchant per install.
+     */
+    private fun runCloverNotesMigration(merchantId: String) {
+        val migrationKey = "clover_notes_migration_completed_$merchantId"
+        val prefs = getSharedPreferences("migration_prefs", MODE_PRIVATE)
+        if (prefs.getBoolean(migrationKey, false)) {
+            return
+        }
+
+        CloverNotesToV2Migrator.migrate(this, merchantId) { result ->
+            Log.d("MainActivity", "Clover notes migration: success=${result.success} " +
+                "ordersAnalyzed=${result.ordersAnalyzed} legacyNotesFound=${result.legacyNotesFound} " +
+                "widgetsCreated=${result.widgetsCreated} errors=${result.errors}")
+
+            if (result.success) {
+                prefs.edit().putBoolean(migrationKey, true).apply()
+            }
+        }
+    }
+
     /**
      * #81: Check if current user can access settings based on role permissions
      * If user doesn't have access, hide the settings nav icon
