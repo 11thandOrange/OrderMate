@@ -15,6 +15,7 @@ import com.orderMate.repository.CloverRepository
 import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.exceptionHandler
+import com.orderMate.utils.isOrderOpenForEditing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -118,23 +119,25 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
             existingNote = existingNote,
             itemName = itemName,
             itemModifiers = modifiersString,
-            itemQuantity = itemQuantity
+            itemQuantity = itemQuantity,
+            isOrderEditable = isOrderOpenForEditing(orderData)
         ).apply {
             setListener(object : ItemNoteDialogFragment.ItemNoteListener {
-                override fun onNoteSaved(itemId: String?, note: String) {
-                    // Update line item note in Clover
+                override fun onNoteSaved(itemId: String?, note: String, quantity: Int) {
+                    // Update line item note and quantity in Clover
                     CoroutineScope(Dispatchers.IO).launch {
                         exceptionHandler {
                             val orderId = orderData?.id ?: return@exceptionHandler
                             val allLineItems = orderData?.lineItems ?: return@exceptionHandler
-                            
-                            // Update note for matching line items
+
+                            // Update note and quantity for matching line items (#139)
                             allLineItems.forEach { lineItem ->
                                 if (lineItem?.item?.id == itemId) {
                                     lineItem.note = note
+                                    lineItem.unitQty = quantity
                                 }
                             }
-                            
+
                             // Save to Clover
                             MyApp.getInstance().getOrderConnector().updateLineItems(orderId, allLineItems)
                         }

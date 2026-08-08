@@ -49,12 +49,14 @@ object WidgetColorUtils {
     const val COLOR_SINGLE_SELECT = 0xFFCE93D8.toInt() // Purple
     const val COLOR_MULTI_SELECT = 0xFF81C784.toInt()  // Green
     const val COLOR_TEXT_BOX = 0xFFA1887F.toInt()      // Brown
-    
+    const val COLOR_QUANTITY = 0xFF4DB6AC.toInt()      // Teal
+
     // Widget type colors - BACKGROUND (darker shade, matches bg_widget_icon_*.xml)
     const val BG_COLOR_CALENDAR = 0xFF1976D2.toInt()      // Dark Blue
     const val BG_COLOR_SINGLE_SELECT = 0xFF7B1FA2.toInt() // Dark Purple
     const val BG_COLOR_MULTI_SELECT = 0xFF388E3C.toInt()  // Dark Green
     const val BG_COLOR_TEXT_BOX = 0xFFF57C00.toInt()      // Dark Orange
+    const val BG_COLOR_QUANTITY = 0xFF00796B.toInt()      // Dark Teal
     
     // Clover filter colors
     const val COLOR_PAYMENT_STATUS = 0xFFFFB74D.toInt()  // Yellow
@@ -72,6 +74,7 @@ object WidgetColorUtils {
             WidgetType.SINGLE_SELECT -> COLOR_SINGLE_SELECT
             WidgetType.MULTI_SELECT -> COLOR_MULTI_SELECT
             WidgetType.TEXT_BOX -> COLOR_TEXT_BOX
+            WidgetType.QUANTITY -> COLOR_QUANTITY
         }
     }
     
@@ -85,9 +88,10 @@ object WidgetColorUtils {
             WidgetType.SINGLE_SELECT -> BG_COLOR_SINGLE_SELECT
             WidgetType.MULTI_SELECT -> BG_COLOR_MULTI_SELECT
             WidgetType.TEXT_BOX -> BG_COLOR_TEXT_BOX
+            WidgetType.QUANTITY -> BG_COLOR_QUANTITY
         }
     }
-    
+
     /**
      * Get icon resource for a widget type - centralized to avoid duplicate functions
      * (#77) Single Select = checkmark, Multi Select = double checkmark, Text Box = 'A' icon
@@ -98,6 +102,7 @@ object WidgetColorUtils {
             WidgetType.SINGLE_SELECT -> R.drawable.ic_check_box
             WidgetType.MULTI_SELECT -> R.drawable.ic_check_double
             WidgetType.TEXT_BOX -> R.drawable.ic_text_format
+            WidgetType.QUANTITY -> R.drawable.ic_add_circle
         }
     }
     
@@ -150,6 +155,7 @@ object WidgetColorUtils {
             WidgetType.SINGLE_SELECT -> R.drawable.bg_widget_icon_select
             WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
             WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
+            WidgetType.QUANTITY -> R.drawable.bg_widget_icon_quantity
         }
     }
     

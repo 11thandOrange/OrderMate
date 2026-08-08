@@ -906,6 +906,17 @@ class SettingsFragment : Fragment() {
         dialogView.findViewById<View>(R.id.optionTextBox)?.setOnClickListener {
             addWidgetOfType(FirebaseWidgetType.TEXT_BOX)
         }
+        // Quantity edits a line item's actual quantity, so it only makes sense at the item
+        // level - hide the option entirely when adding an order-level widget (#139).
+        val optionQuantity = dialogView.findViewById<View>(R.id.optionQuantity)
+        if (level == NoteLevel.ITEM) {
+            optionQuantity?.visibility = View.VISIBLE
+            optionQuantity?.setOnClickListener {
+                addWidgetOfType(FirebaseWidgetType.QUANTITY)
+            }
+        } else {
+            optionQuantity?.visibility = View.GONE
+        }
         dialogView.findViewById<View>(R.id.btnCancel)?.setOnClickListener {
             dialog.dismiss()
         }
