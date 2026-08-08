@@ -64,14 +64,20 @@ package com.orderMate.utils
  *   │   ├── partnerName
  *   │   ├── submittedAt
  *   │   └── submittedBy
- *   └── discounts/{discountId}/          (#81 - admin only)
- *       ├── id
- *       ├── amount
- *       ├── startDate
- *       ├── endDate
- *       ├── discountCode
- *       ├── createdAt
- *       └── isActive
+ *   ├── discounts/{discountId}/          (#81 - admin only)
+ *   │   ├── id
+ *   │   ├── amount
+ *   │   ├── startDate
+ *   │   ├── endDate
+ *   │   ├── discountCode
+ *   │   ├── createdAt
+ *   │   └── isActive
+ *   └── orderConversations/{orderId}/{conversationId}: true  (#54)
+ *       Bird conversation ids recorded against the order they were sent for.
+ *       Bird itself has no server-side way to query conversations by order -
+ *       its `resource` field has a fixed type enum with no value for an order
+ *       and requires a UUID id, which Clover order ids never are - so
+ *       OrderMate tracks this mapping itself to render notification history.
  *
  * referralPartners/{partnerKey}/{referralId}/  (#142 - top-level, NOT merchant-scoped)
  *   Denormalized copy of each referral, keyed by a normalized partner name, so
@@ -94,6 +100,9 @@ object FirebasePaths {
     const val PROFILES = "profiles"
     const val REFERRALS = "referrals"
     const val DISCOUNTS = "discounts"
+
+    // #54: Bird conversation ids recorded per order
+    const val ORDER_CONVERSATIONS = "orderConversations"
 
     // Top-level (not merchant-scoped) index for cross-merchant partner lookups
     const val REFERRAL_PARTNERS = "referralPartners"
@@ -158,9 +167,17 @@ object FirebasePaths {
     // ==================== #81: Discounts ====================
     
     fun discounts(merchantId: String) = "${merchant(merchantId)}/$DISCOUNTS"
-    
-    fun discount(merchantId: String, discountId: String) = 
+
+    fun discount(merchantId: String, discountId: String) =
         "${discounts(merchantId)}/$discountId"
+
+    // ==================== #54: Order Conversations ====================
+
+    fun orderConversations(merchantId: String, orderId: String) =
+        "${merchant(merchantId)}/$ORDER_CONVERSATIONS/$orderId"
+
+    fun orderConversation(merchantId: String, orderId: String, conversationId: String) =
+        "${orderConversations(merchantId, orderId)}/$conversationId"
 
     // ==================== #97/#98: Merchant Info ====================
 

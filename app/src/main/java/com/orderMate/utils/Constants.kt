@@ -46,11 +46,6 @@ class Constants {
         const val subcategory: String = "subcategory"
         const val customData: String = "customData"
         const val data: String = "data"
-        // #54: RTDB path storing which Bird conversation ids belong to which order,
-        // keyed by merchantId/orderId - Bird has no order-aware server-side filter
-        // (its `resource` field has a fixed type enum with no value for an order),
-        // so OrderMate tracks this mapping itself.
-        const val orderConversations: String = "orderConversations"
         const val debouncingTime: Long = 300
         const val BASE_URL = "https://api.bird.com/"
         const val TIME_OUT_DURATION = 1L

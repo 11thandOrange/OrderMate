@@ -54,9 +54,9 @@ class FirebaseRealtimeDataBaseManager private constructor() {
         conversationId: String,
         task: (Boolean) -> Unit
     ) {
-        firebaseDatabaseInstance?.reference
-            ?.child(Constants.orderConversations)?.child(merchantId)?.child(orderId)
-            ?.child(conversationId)?.setValue(true)
+        firebaseDatabaseInstance?.getReference(
+            FirebasePaths.orderConversation(merchantId, orderId, conversationId)
+        )?.setValue(true)
             ?.addOnSuccessListener { task(true) }
             ?.addOnFailureListener { task(false) }
     }
@@ -69,9 +69,9 @@ class FirebaseRealtimeDataBaseManager private constructor() {
         orderId: String,
         task: (List<String>) -> Unit
     ) {
-        firebaseDatabaseInstance?.reference
-            ?.child(Constants.orderConversations)?.child(merchantId)?.child(orderId)
-            ?.get()
+        firebaseDatabaseInstance?.getReference(
+            FirebasePaths.orderConversations(merchantId, orderId)
+        )?.get()
             ?.addOnSuccessListener { snapshot ->
                 task(snapshot.children.mapNotNull { it.key })
             }
