@@ -25,6 +25,12 @@ Every event log write uses a deterministic key (`{merchantId}_{type}_{ts}`) inst
 
 Only the "Apps" webhook category (install/uninstall/subscription-changed) is implemented. Orders, Payments, Refunds, Customers, and Inventory categories are not subscribed to or handled - `handleCloverWebhookEvent()` logs and drops any event whose `objectId` prefix isn't `A:`.
 
+### cloverOAuthCallback
+
+HTTPS endpoint configured as the app's **App URL** in the Clover Developer Dashboard (Configuration page, separate from the Webhooks page). When a merchant installs the app, Clover redirects their browser here with `?merchant_id=...&code=...`. This exchanges that one-time authorization `code` for a token scoped to that merchant only (`POST {CLOVER_OAUTH_BASE_URL}/oauth/v2/token` with `CLOVER_CLIENT_ID`/`CLOVER_CLIENT_SECRET`), and stores the result at `merchants/{merchantId}/cloverAuth`.
+
+`fetchMerchantFromClover()` (used by the `APP_INSTALLED` handler to populate `merchantInfo`) reads that merchant's stored token via `getValidAccessToken()` (`src/oauth/cloverAuth.ts`), refreshing it first if expired. There is no global, hardcoded, or shared-across-merchants API token anywhere in this codebase - each merchant's data is only ever accessed with that merchant's own token, obtained through their own install.
+
 ## Quick Start
 
 ### 1. Install Dependencies
@@ -36,23 +42,19 @@ npm install
 
 ### 2. Configure Environment
 
-Set Firebase environment variables:
+Copy `.env.example` to `.env` and fill in your app's Clover credentials
+(`CLOVER_CLIENT_ID`/`CLOVER_CLIENT_SECRET`, from the Developer Dashboard's
+Configuration page, plus `CLOVER_AUTH_CODE`, from the Webhooks page). These
+are Gen 2 functions - they read `process.env` directly from `.env`, not the
+legacy `firebase functions:config:set` store.
 
 ```bash
-firebase functions:config:set clover.api_token="your-clover-api-token"
-firebase functions:config:set clover.base_url="https://api.clover.com"
+cp .env.example .env
 ```
 
-For local development, create `.runtimeconfig.json`:
-
-```json
-{
-  "clover": {
-    "api_token": "your-clover-api-token",
-    "base_url": "https://api.clover.com"
-  }
-}
-```
+There is no per-merchant API token to configure here - each merchant's own
+access token is obtained automatically via OAuth when they install the app
+(see [cloverOAuthCallback](#cloveroauthcallback) below).
 
 ### 3. Build & Deploy
 
@@ -90,7 +92,11 @@ See [WEBHOOK_SETUP.md](./WEBHOOK_SETUP.md) for detailed instructions.
 npm test
 ```
 
-Runs the Jest suite in `src/webhooks/cloverWebhook.test.ts` against a mocked `firebase-admin` (no real Firebase project needed). Covers: the verification handshake, both payload formats, auth rejection (missing/wrong header, unconfigured `CLOVER_AUTH_CODE`), the idempotent event-key behavior on a simulated Clover retry, and that a batch with multiple merchants keeps processing the healthy ones when one fails - while still reporting the failure (`500`, not `200`) so Clover retries the delivery instead of the failed write being silently dropped.
+Runs the Jest suite in `src/webhooks/cloverWebhook.test.ts` and `src/oauth/cloverOAuthCallback.test.ts` against a mocked `firebase-admin` and mocked `axios` (no real Firebase project or Clover calls needed).
+
+`cloverWebhook.test.ts` covers: the verification handshake, both payload formats, auth rejection (missing/wrong header, unconfigured `CLOVER_AUTH_CODE`), the idempotent event-key behavior on a simulated Clover retry, and that a batch with multiple merchants keeps processing the healthy ones when one fails - while still reporting the failure (`500`, not `200`) so Clover retries the delivery instead of the failed write being silently dropped.
+
+`cloverOAuthCallback.test.ts` covers: a successful code exchange storing the merchant's token, rejecting a request missing `merchant_id`/`code`, and surfacing an exchange failure as `500` rather than silently leaving the merchant with no token.
 
 ### Test with Postman or cURL
 
@@ -158,8 +164,10 @@ merchants/{merchantId}/
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `CLOVER_API_TOKEN` | Clover API access token for fetching merchant details | - |
-| `CLOVER_BASE_URL` | Clover API base URL | `https://api.clover.com` |
+| `CLOVER_CLIENT_ID` | Your app's OAuth client ID (Developer Dashboard > Configuration). Identifies your app, not any merchant. | - |
+| `CLOVER_CLIENT_SECRET` | Your app's OAuth client secret (same page). Used server-side only, to exchange each merchant's install code for that merchant's own access token. | - |
+| `CLOVER_OAUTH_BASE_URL` | Clover's OAuth token host | `https://www.clover.com` |
+| `CLOVER_BASE_URL` | Clover REST API base URL | `https://api.clover.com` |
 | `CLOVER_AUTH_CODE` | Required. Must match the `X-Clover-Auth` header Clover sends with every webhook event. Without this set, all real events (everything except the verification handshake) are rejected with 401. | - |
 
 **Sandbox:** Use `https://sandbox.dev.clover.com` for testing.
@@ -170,9 +178,13 @@ merchants/{merchantId}/
 functions/
 ├── src/
 │   ├── index.ts                      # Main entry, exports functions
-│   └── webhooks/
-│       ├── cloverWebhook.ts          # Clover webhook handler
-│       └── cloverWebhook.test.ts     # Jest tests (npm test)
+│   ├── webhooks/
+│   │   ├── cloverWebhook.ts          # Clover webhook handler
+│   │   └── cloverWebhook.test.ts     # Jest tests (npm test)
+│   └── oauth/
+│       ├── cloverAuth.ts             # Per-merchant token storage/refresh
+│       ├── cloverOAuthCallback.ts    # App URL - exchanges install code for token
+│       └── cloverOAuthCallback.test.ts
 ├── jest.config.js
 ├── package.json
 ├── tsconfig.json

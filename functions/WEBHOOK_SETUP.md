@@ -89,6 +89,30 @@ After verification succeeds:
 
 3. Click **Save**
 
+### Step 6: Configure the App URL (required for merchant enrichment)
+
+The webhook alone only tells you *that* a merchant installed/uninstalled -
+it does not give you a token to call Clover's REST API on that merchant's
+behalf. That token comes from a separate OAuth handshake, triggered by a
+different setting:
+
+1. In the Clover Developer Dashboard, go to **App Settings** ->
+   **Configuration** (not Webhooks)
+2. Set the **App URL** to:
+   ```
+   https://us-central1-ordermate-53077.cloudfunctions.net/cloverOAuthCallback
+   ```
+3. Set **CLOVER_CLIENT_ID** and **CLOVER_CLIENT_SECRET** in `functions/.env`
+   to the values shown on that same Configuration page (these identify your
+   *app*, not any one merchant - see [Environment Variables](./README.md#environment-variables))
+
+When a merchant installs the app, Clover redirects their browser to the App
+URL with `?merchant_id=...&code=...`. `cloverOAuthCallback` exchanges that
+one-time `code` for an access token scoped to that merchant only, and
+stores it at `merchants/{merchantId}/cloverAuth`. No merchant ever needs to
+be handed an API key manually, and no single static token is shared across
+merchants.
+
 ## Verification Flow Diagram
 
 ```
@@ -289,11 +313,20 @@ After webhook events are processed, check Firebase Realtime Database:
 
 Clover includes an `X-Clover-Auth` header with each webhook request. `cloverWebhook.ts` verifies this matches `CLOVER_AUTH_CODE` (env var) before processing any real event - requests without a matching header get a `401`. This does **not** apply to the verification handshake (`{verificationCode: "..."}`), since that's the one-time setup step used before `CLOVER_AUTH_CODE` is even configured.
 
-Set the env var before deploying:
-```bash
-firebase functions:config:set clover.auth_code="your-app-auth-code"
-```
-(or `CLOVER_AUTH_CODE` directly in `.env`/`.runtimeconfig.json` for local emulation - see your app's Clover Developer Dashboard for the auth code value.)
+Set `CLOVER_AUTH_CODE` in `functions/.env` before deploying (Gen 2 functions
+read `process.env`, not the legacy `firebase functions:config:set` store) -
+see your app's Clover Developer Dashboard, Webhooks section, for the value
+(it only appears after the verification handshake in Step 4 succeeds).
+
+### No Hardcoded or Shared Merchant Tokens
+
+`CLOVER_API_TOKEN` used to be a single static value pasted into `.env`,
+which only ever worked for whichever one merchant it was copied from. It has
+been replaced by the per-merchant OAuth flow described in
+[Step 6](#step-6-configure-the-app-url-required-for-merchant-enrichment):
+every merchant gets their own token, obtained automatically when they
+install the app, with no manual key entry required for any merchant
+(including you, testing).
 
 ### HTTPS Only
 

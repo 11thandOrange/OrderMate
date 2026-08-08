@@ -19,6 +19,7 @@ jest.mock("firebase-admin", () => {
       };
     }),
     push: jest.fn(() => ({key: "mock-push-key"})),
+    once: jest.fn(async () => ({val: () => (mockStore[path] as unknown) ?? null})),
   });
 
   // A single shared instance - admin.database() must always return the SAME

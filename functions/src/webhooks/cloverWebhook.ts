@@ -13,6 +13,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import axios from "axios";
+import {getValidAccessToken} from "../oauth/cloverAuth";
 
 const db = admin.database();
 
@@ -210,18 +211,23 @@ function buildEventId(merchantId: string, type: string, sourceTs?: number): stri
 }
 
 /**
- * Fetch merchant details from Clover API
+ * Fetch merchant details from Clover API using that merchant's own OAuth
+ * access token (obtained via cloverOAuthCallback.ts, not a hardcoded key).
+ * If the merchant hasn't completed the OAuth handshake yet (e.g. this
+ * install webhook arrived before the browser redirect did), enrichment is
+ * skipped and the caller falls back to blank name/email/store - the same
+ * degraded behavior as before per-merchant tokens existed.
  * @param {string} merchantId - The Clover merchant ID
  * @return {Promise<MerchantData>} Merchant data from Clover
  */
 async function fetchMerchantFromClover(
   merchantId: string
 ): Promise<MerchantData> {
-  const apiToken = process.env.CLOVER_API_TOKEN;
   const baseUrl = process.env.CLOVER_BASE_URL || "https://api.clover.com";
 
-  if (!apiToken) {
-    console.warn("CLOVER_API_TOKEN not configured");
+  const accessToken = await getValidAccessToken(merchantId);
+  if (!accessToken) {
+    console.warn(`No Clover access token available yet for merchant ${merchantId}`);
     return {};
   }
 
@@ -230,7 +236,7 @@ async function fetchMerchantFromClover(
       `${baseUrl}/v3/merchants/${merchantId}?expand=owner`,
       {
         headers: {
-          "Authorization": `Bearer ${apiToken}`,
+          "Authorization": `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
       }
