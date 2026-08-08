@@ -1,6 +1,0 @@
-com.orderMate.test.app-core-1.5.0-0 /Users/chloe_mac/.gradle/caches/transforms-3/03f21cb5518b12002aa3fb16ceb49457/transformed/core-1.5.0/res
-com.orderMate.test.app-annotation-experimental-1.3.0-1 /Users/chloe_mac/.gradle/caches/transforms-3/de0b9286e6f4a96b640635f2b184eacc/transformed/annotation-experimental-1.3.0/res
-com.orderMate.test.app-androidTest-2 /Users/chloe_mac/Desktop/Repos/OrderMate/app/build/generated/res/resValues/androidTest/debug
-com.orderMate.test.app-mergeDebugAndroidTestResources-3 /Users/chloe_mac/Desktop/Repos/OrderMate/app/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/merged.dir
-com.orderMate.test.app-mergeDebugAndroidTestResources-4 /Users/chloe_mac/Desktop/Repos/OrderMate/app/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/stripped.dir
-com.orderMate.test.app-merged_res-5 /Users/chloe_mac/Desktop/Repos/OrderMate/app/build/intermediates/merged_res/debugAndroidTest

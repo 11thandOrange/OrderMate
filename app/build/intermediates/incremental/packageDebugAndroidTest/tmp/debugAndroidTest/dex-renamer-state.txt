@@ -1,7 +1,0 @@
-#Thu Mar 26 19:51:07 PDT 2026
-base.0=/Users/chloe_mac/Desktop/Repos/OrderMate/app/build/intermediates/dex/debugAndroidTest/mergeDexDebugAndroidTest/classes.dex
-base.1=/Users/chloe_mac/Desktop/Repos/OrderMate/app/build/intermediates/dex/debugAndroidTest/mergeDexDebugAndroidTest/classes2.dex
-path.0=classes.dex
-path.1=classes2.dex
-renamed.0=classes.dex
-renamed.1=classes2.dex
