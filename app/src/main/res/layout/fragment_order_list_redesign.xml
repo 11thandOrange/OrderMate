@@ -51,6 +51,10 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_order_card_redesign"/>
 
+        <!-- Orders beyond Clover's local retention window are backfilled automatically in the
+             background right after load, via OrderListRedesignFragment.loadOlderOrders()
+             (#138/#150) - so there's no "Load more" affordance here. -->
+
         <!-- Empty State -->
         <LinearLayout
             android:id="@+id/emptyState"

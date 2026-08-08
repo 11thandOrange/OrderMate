@@ -12,6 +12,9 @@ import com.clover.sdk.v3.order.Order
 import com.clover.sdk.v3.order.OrderCalc
 import com.clover.sdk.v3.order.OrderV31Connector
 import com.google.firebase.FirebaseApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class MyApp : Application() {
@@ -77,6 +80,32 @@ class MyApp : Application() {
             }
         }
 
+    }
+
+    /**
+     * Loads every locally-cached order for the merchant from the Clover SDK (unfiltered).
+     *
+     * IMPORTANT (#138): this only returns what Clover's on-device order sync has retained
+     * locally - per Clover's own docs that's a retention-windowed slice (guaranteed 7 days,
+     * up to ~100 days best-effort), not the merchant's full order history. Orders older than
+     * that window will not appear here even though they still exist in Clover's cloud.
+     * Callers that need full history should combine this with
+     * CloverRepository.loadOlderOrders(), which fetches beyond the local window via Clover's
+     * REST Orders API. Centralized here (rather than each call site invoking
+     * `getOrderConnector().getOrders(...)` directly) so there is one place for that merge.
+     *
+     * Every order returned here is also remembered in OrderHistoryStore, in the background, so
+     * it survives Clover's local cache evicting it later even if the REST backfill above is
+     * unavailable (e.g. a REST permission grant that hasn't synced to this install yet).
+     */
+    fun getAllOrders(): List<Order>? {
+        val orders = getOrderConnector().getOrders(mutableListOf())
+        if (!orders.isNullOrEmpty()) {
+            CoroutineScope(Dispatchers.IO).launch {
+                OrderHistoryStore.getInstance(applicationContext).remember(orders)
+            }
+        }
+        return orders
     }
 
     fun getEmployeeConnector(): EmployeeConnector? {
