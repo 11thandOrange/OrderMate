@@ -12,8 +12,6 @@
 
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import axios from "axios";
-import {getValidAccessToken} from "../oauth/cloverAuth";
 
 const db = admin.database();
 
@@ -130,11 +128,6 @@ export const cloverWebhook = functions.https.onRequest(async (req, res) => {
   }
 });
 
-interface MerchantData {
-  name?: string;
-  owner?: {name?: string; email?: string};
-}
-
 interface CloverUpdate {
   objectId: string;
   type: "CREATE" | "UPDATE" | "DELETE";
@@ -210,45 +203,6 @@ function buildEventId(merchantId: string, type: string, sourceTs?: number): stri
   return `${merchantId}_${type}_${tsPart}`.replace(/[.#$[\]/]/g, "_");
 }
 
-/**
- * Fetch merchant details from Clover API using that merchant's own OAuth
- * access token (obtained via cloverOAuthCallback.ts, not a hardcoded key).
- * If the merchant hasn't completed the OAuth handshake yet (e.g. this
- * install webhook arrived before the browser redirect did), enrichment is
- * skipped and the caller falls back to blank name/email/store - the same
- * degraded behavior as before per-merchant tokens existed.
- * @param {string} merchantId - The Clover merchant ID
- * @return {Promise<MerchantData>} Merchant data from Clover
- */
-async function fetchMerchantFromClover(
-  merchantId: string
-): Promise<MerchantData> {
-  const baseUrl = process.env.CLOVER_BASE_URL || "https://api.clover.com";
-
-  const accessToken = await getValidAccessToken(merchantId);
-  if (!accessToken) {
-    console.warn(`No Clover access token available yet for merchant ${merchantId}`);
-    return {};
-  }
-
-  try {
-    const response = await axios.get(
-      `${baseUrl}/v3/merchants/${merchantId}?expand=owner`,
-      {
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    return response.data;
-  } catch (error) {
-    console.error("Failed to fetch merchant from Clover:", error);
-    return {};
-  }
-}
-
 interface WebhookPayload {
   appId?: string;
   data?: Record<string, unknown>;
@@ -257,7 +211,15 @@ interface WebhookPayload {
 }
 
 /**
- * Handle APP_INSTALLED webhook
+ * Handle APP_INSTALLED webhook.
+ *
+ * name/email/storeName are left blank here - OrderMate is a native
+ * Android-only Clover app (no "Web" REST client registered), so this
+ * server-side function has no way to obtain a per-merchant Clover REST API
+ * token to enrich these fields. Only the on-device app itself can do that,
+ * via CloverAuth.authenticate() against the CloverAccount already present
+ * on the device - filling these in would be a separate, on-device feature,
+ * not something this webhook can do.
  * @param {string} merchantId - The Clover merchant ID
  * @param {WebhookPayload} payload - The webhook payload
  */
@@ -268,15 +230,14 @@ async function handleInstall(
 ): Promise<void> {
   console.log(`Processing install for merchant ${merchantId}`);
 
-  const merchantData = await fetchMerchantFromClover(merchantId);
   const timestamp = admin.database.ServerValue.TIMESTAMP;
 
   // Store merchant info
   await db.ref(`merchants/${merchantId}/merchantInfo`).set({
     merchantId: merchantId,
-    name: merchantData.owner?.name || "",
-    email: merchantData.owner?.email || "",
-    storeName: merchantData.name || "",
+    name: "",
+    email: "",
+    storeName: "",
     installDate: timestamp,
     uninstallDate: null,
     lastActiveDate: timestamp,

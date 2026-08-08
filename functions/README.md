@@ -17,7 +17,7 @@ Every event, once authenticated (see [Environment Variables](#environment-variab
 | Event | How it's triggered | What it updates | Event log `type` |
 |-------|---------------------|------------------|-------------------|
 | **Verification** | Clicking "Send verification code" in Clover's dashboard | Nothing - the code is only logged (`firebase functions:log`) for you to copy back into Clover | - (not logged as an event) |
-| **APP_INSTALLED** | Merchant installs the app (`A:` object, `CREATE`) | `merchants/{id}/merchantInfo` (fetched from Clover's REST API if `CLOVER_API_TOKEN` is set, otherwise blank name/email/store), `merchants/{id}/subscription` initialized to `{plan: "free", status: "active"}` | `INSTALL` |
+| **APP_INSTALLED** | Merchant installs the app (`A:` object, `CREATE`) | `merchants/{id}/merchantInfo` (name/email/storeName always blank - see note below), `merchants/{id}/subscription` initialized to `{plan: "free", status: "active"}` | `INSTALL` |
 | **APP_UNINSTALLED** | Merchant uninstalls the app (`A:` object, `DELETE`) | `merchants/{id}/merchantInfo/uninstallDate`, `merchants/{id}/subscription/status` set to `"cancelled"` | `UNINSTALL` |
 | **SUBSCRIPTION_CHANGED** | Merchant's plan changes on Clover's side (`A:` object, `UPDATE`) | `merchants/{id}/subscription/plan` | `SUBSCRIPTION_UPGRADE` or `SUBSCRIPTION_DOWNGRADE`, based on a fixed free < basic < premium ranking |
 
@@ -25,11 +25,11 @@ Every event log write uses a deterministic key (`{merchantId}_{type}_{ts}`) inst
 
 Only the "Apps" webhook category (install/uninstall/subscription-changed) is implemented. Orders, Payments, Refunds, Customers, and Inventory categories are not subscribed to or handled - `handleCloverWebhookEvent()` logs and drops any event whose `objectId` prefix isn't `A:`.
 
-### cloverOAuthCallback
+### Why `merchantInfo.name`/`email`/`storeName` are always blank
 
-HTTPS endpoint configured as the app's **App URL** in the Clover Developer Dashboard (Configuration page, separate from the Webhooks page). When a merchant installs the app, Clover redirects their browser here with `?merchant_id=...&code=...`. This exchanges that one-time authorization `code` for a token scoped to that merchant only (`POST {CLOVER_OAUTH_BASE_URL}/oauth/v2/token` with `CLOVER_CLIENT_ID`/`CLOVER_CLIENT_SECRET`), and stores the result at `merchants/{merchantId}/cloverAuth`.
+Fetching those from Clover's REST API (`v3/merchants/{id}?expand=owner`) requires a Clover REST API bearer token scoped to that merchant. Getting one normally means registering a "Web" REST client on the Developer Dashboard and using an OAuth authorization-code redirect - but **OrderMate has no such client registered**; its App Type is Android-only (Flex/Mini/Station devices), and the Developer Dashboard for this app has no "REST Configuration"/Web client section at all. That flow simply isn't available to this app, so this server-side function has no way to get a merchant token, and never will unless a "Web" REST client is added to the app's listing.
 
-`fetchMerchantFromClover()` (used by the `APP_INSTALLED` handler to populate `merchantInfo`) reads that merchant's stored token via `getValidAccessToken()` (`src/oauth/cloverAuth.ts`), refreshing it first if expired. There is no global, hardcoded, or shared-across-merchants API token anywhere in this codebase - each merchant's data is only ever accessed with that merchant's own token, obtained through their own install.
+The only Clover-provided mechanism this app *does* have is on-device: the Android app itself already holds a `CloverAccount` (see `OrderAppApplication.kt`) and could call `CloverAuth.authenticate()` locally to get its own REST token and write real merchant info to Firebase directly from the device - a separate, not-yet-built feature, unrelated to this Cloud Function.
 
 ## Quick Start
 
@@ -42,19 +42,15 @@ npm install
 
 ### 2. Configure Environment
 
-Copy `.env.example` to `.env` and fill in your app's Clover credentials
-(`CLOVER_CLIENT_ID`/`CLOVER_CLIENT_SECRET`, from the Developer Dashboard's
-Configuration page, plus `CLOVER_AUTH_CODE`, from the Webhooks page). These
-are Gen 2 functions - they read `process.env` directly from `.env`, not the
-legacy `firebase functions:config:set` store.
+Copy `.env.example` to `.env` and fill in `CLOVER_AUTH_CODE` (from the
+Developer Dashboard's Webhooks page, after completing the verification
+handshake - see [Register Webhook with Clover](#register-webhook-with-clover)
+below). These are Gen 2 functions - they read `process.env` directly from
+`.env`, not the legacy `firebase functions:config:set` store.
 
 ```bash
 cp .env.example .env
 ```
-
-There is no per-merchant API token to configure here - each merchant's own
-access token is obtained automatically via OAuth when they install the app
-(see [cloverOAuthCallback](#cloveroauthcallback) below).
 
 ### 3. Build & Deploy
 
@@ -92,11 +88,7 @@ See [WEBHOOK_SETUP.md](./WEBHOOK_SETUP.md) for detailed instructions.
 npm test
 ```
 
-Runs the Jest suite in `src/webhooks/cloverWebhook.test.ts` and `src/oauth/cloverOAuthCallback.test.ts` against a mocked `firebase-admin` and mocked `axios` (no real Firebase project or Clover calls needed).
-
-`cloverWebhook.test.ts` covers: the verification handshake, both payload formats, auth rejection (missing/wrong header, unconfigured `CLOVER_AUTH_CODE`), the idempotent event-key behavior on a simulated Clover retry, and that a batch with multiple merchants keeps processing the healthy ones when one fails - while still reporting the failure (`500`, not `200`) so Clover retries the delivery instead of the failed write being silently dropped.
-
-`cloverOAuthCallback.test.ts` covers: a successful code exchange storing the merchant's token, rejecting a request missing `merchant_id`/`code`, and surfacing an exchange failure as `500` rather than silently leaving the merchant with no token.
+Runs the Jest suite in `src/webhooks/cloverWebhook.test.ts` against a mocked `firebase-admin` (no real Firebase project needed). Covers: the verification handshake, both payload formats, auth rejection (missing/wrong header, unconfigured `CLOVER_AUTH_CODE`), the idempotent event-key behavior on a simulated Clover retry, and that a batch with multiple merchants keeps processing the healthy ones when one fails - while still reporting the failure (`500`, not `200`) so Clover retries the delivery instead of the failed write being silently dropped.
 
 ### Test with Postman or cURL
 
@@ -164,13 +156,9 @@ merchants/{merchantId}/
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `CLOVER_CLIENT_ID` | Your app's OAuth client ID (Developer Dashboard > Configuration). Identifies your app, not any merchant. | - |
-| `CLOVER_CLIENT_SECRET` | Your app's OAuth client secret (same page). Used server-side only, to exchange each merchant's install code for that merchant's own access token. | - |
-| `CLOVER_OAUTH_BASE_URL` | Clover's OAuth token host | `https://www.clover.com` |
-| `CLOVER_BASE_URL` | Clover REST API base URL | `https://api.clover.com` |
 | `CLOVER_AUTH_CODE` | Required. Must match the `X-Clover-Auth` header Clover sends with every webhook event. Without this set, all real events (everything except the verification handshake) are rejected with 401. | - |
 
-**Sandbox:** Use `https://sandbox.dev.clover.com` for testing.
+There is intentionally no `CLOVER_API_TOKEN` / `CLOVER_CLIENT_ID` / `CLOVER_CLIENT_SECRET` - see [Why merchantInfo fields are always blank](#why-merchantinfonameemailstorename-are-always-blank) above for why none of them can work for this app.
 
 ## File Structure
 
@@ -178,13 +166,9 @@ merchants/{merchantId}/
 functions/
 ├── src/
 │   ├── index.ts                      # Main entry, exports functions
-│   ├── webhooks/
-│   │   ├── cloverWebhook.ts          # Clover webhook handler
-│   │   └── cloverWebhook.test.ts     # Jest tests (npm test)
-│   └── oauth/
-│       ├── cloverAuth.ts             # Per-merchant token storage/refresh
-│       ├── cloverOAuthCallback.ts    # App URL - exchanges install code for token
-│       └── cloverOAuthCallback.test.ts
+│   └── webhooks/
+│       ├── cloverWebhook.ts          # Clover webhook handler
+│       └── cloverWebhook.test.ts     # Jest tests (npm test)
 ├── jest.config.js
 ├── package.json
 ├── tsconfig.json

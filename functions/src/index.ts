@@ -11,7 +11,3 @@ admin.initializeApp();
 
 // Export webhook functions
 export {cloverWebhook} from "./webhooks/cloverWebhook";
-
-// Export OAuth install callback - exchanges the code Clover sends on
-// install for a merchant-specific access token (no hardcoded API keys).
-export {cloverOAuthCallback} from "./oauth/cloverOAuthCallback";
