@@ -485,7 +485,7 @@ class CalendarFragment : Fragment() {
             var tempFilteredEvents: List<ScheduledEvent> = emptyList()
             
             try {
-                val orderData = myApp.getOrderConnector().getOrders(mutableListOf())
+                val orderData = myApp.getAllOrders()
                 
                 orderData?.forEach {
                     tempAllOrders.add(it)

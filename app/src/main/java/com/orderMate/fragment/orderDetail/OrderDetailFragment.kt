@@ -1144,7 +1144,7 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
         if (isFromResume) {
             delay(8000)
         }
-        val data = myApp.getOrderConnector().getOrders(mutableListOf())
+        val data = myApp.getAllOrders()
         orderArguments = getTheRequiredData(data)
         
         // #78: Enrich order with full customer data (phone/email)

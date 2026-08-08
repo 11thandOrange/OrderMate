@@ -14,7 +14,9 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.clover.sdk.v3.order.LineItem
 import com.clover.sdk.v3.order.Order
 import com.clover.sdk.v3.payments.Payment
@@ -23,11 +25,13 @@ import com.orderMate.R
 import com.orderMate.adapters.OrderCardRedesignAdapter
 import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.databinding.FragmentOrderListRedesignBinding
+import com.orderMate.repository.CloverRepository
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FilterCategories
 import com.orderMate.utils.FilterCategoryBuilder
 import com.orderMate.utils.ModalDialogCategories
 import com.orderMate.utils.MyApp
+import com.orderMate.utils.OrderHistoryStore
 import com.orderMate.utils.OrderSearchFilter
 import com.orderMate.utils.MyApp.Companion.filterArray
 import com.orderMate.utils.PreferenceManager
@@ -68,6 +72,11 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     companion object {
         private const val TAG = "ListFragment_DEBUG"
+
+        // How many items from the end of the list to trigger the next infinite-scroll page
+        // fetch (#138/#150), so the next page is ready before the user hits the literal bottom.
+        private const val SCROLL_LOAD_THRESHOLD = 5
+
         private var instance: OrderListRedesignFragment? = null
         
         fun getInstance(): OrderListRedesignFragment {
@@ -124,7 +133,18 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     // Current filter state for dialog (synced with shared ViewModel)
     private var currentFilterState = FilterDialogFragment.FilterState()
     private var currentSearchQuery = ""
-    
+
+    // Infinite-scroll REST backfill state (#138/#150) - see CloverRepository.loadOlderOrders.
+    // Triggered by scrolling near the bottom of the list rather than a "Load more" button.
+    private var olderOrdersOffset = 0
+    private var isLoadingOlderOrders = false
+    private var hasMoreOlderOrders = true
+    // Orders pulled in via the REST backfill, kept separately from allItemList so that a
+    // fresh loadOrders() reload - which only re-reads Clover's local, retention-windowed
+    // cache - doesn't silently drop them again (#138). Merged back into allItemList on every
+    // reload in loadOrders().
+    private var backfilledOlderOrders: ArrayList<Order?> = ArrayList()
+
     private fun logDebug(message: String) {
         Log.d(TAG, "[$fragmentId] $message | isAdded=$isAdded, binding=${_binding != null}, view=${view != null}")
     }
@@ -271,8 +291,9 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     // ==================== Initialization ====================
 
     private fun initializeRecyclerView() {
+        val layoutManager = LinearLayoutManager(requireContext())
         binding.ordersRecycler.apply {
-            layoutManager = LinearLayoutManager(requireContext())
+            this.layoutManager = layoutManager
             // Reuse existing adapter to avoid rebinding all items on back navigation
             if (orderAdapter == null) {
                 orderAdapter = OrderCardRedesignAdapter(orderItems, this@OrderListRedesignFragment)
@@ -280,6 +301,26 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             } else if (adapter !== orderAdapter) {
                 adapter = orderAdapter
             }
+
+            clearOnScrollListeners()
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (dy <= 0) return // only care about scrolling down
+                    if (isLoadingOlderOrders || !hasMoreOlderOrders) return
+
+                    val visibleItemCount = layoutManager.childCount
+                    val totalItemCount = layoutManager.itemCount
+                    val firstVisiblePosition = layoutManager.findFirstVisibleItemPosition()
+
+                    // Fetch the next page a little before the literal bottom so it's ready
+                    // by the time the user reaches it (#150 - replaces a "Load older orders"
+                    // button with automatic infinite scroll).
+                    if (firstVisiblePosition + visibleItemCount + SCROLL_LOAD_THRESHOLD >= totalItemCount) {
+                        loadOlderOrders()
+                    }
+                }
+            })
         }
     }
 
@@ -367,23 +408,38 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     // ==================== Data Loading ====================
 
-    @SuppressLint("NotifyDataSetChanged")
     private fun loadOrders(onComplete: (() -> Unit)? = null) {
         Log.d(TAG, "[$fragmentId] loadOrders START")
         showLoading(true)
-        
+
         runOnBackgroundThread {
             Log.d(TAG, "[$fragmentId] loadOrders BACKGROUND THREAD START | isAdded=$isAdded")
             // Fetch data on background thread into temporary list
             val tempOrders = ArrayList<Order?>()
             var fetchError: Exception? = null
-            
+
             try {
-                val orderData = myApp.getOrderConnector().getOrders(mutableListOf())
+                val orderData = myApp.getAllOrders()
                 orderData?.forEach {
                     tempOrders.add(it)
                 }
                 Log.d(TAG, "[$fragmentId] loadOrders fetched ${tempOrders.size} orders")
+
+                // Clover's local cache is retention-windowed and can stop returning orders
+                // that were previously pulled in via the REST backfill - re-merge them so a
+                // reload (sync button, refreshTrigger, etc.) doesn't make them disappear
+                // again (#138).
+                val freshIds = tempOrders.mapNotNull { it?.id }.toSet()
+                tempOrders.addAll(backfilledOlderOrders.filter { it?.id !in freshIds })
+
+                // Also re-merge every order OrderMate has ever locally observed, regardless of
+                // whether the REST backfill above is working - this is what keeps orders from
+                // disappearing even when the REST path is blocked (e.g. a permission grant
+                // that hasn't synced to this install - see #138).
+                val knownIds = tempOrders.mapNotNull { it?.id }.toSet()
+                val rememberedOrders = OrderHistoryStore.getInstance(requireContext()).getAll()
+                tempOrders.addAll(rememberedOrders.filter { it.id !in knownIds })
+                Log.d(TAG, "[$fragmentId] loadOrders after backfill/history merge: ${tempOrders.size}")
             } catch (e: Exception) {
                 e.printStackTrace()
                 fetchError = e
@@ -392,50 +448,117 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
             runOnMainThread {
                 Log.d(TAG, "[$fragmentId] loadOrders MAIN THREAD CALLBACK | isAdded=$isAdded, binding=${_binding != null}")
-                
+
                 // Safety check before accessing fragment state
                 if (!isAdded || _binding == null) {
                     Log.w(TAG, "[$fragmentId] loadOrders MAIN THREAD - Fragment not attached or binding null, aborting!")
                     return@runOnMainThread
                 }
-                
+
                 // All list modifications on main thread to avoid RecyclerView inconsistency
                 if (fetchError != null) {
                     debugSnackBar(getString(R.string.there_is_issue_with_your_account))
                 } else {
-                    orderItems.clear()
                     allItemList.clear()
                     allItemList.addAll(tempOrders)
-                    orderItems.addAll(tempOrders)
+                    applyCurrentViewToOrderItems()
                 }
-                
+
                 showLoading(false)
-                
-                // Apply any pending shared state after orders are loaded
-                val sharedState = sharedFilterViewModel.filterState.value
-                val dateCount = sharedState?.dateSelections?.values?.sumOf { it.size } ?: 0
-                Log.d(TAG, "[$fragmentId] loadOrders checking shared state | hasFilters=${sharedState?.hasActiveFilters()}, dateCount=$dateCount")
-                
-                if (sharedState != null && sharedState.hasActiveFilters()) {
-                    currentFilterState = sharedState
-                    Log.d(TAG, "[$fragmentId] loadOrders applying dialog filters")
-                    applyDialogFilters(sharedState)
-                } else if (currentSearchQuery.isNotEmpty()) {
-                    // No dialog filters but search is active - apply search filter
-                    Log.d(TAG, "[$fragmentId] loadOrders applying search: '$currentSearchQuery'")
-                    searchOrders(currentSearchQuery)
-                } else {
-                    updateResultsInfo()
-                    orderAdapter?.notifyDataSetChanged()
-                    updateEmptyState()
-                }
-                
                 onComplete?.invoke()
+
+                // Eagerly pull in the merchant's full order history in the background, rather
+                // than waiting for the user to scroll (#138) - a no-op once hasMoreOlderOrders
+                // is false, i.e. after the first time it's run to completion, since that flag
+                // persists across reloads.
+                loadOlderOrders()
             }
 
             // Update filter options
             CoroutineScope(Dispatchers.Default).launch {
                 updateFilterOptions()
+            }
+        }
+    }
+
+    /**
+     * Rebuilds orderItems from allItemList according to whatever view (filtered/search/plain)
+     * is currently active. Shared by loadOrders() and loadOlderOrders() so both a full reload
+     * and a scroll-triggered backfill page land in the same place (#138/#150).
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    private fun applyCurrentViewToOrderItems() {
+        val sharedState = sharedFilterViewModel.filterState.value
+        Log.d(
+            TAG,
+            "[$fragmentId] applyCurrentViewToOrderItems: allItemList=${allItemList.size}, " +
+                "hasActiveFilters=${sharedState?.hasActiveFilters()}, searchQuery='$currentSearchQuery'"
+        )
+        when {
+            sharedState != null && sharedState.hasActiveFilters() -> {
+                currentFilterState = sharedState
+                applyDialogFilters(sharedState)
+            }
+            currentSearchQuery.isNotEmpty() -> searchOrders(currentSearchQuery)
+            else -> {
+                orderItems.clear()
+                orderItems.addAll(allItemList)
+                updateResultsInfo()
+                orderAdapter?.notifyDataSetChanged()
+                updateEmptyState()
+            }
+        }
+    }
+
+    /**
+     * Fetches the merchant's full order history beyond what Clover's on-device cache retains,
+     * via Clover's REST Orders API - one page per call, chaining itself to fetch the next page
+     * immediately after a successful one, until the API returns an empty page (#138). Runs
+     * automatically in the background right after every loadOrders() completes, so the whole
+     * history is pulled in without the user needing to scroll for it; the RecyclerView scroll
+     * listener also calls this as a redundant nudge in case the eager chain hasn't caught up
+     * yet, but is normally a same-page no-op by the time the user reaches the bottom.
+     */
+    private fun loadOlderOrders() {
+        if (isLoadingOlderOrders || !hasMoreOlderOrders || !isAdded) return
+        isLoadingOlderOrders = true
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val olderOrders = try {
+                CloverRepository.getInstance(requireContext()).loadOlderOrders(olderOrdersOffset)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emptyList()
+            }
+
+            if (!isAdded || _binding == null) return@launch
+
+            isLoadingOlderOrders = false
+
+            if (olderOrders.isEmpty()) {
+                hasMoreOlderOrders = false
+                return@launch
+            }
+
+            // Clover's offset is "how many of the merchant's orders to skip", independent of
+            // how many were new to us - always advance by the page size actually returned so
+            // the next fetch keeps paging forward instead of re-fetching the same page.
+            olderOrdersOffset += olderOrders.size
+
+            val existingIds = allItemList.mapNotNull { it?.id }.toSet()
+            val newOrders = olderOrders.filter { it.id !in existingIds }
+            allItemList.addAll(newOrders)
+            // Remembered across reloads so a later loadOrders() (sync, refreshTrigger, etc.)
+            // re-merges these back in instead of losing them to the local cache's retention
+            // window again (#138).
+            backfilledOlderOrders.addAll(newOrders)
+
+            applyCurrentViewToOrderItems()
+
+            // Keep going until the API signals there's nothing left (#138 - the whole history
+            // backfills automatically rather than one page at a time on scroll).
+            if (hasMoreOlderOrders) {
+                loadOlderOrders()
             }
         }
     }

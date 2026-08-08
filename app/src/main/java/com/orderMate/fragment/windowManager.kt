@@ -648,7 +648,7 @@ class FloatingWidgetService : Service(), IOrderItemClickListener {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val data =
-                    MyApp.getInstance().getOrderConnector().getOrders(mutableListOf())
+                    MyApp.getInstance().getAllOrders()
                 lineItems.clear()
                 if (data?.isEmpty() == true) {
                     Log.d("DrawerState", "No orders available from getOrders()")
