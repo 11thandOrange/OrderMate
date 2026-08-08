@@ -147,6 +147,9 @@ class OrderNoteDialogFragment : DialogFragment() {
                 WidgetType.MULTI_SELECT -> addMultiSelectSection(widget)
                 WidgetType.CALENDAR -> addCalendarSection(widget)
                 WidgetType.TEXT_BOX -> addTextBoxSection(widget)
+                // Quantity applies to individual line items, not a whole order - the
+                // "Add Widget" picker doesn't offer it at the order level (#139).
+                WidgetType.QUANTITY -> Unit
             }
         }
     }
@@ -368,6 +371,7 @@ class OrderNoteDialogFragment : DialogFragment() {
                         parts.add("${widget.label}:$value")
                     }
                 }
+                WidgetType.QUANTITY -> Unit
             }
         }
 
@@ -409,6 +413,7 @@ class OrderNoteDialogFragment : DialogFragment() {
                         WidgetType.TEXT_BOX -> {
                             textSelections[it.id] = value
                         }
+                        WidgetType.QUANTITY -> Unit
                     }
                 }
             }

@@ -26,12 +26,13 @@ import java.util.Locale
 
 /**
  * Dialog for adding/editing notes on line items
- * 
+ *
  * Displays widgets dynamically based on WidgetConfig list:
  * - SINGLE_SELECT: Chips with radio-like behavior (one selection)
  * - MULTI_SELECT: Chips with checkbox-like behavior (multiple selections)
  * - CALENDAR: Date picker input
  * - TEXT_BOX: Free-form text input
+ * - QUANTITY: Stepper input that edits the line item's quantity directly (#139)
  */
 class ItemNoteDialogFragment : DialogFragment() {
 
@@ -45,6 +46,15 @@ class ItemNoteDialogFragment : DialogFragment() {
     private var itemName: String? = null
     private var itemModifiers: String? = null
     private var itemQuantity: Int = 1
+    private var isOrderEditable: Boolean = true
+
+    // Current quantity selection, seeded from itemQuantity and edited via the QUANTITY widget's
+    // header stepper (#139). QUANTITY is a "Clover-state" widget (WidgetType.savesToNotes ==
+    // false): it reads and writes LineItem.unitQty directly rather than being serialized into
+    // the note string, so it's rendered in the header (see setupQuantityStepper) rather than
+    // as a note section, and is carried back to the caller separately via
+    // ItemNoteListener.onNoteSaved's quantity param.
+    private var selectedQuantity: Int = 1
 
     // Selections: widgetId -> selected values
     private val singleSelections = mutableMapOf<String, String?>()
@@ -59,7 +69,7 @@ class ItemNoteDialogFragment : DialogFragment() {
     private val dateTimeFormat = SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault())
 
     interface ItemNoteListener {
-        fun onNoteSaved(lineItemId: String?, note: String)
+        fun onNoteSaved(lineItemId: String?, note: String, quantity: Int)
         fun onNoteCancelled()
     }
 
@@ -74,7 +84,9 @@ class ItemNoteDialogFragment : DialogFragment() {
             itemName = args.getString(ARG_ITEM_NAME)
             itemModifiers = args.getString(ARG_ITEM_MODIFIERS)
             itemQuantity = args.getInt(ARG_ITEM_QUANTITY, 1)
+            isOrderEditable = args.getBoolean(ARG_IS_ORDER_EDITABLE, true)
         }
+        selectedQuantity = itemQuantity.coerceIn(MIN_QUANTITY, MAX_QUANTITY)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -133,14 +145,13 @@ class ItemNoteDialogFragment : DialogFragment() {
         parseExistingNote()
         buildNoteSections()
     }
-    
+
     private fun setupHeader() {
-        // Set quantity badge
         binding.dialogQtyBadge.text = "x$itemQuantity"
-        
+
         // Set item name
         binding.dialogTitle.text = itemName ?: "Item"
-        
+
         // Show modifiers if available, hide subtitle if empty
         if (itemModifiers.isNullOrBlank()) {
             binding.dialogSubtitle.visibility = View.GONE
@@ -168,7 +179,7 @@ class ItemNoteDialogFragment : DialogFragment() {
                 }
                 android.util.Log.d("ItemNoteSaveDebug", "=====================================")
                 android.util.Log.d("ItemNoteSaveDebug", "Calling listener?.onNoteSaved...")
-                listener?.onNoteSaved(lineItemId, note)
+                listener?.onNoteSaved(lineItemId, note, selectedQuantity)
                 android.util.Log.d("ItemNoteSaveDebug", "onNoteSaved returned, calling dismiss()...")
                 dismiss()
                 android.util.Log.d("ItemNoteSaveDebug", "dismiss() completed")
@@ -185,7 +196,7 @@ class ItemNoteDialogFragment : DialogFragment() {
         binding.noteSectionsContainer.removeAllViews()
 
         val enabledWidgets = widgets.filter { it.isEnabled }.sortedBy { it.order }
-        
+
         if (enabledWidgets.isEmpty()) {
             // Show empty state message and disable save button
             addEmptyStateMessage()
@@ -193,13 +204,14 @@ class ItemNoteDialogFragment : DialogFragment() {
             binding.btnSave.alpha = 0.5f
             return
         }
-        
+
         enabledWidgets.forEach { widget ->
             when (widget.type) {
                 WidgetType.SINGLE_SELECT -> addSingleSelectSection(widget)
                 WidgetType.MULTI_SELECT -> addMultiSelectSection(widget)
                 WidgetType.CALENDAR -> addCalendarSection(widget)
                 WidgetType.TEXT_BOX -> addTextBoxSection(widget)
+                WidgetType.QUANTITY -> addQuantitySection(widget)
             }
         }
     }
@@ -291,6 +303,44 @@ class ItemNoteDialogFragment : DialogFragment() {
 
         // Restore existing text
         textSelections[widget.id]?.let { textInput.setText(it) }
+
+        binding.noteSectionsContainer.addView(sectionView)
+    }
+
+    /**
+     * Add QUANTITY section - stepper that edits the line item's quantity directly (#139).
+     * Unlike every other widget type, its value isn't part of the note string - it's carried
+     * back separately via ItemNoteListener.onNoteSaved's quantity param and written to
+     * LineItem.unitQty. Disabled (greyed, non-interactive) once the order is no longer open,
+     * since quantity can't change after any payment has touched the order.
+     */
+    private fun addQuantitySection(widget: WidgetConfig) {
+        val sectionView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.note_section_quantity, binding.noteSectionsContainer, false)
+
+        val labelView = sectionView.findViewById<TextView>(R.id.sectionLabel)
+        labelView.text = widget.label
+
+        val decrementView = sectionView.findViewById<TextView>(R.id.quantityDecrement)
+        val incrementView = sectionView.findViewById<TextView>(R.id.quantityIncrement)
+        val valueView = sectionView.findViewById<TextView>(R.id.quantityValue)
+
+        valueView.text = selectedQuantity.toString()
+
+        decrementView.isEnabled = isOrderEditable
+        incrementView.isEnabled = isOrderEditable
+        sectionView.alpha = if (isOrderEditable) 1f else 0.4f
+
+        if (isOrderEditable) {
+            decrementView.setOnClickListener {
+                selectedQuantity = (selectedQuantity - 1).coerceIn(MIN_QUANTITY, MAX_QUANTITY)
+                valueView.text = selectedQuantity.toString()
+            }
+            incrementView.setOnClickListener {
+                selectedQuantity = (selectedQuantity + 1).coerceIn(MIN_QUANTITY, MAX_QUANTITY)
+                valueView.text = selectedQuantity.toString()
+            }
+        }
 
         binding.noteSectionsContainer.addView(sectionView)
     }
@@ -466,6 +516,11 @@ class ItemNoteDialogFragment : DialogFragment() {
                         parts.add("${widget.label}:$value")
                     }
                 }
+                WidgetType.QUANTITY -> {
+                    // Quantity is carried back via ItemNoteListener.onNoteSaved's quantity
+                    // param and written to LineItem.unitQty directly - it's never part of
+                    // the note string.
+                }
             }
         }
 
@@ -510,6 +565,7 @@ class ItemNoteDialogFragment : DialogFragment() {
                         WidgetType.TEXT_BOX -> {
                             textSelections[it.id] = value
                         }
+                        WidgetType.QUANTITY -> Unit
                     }
                 }
             }
@@ -559,20 +615,32 @@ class ItemNoteDialogFragment : DialogFragment() {
         this.itemQuantity = quantity
     }
 
+    /**
+     * Whether the order is still open for editing. Quantity can only be changed while the
+     * order is open - once any payment has touched it, the stepper is disabled (#139 feedback).
+     */
+    fun setOrderEditable(editable: Boolean) {
+        this.isOrderEditable = editable
+    }
+
     companion object {
         const val TAG = "ItemNoteDialogFragment"
+        const val MIN_QUANTITY = 1
+        const val MAX_QUANTITY = 999
         private const val ARG_LINE_ITEM_ID = "arg_line_item_id"
         private const val ARG_EXISTING_NOTE = "arg_existing_note"
         private const val ARG_ITEM_NAME = "arg_item_name"
         private const val ARG_ITEM_MODIFIERS = "arg_item_modifiers"
         private const val ARG_ITEM_QUANTITY = "arg_item_quantity"
+        private const val ARG_IS_ORDER_EDITABLE = "arg_is_order_editable"
 
         fun newInstance(
             lineItemId: String? = null,
             existingNote: String? = null,
             itemName: String? = null,
             itemModifiers: String? = null,
-            itemQuantity: Int = 1
+            itemQuantity: Int = 1,
+            isOrderEditable: Boolean = true
         ): ItemNoteDialogFragment {
             return ItemNoteDialogFragment().apply {
                 arguments = Bundle().apply {
@@ -581,6 +649,7 @@ class ItemNoteDialogFragment : DialogFragment() {
                     putString(ARG_ITEM_NAME, itemName)
                     putString(ARG_ITEM_MODIFIERS, itemModifiers)
                     putInt(ARG_ITEM_QUANTITY, itemQuantity)
+                    putBoolean(ARG_IS_ORDER_EDITABLE, isOrderEditable)
                 }
             }
         }

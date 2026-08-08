@@ -109,13 +109,13 @@ object FilterCategoryBuilder {
             }
         }
         
-        // 3. Item-level widgets (ITEM level, enabled, showInFilter=true, not TEXT_BOX)
+        // 3. Item-level widgets (ITEM level, enabled, showInFilter=true, filterable type)
         val itemWidgets = widgets
-            .filter { 
-                it.isEnabled && 
-                it.showInFilter && 
-                it.type != WidgetType.TEXT_BOX && 
-                it.level == NoteLevel.ITEM 
+            .filter {
+                it.isEnabled &&
+                it.showInFilter &&
+                it.type.isFilterable &&
+                it.level == NoteLevel.ITEM
             }
             .sortedBy { it.order }
         
@@ -123,13 +123,13 @@ object FilterCategoryBuilder {
             categories.add(buildWidgetFilter(widget))
         }
         
-        // 4. Order-level widgets (ORDER level, enabled, showInFilter=true, not TEXT_BOX) (#93)
+        // 4. Order-level widgets (ORDER level, enabled, showInFilter=true, filterable type) (#93)
         val orderWidgets = widgets
-            .filter { 
-                it.isEnabled && 
-                it.showInFilter && 
-                it.type != WidgetType.TEXT_BOX && 
-                it.level == NoteLevel.ORDER 
+            .filter {
+                it.isEnabled &&
+                it.showInFilter &&
+                it.type.isFilterable &&
+                it.level == NoteLevel.ORDER
             }
             .sortedBy { it.order }
         

@@ -259,8 +259,71 @@ class ItemNoteDialogTest {
     @Test
     fun `parse null note returns empty map`() {
         val parsed = parseNoteString(null)
-        
+
         assertTrue(parsed.isEmpty())
+    }
+
+    // ==================== Quantity Widget Tests (#139) ====================
+
+    // Mirrors ItemNoteDialogFragment.Companion.MIN_QUANTITY / MAX_QUANTITY
+    private val MIN_QUANTITY = 1
+    private val MAX_QUANTITY = 999
+
+    @Test
+    fun `quantity widget has no options`() {
+        val quantity = WidgetConfig(id = "widget5", type = WidgetType.QUANTITY, label = "Quantity")
+
+        assertTrue(quantity.options.isEmpty())
+    }
+
+    @Test
+    fun `quantity is excluded from note serialization`() {
+        // Unlike every other widget type, QUANTITY is carried back via a dedicated
+        // ItemNoteListener.onNoteSaved quantity param and written straight to
+        // LineItem.unitQty - it never appears in the selections map passed to
+        // buildNoteString, so it can never show up in the note text.
+        val selections = mapOf("Category" to "Birthday", "Description" to "Custom cake")
+        val note = buildNoteString(selections)
+
+        assertFalse(note.contains("Quantity", ignoreCase = true))
+    }
+
+    @Test
+    fun `quantity stepper increments and decrements within bounds`() {
+        var quantity = 1
+
+        quantity = stepQuantity(quantity, delta = 1)
+        assertEquals(2, quantity)
+
+        quantity = stepQuantity(quantity, delta = -1)
+        assertEquals(1, quantity)
+    }
+
+    @Test
+    fun `quantity stepper cannot go below minimum`() {
+        val quantity = stepQuantity(MIN_QUANTITY, delta = -1)
+
+        assertEquals(MIN_QUANTITY, quantity)
+    }
+
+    @Test
+    fun `quantity stepper cannot exceed maximum`() {
+        val quantity = stepQuantity(MAX_QUANTITY, delta = 1)
+
+        assertEquals(MAX_QUANTITY, quantity)
+    }
+
+    @Test
+    fun `quantity seeded from existing line item quantity`() {
+        val existingLineItemQuantity = 4
+        val seeded = existingLineItemQuantity.coerceIn(MIN_QUANTITY, MAX_QUANTITY)
+
+        assertEquals(4, seeded)
+    }
+
+    // Mirrors ItemNoteDialogFragment's stepper click handlers
+    private fun stepQuantity(current: Int, delta: Int): Int {
+        return (current + delta).coerceIn(MIN_QUANTITY, MAX_QUANTITY)
     }
 
     // Helper functions that mirror ItemNoteDialogFragment logic

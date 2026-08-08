@@ -70,14 +70,35 @@ data class WidgetOption(
 }
 
 /**
- * 4 widget types for pop-up editor
+ * Widget types for pop-up editor
  */
 enum class WidgetType(val displayName: String) {
     SINGLE_SELECT("Single Select"),
     MULTI_SELECT("Multi Select"),
     TEXT_BOX("Text Box"),
-    CALENDAR("Calendar");
-    
+    CALENDAR("Calendar"),
+    QUANTITY("Quantity");
+
+    /**
+     * Whether this widget type has discrete values a merchant could filter the order list
+     * by. TEXT_BOX (free text) and QUANTITY (a live number, not a value with a fixed set of
+     * options) don't - they're excluded from the order-list filter dialog and from the
+     * "Filter" toggle list in Settings entirely, not just defaulted off.
+     */
+    val isFilterable: Boolean
+        get() = this != TEXT_BOX && this != QUANTITY
+
+    /**
+     * Whether this widget's value is stored in the item/order note (Order.note /
+     * LineItem.note, synced to Firebase-configured widgets) versus written directly to a
+     * live Clover field with no note/DB storage at all. QUANTITY reads and writes
+     * LineItem.unitQty directly - it has no note representation. Widgets that are
+     * `!savesToNotes` render outside the notes section in the popup (see
+     * ItemNoteDialogFragment) since they aren't "notes."
+     */
+    val savesToNotes: Boolean
+        get() = this != QUANTITY
+
     companion object {
         @JvmStatic
         fun fromString(value: String?): WidgetType {

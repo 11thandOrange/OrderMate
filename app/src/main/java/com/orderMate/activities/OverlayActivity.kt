@@ -15,6 +15,7 @@ import com.orderMate.repository.CloverRepository
 import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
 import com.orderMate.utils.exceptionHandler
+import com.orderMate.utils.isOrderOpenForEditing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -105,7 +106,10 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
         val lineItem = orderData?.lineItems?.find { it?.item?.id == lineItemId }
         val existingNote = lineItem?.note
         val itemName = lineItem?.getName()
-        val itemQuantity = lineItem?.unitQty?.toInt() ?: 1
+        // Quantity is "how many separate line items share this catalog item" (see
+        // CommonFunctions.countElementsByUniqueKeys) - unitQty is a different, weight-based
+        // Clover concept and isn't what's shown/edited as quantity anywhere else in the app (#139).
+        val itemQuantity = orderData?.lineItems?.count { it?.item?.id == lineItemId } ?: 1
         
         // Build modifiers string from modifications
         val modifiersString = lineItem?.modifications?.mapNotNull { it?.name }
@@ -118,25 +122,48 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
             existingNote = existingNote,
             itemName = itemName,
             itemModifiers = modifiersString,
-            itemQuantity = itemQuantity
+            itemQuantity = itemQuantity,
+            isOrderEditable = isOrderOpenForEditing(orderData)
         ).apply {
             setListener(object : ItemNoteDialogFragment.ItemNoteListener {
-                override fun onNoteSaved(itemId: String?, note: String) {
-                    // Update line item note in Clover
+                override fun onNoteSaved(itemId: String?, note: String, quantity: Int) {
+                    // Update line item note and quantity in Clover
                     CoroutineScope(Dispatchers.IO).launch {
                         exceptionHandler {
                             val orderId = orderData?.id ?: return@exceptionHandler
                             val allLineItems = orderData?.lineItems ?: return@exceptionHandler
-                            
-                            // Update note for matching line items
-                            allLineItems.forEach { lineItem ->
-                                if (lineItem?.item?.id == itemId) {
-                                    lineItem.note = note
+                            val orderConnector = MyApp.getInstance().getOrderConnector()
+
+                            // Update note first, only on line items we know currently exist -
+                            // avoids touching anything that's about to be deleted below (#139).
+                            val existingGroupItems = allLineItems.filter { it?.item?.id == itemId }
+                            if (existingGroupItems.isNotEmpty()) {
+                                existingGroupItems.forEach { it?.note = note }
+                                orderConnector.updateLineItems(orderId, existingGroupItems)
+                            }
+
+                            // Quantity here means "how many separate line items represent this
+                            // product" - Clover has no per-line-item count field (unitQty is a
+                            // different, weight-based concept), so changing it means actually
+                            // adding or deleting line items (#139).
+                            val delta = quantity - itemQuantity
+                            if (delta > 0) {
+                                // Duplicate an actual existing (already note-updated, already
+                                // grouped) line item via createLineItemsFrom rather than
+                                // reconstructing one from catalog defaults - see
+                                // OrderDetailFragment.onOrderItemClick for why (#139).
+                                val sourceId = existingGroupItems.firstOrNull()?.id
+                                if (!sourceId.isNullOrEmpty()) {
+                                    repeat(delta) {
+                                        orderConnector.createLineItemsFrom(orderId, orderId, listOf(sourceId))
+                                    }
+                                }
+                            } else if (delta < 0) {
+                                val idsToRemove = existingGroupItems.mapNotNull { it?.id }.take(-delta)
+                                if (idsToRemove.isNotEmpty()) {
+                                    orderConnector.deleteLineItems(orderId, idsToRemove)
                                 }
                             }
-                            
-                            // Save to Clover
-                            MyApp.getInstance().getOrderConnector().updateLineItems(orderId, allLineItems)
                         }
                     }
                     finish()

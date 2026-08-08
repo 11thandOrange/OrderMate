@@ -153,9 +153,13 @@ object OrderNoteParser {
                         tags.add(ParsedTag(widget.label, value, TagType.TEXT_BOX, widget.type))
                     }
                 }
+                WidgetType.QUANTITY -> {
+                    // Quantity lives on the line item itself (unitQty), never serialized into
+                    // the note string, so there's nothing to extract as a tag here.
+                }
             }
         }
-        
+
         return tags
     }
     
