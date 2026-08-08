@@ -723,10 +723,15 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             }
 
             runOnMainThread {
+                // Safety check before modifying UI
+                if (!isAdded || _binding == null) {
+                    return@runOnMainThread
+                }
+
                 // All list modifications on main thread to avoid RecyclerView inconsistency
                 orderItems.clear()
                 orderItems.addAll(tempResults)
-                
+
                 updateResultsInfo()
                 notifyAdapter()
                 updateEmptyState()
@@ -1017,6 +1022,8 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     }
 
     private fun updateFilterOptions() {
+        if (!isAdded || view == null) return
+
         orderPaymentStatusType.clear()
         orderPaymentStatusType.add(Constants.all_orders)
         
