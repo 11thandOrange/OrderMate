@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.orderMate.modals.ConversationItem
 import com.orderMate.modals.CreateEmailConversationRequest
 import com.orderMate.modals.CreateSmsConversationRequest
 import com.orderMate.repository.CloverRepository
@@ -24,10 +25,10 @@ class OrderDetailViewModel(application: Application) : AndroidViewModel(applicat
 
 
 
-    fun shareEmail(data: CreateEmailConversationRequest) {
+    fun shareEmail(data: CreateEmailConversationRequest, orderId: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val response = repository.sendEmail(data)
+                val response = repository.sendEmail(data, orderId)
                 handleResponse(response , Constants.emailAddress)
             }
             catch (e : UnknownHostException){
@@ -40,14 +41,14 @@ class OrderDetailViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    private fun handleResponse(response: Response<Any> , whichType : String) {
+    private fun handleResponse(response: Response<ConversationItem> , whichType : String) {
         _successResponse.postValue(Pair( whichType ,response.isSuccessful))
     }
 
-    fun shareSms(data: CreateSmsConversationRequest) {
+    fun shareSms(data: CreateSmsConversationRequest, orderId: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val response = repository.sendSms(data)
+                val response = repository.sendSms(data, orderId)
                 handleResponse(response , Constants.phoneNumber)
             }
             catch (e : UnknownHostException){

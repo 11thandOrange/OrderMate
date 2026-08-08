@@ -7,17 +7,22 @@ import com.clover.sdk.v3.customers.Customer
 import com.clover.sdk.v3.customers.EmailAddress
 import com.clover.sdk.v3.customers.PhoneNumber
 import com.clover.sdk.v3.order.Order
+import com.orderMate.modals.ConversationItem
 import com.orderMate.modals.CreateEmailConversationRequest
 import com.orderMate.modals.CreateSmsConversationRequest
 import com.orderMate.networkManager.CloverOrdersApiClient
 import com.orderMate.networkManager.RetrofitInstanceWithAuth
 import com.orderMate.services.ScheduledTaskManager
 import com.orderMate.utils.Constants
+import com.orderMate.utils.FirebaseRealtimeDataBaseManager
 import com.orderMate.utils.MyApp
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import retrofit2.Response
+import kotlin.coroutines.resume
 import com.clover.sdk.v1.customer.Customer as V1Customer
 
 
@@ -60,44 +65,69 @@ class CloverRepository private constructor(private val context: Context) {
 
     // ==================== Messaging API ====================
 
-    suspend fun sendEmail(data: CreateEmailConversationRequest) =
-        apiWithAuth.createEmailConversation(Constants.workSpaceId, data)
+    suspend fun sendEmail(data: CreateEmailConversationRequest, orderId: String?): Response<ConversationItem> {
+        val response = apiWithAuth.createEmailConversation(Constants.workSpaceId, data)
+        persistConversationForOrder(response, orderId)
+        return response
+    }
 
-    suspend fun sendSms(data: CreateSmsConversationRequest) =
-        apiWithAuth.createSmsConversation(Constants.workSpaceId, data)
+    suspend fun sendSms(data: CreateSmsConversationRequest, orderId: String?): Response<ConversationItem> {
+        val response = apiWithAuth.createSmsConversation(Constants.workSpaceId, data)
+        persistConversationForOrder(response, orderId)
+        return response
+    }
+
+    /**
+     * #54: record the conversation Bird just created against the order it was sent
+     * for, so it's findable later. Bird's `resource` field can't do this itself -
+     * its `type` enum has no value for an order and its `id` must be a UUID, which
+     * Clover order ids never are (confirmed via a live 422 InvalidPayload response) -
+     * so OrderMate tracks the mapping itself in Firebase.
+     */
+    private suspend fun persistConversationForOrder(response: Response<ConversationItem>, orderId: String?) {
+        val conversationId = response.body()?.id ?: return
+        if (orderId == null) return
+        val merchantId = myApp.getMerchantId() ?: return
+        suspendCancellableCoroutine<Unit> { cont ->
+            FirebaseRealtimeDataBaseManager.getInstance().saveConversationForOrder(
+                merchantId, orderId, conversationId
+            ) {
+                if (cont.isActive) cont.resume(Unit)
+            }
+        }
+    }
 
     // ==================== Notification History (#54) ====================
 
     /**
-     * Get all sent notifications for a specific order
-     * Uses Bird Conversations API with resource filter
+     * Get all sent notifications for a specific order.
+     * Looks up the conversation ids OrderMate recorded for this order (see
+     * persistConversationForOrder) and fetches their messages from Bird.
      * @param orderId The Clover order ID
      * @return List of messages sent for this order
      */
     suspend fun getNotificationsForOrder(orderId: String): List<com.orderMate.modals.MessageItem> = withContext(Dispatchers.IO) {
         try {
-            // Query conversations filtered by order resource
-            val conversationsResponse = apiWithAuth.getConversationsByOrder(
-                workspaceId = Constants.workSpaceId,
-                resource = "order:$orderId"
-            )
-
-            // A non-2xx here (e.g. auth failure) is otherwise indistinguishable from
-            // "genuinely no notifications sent" - log it so that's not the case.
-            if (!conversationsResponse.isSuccessful) {
-                Log.e(TAG, "getNotificationsForOrder($orderId): conversations request " +
-                    "failed - HTTP ${conversationsResponse.code()}")
+            val merchantId = myApp.getMerchantId()
+            if (merchantId == null) {
+                Log.e(TAG, "getNotificationsForOrder($orderId): no merchant id available")
                 return@withContext emptyList()
             }
 
-            val conversations = conversationsResponse.body()?.results ?: emptyList()
+            val conversationIds = suspendCancellableCoroutine<List<String>> { cont ->
+                FirebaseRealtimeDataBaseManager.getInstance().getConversationsForOrder(
+                    merchantId, orderId
+                ) { ids ->
+                    if (cont.isActive) cont.resume(ids)
+                }
+            }
 
-            // Collect messages from all matching conversations
+            if (conversationIds.isEmpty()) return@withContext emptyList()
+
+            // Collect messages from all conversations recorded for this order
             val allMessages = mutableListOf<com.orderMate.modals.MessageItem>()
 
-            for (conversation in conversations) {
-                val conversationId = conversation.id ?: continue
-
+            for (conversationId in conversationIds) {
                 val messagesResponse = apiWithAuth.getConversationMessages(
                     workspaceId = Constants.workSpaceId,
                     conversationId = conversationId

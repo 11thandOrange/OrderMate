@@ -1,7 +1,7 @@
 package com.orderMate.networkManager
 
 
-import com.orderMate.modals.ConversationsResponse
+import com.orderMate.modals.ConversationItem
 import com.orderMate.modals.CreateEmailConversationRequest
 import com.orderMate.modals.CreateSmsConversationRequest
 import com.orderMate.modals.MessagesResponse
@@ -22,31 +22,21 @@ interface ApiCall {
 
     /**
      * Sends via the Conversations API's Create Conversation endpoint (not the
-     * simpler Channels API) so the resulting conversation can carry a `resource`
-     * tag - required for notification history to later be queryable by order ID.
+     * simpler Channels API). The response carries the created conversation's `id`,
+     * which OrderMate persists itself (keyed by order id) to make notification
+     * history queryable later - see CloverRepository.sendEmail/sendSms.
      */
     @POST("/workspaces/{workspaceId}/conversations")
     suspend fun createEmailConversation(
         @Path("workspaceId") workspaceId: String,
         @Body request: CreateEmailConversationRequest
-    ): Response<Any>
+    ): Response<ConversationItem>
 
     @POST("/workspaces/{workspaceId}/conversations")
     suspend fun createSmsConversation(
         @Path("workspaceId") workspaceId: String,
         @Body request: CreateSmsConversationRequest
-    ): Response<Any>
-
-    /**
-     * Get conversations filtered by resource (order ID)
-     * Use resource format: "order:{orderId}"
-     */
-    @GET("/workspaces/{workspaceId}/conversations")
-    suspend fun getConversationsByOrder(
-        @Path("workspaceId") workspaceId: String,
-        @Query("resource") resource: String,
-        @Query("limit") limit: Int = 100
-    ): Response<ConversationsResponse>
+    ): Response<ConversationItem>
 
     /**
      * Get all messages in a conversation

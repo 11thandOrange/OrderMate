@@ -22,7 +22,6 @@ import com.orderMate.R
 import com.orderMate.communicators.IShareEmailOrMessage
 import com.orderMate.databinding.DialogSendNotificationBinding
 import com.orderMate.modals.Body
-import com.orderMate.modals.ConversationResource
 import com.orderMate.modals.CreateEmailConversationRequest
 import com.orderMate.modals.CreateSmsConversationRequest
 import com.orderMate.modals.Html
@@ -370,10 +369,10 @@ class SendNotificationDialog(
                 }
                 if (isSmsEnabled) {
                     val data = processTheSmSData()
-                    listener.shareSms(data)
+                    listener.shareSms(data, order?.id)
                 } else {
                     val data = processTheEmailData()
-                    listener.sendEmail(data)
+                    listener.sendEmail(data, order?.id)
                 }
                 dismiss()
             }
@@ -451,17 +450,17 @@ class SendNotificationDialog(
         )
         val body = Body(html, Constants.html)
 
-        // Sending via Create Conversation (not the Channels API) and tagging with
-        // `resource` is what makes this findable later via notification history (#54).
+        // Sending via Create Conversation (not the Channels API) returns a
+        // conversation id that OrderMate persists itself, keyed by order id, so
+        // notification history can be looked back up later (#54).
         val orderId = order?.id
         val reference = orderId?.let { "order-$it" }
-        val resource = orderId?.let { ConversationResource("order", it) }
 
         return CreateEmailConversationRequest(
             channelId = Constants.channelId,
+            name = orderId?.let { "Order $it" } ?: "OrderMate notification",
             participants = participants,
-            initialMessage = InitialEmailMessageRequest(body, recipients, reference),
-            resource = resource
+            initialMessage = InitialEmailMessageRequest(body, recipients, reference)
         )
     }
 
@@ -476,17 +475,17 @@ class SendNotificationDialog(
             Constants.text,
         )
 
-        // Sending via Create Conversation (not the Channels API) and tagging with
-        // `resource` is what makes this findable later via notification history (#54).
+        // Sending via Create Conversation (not the Channels API) returns a
+        // conversation id that OrderMate persists itself, keyed by order id, so
+        // notification history can be looked back up later (#54).
         val orderId = order?.id
         val reference = orderId?.let { "order-$it" }
-        val resource = orderId?.let { ConversationResource("order", it) }
 
         return CreateSmsConversationRequest(
             channelId = Constants.SMSChannelId,
+            name = orderId?.let { "Order $it" } ?: "OrderMate notification",
             participants = participants,
-            initialMessage = InitialSmsMessageRequest(smsBody, recipients, reference),
-            resource = resource
+            initialMessage = InitialSmsMessageRequest(smsBody, recipients, reference)
         )
     }
 

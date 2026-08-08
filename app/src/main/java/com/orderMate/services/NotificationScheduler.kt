@@ -10,7 +10,6 @@ import com.clover.sdk.util.CloverAccount
 import com.clover.sdk.v1.merchant.MerchantConnector
 import com.clover.sdk.v3.order.OrderConnector
 import com.orderMate.modals.Body
-import com.orderMate.modals.ConversationResource
 import com.orderMate.modals.CreateEmailConversationRequest
 import com.orderMate.modals.Html
 import com.orderMate.modals.InitialEmailMessageRequest
@@ -294,8 +293,9 @@ class OrderNotificationReceiver : BroadcastReceiver() {
             """.trimIndent()
             
             // 4. Build the Create Conversation request for the Bird API. Sending via
-            // Create Conversation (not the Channels API) and tagging with `resource`
-            // is what makes this findable later via notification history (#54).
+            // Create Conversation (not the Channels API) returns a conversation id
+            // that OrderMate persists itself, keyed by order id, so notification
+            // history can be looked back up later (#54).
             val html = Html(
                 html = emailHtml,
                 metadata = Metadata(subject = "📅 Order #$shortOrderId Due: $dueDateStr at $dueTimeStr"),
@@ -311,14 +311,14 @@ class OrderNotificationReceiver : BroadcastReceiver() {
             val reference = "scheduled-notification-$orderId"
             val emailData = CreateEmailConversationRequest(
                 channelId = Constants.channelId,
+                name = "Order $orderId",
                 participants = listOf(participant),
-                initialMessage = InitialEmailMessageRequest(body, listOf(recipient), reference),
-                resource = ConversationResource("order", orderId)
+                initialMessage = InitialEmailMessageRequest(body, listOf(recipient), reference)
             )
-            
+
             // 5. Send via Bird API
             val repository = CloverRepository.getInstance(context)
-            repository.sendEmail(emailData)
+            repository.sendEmail(emailData, orderId)
             
         } catch (e: Exception) {
             e.printStackTrace()

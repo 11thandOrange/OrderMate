@@ -1343,12 +1343,12 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
     // when we want to share the email and sms to the customer
-    override fun sendEmail(data: CreateEmailConversationRequest) {
-        viewModel.shareEmail(data)
+    override fun sendEmail(data: CreateEmailConversationRequest, orderId: String?) {
+        viewModel.shareEmail(data, orderId)
     }
 
-    override fun shareSms(data: CreateSmsConversationRequest) {
-        viewModel.shareSms(data)
+    override fun shareSms(data: CreateSmsConversationRequest, orderId: String?) {
+        viewModel.shareSms(data, orderId)
     }
     
     // populatePaymentTypeBadge() REMOVED - using shared setupPaymentTypePill() from CommonFunctions.kt

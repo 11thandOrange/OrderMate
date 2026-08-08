@@ -43,6 +43,41 @@ class FirebaseRealtimeDataBaseManager private constructor() {
     }
 
 
+    /**
+     * #54: record that a Bird conversation was created for an order, so the
+     * notification history UI can look it back up later (Bird itself has no
+     * server-side way to query conversations by order).
+     */
+    fun saveConversationForOrder(
+        merchantId: String,
+        orderId: String,
+        conversationId: String,
+        task: (Boolean) -> Unit
+    ) {
+        firebaseDatabaseInstance?.reference
+            ?.child(Constants.orderConversations)?.child(merchantId)?.child(orderId)
+            ?.child(conversationId)?.setValue(true)
+            ?.addOnSuccessListener { task(true) }
+            ?.addOnFailureListener { task(false) }
+    }
+
+    /**
+     * #54: fetch the Bird conversation ids previously recorded for an order.
+     */
+    fun getConversationsForOrder(
+        merchantId: String,
+        orderId: String,
+        task: (List<String>) -> Unit
+    ) {
+        firebaseDatabaseInstance?.reference
+            ?.child(Constants.orderConversations)?.child(merchantId)?.child(orderId)
+            ?.get()
+            ?.addOnSuccessListener { snapshot ->
+                task(snapshot.children.mapNotNull { it.key })
+            }
+            ?.addOnFailureListener { task(emptyList()) }
+    }
+
     fun getData(
         context: Context,
         merchantId: String?,

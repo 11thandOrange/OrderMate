@@ -5,13 +5,10 @@ package com.orderMate.modals
  * Used to fetch sent notification history for orders
  */
 
-// Response for GET /workspaces/{workspaceId}/conversations
-data class ConversationsResponse(
-    val results: List<ConversationItem>?,
-    val nextPageToken: String?,
-    val total: Int?
-)
-
+// Response for POST /workspaces/{workspaceId}/conversations (Create Conversation).
+// Bird returns the created conversation, including its `id` - that id is what
+// OrderMate persists (keyed by order id) so notification history can be looked
+// back up later (see CloverRepository.getNotificationsForOrder).
 data class ConversationItem(
     val id: String?,
     val name: String?,
@@ -20,13 +17,7 @@ data class ConversationItem(
     val featuredParticipants: List<Participant>?,
     val lastMessage: LastMessage?,
     val createdAt: String?,
-    val updatedAt: String?,
-    val resource: ConversationResource?
-)
-
-data class ConversationResource(
-    val type: String?,
-    val id: String?
+    val updatedAt: String?
 )
 
 data class Participant(
@@ -107,21 +98,24 @@ data class MessageItemMeta(
 
 // Request for POST /workspaces/{workspaceId}/conversations (Create Conversation).
 // Sending through this endpoint - instead of the old Channels API
-// /workspaces/{id}/channels/{id}/messages send - is what actually lets a sent
-// notification be tagged with `resource` so it's later findable by order ID via
-// List Conversations' `resource` filter (see CloverRepository.getNotificationsForOrder).
+// /workspaces/{id}/channels/{id}/messages send - returns a conversation `id` that
+// OrderMate persists itself (keyed by order id, see CloverRepository) so notification
+// history can be looked up later. `name` is required by Bird; there is no `resource`
+// field here because Bird's `resource.type` enum has no value for an order and
+// `resource.id` must be a UUID, which Clover order ids never are (confirmed via a
+// live 422 InvalidPayload response).
 data class CreateEmailConversationRequest(
     val channelId: String,
+    val name: String,
     val participants: List<Recipient>,
-    val initialMessage: InitialEmailMessageRequest,
-    val resource: ConversationResource? = null
+    val initialMessage: InitialEmailMessageRequest
 )
 
 data class CreateSmsConversationRequest(
     val channelId: String,
+    val name: String,
     val participants: List<Recipient>,
-    val initialMessage: InitialSmsMessageRequest,
-    val resource: ConversationResource? = null
+    val initialMessage: InitialSmsMessageRequest
 )
 
 data class InitialEmailMessageRequest(
