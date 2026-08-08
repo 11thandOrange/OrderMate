@@ -4,6 +4,9 @@ package com.orderMate.networkManager
 import com.orderMate.modals.ConversationItem
 import com.orderMate.modals.CreateEmailConversationRequest
 import com.orderMate.modals.CreateSmsConversationRequest
+import com.orderMate.modals.InitialEmailMessageRequest
+import com.orderMate.modals.InitialSmsMessageRequest
+import com.orderMate.modals.MessageItem
 import com.orderMate.modals.MessagesResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -37,6 +40,36 @@ interface ApiCall {
         @Path("workspaceId") workspaceId: String,
         @Body request: CreateSmsConversationRequest
     ): Response<ConversationItem>
+
+    /**
+     * Bird only allows one *open* conversation per contact, regardless of channel -
+     * Create Conversation 409s (ContactAlreadyInConversation) for every send after a
+     * contact's first. Used to check the existing conversation's channel before
+     * posting into it, so a message is never rerouted onto the wrong channel.
+     */
+    @GET("/workspaces/{workspaceId}/conversations/{conversationId}")
+    suspend fun getConversation(
+        @Path("workspaceId") workspaceId: String,
+        @Path("conversationId") conversationId: String
+    ): Response<ConversationItem>
+
+    /**
+     * Sends a message into an already-open conversation - the fallback used when
+     * Create Conversation 409s and the existing conversation is on the matching channel.
+     */
+    @POST("/workspaces/{workspaceId}/conversations/{conversationId}/messages")
+    suspend fun createSmsMessage(
+        @Path("workspaceId") workspaceId: String,
+        @Path("conversationId") conversationId: String,
+        @Body request: InitialSmsMessageRequest
+    ): Response<MessageItem>
+
+    @POST("/workspaces/{workspaceId}/conversations/{conversationId}/messages")
+    suspend fun createEmailMessage(
+        @Path("workspaceId") workspaceId: String,
+        @Path("conversationId") conversationId: String,
+        @Body request: InitialEmailMessageRequest
+    ): Response<MessageItem>
 
     /**
      * Get all messages in a conversation

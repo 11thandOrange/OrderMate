@@ -67,14 +67,99 @@ class CloverRepository private constructor(private val context: Context) {
 
     suspend fun sendEmail(data: CreateEmailConversationRequest, orderId: String?): Response<ConversationItem> {
         val response = apiWithAuth.createEmailConversation(Constants.workSpaceId, data)
+        if (!response.isSuccessful && response.code() == 409) {
+            return sendIntoExistingConversation(response, data.channelId, orderId) { conversationId ->
+                apiWithAuth.createEmailMessage(Constants.workSpaceId, conversationId, data.initialMessage)
+            }
+        }
         persistConversationForOrder(response, orderId)
         return response
     }
 
     suspend fun sendSms(data: CreateSmsConversationRequest, orderId: String?): Response<ConversationItem> {
         val response = apiWithAuth.createSmsConversation(Constants.workSpaceId, data)
+        if (!response.isSuccessful && response.code() == 409) {
+            return sendIntoExistingConversation(response, data.channelId, orderId) { conversationId ->
+                apiWithAuth.createSmsMessage(Constants.workSpaceId, conversationId, data.initialMessage)
+            }
+        }
         persistConversationForOrder(response, orderId)
         return response
+    }
+
+    /**
+     * Bird allows only one *open* conversation per contact - Create Conversation 409s
+     * (code "ContactAlreadyInConversation") for every notification sent to a contact
+     * after their first, returning the existing conversation's id in the error body.
+     * Without this, every one of those sends was silently dropped.
+     *
+     * The existing conversation can be on a different channel than the one just
+     * requested (e.g. the contact has an open email thread and we're trying to text
+     * them) - Bird's per-contact limit applies across channels. Posting into it
+     * regardless would silently deliver on the wrong channel, so the existing
+     * conversation's channel is checked first and this only proceeds on a match;
+     * otherwise the original 409 is returned as a real failure.
+     */
+    private suspend fun <TMessage> sendIntoExistingConversation(
+        response: Response<ConversationItem>,
+        intendedChannelId: String,
+        orderId: String?,
+        sendMessage: suspend (conversationId: String) -> Response<TMessage>
+    ): Response<ConversationItem> {
+        val existingConversationId = parseExistingConversationId(response)
+        if (existingConversationId == null) {
+            Log.e(TAG, "sendIntoExistingConversation: 409 response had no details.conversationId")
+            return response
+        }
+
+        val existingConversation = apiWithAuth.getConversation(Constants.workSpaceId, existingConversationId)
+        val existingChannelId = existingConversation.body()?.channelId
+        if (existingChannelId != intendedChannelId) {
+            Log.e(
+                TAG,
+                "sendIntoExistingConversation: contact's open conversation $existingConversationId is on " +
+                    "channel $existingChannelId, not the requested $intendedChannelId - not sending, this " +
+                    "would deliver on the wrong channel"
+            )
+            return response
+        }
+
+        val messageResponse = sendMessage(existingConversationId)
+        if (!messageResponse.isSuccessful) {
+            Log.e(
+                TAG,
+                "sendIntoExistingConversation: failed to post into existing conversation " +
+                    "$existingConversationId - HTTP ${messageResponse.code()}"
+            )
+            return response
+        }
+
+        val syntheticResponse = Response.success(
+            ConversationItem(
+                id = existingConversationId,
+                name = null,
+                status = null,
+                channelId = existingChannelId,
+                featuredParticipants = null,
+                lastMessage = null,
+                createdAt = null,
+                updatedAt = null
+            )
+        )
+        persistConversationForOrder(syntheticResponse, orderId)
+        return syntheticResponse
+    }
+
+    private fun parseExistingConversationId(response: Response<ConversationItem>): String? {
+        return try {
+            val errorJson = response.errorBody()?.string() ?: return null
+            JSONObject(errorJson).optJSONObject("details")
+                ?.optString("conversationId")
+                ?.takeIf { it.isNotBlank() }
+        } catch (e: Exception) {
+            Log.e(TAG, "parseExistingConversationId: failed to parse 409 error body", e)
+            null
+        }
     }
 
     /**
