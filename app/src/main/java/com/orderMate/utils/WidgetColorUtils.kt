@@ -50,6 +50,7 @@ object WidgetColorUtils {
     const val COLOR_MULTI_SELECT = 0xFF81C784.toInt()  // Green
     const val COLOR_TEXT_BOX = 0xFFA1887F.toInt()      // Brown
     const val COLOR_QUANTITY = 0xFF4DB6AC.toInt()      // Teal
+    const val COLOR_CUSTOMER = 0xFFFF8A65.toInt()      // Orange
 
     // Widget type colors - BACKGROUND (darker shade, matches bg_widget_icon_*.xml)
     const val BG_COLOR_CALENDAR = 0xFF1976D2.toInt()      // Dark Blue
@@ -57,6 +58,7 @@ object WidgetColorUtils {
     const val BG_COLOR_MULTI_SELECT = 0xFF388E3C.toInt()  // Dark Green
     const val BG_COLOR_TEXT_BOX = 0xFFF57C00.toInt()      // Dark Orange
     const val BG_COLOR_QUANTITY = 0xFF00796B.toInt()      // Dark Teal
+    const val BG_COLOR_CUSTOMER = 0xFFE64A19.toInt()      // Dark Orange/Red
     
     // Clover filter colors
     const val COLOR_PAYMENT_STATUS = 0xFFFFB74D.toInt()  // Yellow
@@ -75,6 +77,7 @@ object WidgetColorUtils {
             WidgetType.MULTI_SELECT -> COLOR_MULTI_SELECT
             WidgetType.TEXT_BOX -> COLOR_TEXT_BOX
             WidgetType.QUANTITY -> COLOR_QUANTITY
+            WidgetType.CUSTOMER -> COLOR_CUSTOMER
         }
     }
     
@@ -89,6 +92,7 @@ object WidgetColorUtils {
             WidgetType.MULTI_SELECT -> BG_COLOR_MULTI_SELECT
             WidgetType.TEXT_BOX -> BG_COLOR_TEXT_BOX
             WidgetType.QUANTITY -> BG_COLOR_QUANTITY
+            WidgetType.CUSTOMER -> BG_COLOR_CUSTOMER
         }
     }
 
@@ -103,9 +107,10 @@ object WidgetColorUtils {
             WidgetType.MULTI_SELECT -> R.drawable.ic_check_double
             WidgetType.TEXT_BOX -> R.drawable.ic_text_format
             WidgetType.QUANTITY -> R.drawable.ic_add_circle
+            WidgetType.CUSTOMER -> R.drawable.ic_user_circle
         }
     }
-    
+
     /**
      * Get icon resource for utils WidgetType (used in SettingsFragment)
      * Overload for compatibility with com.orderMate.utils.WidgetType
@@ -156,6 +161,7 @@ object WidgetColorUtils {
             WidgetType.MULTI_SELECT -> R.drawable.bg_widget_icon_multiselect
             WidgetType.TEXT_BOX -> R.drawable.bg_widget_icon_text
             WidgetType.QUANTITY -> R.drawable.bg_widget_icon_quantity
+            WidgetType.CUSTOMER -> R.drawable.bg_widget_icon_customer
         }
     }
     

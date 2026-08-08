@@ -157,6 +157,10 @@ object OrderNoteParser {
                     // Quantity lives on the line item itself (unitQty), never serialized into
                     // the note string, so there's nothing to extract as a tag here.
                 }
+                WidgetType.CUSTOMER -> {
+                    // Customer assignment lives on Order.customers, never serialized into the
+                    // note string, so there's nothing to extract as a tag here.
+                }
             }
         }
 

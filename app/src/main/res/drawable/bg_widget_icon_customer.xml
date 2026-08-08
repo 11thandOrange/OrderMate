@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Customer widget icon background - 20% opacity of WidgetColorUtils.COLOR_CUSTOMER (#FF8A65) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#33FF8A65" />
+    <corners android:radius="8dp" />
+</shape>

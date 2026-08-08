@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import com.orderMate.fragment.FloatingWidgetService
+import com.clover.sdk.v3.customers.Customer
 import com.clover.sdk.v3.order.Order
 import com.orderMate.communicators.ILineItemUpdateListener
 import com.orderMate.databinding.ActivityOverlayBinding
@@ -186,12 +187,16 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
             orderId = orderData?.id,
             existingNote = existingNote
         ).apply {
+            setCurrentCustomer(orderData?.customers?.firstOrNull())
             setListener(object : OrderNoteDialogFragment.OrderNoteListener {
-                override fun onOrderNoteSaved(orderId: String?, note: String) {
+                override fun onOrderNoteSaved(orderId: String?, note: String, customer: Customer?) {
                     if (orderId != null) {
                         CoroutineScope(Dispatchers.IO).launch {
-                            CloverRepository.getInstance(this@OverlayActivity)
-                                .saveOrderNote(orderId, note)
+                            val repository = CloverRepository.getInstance(this@OverlayActivity)
+                            if (customer != null) {
+                                repository.assignCustomerToOrder(orderId, customer)
+                            }
+                            repository.saveOrderNote(orderId, note)
                         }
                     }
                     finish()

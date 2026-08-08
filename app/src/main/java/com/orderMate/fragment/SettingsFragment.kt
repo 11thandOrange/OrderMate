@@ -917,6 +917,17 @@ class SettingsFragment : Fragment() {
         } else {
             optionQuantity?.visibility = View.GONE
         }
+        // Customer assignment applies to the whole order, so it only makes sense at the
+        // order level - hide the option entirely when adding an item-level widget (#140).
+        val optionCustomer = dialogView.findViewById<View>(R.id.optionCustomer)
+        if (level == NoteLevel.ORDER) {
+            optionCustomer?.visibility = View.VISIBLE
+            optionCustomer?.setOnClickListener {
+                addWidgetOfType(FirebaseWidgetType.CUSTOMER)
+            }
+        } else {
+            optionCustomer?.visibility = View.GONE
+        }
         dialogView.findViewById<View>(R.id.btnCancel)?.setOnClickListener {
             dialog.dismiss()
         }

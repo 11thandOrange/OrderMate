@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
+import com.clover.sdk.v3.customers.Customer
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.textfield.TextInputEditText
 import com.orderMate.R
@@ -42,6 +43,16 @@ class OrderNoteDialogFragment : DialogFragment() {
     private var orderId: String? = null
     private var existingNote: String? = null
 
+    // Currently assigned customer, seeded by the caller from Order.customers (#140). Unlike
+    // other widget types this isn't serialized into the note string. CustomerDialog is opened
+    // without an orderId here so its Save only updates this local field (via onCustomerUpdated
+    // below) instead of assigning to Clover immediately - the actual assignment happens when
+    // this popup's own Save button is clicked, alongside the note save.
+    private var currentCustomer: Customer? = null
+    private var customerNameView: TextView? = null
+    private var customerActionView: TextView? = null
+    private var onCustomerChanged: ((Customer?) -> Unit)? = null
+
     private val singleSelections = mutableMapOf<String, String?>()
     private val multiSelections = mutableMapOf<String, MutableSet<String>>()
     private val dateSelections = mutableMapOf<String, String?>()
@@ -52,7 +63,7 @@ class OrderNoteDialogFragment : DialogFragment() {
     private val dateTimeFormat = SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault())
 
     interface OrderNoteListener {
-        fun onOrderNoteSaved(orderId: String?, note: String)
+        fun onOrderNoteSaved(orderId: String?, note: String, customer: Customer?)
         fun onOrderNoteCancelled()
     }
 
@@ -124,7 +135,7 @@ class OrderNoteDialogFragment : DialogFragment() {
 
         btnSave?.setOnClickListener {
             val note = buildNoteString()
-            listener?.onOrderNoteSaved(orderId, note)
+            listener?.onOrderNoteSaved(orderId, note, currentCustomer)
             dismiss()
         }
     }
@@ -150,10 +161,11 @@ class OrderNoteDialogFragment : DialogFragment() {
                 // Quantity applies to individual line items, not a whole order - the
                 // "Add Widget" picker doesn't offer it at the order level (#139).
                 WidgetType.QUANTITY -> Unit
+                WidgetType.CUSTOMER -> addCustomerSection(widget)
             }
         }
     }
-    
+
     private fun addEmptyStateMessage() {
         val emptyView = TextView(requireContext()).apply {
             text = "No order-level widgets enabled. Update Order Level Notes settings."
@@ -224,6 +236,64 @@ class OrderNoteDialogFragment : DialogFragment() {
         android.util.Log.d("TextBoxDebug", "  textInputViews AFTER: ${textInputViews.keys}")
 
         noteSectionsContainer?.addView(sectionView)
+    }
+
+    /**
+     * Add CUSTOMER section - shows the order's assigned customer and lets the merchant
+     * search/select, edit, or create one without leaving the register (#140).
+     *
+     * Reuses CustomerDialog end-to-end (search via CustomerSearchDialog, create, edit) - no
+     * customer logic is duplicated here. The actual assign-to-order call is deferred until
+     * this popup's own Save button is clicked (see openCustomerDialog()).
+     */
+    private fun addCustomerSection(widget: WidgetConfig) {
+        val sectionView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.note_section_customer, noteSectionsContainer, false)
+
+        val labelView = sectionView.findViewById<TextView>(R.id.sectionLabel)
+        labelView.text = widget.label
+
+        customerNameView = sectionView.findViewById(R.id.customerName)
+        customerActionView = sectionView.findViewById(R.id.customerAction)
+        renderCustomer()
+
+        val rowView = sectionView.findViewById<View>(R.id.customerRow)
+        rowView.setOnClickListener { openCustomerDialog() }
+
+        noteSectionsContainer?.addView(sectionView)
+    }
+
+    private fun renderCustomer() {
+        val customer = currentCustomer
+        if (customer != null) {
+            val name = listOfNotNull(customer.firstName, customer.lastName)
+                .filter { it.isNotBlank() }
+                .joinToString(" ")
+                .ifBlank { "Customer" }
+            customerNameView?.text = name
+            customerActionView?.text = "Change"
+        } else {
+            customerNameView?.text = "No customer assigned"
+            customerActionView?.text = "Add"
+        }
+    }
+
+    private fun openCustomerDialog() {
+        // orderId is deliberately withheld here (unlike OrderDetailFragment's hardcoded
+        // customerRow) so CustomerDialog.saveCustomer() skips its immediate
+        // assignCustomerToOrder() call - Save on the Customer Details screen should only
+        // update this popup's local state, not commit the assignment to Clover. The actual
+        // assignment happens when THIS popup's own Save button is clicked, via
+        // OrderNoteListener.onOrderNoteSaved's customer param.
+        CustomerDialog.newInstance(
+            customer = currentCustomer,
+            orderId = null,
+            onCustomerUpdated = { updatedCustomer ->
+                currentCustomer = updatedCustomer
+                renderCustomer()
+                onCustomerChanged?.invoke(updatedCustomer)
+            }
+        ).show(parentFragmentManager, CustomerDialog.TAG)
     }
 
     private fun setupSingleSelectOptions(container: FlexboxLayout, widget: WidgetConfig) {
@@ -372,6 +442,10 @@ class OrderNoteDialogFragment : DialogFragment() {
                     }
                 }
                 WidgetType.QUANTITY -> Unit
+                // Customer assignment is committed via CloverRepository when this popup's
+                // Save button is clicked (see setupButtons()), not serialized into the note
+                // string (#140).
+                WidgetType.CUSTOMER -> Unit
             }
         }
 
@@ -414,6 +488,7 @@ class OrderNoteDialogFragment : DialogFragment() {
                             textSelections[it.id] = value
                         }
                         WidgetType.QUANTITY -> Unit
+                        WidgetType.CUSTOMER -> Unit
                     }
                 }
             }
@@ -432,6 +507,8 @@ class OrderNoteDialogFragment : DialogFragment() {
         noteSectionsContainer = null
         btnCancel = null
         btnSave = null
+        customerNameView = null
+        customerActionView = null
     }
 
     override fun onCancel(dialog: android.content.DialogInterface) {
@@ -450,6 +527,20 @@ class OrderNoteDialogFragment : DialogFragment() {
 
     fun setExistingNote(note: String?) {
         this.existingNote = note
+    }
+
+    /** Seeds the CUSTOMER widget with the order's currently assigned customer, if any (#140). */
+    fun setCurrentCustomer(customer: Customer?) {
+        this.currentCustomer = customer
+    }
+
+    /**
+     * Notified whenever the CUSTOMER widget assigns/changes the order's customer, so a caller
+     * showing its own order data behind this popup (e.g. OrderDetailFragment) can refresh -
+     * matching what the existing hardcoded customerRow's onCustomerUpdated already does (#140).
+     */
+    fun setOnCustomerChanged(listener: ((Customer?) -> Unit)?) {
+        this.onCustomerChanged = listener
     }
 
     companion object {
