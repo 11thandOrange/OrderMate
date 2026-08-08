@@ -36,58 +36,6 @@
                 android:layout_marginEnd="10dp"
                 android:text="x1"/>
 
-            <!-- Quantity stepper - replaces dialogQtyBadge when the Quantity widget is
-                 enabled (#139 feedback: this reads/writes LineItem.unitQty directly, it is
-                 not a note, so it lives in the header rather than the notes section below). -->
-            <LinearLayout
-                android:id="@+id/quantityStepperRow"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_note_input"
-                android:paddingHorizontal="2dp"
-                android:layout_marginEnd="10dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/quantityDecrement"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:gravity="center"
-                    android:text="−"
-                    android:textColor="@color/text_light"
-                    android:textSize="16sp"
-                    android:background="@drawable/bg_quantity_step_button"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:contentDescription="Decrease quantity" />
-
-                <TextView
-                    android:id="@+id/quantityValue"
-                    android:layout_width="32dp"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="1"
-                    android:textColor="@color/text_light"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-medium" />
-
-                <TextView
-                    android:id="@+id/quantityIncrement"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:gravity="center"
-                    android:text="+"
-                    android:textColor="@color/text_light"
-                    android:textSize="16sp"
-                    android:background="@drawable/bg_quantity_step_button"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:contentDescription="Increase quantity" />
-
-            </LinearLayout>
-
             <TextView
                 android:id="@+id/dialogTitle"
                 android:layout_width="wrap_content"

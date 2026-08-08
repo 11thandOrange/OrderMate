@@ -140,7 +140,6 @@ class ItemNoteDialogFragment : DialogFragment() {
         android.util.Log.d("ItemNoteDialogDebug", "==============================================")
         
         setupHeader()
-        setupQuantityStepper()
         setupButtons()
         // Task 10: Parse existing note BEFORE building UI so selections are pre-populated
         parseExistingNote()
@@ -148,8 +147,6 @@ class ItemNoteDialogFragment : DialogFragment() {
     }
 
     private fun setupHeader() {
-        // Static quantity display - replaced by the interactive stepper in
-        // setupQuantityStepper() when a QUANTITY widget is enabled.
         binding.dialogQtyBadge.text = "x$itemQuantity"
 
         // Set item name
@@ -161,40 +158,6 @@ class ItemNoteDialogFragment : DialogFragment() {
         } else {
             binding.dialogSubtitle.text = itemModifiers
             binding.dialogSubtitle.visibility = View.VISIBLE
-        }
-    }
-
-    /**
-     * QUANTITY is a "Clover-state" widget (WidgetType.savesToNotes == false) - it lives in the
-     * header, not the notes section, since it isn't a note (#139 feedback). Shown only when a
-     * QUANTITY widget is enabled; disabled (greyed, non-interactive) once the order is no
-     * longer open, since quantity can't change after any payment has touched the order.
-     */
-    private fun setupQuantityStepper() {
-        val quantityEnabled = widgets.any { it.type == WidgetType.QUANTITY && it.isEnabled }
-        if (!quantityEnabled) {
-            binding.dialogQtyBadge.visibility = View.VISIBLE
-            binding.quantityStepperRow.visibility = View.GONE
-            return
-        }
-
-        binding.dialogQtyBadge.visibility = View.GONE
-        binding.quantityStepperRow.visibility = View.VISIBLE
-        binding.quantityValue.text = selectedQuantity.toString()
-
-        binding.quantityDecrement.isEnabled = isOrderEditable
-        binding.quantityIncrement.isEnabled = isOrderEditable
-        binding.quantityStepperRow.alpha = if (isOrderEditable) 1f else 0.4f
-
-        if (!isOrderEditable) return
-
-        binding.quantityDecrement.setOnClickListener {
-            selectedQuantity = (selectedQuantity - 1).coerceIn(MIN_QUANTITY, MAX_QUANTITY)
-            binding.quantityValue.text = selectedQuantity.toString()
-        }
-        binding.quantityIncrement.setOnClickListener {
-            selectedQuantity = (selectedQuantity + 1).coerceIn(MIN_QUANTITY, MAX_QUANTITY)
-            binding.quantityValue.text = selectedQuantity.toString()
         }
     }
 
@@ -232,10 +195,7 @@ class ItemNoteDialogFragment : DialogFragment() {
     private fun buildNoteSections() {
         binding.noteSectionsContainer.removeAllViews()
 
-        // Clover-state widgets (currently just QUANTITY - see WidgetType.savesToNotes) render
-        // in the header via setupQuantityStepper(), not here - this container is note-backed
-        // widgets only.
-        val enabledWidgets = widgets.filter { it.isEnabled && it.type.savesToNotes }.sortedBy { it.order }
+        val enabledWidgets = widgets.filter { it.isEnabled }.sortedBy { it.order }
 
         if (enabledWidgets.isEmpty()) {
             // Show empty state message and disable save button
@@ -251,7 +211,7 @@ class ItemNoteDialogFragment : DialogFragment() {
                 WidgetType.MULTI_SELECT -> addMultiSelectSection(widget)
                 WidgetType.CALENDAR -> addCalendarSection(widget)
                 WidgetType.TEXT_BOX -> addTextBoxSection(widget)
-                WidgetType.QUANTITY -> Unit // rendered in the header, not here - see above
+                WidgetType.QUANTITY -> addQuantitySection(widget)
             }
         }
     }
@@ -343,6 +303,44 @@ class ItemNoteDialogFragment : DialogFragment() {
 
         // Restore existing text
         textSelections[widget.id]?.let { textInput.setText(it) }
+
+        binding.noteSectionsContainer.addView(sectionView)
+    }
+
+    /**
+     * Add QUANTITY section - stepper that edits the line item's quantity directly (#139).
+     * Unlike every other widget type, its value isn't part of the note string - it's carried
+     * back separately via ItemNoteListener.onNoteSaved's quantity param and written to
+     * LineItem.unitQty. Disabled (greyed, non-interactive) once the order is no longer open,
+     * since quantity can't change after any payment has touched the order.
+     */
+    private fun addQuantitySection(widget: WidgetConfig) {
+        val sectionView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.note_section_quantity, binding.noteSectionsContainer, false)
+
+        val labelView = sectionView.findViewById<TextView>(R.id.sectionLabel)
+        labelView.text = widget.label
+
+        val decrementView = sectionView.findViewById<TextView>(R.id.quantityDecrement)
+        val incrementView = sectionView.findViewById<TextView>(R.id.quantityIncrement)
+        val valueView = sectionView.findViewById<TextView>(R.id.quantityValue)
+
+        valueView.text = selectedQuantity.toString()
+
+        decrementView.isEnabled = isOrderEditable
+        incrementView.isEnabled = isOrderEditable
+        sectionView.alpha = if (isOrderEditable) 1f else 0.4f
+
+        if (isOrderEditable) {
+            decrementView.setOnClickListener {
+                selectedQuantity = (selectedQuantity - 1).coerceIn(MIN_QUANTITY, MAX_QUANTITY)
+                valueView.text = selectedQuantity.toString()
+            }
+            incrementView.setOnClickListener {
+                selectedQuantity = (selectedQuantity + 1).coerceIn(MIN_QUANTITY, MAX_QUANTITY)
+                valueView.text = selectedQuantity.toString()
+            }
+        }
 
         binding.noteSectionsContainer.addView(sectionView)
     }
