@@ -148,12 +148,24 @@ class OverlayActivity : AppCompatActivity(), ILineItemUpdateListener {
                             // adding or deleting line items (#139).
                             val delta = quantity - itemQuantity
                             if (delta > 0 && !itemId.isNullOrEmpty()) {
-                                val binName = existingGroupItems.firstOrNull()?.binName ?: ""
+                                val template = existingGroupItems.firstOrNull()
+                                val binName = template?.binName ?: ""
                                 val newItems = orderConnector.addFixedPriceLineItems(
                                     orderId, itemId, binName, "", delta
                                 )
-                                if (note.isNotBlank() && !newItems.isNullOrEmpty()) {
-                                    newItems.forEach { it?.note = note }
+                                if (!newItems.isNullOrEmpty()) {
+                                    // Match every field CommonFunctions.getTheUniqueOrderItemKey()
+                                    // groups by, or the new copies won't merge into the same row and
+                                    // show up as a separate item instead (#139). Setting note
+                                    // unconditionally (not just when non-blank) matters: an unset
+                                    // note defaults to null on a freshly created item, which is a
+                                    // different key string than the existing group's explicit "".
+                                    newItems.forEach {
+                                        it?.note = note
+                                        it?.unitQty = template?.unitQty
+                                        it?.unitName = template?.unitName
+                                        it?.modifications = template?.modifications
+                                    }
                                     orderConnector.updateLineItems(orderId, newItems)
                                 }
                             } else if (delta < 0) {
