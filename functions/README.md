@@ -92,34 +92,61 @@ Runs the Jest suite in `src/webhooks/cloverWebhook.test.ts` against a mocked `fi
 
 ### Test with Postman or cURL
 
-Real events require the `x-clover-auth` header to match `CLOVER_AUTH_CODE` (see [Environment Variables](#environment-variables)) - requests without it get a `401`. The verification handshake below is the one exception.
+Every request except the verification handshake requires an `x-clover-auth` header whose value **exactly** matches `CLOVER_AUTH_CODE` in the *deployed* function's `.env` (see [Environment Variables](#environment-variables)) - requests without a matching header get a `401`.
 
-**Verification test (no auth header needed):**
-```bash
-curl -X POST https://us-central1-ordermate-53077.cloudfunctions.net/cloverWebhook \
-  -H "Content-Type: application/json" \
-  -d '{"verificationCode": "test-123"}'
-# Expected response: OK
+**Postman setup, in order:**
+1. Method: `POST`
+2. URL: `https://us-central1-ordermate-53077.cloudfunctions.net/cloverWebhook`
+3. Headers tab: `Content-Type: application/json` and `x-clover-auth: <value from Clover's Webhooks page, same string as CLOVER_AUTH_CODE>`
+4. Body tab: select **raw** + **JSON**, paste one of the bodies below
+
+**1. Verification handshake** (no `x-clover-auth` header needed - this is the one exception):
+```json
+{"verificationCode": "test-123"}
+```
+Expected: `200 OK`.
+
+**2. APP_INSTALLED:**
+```json
+{
+  "appId": "TEST_APP",
+  "merchants": {
+    "TEST_MERCHANT_123": [{"objectId": "A:TEST_APP", "type": "CREATE", "ts": 1699000000000}]
+  }
+}
 ```
 
-**APP_INSTALLED test:**
-```bash
-curl -X POST https://us-central1-ordermate-53077.cloudfunctions.net/cloverWebhook \
-  -H "Content-Type: application/json" \
-  -H "x-clover-auth: YOUR_CLOVER_AUTH_CODE" \
-  -d '{
-    "appId": "TEST_APP",
-    "merchants": {
-      "TEST_MERCHANT_123": [{
-        "objectId": "A:TEST_APP",
-        "type": "CREATE",
-        "ts": 1699000000000
-      }]
-    }
-  }'
+**3. APP_UNINSTALLED:**
+```json
+{
+  "appId": "TEST_APP",
+  "merchants": {
+    "TEST_MERCHANT_123": [{"objectId": "A:TEST_APP", "type": "DELETE", "ts": 1699000000000}]
+  }
+}
 ```
 
-**Check logs:**
+**4. SUBSCRIPTION_CHANGED:**
+```json
+{
+  "appId": "TEST_APP",
+  "merchants": {
+    "TEST_MERCHANT_123": [{"objectId": "A:TEST_APP", "type": "UPDATE", "ts": 1699000000000}]
+  }
+}
+```
+
+Expected for 2-4: `200 OK`, and a new/updated node under `merchants/TEST_MERCHANT_123/` in the Realtime Database (see [Firebase Database Structure](#firebase-database-structure)).
+
+**If you're getting `401 Unauthorized` on 2-4, check in this order:**
+1. Did you redeploy *after* setting `CLOVER_AUTH_CODE` in `functions/.env`? Setting the file alone does nothing until `firebase deploy --only functions:cloverWebhook` runs again.
+2. Does the header value match **exactly** what's shown on Clover's Webhooks page right now? Values there change if "Send Verification Code" gets clicked again - always copy the *current* one, not a code from an earlier attempt.
+3. Is there a trailing space or newline in either the header value or `.env`? Terminal/heredoc copy-paste is the usual source.
+4. Confirm what's actually deployed: `firebase functions:log --only cloverWebhook` should show `CLOVER_AUTH_CODE not configured - rejecting webhook event` if the env var is missing entirely (as opposed to just mismatched), which tells you it's a deploy/config problem rather than a typo.
+
+**If you're getting `400 Bad Request`:** the body doesn't match either supported shape (Clover-standard `{appId, merchants}` or legacy `{merchantId, type}`) - check for a JSON syntax error or a typo'd field name.
+
+**Check logs after every attempt:**
 ```bash
 firebase functions:log --only cloverWebhook
 ```
