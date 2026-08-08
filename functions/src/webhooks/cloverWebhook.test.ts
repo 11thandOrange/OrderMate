@@ -21,7 +21,12 @@ jest.mock("firebase-admin", () => {
     push: jest.fn(() => ({key: "mock-push-key"})),
   });
 
-  const mockDatabaseFn = jest.fn(() => ({ref: mockRef})) as unknown as {
+  // A single shared instance - admin.database() must always return the SAME
+  // object, since cloverWebhook.ts captures it once at module load. Returning
+  // a fresh object per call would make jest.spyOn() in tests silently target
+  // an instance the module under test never actually uses.
+  const mockDbInstance = {ref: mockRef};
+  const mockDatabaseFn = jest.fn(() => mockDbInstance) as unknown as {
     (): {ref: typeof mockRef};
     ServerValue: {TIMESTAMP: string};
     __store: Record<string, unknown>;
@@ -187,7 +192,7 @@ describe("cloverWebhook", () => {
     expect(eventKeys).toHaveLength(1);
   });
 
-  it("processes remaining merchants in a batch even if one merchant's update fails", async () => {
+  it("still processes remaining merchants when one fails, but reports failure so Clover retries", async () => {
     const res = makeRes();
     const mockDb = admin.database as unknown as () => {ref: (path: string) => unknown};
     const realRef = mockDb().ref;
@@ -215,8 +220,13 @@ describe("cloverWebhook", () => {
       res
     );
 
-    expect(res.status).toHaveBeenCalledWith(200);
+    // BAD's failure must not be reported as success - Clover needs a non-2xx
+    // to know to retry this delivery, or the failed write is lost silently.
+    expect(res.status).toHaveBeenCalledWith(500);
+    // GOOD must still have been processed despite BAD's failure.
     expect(getStore()["merchants/GOOD/merchantInfo"]).toBeDefined();
+    // BAD's failure must not have silently written partial/incorrect data.
+    expect(getStore()["merchants/BAD/merchantInfo"]).toBeUndefined();
 
     refSpy.mockRestore();
   });

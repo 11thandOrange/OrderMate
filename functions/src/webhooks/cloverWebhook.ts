@@ -76,8 +76,17 @@ export const cloverWebhook = functions.https.onRequest(async (req, res) => {
   if (appId && merchants) {
     console.log(`Received Clover webhook for app ${appId}`);
     try {
-      await handleCloverWebhookEvent(req.body);
-      res.status(200).send("OK");
+      const {hadFailures} = await handleCloverWebhookEvent(req.body);
+      if (hadFailures) {
+        // At least one merchant's update failed. Respond with an error so
+        // Clover's own retry mechanism re-delivers this payload - merchants
+        // that already succeeded are unaffected by the retry (writes are
+        // idempotent), and the failed one gets another chance instead of
+        // being silently dropped.
+        res.status(500).send("Partial failure processing webhook - see logs");
+      } else {
+        res.status(200).send("OK");
+      }
     } catch (error) {
       console.error("Error processing webhook:", error);
       res.status(500).send("Internal Server Error");
@@ -137,13 +146,20 @@ interface CloverWebhookPayload {
 }
 
 /**
- * Handle Clover webhook event in standard format
+ * Handle Clover webhook event in standard format.
+ *
+ * Isolates failures per-update so one merchant's error doesn't stop the rest
+ * of the batch from being processed - but still reports whether anything
+ * failed, so the caller can tell Clover to retry the delivery rather than
+ * silently treating a failed write as successful.
  * @param {CloverWebhookPayload} payload - The Clover webhook payload
+ * @return {Promise<{hadFailures: boolean}>} Whether any update failed
  */
 async function handleCloverWebhookEvent(
   payload: CloverWebhookPayload
-): Promise<void> {
+): Promise<{hadFailures: boolean}> {
   const {appId, merchants} = payload;
+  let hadFailures = false;
 
   for (const [merchantId, updates] of Object.entries(merchants)) {
     for (const update of updates) {
@@ -166,8 +182,7 @@ async function handleCloverWebhookEvent(
         console.log(`Event: ${eventKey}, Type: ${update.type}, ` +
           `Merchant: ${merchantId}, Object: ${update.objectId}`);
       } catch (error) {
-        // Isolate failures per-update so one merchant's error doesn't stop
-        // the rest of the batch from being processed.
+        hadFailures = true;
         console.error(
           `Failed to process event for merchant ${merchantId}, ` +
           `object ${update.objectId}:`, error
@@ -175,6 +190,8 @@ async function handleCloverWebhookEvent(
       }
     }
   }
+
+  return {hadFailures};
 }
 
 /**
