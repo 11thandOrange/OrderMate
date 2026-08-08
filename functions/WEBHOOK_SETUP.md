@@ -89,6 +89,23 @@ After verification succeeds:
 
 3. Click **Save**
 
+### Merchant enrichment is not available for this app
+
+The webhook alone only tells you *that* a merchant installed/uninstalled -
+it does not give you a token to call Clover's REST API on that merchant's
+behalf (`merchantInfo.name`/`email`/`storeName` stay blank; everything else
+still works). Getting that token normally means registering a **Web** REST
+client on the Developer Dashboard and using an OAuth redirect - but
+OrderMate's App Type is Android-only (Flex/Mini/Station devices), and its
+Developer Dashboard has no "REST Configuration"/Web client section at all
+(confirmed directly in the dashboard - there is no "App URL"/"Configuration"
+page to set). That flow is simply not available for this app.
+
+If merchant name/email is ever needed, the only path is on-device: the
+Android app already holds a `CloverAccount` and could call
+`CloverAuth.authenticate()` locally to get its own token and write the info
+to Firebase directly - a separate feature, not part of this webhook.
+
 ## Verification Flow Diagram
 
 ```
@@ -287,15 +304,24 @@ After webhook events are processed, check Firebase Realtime Database:
 
 ### Verify Webhook Origin
 
-Clover includes an `X-Clover-Auth` header with each webhook request. You can verify this matches your app's auth code.
+Clover includes an `X-Clover-Auth` header with each webhook request. `cloverWebhook.ts` verifies this matches `CLOVER_AUTH_CODE` (env var) before processing any real event - requests without a matching header get a `401`. This does **not** apply to the verification handshake (`{verificationCode: "..."}`), since that's the one-time setup step used before `CLOVER_AUTH_CODE` is even configured.
 
-```typescript
-const cloverAuthCode = req.headers['x-clover-auth'];
-if (cloverAuthCode !== process.env.CLOVER_AUTH_CODE) {
-  res.status(401).send('Unauthorized');
-  return;
-}
-```
+Set `CLOVER_AUTH_CODE` in `functions/.env` before deploying (Gen 2 functions
+read `process.env`, not the legacy `firebase functions:config:set` store) -
+see your app's Clover Developer Dashboard, Webhooks section, for the value
+(it only appears after the verification handshake in Step 4 succeeds).
+
+### No Merchant API Token in This Codebase
+
+`CLOVER_API_TOKEN` used to be a single static value pasted into `.env`,
+which only ever worked for whichever one merchant it was copied from -
+every other merchant got a `401` calling Clover's REST API. It has been
+removed rather than replaced: as covered in
+[Merchant enrichment is not available for this app](#merchant-enrichment-is-not-available-for-this-app),
+OrderMate's Android-only app registration has no way to obtain a
+per-merchant (or any) Clover REST API token server-side, so this webhook no
+longer attempts to call Clover's REST API at all. No token - static,
+per-merchant, or otherwise - is stored or used anywhere in this codebase.
 
 ### HTTPS Only
 

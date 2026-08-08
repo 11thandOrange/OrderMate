@@ -697,17 +697,27 @@ class FirebaseConfigManager private constructor() {
     }
     
     /**
-     * Save a new referral
+     * Save a new referral.
+     *
+     * Writes atomically to two locations: the merchant-scoped referrals list
+     * (merchants/{merchantId}/referrals/{id}) and a top-level index keyed by a
+     * normalized partner name (referralPartners/{partnerKey}/{id}) - the index is
+     * what makes getReferralsForPartner() possible without scanning every merchant.
      */
     fun saveReferral(merchantId: String, referral: ReferralInfo, callback: (Boolean) -> Unit) {
         val referralWithId = if (referral.id.isEmpty()) {
             referral.copy(id = ReferralInfo.generateId())
         } else {
             referral
-        }
-        
-        db.getReference(FirebasePaths.referral(merchantId, referralWithId.id))
-            .setValue(referralWithId.toMap())
+        }.copy(merchantId = merchantId)
+
+        val partnerKey = ReferralInfo.normalizePartnerKey(referralWithId.partnerName)
+        val updates = mapOf<String, Any?>(
+            FirebasePaths.referral(merchantId, referralWithId.id) to referralWithId.toMap(),
+            FirebasePaths.referralPartnerEntry(partnerKey, referralWithId.id) to referralWithId.toMap()
+        )
+
+        db.reference.updateChildren(updates)
             .addOnSuccessListener {
                 updateTimestamp(merchantId)
                 callback(true)
@@ -717,26 +727,33 @@ class FirebaseConfigManager private constructor() {
                 callback(false)
             }
     }
-    
+
     /**
-     * Check if merchant has any referrals
+     * Get all referrals for one partner across every merchant, via the
+     * referralPartners/{partnerKey} index written by saveReferral().
      */
-    fun hasAnyReferral(merchantId: String, callback: (Boolean) -> Unit) {
-        db.getReference(FirebasePaths.referrals(merchantId))
-            .limitToFirst(1)
+    fun getReferralsForPartner(partnerName: String, callback: (List<ReferralInfo>) -> Unit) {
+        val partnerKey = ReferralInfo.normalizePartnerKey(partnerName)
+        db.getReference(FirebasePaths.referralPartner(partnerKey))
             .get()
             .addOnSuccessListener { snapshot ->
-                callback(snapshot.exists() && snapshot.childrenCount > 0)
+                val referrals = mutableListOf<ReferralInfo>()
+                snapshot.children.forEach { child ->
+                    val referral = parseReferral(child)
+                    if (referral != null) referrals.add(referral)
+                }
+                callback(referrals.sortedByDescending { it.submittedAt })
             }
             .addOnFailureListener {
-                callback(false)
+                callback(emptyList())
             }
     }
-    
+
     private fun parseReferral(snapshot: DataSnapshot): ReferralInfo? {
         if (!snapshot.exists()) return null
         return ReferralInfo(
             id = snapshot.child("id").getValue(String::class.java) ?: snapshot.key ?: "",
+            merchantId = snapshot.child("merchantId").getValue(String::class.java) ?: "",
             partnerName = snapshot.child("partnerName").getValue(String::class.java) ?: "",
             submittedAt = snapshot.child("submittedAt").getValue(Long::class.java) ?: 0,
             submittedBy = snapshot.child("submittedBy").getValue(String::class.java) ?: ""

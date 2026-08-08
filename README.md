@@ -134,7 +134,27 @@ The `functions/` directory contains Firebase Cloud Functions for:
 - **Clover Webhooks** - Track app installs, uninstalls, subscription changes
 - **Merchant Analytics** - Store merchant lifecycle data in Firebase
 
-See [functions/README.md](./functions/README.md) for setup instructions.
+See [functions/README.md](./functions/README.md) for setup instructions, the full list of tracked webhook events, where each one is stored, and how to test them.
+
+## Referrals
+
+Owners can submit partner-referral records from Profile Settings (repeatedly - the button no longer hides after the first submission). Each referral is stored twice:
+
+- `merchants/{merchantId}/referrals/{referralId}` - all referrals made by one merchant
+- `referralPartners/{partnerKey}/{referralId}` - a denormalized top-level index (`partnerKey` = the partner name, lowercased/trimmed/with `.#$[]/` stripped) so referrals for one partner can be looked up across every merchant without scanning the whole database
+
+Both are written atomically by `FirebaseConfigManager.saveReferral()`. Query methods: `getReferrals(merchantId)` (per-merchant) and `getReferralsForPartner(partnerName)` (per-partner, across merchants). There is currently no payout/commission field on a referral record - the data model only tracks who referred whom and when, not how much is owed to a partner.
+
+## Discounts
+
+`MerchantDiscount` (`merchants/{merchantId}/discounts/{discountId}`) is a **tracking-only record** of which merchants have been given a discount - it does not itself cause any discount to be applied. Discounts are never written by the app (read-only in-app, admin writes via Firebase Console/Postman).
+
+The actual discounting happens entirely on Clover's side, outside this repo:
+1. Create a new, separately-priced subscription tier for OrderMate in the Clover Developer Dashboard.
+2. Share that tier's install link with the specific merchant, so they install under the discounted tier.
+3. Disable that tier afterward so no one else can install under it. Clover pricing tiers can't be deleted, only disabled - a disabled tier still applies to merchants already on it, it just stops being offered to new installs.
+
+The Firebase `MerchantDiscount` record is written separately (manually) as the internal paper trail for "which merchant got which discount," matching what was actually done in Clover - it is not read by any billing calculation in this codebase.
 
 ## Documentation
 

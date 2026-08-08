@@ -20,8 +20,8 @@ import com.orderMate.utils.MyApp
 
 /**
  * Dialog for entering referral partner information (#81)
- * 
- * Only shown to Owners who haven't already submitted a referral.
+ *
+ * Only shown to Owners. Can be submitted repeatedly to refer multiple partners.
  * Saves referral info to Firebase at: merchants/{merchantId}/referrals/{referralId}/
  */
 class ReferralPartnerDialog : DialogFragment() {
@@ -96,7 +96,8 @@ class ReferralPartnerDialog : DialogFragment() {
         
         val referral = ReferralInfo.create(
             partnerName = partnerName,
-            employeeId = employeeId ?: "unknown"
+            employeeId = employeeId ?: "unknown",
+            merchantId = merchantId
         )
         
         firebaseManager.saveReferral(merchantId, referral) { success ->

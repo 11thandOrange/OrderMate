@@ -60,6 +60,7 @@ package com.orderMate.utils
  *   │   └── avatar
  *   ├── referrals/{referralId}/          (#81)
  *   │   ├── id
+ *   │   ├── merchantId
  *   │   ├── partnerName
  *   │   ├── submittedAt
  *   │   └── submittedBy
@@ -71,6 +72,11 @@ package com.orderMate.utils
  *       ├── discountCode
  *       ├── createdAt
  *       └── isActive
+ *
+ * referralPartners/{partnerKey}/{referralId}/  (#142 - top-level, NOT merchant-scoped)
+ *   Denormalized copy of each referral, keyed by a normalized partner name, so
+ *   "all referrals for one partner" can be read directly instead of scanning
+ *   every merchant's referrals subtree. Same fields as merchants/{id}/referrals/{id}.
  */
 object FirebasePaths {
     
@@ -88,6 +94,9 @@ object FirebasePaths {
     const val PROFILES = "profiles"
     const val REFERRALS = "referrals"
     const val DISCOUNTS = "discounts"
+
+    // Top-level (not merchant-scoped) index for cross-merchant partner lookups
+    const val REFERRAL_PARTNERS = "referralPartners"
 
     // #97/#98: Merchant info, subscription, and events
     const val MERCHANT_INFO = "merchantInfo"
@@ -135,9 +144,16 @@ object FirebasePaths {
     // ==================== #81: Referrals ====================
     
     fun referrals(merchantId: String) = "${merchant(merchantId)}/$REFERRALS"
-    
-    fun referral(merchantId: String, referralId: String) = 
+
+    fun referral(merchantId: String, referralId: String) =
         "${referrals(merchantId)}/$referralId"
+
+    // Top-level index: referralPartners/{partnerKey}/{referralId} - lets a query find
+    // every referral for one partner across all merchants without scanning "merchants".
+    fun referralPartner(partnerKey: String) = "$REFERRAL_PARTNERS/$partnerKey"
+
+    fun referralPartnerEntry(partnerKey: String, referralId: String) =
+        "${referralPartner(partnerKey)}/$referralId"
     
     // ==================== #81: Discounts ====================
     

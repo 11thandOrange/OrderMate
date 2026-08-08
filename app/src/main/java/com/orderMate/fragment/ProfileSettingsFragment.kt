@@ -158,7 +158,7 @@ class ProfileSettingsFragment : Fragment() {
     
     /**
      * Check if referral button should be visible
-     * Only show for Owners who haven't already submitted a referral
+     * Only show for Owners - stays visible after submitting so they can refer more partners
      */
     private fun checkReferralButtonVisibility() {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -166,25 +166,14 @@ class ProfileSettingsFragment : Fragment() {
                 val myApp = MyApp.getInstance()
                 val employee = myApp.getCurrentEmployee()
                 val merchantId = myApp.getMerchantId()
-                
+
                 // Cache employee info
                 currentEmployeeId = employee?.id
                 isOwner = EmployeeRoleUtils.isOwner(employee)
-                
-                // Only owners can see the referral button
-                if (!isOwner || merchantId.isNullOrEmpty()) {
-                    withContext(Dispatchers.Main) {
-                        binding.referralButtonContainer.visibility = View.GONE
-                    }
-                    return@launch
-                }
-                
-                // Check if merchant already has a referral
-                firebaseManager.hasAnyReferral(merchantId) { hasReferral ->
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        binding.referralButtonContainer.visibility = 
-                            if (hasReferral) View.GONE else View.VISIBLE
-                    }
+
+                withContext(Dispatchers.Main) {
+                    binding.referralButtonContainer.visibility =
+                        if (isOwner && !merchantId.isNullOrEmpty()) View.VISIBLE else View.GONE
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -194,15 +183,13 @@ class ProfileSettingsFragment : Fragment() {
             }
         }
     }
-    
+
     /**
      * Show referral partner dialog
      */
     private fun showReferralDialog() {
         val dialog = ReferralPartnerDialog.newInstance()
         dialog.setOnSaveListener { partnerName ->
-            // Referral saved, hide button
-            binding.referralButtonContainer.visibility = View.GONE
             showToast("Thank you! Referral saved: $partnerName")
         }
         dialog.show(childFragmentManager, ReferralPartnerDialog.TAG)
