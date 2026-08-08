@@ -100,6 +100,10 @@ class MyApp : Application() {
      */
     fun getAllOrders(): List<Order>? {
         val orders = getOrderConnector().getOrders(mutableListOf())
+        // Temporary diagnostic for #138 - tells us exactly how many orders Clover's on-device
+        // connector itself returns on a call, independent of anything OrderMate does with them
+        // afterward. Remove once the root cause of orders disappearing is confirmed.
+        android.util.Log.d("OrderCountDebug", "getOrderConnector().getOrders() returned ${orders?.size} orders")
         if (!orders.isNullOrEmpty()) {
             CoroutineScope(Dispatchers.IO).launch {
                 OrderHistoryStore.getInstance(applicationContext).remember(orders)

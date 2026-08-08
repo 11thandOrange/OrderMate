@@ -378,6 +378,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 val orderData = myApp.getAllOrders()
                 allItemList.clear()
                 orderData?.forEach { allItemList.add(it) }
+                android.util.Log.d("OrderCountDebug", "loadOrders: after raw fetch, allItemList=${allItemList.size}")
 
                 // Clover's local cache is retention-windowed and can stop returning orders
                 // that were previously pulled in via the REST backfill - re-merge them so a
@@ -385,6 +386,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 // again (#138).
                 val freshIds = allItemList.mapNotNull { it?.id }.toSet()
                 allItemList.addAll(backfilledOlderOrders.filter { it?.id !in freshIds })
+                android.util.Log.d("OrderCountDebug", "loadOrders: after REST-backfill merge, allItemList=${allItemList.size} (backfilledOlderOrders=${backfilledOlderOrders.size})")
 
                 // Also re-merge every order OrderMate has ever locally observed, regardless of
                 // whether the REST backfill above is working - this is what keeps orders from
@@ -393,6 +395,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 val knownIds = allItemList.mapNotNull { it?.id }.toSet()
                 val rememberedOrders = OrderHistoryStore.getInstance(requireContext()).getAll()
                 allItemList.addAll(rememberedOrders.filter { it.id !in knownIds })
+                android.util.Log.d("OrderCountDebug", "loadOrders: after local-history merge, allItemList=${allItemList.size} (rememberedOrders=${rememberedOrders.size})")
             } catch (e: Exception) {
                 e.printStackTrace()
                 // runOnBackgroundThread isn't tied to the fragment's lifecycle, so this
@@ -432,6 +435,11 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
      */
     private fun applyCurrentViewToOrderItems() {
         val sharedState = sharedFilterViewModel.filterState.value
+        android.util.Log.d(
+            "OrderCountDebug",
+            "applyCurrentViewToOrderItems: allItemList=${allItemList.size}, " +
+                "hasActiveFilters=${sharedState?.hasActiveFilters()}, searchQuery='$currentSearchQuery'"
+        )
         when {
             sharedState != null && sharedState.hasActiveFilters() -> {
                 currentFilterState = sharedState
@@ -444,6 +452,7 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 updateResultsInfo()
                 notifyAdapter()
                 updateEmptyState()
+                android.util.Log.d("OrderCountDebug", "applyCurrentViewToOrderItems (plain): orderItems=${orderItems.size}")
             }
         }
     }
