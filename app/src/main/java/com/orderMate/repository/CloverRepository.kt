@@ -1,13 +1,14 @@
 package com.orderMate.repository
 
 import android.content.Context
+import android.util.Log
 import com.clover.sdk.util.CloverAuth
 import com.clover.sdk.v3.customers.Customer
 import com.clover.sdk.v3.customers.EmailAddress
 import com.clover.sdk.v3.customers.PhoneNumber
 import com.clover.sdk.v3.order.Order
-import com.orderMate.modals.ShareMessageJson
-import com.orderMate.modals.ShareSmsModal
+import com.orderMate.modals.CreateEmailConversationRequest
+import com.orderMate.modals.CreateSmsConversationRequest
 import com.orderMate.networkManager.CloverOrdersApiClient
 import com.orderMate.networkManager.RetrofitInstanceWithAuth
 import com.orderMate.services.ScheduledTaskManager
@@ -59,11 +60,11 @@ class CloverRepository private constructor(private val context: Context) {
 
     // ==================== Messaging API ====================
 
-    suspend fun sendEmail(data: ShareMessageJson) =
-        apiWithAuth.shareEmail(Constants.workSpaceId, Constants.channelId, data)
+    suspend fun sendEmail(data: CreateEmailConversationRequest) =
+        apiWithAuth.createEmailConversation(Constants.workSpaceId, data)
 
-    suspend fun sendSms(data: ShareSmsModal) =
-        apiWithAuth.shareSms(Constants.workSpaceId, Constants.SMSChannelId, data)
+    suspend fun sendSms(data: CreateSmsConversationRequest) =
+        apiWithAuth.createSmsConversation(Constants.workSpaceId, data)
 
     // ==================== Notification History (#54) ====================
 
@@ -80,28 +81,42 @@ class CloverRepository private constructor(private val context: Context) {
                 workspaceId = Constants.workSpaceId,
                 resource = "order:$orderId"
             )
-            
-            val conversations = conversationsResponse.body()?.results ?: return@withContext emptyList()
-            
+
+            // A non-2xx here (e.g. auth failure) is otherwise indistinguishable from
+            // "genuinely no notifications sent" - log it so that's not the case.
+            if (!conversationsResponse.isSuccessful) {
+                Log.e(TAG, "getNotificationsForOrder($orderId): conversations request " +
+                    "failed - HTTP ${conversationsResponse.code()}")
+                return@withContext emptyList()
+            }
+
+            val conversations = conversationsResponse.body()?.results ?: emptyList()
+
             // Collect messages from all matching conversations
             val allMessages = mutableListOf<com.orderMate.modals.MessageItem>()
-            
+
             for (conversation in conversations) {
                 val conversationId = conversation.id ?: continue
-                
+
                 val messagesResponse = apiWithAuth.getConversationMessages(
                     workspaceId = Constants.workSpaceId,
                     conversationId = conversationId
                 )
-                
+
+                if (!messagesResponse.isSuccessful) {
+                    Log.e(TAG, "getNotificationsForOrder($orderId): messages request " +
+                        "failed for conversation $conversationId - HTTP ${messagesResponse.code()}")
+                    continue
+                }
+
                 val messages = messagesResponse.body()?.results ?: continue
                 allMessages.addAll(messages)
             }
-            
+
             // Sort by createdAt descending (newest first)
             allMessages.sortedByDescending { it.createdAt }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "getNotificationsForOrder($orderId) failed: ${e.message}", e)
             emptyList()
         }
     }

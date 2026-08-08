@@ -105,6 +105,37 @@ data class MessageItemMeta(
     val extraInformation: Map<String, String>?
 )
 
+// Request for POST /workspaces/{workspaceId}/conversations (Create Conversation).
+// Sending through this endpoint - instead of the old Channels API
+// /workspaces/{id}/channels/{id}/messages send - is what actually lets a sent
+// notification be tagged with `resource` so it's later findable by order ID via
+// List Conversations' `resource` filter (see CloverRepository.getNotificationsForOrder).
+data class CreateEmailConversationRequest(
+    val channelId: String,
+    val participants: List<Recipient>,
+    val initialMessage: InitialEmailMessageRequest,
+    val resource: ConversationResource? = null
+)
+
+data class CreateSmsConversationRequest(
+    val channelId: String,
+    val participants: List<Recipient>,
+    val initialMessage: InitialSmsMessageRequest,
+    val resource: ConversationResource? = null
+)
+
+data class InitialEmailMessageRequest(
+    val body: Body,
+    val recipients: List<Recipient>,
+    val reference: String? = null
+)
+
+data class InitialSmsMessageRequest(
+    val body: SmsBody,
+    val recipients: List<Recipient>,
+    val reference: String? = null
+)
+
 // Contact search request/response
 data class ContactSearchRequest(
     val identifier: ContactIdentifier

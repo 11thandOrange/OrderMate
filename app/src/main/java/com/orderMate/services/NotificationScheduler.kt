@@ -10,12 +10,12 @@ import com.clover.sdk.util.CloverAccount
 import com.clover.sdk.v1.merchant.MerchantConnector
 import com.clover.sdk.v3.order.OrderConnector
 import com.orderMate.modals.Body
-import com.orderMate.modals.Contact
+import com.orderMate.modals.ConversationResource
+import com.orderMate.modals.CreateEmailConversationRequest
 import com.orderMate.modals.Html
-import com.orderMate.modals.MessageMeta
+import com.orderMate.modals.InitialEmailMessageRequest
 import com.orderMate.modals.Metadata
-import com.orderMate.modals.Receiver
-import com.orderMate.modals.ShareMessageJson
+import com.orderMate.modals.Recipient
 import com.orderMate.repository.CloverRepository
 import com.orderMate.utils.Constants
 import com.orderMate.utils.FirebaseConfigManager
@@ -293,24 +293,28 @@ class OrderNotificationReceiver : BroadcastReceiver() {
                 Sent by OrderMate for $merchantName
             """.trimIndent()
             
-            // 4. Build ShareMessageJson for Bird API
+            // 4. Build the Create Conversation request for the Bird API. Sending via
+            // Create Conversation (not the Channels API) and tagging with `resource`
+            // is what makes this findable later via notification history (#54).
             val html = Html(
                 html = emailHtml,
                 metadata = Metadata(subject = "📅 Order #$shortOrderId Due: $dueDateStr at $dueTimeStr"),
                 text = plainText
             )
             val body = Body(html, Constants.html)
-            val receiver = Receiver(listOf(
-                Contact(identifierKey = "emailaddress", identifierValue = merchantEmail)
-            ))
-            val reference = "scheduled-notification-$orderId"
-            val meta = MessageMeta(
-                extraInformation = mapOf(
-                    "orderId" to orderId,
-                    "type" to "scheduled_notification"
-                )
+            val recipient = Recipient(
+                type = "to",
+                identifierKey = "emailaddress",
+                identifierValue = merchantEmail
             )
-            val emailData = ShareMessageJson(body, receiver, reference, meta)
+            val participant = recipient.copy(type = "contact")
+            val reference = "scheduled-notification-$orderId"
+            val emailData = CreateEmailConversationRequest(
+                channelId = Constants.channelId,
+                participants = listOf(participant),
+                initialMessage = InitialEmailMessageRequest(body, listOf(recipient), reference),
+                resource = ConversationResource("order", orderId)
+            )
             
             // 5. Send via Bird API
             val repository = CloverRepository.getInstance(context)

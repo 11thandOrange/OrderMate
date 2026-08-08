@@ -30,8 +30,8 @@ import com.orderMate.communicators.IOrderItemClickListener
 import com.orderMate.communicators.IShareEmailOrMessage
 import com.orderMate.databinding.FragmentOrderDetailBinding
 import com.orderMate.modals.ItemModal
-import com.orderMate.modals.ShareMessageJson
-import com.orderMate.modals.ShareSmsModal
+import com.orderMate.modals.CreateEmailConversationRequest
+import com.orderMate.modals.CreateSmsConversationRequest
 import com.orderMate.utils.ConnectionManager
 import com.orderMate.utils.Constants
 import com.orderMate.utils.MyApp
@@ -684,7 +684,11 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                         displayHistoryItems(historyItems)
                     }
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    android.util.Log.e(
+                        "OrderDetailFragment",
+                        "populateHistoryCard: failed to fetch notifications for order $orderId",
+                        e
+                    )
                     // Keep showing items without notifications on error
                 }
             }
@@ -709,6 +713,11 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
      * Display history items in the card
      */
     private fun displayHistoryItems(historyItems: MutableList<HistoryItem>) {
+        // Safety check - the async Bird fetch in populateHistoryCard() can resolve
+        // after the fragment's view is destroyed; requireContext()/layoutInflater
+        // below would crash without this guard.
+        if (!isAdded || view == null) return
+
         val historyContainer = binding.historyContainer
         historyContainer.removeAllViews()
         
@@ -1334,11 +1343,11 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
     }
 
     // when we want to share the email and sms to the customer
-    override fun sendEmail(data: ShareMessageJson) {
+    override fun sendEmail(data: CreateEmailConversationRequest) {
         viewModel.shareEmail(data)
     }
 
-    override fun shareSms(data: ShareSmsModal) {
+    override fun shareSms(data: CreateSmsConversationRequest) {
         viewModel.shareSms(data)
     }
     

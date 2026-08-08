@@ -5,8 +5,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.orderMate.modals.ShareMessageJson
-import com.orderMate.modals.ShareSmsModal
+import com.orderMate.modals.CreateEmailConversationRequest
+import com.orderMate.modals.CreateSmsConversationRequest
 import com.orderMate.repository.CloverRepository
 import com.orderMate.utils.Constants
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +24,7 @@ class OrderDetailViewModel(application: Application) : AndroidViewModel(applicat
 
 
 
-    fun shareEmail(data: ShareMessageJson) {
+    fun shareEmail(data: CreateEmailConversationRequest) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = repository.sendEmail(data)
@@ -44,7 +44,7 @@ class OrderDetailViewModel(application: Application) : AndroidViewModel(applicat
         _successResponse.postValue(Pair( whichType ,response.isSuccessful))
     }
 
-    fun shareSms(data: ShareSmsModal) {
+    fun shareSms(data: CreateSmsConversationRequest) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = repository.sendSms(data)

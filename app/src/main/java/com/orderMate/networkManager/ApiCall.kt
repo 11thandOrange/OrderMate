@@ -2,9 +2,9 @@ package com.orderMate.networkManager
 
 
 import com.orderMate.modals.ConversationsResponse
+import com.orderMate.modals.CreateEmailConversationRequest
+import com.orderMate.modals.CreateSmsConversationRequest
 import com.orderMate.modals.MessagesResponse
-import com.orderMate.modals.ShareMessageJson
-import com.orderMate.modals.ShareSmsModal
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -20,19 +20,21 @@ import retrofit2.http.Query
 * */
 interface ApiCall {
 
-    @POST("/workspaces/{merchantId}/channels/{channelId}/messages")
-    suspend fun shareEmail(
-        @Path("merchantId") merchantId: String,
-        @Path("channelId") channelId: String,
-        @Body request: ShareMessageJson
+    /**
+     * Sends via the Conversations API's Create Conversation endpoint (not the
+     * simpler Channels API) so the resulting conversation can carry a `resource`
+     * tag - required for notification history to later be queryable by order ID.
+     */
+    @POST("/workspaces/{workspaceId}/conversations")
+    suspend fun createEmailConversation(
+        @Path("workspaceId") workspaceId: String,
+        @Body request: CreateEmailConversationRequest
     ): Response<Any>
 
-
-    @POST("/workspaces/{merchantId}/channels/{channelId}/messages")
-    suspend fun shareSms(
-        @Path("merchantId") merchantId: String,
-        @Path("channelId") channelId: String,
-        @Body request: ShareSmsModal
+    @POST("/workspaces/{workspaceId}/conversations")
+    suspend fun createSmsConversation(
+        @Path("workspaceId") workspaceId: String,
+        @Body request: CreateSmsConversationRequest
     ): Response<Any>
 
     /**

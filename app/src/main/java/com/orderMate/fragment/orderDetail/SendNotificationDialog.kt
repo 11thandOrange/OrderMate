@@ -22,13 +22,14 @@ import com.orderMate.R
 import com.orderMate.communicators.IShareEmailOrMessage
 import com.orderMate.databinding.DialogSendNotificationBinding
 import com.orderMate.modals.Body
-import com.orderMate.modals.Contact
+import com.orderMate.modals.ConversationResource
+import com.orderMate.modals.CreateEmailConversationRequest
+import com.orderMate.modals.CreateSmsConversationRequest
 import com.orderMate.modals.Html
-import com.orderMate.modals.MessageMeta
+import com.orderMate.modals.InitialEmailMessageRequest
+import com.orderMate.modals.InitialSmsMessageRequest
 import com.orderMate.modals.Metadata
-import com.orderMate.modals.Receiver
-import com.orderMate.modals.ShareMessageJson
-import com.orderMate.modals.ShareSmsModal
+import com.orderMate.modals.Recipient
 import com.orderMate.modals.SmsBody
 import com.orderMate.modals.Text
 import com.orderMate.services.TemplateProcessor
@@ -437,10 +438,11 @@ class SendNotificationDialog(
         return result
     }
 
-//    make the request for the messaging Bird for email
-    private fun processTheEmailData(): ShareMessageJson {
-        val list = getContactList()
-        val messageReceiver = Receiver(list)
+    //    make the request for the messaging Bird for email
+    private fun processTheEmailData(): CreateEmailConversationRequest {
+        val identifiers = getContactIdentifiers()
+        val participants = identifiers.map { (key, value) -> Recipient("contact", key, value) }
+        val recipients = identifiers.map { (key, value) -> Recipient("to", key, value) }
 
         val html = Html(
             binding.etNotes.text.toString(),
@@ -448,59 +450,52 @@ class SendNotificationDialog(
             binding.etNotes.text.toString()
         )
         val body = Body(html, Constants.html)
-        
-        // Include order ID reference for notification history (#54)
+
+        // Sending via Create Conversation (not the Channels API) and tagging with
+        // `resource` is what makes this findable later via notification history (#54).
         val orderId = order?.id
         val reference = orderId?.let { "order-$it" }
-        val meta = orderId?.let {
-            MessageMeta(
-                extraInformation = mapOf(
-                    "orderId" to it,
-                    "type" to "email"
-                )
-            )
-        }
-        
-        return ShareMessageJson(body, messageReceiver, reference, meta)
+        val resource = orderId?.let { ConversationResource("order", it) }
+
+        return CreateEmailConversationRequest(
+            channelId = Constants.channelId,
+            participants = participants,
+            initialMessage = InitialEmailMessageRequest(body, recipients, reference),
+            resource = resource
+        )
     }
 
     //    make the request for the messaging Bird for sms
-    private fun processTheSmSData(): ShareSmsModal {
-        val list = getContactList()
-        val messageReceiver = Receiver(list)
+    private fun processTheSmSData(): CreateSmsConversationRequest {
+        val identifiers = getContactIdentifiers()
+        val participants = identifiers.map { (key, value) -> Recipient("contact", key, value) }
+        val recipients = identifiers.map { (key, value) -> Recipient("to", key, value) }
 
         val smsBody = SmsBody(
             Text(binding.etNotes.text.toString()),
             Constants.text,
         )
-        
-        // Include order ID reference for notification history (#54)
+
+        // Sending via Create Conversation (not the Channels API) and tagging with
+        // `resource` is what makes this findable later via notification history (#54).
         val orderId = order?.id
         val reference = orderId?.let { "order-$it" }
-        val meta = orderId?.let {
-            MessageMeta(
-                extraInformation = mapOf(
-                    "orderId" to it,
-                    "type" to "sms"
-                )
-            )
-        }
-        
-        return ShareSmsModal(smsBody, messageReceiver, reference, meta)
+        val resource = orderId?.let { ConversationResource("order", it) }
+
+        return CreateSmsConversationRequest(
+            channelId = Constants.SMSChannelId,
+            participants = participants,
+            initialMessage = InitialSmsMessageRequest(smsBody, recipients, reference),
+            resource = resource
+        )
     }
 
-    private fun getContactList(): List<Contact> {
-        val resultant: MutableList<Contact> = mutableListOf()
-        val data = binding.customerNumber.text.toString().split(",")
-        data.forEach {
-            resultant.add(
-                Contact(
-                    if (isSmsEnabled) Constants.phoneNumber else Constants.emailAddress,
-                    if(isSmsEnabled && !it.contains("+" , true)) "+1$it" else it
-                )
-            )
+    private fun getContactIdentifiers(): List<Pair<String, String>> {
+        val identifierKey = if (isSmsEnabled) Constants.phoneNumber else Constants.emailAddress
+        return binding.customerNumber.text.toString().split(",").map {
+            val identifierValue = if (isSmsEnabled && !it.contains("+", true)) "+1$it" else it
+            identifierKey to identifierValue
         }
-        return resultant
     }
 
     private fun updateThePassedArray(customerEmailArray: List<String?>) {

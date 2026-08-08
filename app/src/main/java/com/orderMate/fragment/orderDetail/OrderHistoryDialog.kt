@@ -176,11 +176,16 @@ class OrderHistoryDialog : DialogFragment() {
                         historyItems.sortByDescending { it.timestamp }
                         
                         CoroutineScope(Dispatchers.Main).launch {
+                            if (_binding == null) return@launch
                             updateHistoryUI()
                             binding.historyRecyclerView.adapter?.notifyDataSetChanged()
                         }
                     } catch (e: Exception) {
-                        e.printStackTrace()
+                        android.util.Log.e(
+                            TAG,
+                            "loadHistoryData: failed to fetch notifications for order $orderId",
+                            e
+                        )
                     }
                 }
             }
