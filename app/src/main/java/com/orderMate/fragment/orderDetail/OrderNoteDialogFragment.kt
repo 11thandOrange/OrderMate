@@ -44,8 +44,10 @@ class OrderNoteDialogFragment : DialogFragment() {
     private var existingNote: String? = null
 
     // Currently assigned customer, seeded by the caller from Order.customers (#140). Unlike
-    // other widget types this isn't serialized into the note string - selecting/creating a
-    // customer reuses CustomerDialog's own save/assign-to-Clover flow directly.
+    // other widget types this isn't serialized into the note string. CustomerDialog is opened
+    // without an orderId here so its Save only updates this local field (via onCustomerUpdated
+    // below) instead of assigning to Clover immediately - the actual assignment happens when
+    // this popup's own Save button is clicked, alongside the note save.
     private var currentCustomer: Customer? = null
     private var customerNameView: TextView? = null
     private var customerActionView: TextView? = null
@@ -61,7 +63,7 @@ class OrderNoteDialogFragment : DialogFragment() {
     private val dateTimeFormat = SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault())
 
     interface OrderNoteListener {
-        fun onOrderNoteSaved(orderId: String?, note: String)
+        fun onOrderNoteSaved(orderId: String?, note: String, customer: Customer?)
         fun onOrderNoteCancelled()
     }
 
@@ -133,7 +135,7 @@ class OrderNoteDialogFragment : DialogFragment() {
 
         btnSave?.setOnClickListener {
             val note = buildNoteString()
-            listener?.onOrderNoteSaved(orderId, note)
+            listener?.onOrderNoteSaved(orderId, note, currentCustomer)
             dismiss()
         }
     }
@@ -240,9 +242,9 @@ class OrderNoteDialogFragment : DialogFragment() {
      * Add CUSTOMER section - shows the order's assigned customer and lets the merchant
      * search/select, edit, or create one without leaving the register (#140).
      *
-     * Reuses CustomerDialog end-to-end (search via CustomerSearchDialog, create, edit, and
-     * assign-to-order via CloverRepository.assignCustomerToOrder) - no customer logic is
-     * duplicated here.
+     * Reuses CustomerDialog end-to-end (search via CustomerSearchDialog, create, edit) - no
+     * customer logic is duplicated here. The actual assign-to-order call is deferred until
+     * this popup's own Save button is clicked (see openCustomerDialog()).
      */
     private fun addCustomerSection(widget: WidgetConfig) {
         val sectionView = LayoutInflater.from(requireContext())
@@ -277,13 +279,15 @@ class OrderNoteDialogFragment : DialogFragment() {
     }
 
     private fun openCustomerDialog() {
-        // Identical CustomerDialog invocation to OrderDetailFragment's existing hardcoded
-        // customerRow - the only addition is notifying the caller via onCustomerChanged so a
-        // screen open behind this popup (e.g. OrderDetailFragment) can refresh itself the
-        // same way the hardcoded row's own onCustomerUpdated already does (#140).
+        // orderId is deliberately withheld here (unlike OrderDetailFragment's hardcoded
+        // customerRow) so CustomerDialog.saveCustomer() skips its immediate
+        // assignCustomerToOrder() call - Save on the Customer Details screen should only
+        // update this popup's local state, not commit the assignment to Clover. The actual
+        // assignment happens when THIS popup's own Save button is clicked, via
+        // OrderNoteListener.onOrderNoteSaved's customer param.
         CustomerDialog.newInstance(
             customer = currentCustomer,
-            orderId = orderId,
+            orderId = null,
             onCustomerUpdated = { updatedCustomer ->
                 currentCustomer = updatedCustomer
                 renderCustomer()
@@ -438,9 +442,9 @@ class OrderNoteDialogFragment : DialogFragment() {
                     }
                 }
                 WidgetType.QUANTITY -> Unit
-                // Customer assignment is persisted immediately via CloverRepository when
-                // picked in addCustomerSection() (reusing CustomerDialog's own save/assign
-                // flow), not serialized into the note string (#140).
+                // Customer assignment is committed via CloverRepository when this popup's
+                // Save button is clicked (see setupButtons()), not serialized into the note
+                // string (#140).
                 WidgetType.CUSTOMER -> Unit
             }
         }

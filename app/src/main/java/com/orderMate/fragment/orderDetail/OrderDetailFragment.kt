@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.clover.sdk.v1.Intents
 import com.clover.sdk.v1.Intents.EXTRA_ORDER_ID
 import com.clover.sdk.v3.apps.AppsConnector
+import com.clover.sdk.v3.customers.Customer
 import com.clover.sdk.v3.order.Order
 import com.clover.sdk.v3.payments.Payment
 import com.clover.sdk.v3.payments.Refund
@@ -1111,18 +1112,21 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                 CoroutineScope(Dispatchers.IO).launch { refreshUI() }
             }
             setListener(object : OrderNoteDialogFragment.OrderNoteListener {
-                override fun onOrderNoteSaved(orderId: String?, note: String) {
+                override fun onOrderNoteSaved(orderId: String?, note: String, customer: Customer?) {
                     if (orderId != null) {
                         CoroutineScope(Dispatchers.IO).launch {
-                            val success = CloverRepository.getInstance(requireContext())
-                                .saveOrderNote(orderId, note)
+                            val repository = CloverRepository.getInstance(requireContext())
+                            if (customer != null) {
+                                repository.assignCustomerToOrder(orderId, customer)
+                            }
+                            val success = repository.saveOrderNote(orderId, note)
                             if (success) {
                                 refreshUI()
                             }
                         }
                     }
                 }
-                
+
                 override fun onOrderNoteCancelled() {
                     // No action needed
                 }
