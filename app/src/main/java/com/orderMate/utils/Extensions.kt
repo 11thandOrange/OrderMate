@@ -15,7 +15,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
 import com.orderMate.BuildConfig
 import com.orderMate.R
-import com.orderMate.activities.MainActivity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -257,11 +256,10 @@ fun Fragment.onBackPressed(task: () -> Unit) {
             task()
         }
     }
-    if (activity != null)
-        (activity as MainActivity).onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            onBackPressedCallback
-        )
+    activity?.onBackPressedDispatcher?.addCallback(
+        viewLifecycleOwner,
+        onBackPressedCallback
+    )
 }
 
 
