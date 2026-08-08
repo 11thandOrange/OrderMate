@@ -133,6 +133,11 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
     private var olderOrdersOffset = 0
     private var isLoadingOlderOrders = false
     private var hasMoreOlderOrders = true
+    // Orders pulled in via the REST backfill, kept separately from allItemList so that a
+    // fresh loadOrders() reload - which only re-reads Clover's local, retention-windowed
+    // cache - doesn't silently drop them again (#138). Merged back into allItemList on every
+    // reload in loadOrders().
+    private var backfilledOlderOrders: ArrayList<Order?> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -364,24 +369,21 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
 
     // ==================== Data Loading ====================
 
-    @SuppressLint("NotifyDataSetChanged")
     private fun loadOrders(onComplete: (() -> Unit)? = null) {
         showLoading(true)
-        // A fresh load re-establishes the local-cache baseline, so any previously loaded
-        // REST backfill offset/state is no longer valid (#138).
-        olderOrdersOffset = 0
-        hasMoreOlderOrders = true
 
         runOnBackgroundThread {
             try {
                 val orderData = myApp.getAllOrders()
-                orderItems.clear()
                 allItemList.clear()
+                orderData?.forEach { allItemList.add(it) }
 
-                orderData?.forEach {
-                    allItemList.add(it)
-                    orderItems.add(it)
-                }
+                // Clover's local cache is retention-windowed and can stop returning orders
+                // that were previously pulled in via the REST backfill - re-merge them so a
+                // reload (sync button, refreshTrigger, etc.) doesn't make them disappear
+                // again (#138).
+                val freshIds = allItemList.mapNotNull { it?.id }.toSet()
+                allItemList.addAll(backfilledOlderOrders.filter { it?.id !in freshIds })
             } catch (e: Exception) {
                 e.printStackTrace()
                 // runOnBackgroundThread isn't tied to the fragment's lifecycle, so this
@@ -397,27 +399,36 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
                 if (!isAdded || view == null) return@runOnMainThread
 
                 showLoading(false)
-
-                // Apply any pending shared state after orders are loaded
-                val sharedState = sharedFilterViewModel.filterState.value
-                if (sharedState != null && sharedState.hasActiveFilters()) {
-                    currentFilterState = sharedState
-                    applyDialogFilters(sharedState)
-                } else if (currentSearchQuery.isNotEmpty()) {
-                    // No dialog filters but search is active - apply search filter
-                    searchOrders(currentSearchQuery)
-                } else {
-                    updateResultsInfo()
-                    orderAdapter?.notifyDataSetChanged()
-                    updateEmptyState()
-                }
-                
+                applyCurrentViewToOrderItems()
                 onComplete?.invoke()
             }
 
             // Update filter options
             CoroutineScope(Dispatchers.Default).launch {
                 updateFilterOptions()
+            }
+        }
+    }
+
+    /**
+     * Rebuilds orderItems from allItemList according to whatever view (filtered/search/plain)
+     * is currently active. Shared by loadOrders() and loadOlderOrders() so both a full reload
+     * and a scroll-triggered backfill page land in the same place (#138/#150).
+     */
+    private fun applyCurrentViewToOrderItems() {
+        val sharedState = sharedFilterViewModel.filterState.value
+        when {
+            sharedState != null && sharedState.hasActiveFilters() -> {
+                currentFilterState = sharedState
+                applyDialogFilters(sharedState)
+            }
+            currentSearchQuery.isNotEmpty() -> searchOrders(currentSearchQuery)
+            else -> {
+                orderItems.clear()
+                orderItems.addAll(allItemList)
+                updateResultsInfo()
+                notifyAdapter()
+                updateEmptyState()
             }
         }
     }
@@ -452,7 +463,6 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
      * count/total shown at the top of the screen reflects every loaded order, not just the
      * first page.
      */
-    @SuppressLint("NotifyDataSetChanged")
     private fun loadOlderOrders() {
         if (isLoadingOlderOrders || !hasMoreOlderOrders || !isAdded) return
         isLoadingOlderOrders = true
@@ -483,19 +493,12 @@ class OrderListRedesignFragment : Fragment(), IOrderItemClickListener {
             val existingIds = allItemList.mapNotNull { it?.id }.toSet()
             val newOrders = olderOrders.filter { it.id !in existingIds }
             allItemList.addAll(newOrders)
+            // Remembered across reloads so a later loadOrders() (sync, refreshTrigger, etc.)
+            // re-merges these back in instead of losing them to the local cache's retention
+            // window again (#138).
+            backfilledOlderOrders.addAll(newOrders)
 
-            val sharedState = sharedFilterViewModel.filterState.value
-            when {
-                sharedState != null && sharedState.hasActiveFilters() -> applyDialogFilters(sharedState)
-                currentSearchQuery.isNotEmpty() -> searchOrders(currentSearchQuery)
-                else -> {
-                    orderItems.clear()
-                    orderItems.addAll(allItemList)
-                    updateResultsInfo()
-                    orderAdapter?.notifyDataSetChanged()
-                    updateEmptyState()
-                }
-            }
+            applyCurrentViewToOrderItems()
         }
     }
 
