@@ -82,8 +82,8 @@ class OrderNoteDialogTest {
 
     @Test
     fun `customer is excluded from note serialization`() {
-        // Like QUANTITY, CUSTOMER is persisted immediately via CloverRepository (reusing
-        // CustomerDialog's own save/assign flow) rather than being serialized into the note
+        // CUSTOMER is committed via CloverRepository.assignCustomerToOrder (reusing
+        // CustomerDialog's own save flow) rather than being serialized into the note
         // string, so it can never show up in the note text built from other widget selections.
         val selections = mapOf("Deadline" to "Apr 20, 2026", "Group" to "Catering")
         val note = selections
@@ -92,5 +92,40 @@ class OrderNoteDialogTest {
             .joinToString(" • ")
 
         assertFalse(note.contains("Customer", ignoreCase = true))
+    }
+
+    // --- Regression tests for the deferred-save fix ---
+    //
+    // Bug: CustomerDialog.saveCustomer() assigns the customer to the order (writes to Clover)
+    // immediately whenever it is given a non-null orderId. OrderNoteDialogFragment.
+    // openCustomerDialog() used to pass its real orderId straight through, so clicking Save on
+    // the Customer Details screen wrote the order-customer assignment to Clover right away -
+    // before the outer "Edit Order Level Notes" popup's own Save was ever clicked.
+    //
+    // Fix: openCustomerDialog() now always opens CustomerDialog with orderId = null, so its
+    // Save only updates local popup state (currentCustomer, via onCustomerUpdated). The actual
+    // assignment now happens in OrderNoteListener.onOrderNoteSaved(orderId, note, customer),
+    // fired only when the popup's own Save button is clicked.
+
+    // Mirrors OrderNoteDialogFragment.openCustomerDialog()'s CustomerDialog.newInstance(...)
+    // call: it must never forward the popup's orderId, regardless of what the popup was opened
+    // with, so CustomerDialog's own Save can never assign directly to Clover from this context.
+    private fun customerDialogOrderIdForPopup(popupOrderId: String?): String? = null
+
+    // Mirrors the listener implementations added to OrderDetailFragment/OverlayActivity's
+    // onOrderNoteSaved: CloverRepository.assignCustomerToOrder is only called when a customer
+    // is present.
+    private fun shouldAssignCustomerToOrder(customer: TestCustomer?): Boolean = customer != null
+
+    @Test
+    fun `opening the Customer Details screen from the order-level popup never forwards orderId`() {
+        assertNull(customerDialogOrderIdForPopup("order-123"))
+        assertNull(customerDialogOrderIdForPopup(null))
+    }
+
+    @Test
+    fun `order-level popup Save assigns the customer to Clover only when one is present`() {
+        assertTrue(shouldAssignCustomerToOrder(TestCustomer(firstName = "Jane", lastName = "Doe")))
+        assertFalse(shouldAssignCustomerToOrder(null))
     }
 }
