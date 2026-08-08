@@ -1208,33 +1208,61 @@ class OrderDetailFragment : Fragment(), IOrderItemClickListener, ILineItemUpdate
                         android.util.Log.d("ItemNoteReceivedDebug", "========== NOTE RECEIVED FROM DIALOG ==========")
                         android.util.Log.d("ItemNoteReceivedDebug", "itemId: $itemId")
                         android.util.Log.d("ItemNoteReceivedDebug", "note received: '$note'")
-                        android.util.Log.d("ItemNoteReceivedDebug", "quantity received: $quantity")
+                        android.util.Log.d("ItemNoteReceivedDebug", "quantity received: $quantity (was $itemQuantity)")
                         android.util.Log.d("ItemNoteReceivedDebug", "orderPosition: $orderPosition")
                         android.util.Log.d("ItemNoteReceivedDebug", "================================================")
-
-                        // Update the line item note in UI
-                        updateNoteInTheLineItemOfOrder(itemId, note, orderPosition)
 
                         // Save to Clover via OrderConnector
                         runOnBackgroundThread {
                             exceptionHandler {
                                 val orderId = orderArguments?.id ?: return@exceptionHandler
                                 val allLineItems = orderArguments?.lineItems ?: return@exceptionHandler
+                                val orderConnector = myApp.getOrderConnector()
 
-                                android.util.Log.d("ItemNoteReceivedDebug", "Saving to Clover - orderId: $orderId")
+                                // Update note first, only on line items we know currently exist -
+                                // avoids touching anything that's about to be deleted below (#139).
+                                val existingGroupItems = allLineItems.filter { it?.item?.id == itemId }
+                                if (existingGroupItems.isNotEmpty()) {
+                                    existingGroupItems.forEach { it?.note = note }
+                                    orderConnector.updateLineItems(orderId, existingGroupItems)
+                                    android.util.Log.d("ItemNoteReceivedDebug", "Note saved on ${existingGroupItems.size} line item(s)")
+                                }
 
-                                // Update note and quantity for matching line items (#139)
-                                allLineItems.forEach { lineItem ->
-                                    if (lineItem?.item?.id == itemId) {
-                                        android.util.Log.d("ItemNoteReceivedDebug", "Setting note on lineItem: ${lineItem.id}")
-                                        lineItem.note = note
-                                        lineItem.unitQty = quantity
+                                // Quantity here means "how many separate line items represent
+                                // this product" (see CommonFunctions.countElementsByUniqueKeys) -
+                                // Clover has no per-line-item count field (LineItem.unitQty is a
+                                // different, weight-based concept), so changing it means actually
+                                // adding or deleting line items (#139).
+                                val delta = quantity - itemQuantity
+                                if (delta > 0 && !itemId.isNullOrEmpty()) {
+                                    val binName = existingGroupItems.firstOrNull()?.binName ?: ""
+                                    val newItems = orderConnector.addFixedPriceLineItems(
+                                        orderId, itemId, binName, "", delta
+                                    )
+                                    if (note.isNotBlank() && !newItems.isNullOrEmpty()) {
+                                        newItems.forEach { it?.note = note }
+                                        orderConnector.updateLineItems(orderId, newItems)
+                                    }
+                                    android.util.Log.d("ItemNoteReceivedDebug", "Added $delta line item(s)")
+                                } else if (delta < 0) {
+                                    val idsToRemove = lineItemGroup?.lineItemDifferentId
+                                        ?.filterNotNull()
+                                        ?.take(-delta)
+                                        ?: emptyList()
+                                    if (idsToRemove.isNotEmpty()) {
+                                        orderConnector.deleteLineItems(orderId, idsToRemove)
+                                        android.util.Log.d("ItemNoteReceivedDebug", "Deleted ${idsToRemove.size} line item(s)")
                                     }
                                 }
 
-                                // Save to Clover
-                                myApp.getOrderConnector().updateLineItems(orderId, allLineItems)
                                 android.util.Log.d("ItemNoteReceivedDebug", "Saved to Clover!")
+
+                                // Full resync rather than a manual local patch - note and
+                                // quantity both changed, and quantity now depends on Clover's
+                                // actual line item count after the add/delete above.
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    refreshUI()
+                                }
                             }
                         }
                     } catch (e: Exception) {
