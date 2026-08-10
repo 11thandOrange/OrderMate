@@ -1,0 +1,9 @@
+# Authored changelog for the OrderMate docs site (approach A, keyed by date).
+# Consumed by agent-ops's changelog extractor -> the Changelog timeline.
+
+- date: "2026-08-10"
+  added:
+    - "Onboarded OrderMate to the shared wiki documentation generator (Epic 10, tickets #49/#51): wiki.config.yaml, the wiki-generate caller workflow, and authored doc sources."
+    - "Feature pages for Order Management, Receipt Printing, and Webhooks & Cron."
+  changed:
+    - "Documented Clover, Firebase, and FCM as first-class integrations."
