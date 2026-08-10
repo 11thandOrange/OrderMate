@@ -1,0 +1,37 @@
+# Thin caller for agent-ops's shared wiki generator (issue #286).
+# Runs the reusable wiki-generate workflow, which reads this repo's
+# wiki.config.yaml, regenerates the docs site under docs/, commits any
+# changed generated output back to main, and deploys it to GitHub Pages.
+#
+# Requires GH_APP_ID / GH_APP_PRIVATE_KEY to exist as repo or org secrets
+# (same as the dev-pipeline caller already requires).
+
+name: wiki-generate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "wiki.config.yaml"
+      - "docs/src/content/features/**"
+      - "wiki-content/**"
+      - "app/src/main/java/com/orderMate/networkManager/**"
+      - "app/src/test/**"
+      - "functions/src/**"
+      - "README.md"
+      - "IMPLEMENTATION_PLAN.md"
+      - "WEBHOOK_CRON_IMPLEMENTATION.md"
+      - ".github/workflows/wiki-generate.yml"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    uses: 11thandOrange/agent-ops/.github/workflows/wiki-generate-reusable.yml@main
+    with:
+      site_dir: docs
+      config_path: wiki.config.yaml
+    secrets: inherit

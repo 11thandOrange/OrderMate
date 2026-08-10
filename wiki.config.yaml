@@ -1,0 +1,122 @@
+# wiki.config.yaml - per-repo configuration for the shared wiki generator
+# (agent-ops issue #286). Onboards OrderMate (Epic 10, tickets #49/#51).
+#
+# The driver (agent-ops scripts/wiki-generate.mjs) reads this file and runs
+# only the extractors listed under `extractors:` whose `enabled` is true.
+# All theming/title/favicon values below are literal, deterministic strings -
+# nothing here is ever LLM-generated.
+
+site:
+  title: "OrderMate Docs"
+  description: "Documentation and API reference for OrderMate, an Android order-management app for Clover POS."
+  theme:
+    accent: "#2E7D32"
+    accentHover: "#1B5E20"
+    accentMuted: "rgba(46, 125, 50, 0.1)"
+  favicon: "/favicon.svg"
+  githubUrl: "https://github.com/11thandOrange/OrderMate"
+
+# The Sandbox ("Try it") panel proxies requests through this repo's deployed
+# wiki-backend instance, which forwards them to the real upstream API.
+backend:
+  proxyBaseUrl: "https://ordermate-wiki-backend.example.com"
+  targetApiBaseUrl: "https://api.clover.com"
+
+extractors:
+  # Kotlin Retrofit interfaces -> endpoints.ts
+  endpointsKotlin:
+    enabled: true
+    interfaceGlob:
+      - "app/src/main/java/com/orderMate/networkManager/*.kt"
+    modelGlobs:
+      - "app/src/main/**/*.kt"
+
+  # GH Actions workflows -> CI/CD section.
+  workflows:
+    enabled: true
+    glob:
+      - ".github/workflows/*.yml"
+    exclude: []
+
+  # Authored feature pages (docs/src/content/features/*.md).
+  features:
+    enabled: true
+    dir: features
+
+  # Non-source third parties (authored) -> Dependencies & Integrations section.
+  integrations:
+    enabled: true
+    items:
+      - slug: clover-api
+        name: "Clover API"
+        kind: api
+        summary: "Clover POS platform. The app reads/manages orders via the on-device Clover SDK v3 (OrderConnector, PrinterConnector, CloverAuth) and supplements the retention-windowed local cache with the Clover REST v3 Orders API for full paginated order history."
+        auth: "OAuth bearer token from com.clover.sdk.util.CloverAuth.authenticate(); the base URL and token are resolved per merchant/environment and passed as an Authorization header."
+        url: "https://docs.clover.com/dev/docs/orders-faqs"
+        notes:
+          - kind: note
+            body: "The REST client (CloverOrdersApi) returns a raw ResponseBody rather than a Gson-deserialized model, because com.clover.sdk.v3.order.Order is a JSONObject-backed SDK type, not a Gson-reflectable POJO; callers parse the JSON manually."
+      - slug: firebase
+        name: "Firebase (Realtime Database & Cloud Functions)"
+        kind: platform
+        summary: "Backend of record for merchant lifecycle and analytics. Firebase Realtime Database stores per-merchant info, subscription, and event records; Firebase Cloud Functions (TypeScript) host the Clover lifecycle webhook receiver."
+        auth: "Firebase Admin SDK (server-side, in Cloud Functions) and the app's Firebase client config on-device."
+        url: "https://firebase.google.com/docs"
+        notes:
+          - kind: note
+            body: "The cloverWebhook function verifies the X-Clover-Auth header against CLOVER_AUTH_CODE and writes idempotent, deterministically-keyed event records so Clover retries update the same record instead of duplicating it."
+      - slug: fcm
+        name: "Firebase Cloud Messaging (FCM)"
+        kind: service
+        summary: "Push messaging channel used to deliver customer-facing SMS/email notifications and in-app alerts tied to orders."
+        auth: "FCM server credentials (Firebase project) plus per-device registration tokens."
+        url: "https://firebase.google.com/docs/cloud-messaging"
+
+  # Suite-level test coverage -> tests.ts
+  tests:
+    enabled: true
+    suites:
+      - name: "Android unit tests"
+        framework: junit
+        glob: "app/src/test/**/*.kt"
+        description: "JVM/JUnit 4 unit tests covering utils, view models, adapters, modals, on-device schedulers, and settings/integration logic."
+      - name: "Cloud Functions webhook tests"
+        framework: jest
+        glob: "functions/src/**/*.test.ts"
+        description: "Jest tests for the Clover lifecycle webhook handler (auth gating, verification handshake, idempotency, per-merchant failure isolation)."
+
+  # Existing markdown docs, ingested verbatim -> one section per navSection.
+  markdown:
+    enabled: true
+    sources:
+      - glob: "README.md"
+        navSection: "Overview"
+      - glob: "IMPLEMENTATION_PLAN.md"
+        navSection: "Planning"
+      - glob: "WEBHOOK_CRON_IMPLEMENTATION.md"
+        navSection: "Backend"
+
+  # OrderMate's entry in agent-ops's pipelines.yaml -> automation.ts
+  automation:
+    enabled: true
+    pipelinesYamlPath: "orchestrator/src/registry/pipelines.yaml"
+    repoMatch: "11thandOrange/OrderMate"
+
+  # Authored changelog -> Changelog timeline.
+  changelog:
+    enabled: true
+    source: wiki-content/changelog.yaml
+
+  # Not applicable to OrderMate - explicitly disabled.
+  endpointsExpress:
+    enabled: false
+  appList:
+    enabled: false
+  skills:
+    enabled: false
+  dependencies:
+    enabled: false
+
+output:
+  dataDir: "src/data"
+  contentDir: "src/content"
