@@ -1,0 +1,66 @@
+# Email pipeline caller — shared Agent Ops workflow integration (Ticket 23, #172)
+#
+# This is a thin workflow_dispatch caller that delegates all email sending to the
+# shared Agent Ops reusable workflow. OrderMate carries NO provider-specific email
+# logic: choice of Gmail vs Mailchimp, direct content vs template, and single vs
+# many recipients are all handled by the shared pipeline.
+#
+# Requirements:
+#   - Org/repo secrets ORCHESTRATOR_URL and ORCHESTRATOR_SHARED_SECRET must be set
+#     (passed through via `secrets: inherit`).
+#   - The reusable workflow must land on agent-ops main first
+#     (Epic 6 / agent-ops #63): 11thandOrange/agent-ops
+#     .github/workflows/email-reusable.yml@main
+#
+# This supersedes and replaces the never-built, design-only Mailchimp / weekly-report
+# email spec in WEBHOOK_CRON_IMPLEMENTATION.md — the shared pipeline replaces it.
+
+name: Email
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: "Email provider to send through"
+        required: true
+        type: choice
+        options:
+          - gmail
+          - mailchimp
+      to:
+        description: "Recipient(s) — single address or comma-separated list"
+        required: true
+        type: string
+      subject:
+        description: "Email subject (for direct content)"
+        required: false
+        type: string
+      text:
+        description: "Plain-text body (for direct content)"
+        required: false
+        type: string
+      html:
+        description: "HTML body (for direct content)"
+        required: false
+        type: string
+      template:
+        description: "Template identifier (alternative to direct content)"
+        required: false
+        type: string
+      template_vars:
+        description: "JSON object of variables for the template"
+        required: false
+        type: string
+
+jobs:
+  email:
+    uses: 11thandOrange/agent-ops/.github/workflows/email-reusable.yml@main
+    secrets: inherit
+    with:
+      provider: ${{ inputs.provider }}
+      to: ${{ inputs.to }}
+      subject: ${{ inputs.subject }}
+      text: ${{ inputs.text }}
+      html: ${{ inputs.html }}
+      template: ${{ inputs.template }}
+      template_vars: ${{ inputs.template_vars }}
