@@ -5,6 +5,7 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")  // plugin for the navigation
     id("com.google.gms.google-services")  // firebase
     id("com.google.firebase.crashlytics")   // crashlytics
+    id("jacoco")  // code coverage — see jacocoTestReport task at bottom of file (additive, CI coverage gate)
 }
 
 android {
@@ -132,4 +133,59 @@ dependencies {
     
     // WorkManager for scheduled notifications and printing (#83 requirement)
     implementation("androidx.work:work-runtime-ktx:2.7.1")
+}
+
+// ---------------------------------------------------------------------------
+// JaCoCo coverage support (ADDITIVE — bootstrap for agent-ops CI coverage gate)
+//
+// Enables the `ordermate-dev` coverage gate (coverage_type=jacoco) to consume
+// an XML coverage report. This is the conventional Android + Kotlin JaCoCo
+// pattern: a `jacocoTestReport` task that runs the debug unit tests and emits
+// build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml.
+//
+// This block only ADDS a task and configures the jacoco tool version; it does
+// not change any existing app, source, or build logic.
+// ---------------------------------------------------------------------------
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    // Run unit tests first so execution data (.exec) exists.
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)   // consumed by the coverage gate
+        html.required.set(true)  // handy for local inspection
+        csv.required.set(false)
+    }
+
+    // Exclude generated/framework classes that would skew coverage numbers.
+    val coverageExcludes = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+        "**/databinding/**",
+        "**/*_ViewBinding*.*",
+        "**/*Binding.*"
+    )
+
+    val buildDirFile = layout.buildDirectory.get().asFile
+    val debugClasses = fileTree("$buildDirFile/tmp/kotlin-classes/debug") {
+        exclude(coverageExcludes)
+    }
+    val javacClasses = fileTree("$buildDirFile/intermediates/javac/debug/classes") {
+        exclude(coverageExcludes)
+    }
+
+    sourceDirectories.setFrom(files("$projectDir/src/main/java"))
+    classDirectories.setFrom(files(debugClasses, javacClasses))
+    executionData.setFrom(
+        fileTree(buildDirFile) {
+            include("**/*.exec", "**/*.ec")
+        }
+    )
 }

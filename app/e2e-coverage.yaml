@@ -1,0 +1,42 @@
+# OrderMate — critical-flow coverage manifest (STARTER)
+#
+# NOTE: This manifest is NOT yet wired into the E2E caller.
+# In .github/workflows/e2e-pipeline.yml the `coverage_manifest_path` input is
+# intentionally left EMPTY because no real instrumented (Espresso) tests exist
+# yet — only the default ExampleInstrumentedTest boilerplate.
+#
+# Enable this file ONLY after adding instrumented tests that exercise the flows
+# below. To enable: set
+#   coverage_manifest_path: app/e2e-coverage.yaml
+# in the e2e-pipeline caller. See docs/ci-e2e.md for the full procedure.
+#
+# Each flow lists a stable `name` used by the coverage gate to check that a
+# corresponding instrumented test exists and passes. Flows were inferred from
+# the app's navigation graph and fragments (start destination:
+# orderListRedesignFragment).
+
+flows:
+  - name: order_list_browse_and_filter
+    description: >-
+      Launch the app to the order list (start destination), browse orders and
+      apply filters via the filter dialog.
+
+  - name: order_detail_and_notes
+    description: >-
+      Open an order from the list, view its details, and add/edit order and
+      item notes.
+
+  - name: calendar_scheduling
+    description: >-
+      Open the calendar view and navigate day/week/month to see scheduled
+      order events.
+
+  - name: customer_notifications
+    description: >-
+      Trigger an SMS/email customer notification from an order and confirm the
+      send flow.
+
+  - name: settings_and_profile
+    description: >-
+      Open settings / profile, adjust merchant configuration, and persist
+      changes.

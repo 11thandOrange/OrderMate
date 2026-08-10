@@ -1,0 +1,32 @@
+name: e2e-pipeline
+
+# Thin caller for the shared agent-ops reusable E2E pipeline.
+# All emulator setup (KVM, AVD cache, SDK install, boot/input-ready wait,
+# teardown, artifact upload, PR comment) is owned by the reusable workflow.
+# This file only passes OrderMate-specific inputs.
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      record_video:
+        type: boolean
+        default: false
+
+jobs:
+  espresso:
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: 11thandOrange/agent-ops/.github/workflows/e2e-pipeline-reusable.yml@main
+    with:
+      working_directory: app
+      test_command: "./gradlew connectedDebugAndroidTest"
+      needs_emulator: true
+      emulator_api_level: 30
+      record_video: ${{ inputs.record_video || false }}
+      # Keep EMPTY for now — no real instrumented tests exist yet (only the
+      # default ExampleInstrumentedTest boilerplate). Wiring the coverage
+      # manifest before critical-flow tests exist would fail the coverage gate.
+      # See app/e2e-coverage.yaml and docs/ci-e2e.md to enable it later.
+      coverage_manifest_path: ""
