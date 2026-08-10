@@ -21,7 +21,10 @@ jobs:
     uses: 11thandOrange/agent-ops/.github/workflows/e2e-pipeline-reusable.yml@main
     with:
       working_directory: app
-      test_command: "./gradlew connectedDebugAndroidTest"
+      # The Gradle wrapper lives at the repo root, but the reusable runs
+      # test_command from working_directory (app/), so call it via ../gradlew
+      # and target the :app module explicitly.
+      test_command: "../gradlew :app:connectedDebugAndroidTest"
       needs_emulator: true
       emulator_api_level: 30
       record_video: ${{ inputs.record_video || false }}
