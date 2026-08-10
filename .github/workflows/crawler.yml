@@ -1,0 +1,102 @@
+# Daily payment-processor crawler cron.
+#
+# This workflow invokes the shared agent-ops `payment-processor-crawler`
+# orchestrator pipeline (Epic 7 / agent-ops PR). It does NOT crawl anything
+# itself; it only triggers the pipeline that lives on the Agent Ops orchestrator.
+#
+# The accumulated CSV write to `11thandOrange/the-store` is handled downstream
+# by Epic 8 (not this workflow).
+#
+# Requirements:
+#   - The `payment-processor-crawler` pipeline must be deployed on the
+#     orchestrator FIRST, otherwise the trigger call will fail.
+#   - Two repository secrets must be configured:
+#       ORCHESTRATOR_URL           - base URL of the Agent Ops orchestrator
+#       ORCHESTRATOR_SHARED_SECRET - shared secret sent as x-orchestrator-secret
+#
+# Epic 7, Ticket 26 (#169).
+
+name: Daily payment-processor crawler
+
+on:
+  schedule:
+    # Daily at 06:00 UTC (off-peak).
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run without persisting results (manual runs default to dry run)."
+        type: boolean
+        required: false
+        default: true
+      max_pages:
+        description: "Optional cap on the number of pages to crawl."
+        type: string
+        required: false
+        default: ""
+      max_domains:
+        description: "Optional cap on the number of domains to crawl."
+        type: string
+        required: false
+        default: ""
+
+jobs:
+  trigger-crawler:
+    name: Trigger agent-ops crawler pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invoke payment-processor-crawler pipeline
+        env:
+          ORCHESTRATOR_URL: ${{ secrets.ORCHESTRATOR_URL }}
+          ORCHESTRATOR_SHARED_SECRET: ${{ secrets.ORCHESTRATOR_SHARED_SECRET }}
+          # On a manual run, honor the dry_run input (defaults to true).
+          # On a scheduled run, event_name != workflow_dispatch, so force false.
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_DRY_RUN: ${{ github.event.inputs.dry_run }}
+          INPUT_MAX_PAGES: ${{ github.event.inputs.max_pages }}
+          INPUT_MAX_DOMAINS: ${{ github.event.inputs.max_domains }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${ORCHESTRATOR_URL:-}" ] || [ -z "${ORCHESTRATOR_SHARED_SECRET:-}" ]; then
+            echo "::error::ORCHESTRATOR_URL and ORCHESTRATOR_SHARED_SECRET secrets must be set."
+            exit 1
+          fi
+
+          # Determine dryRun: manual runs honor the input (default true);
+          # scheduled runs always persist (dryRun=false).
+          if [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
+            if [ "${INPUT_DRY_RUN}" = "false" ]; then
+              DRY_RUN=false
+            else
+              DRY_RUN=true
+            fi
+          else
+            DRY_RUN=false
+          fi
+
+          # Build the input object, including maxPages / maxDomains only when
+          # provided (as numbers).
+          INPUT_JSON=$(jq -n --argjson dryRun "${DRY_RUN}" '{dryRun: $dryRun}')
+
+          if [ -n "${INPUT_MAX_PAGES:-}" ]; then
+            INPUT_JSON=$(printf '%s' "${INPUT_JSON}" \
+              | jq --argjson maxPages "${INPUT_MAX_PAGES}" '. + {maxPages: $maxPages}')
+          fi
+          if [ -n "${INPUT_MAX_DOMAINS:-}" ]; then
+            INPUT_JSON=$(printf '%s' "${INPUT_JSON}" \
+              | jq --argjson maxDomains "${INPUT_MAX_DOMAINS}" '. + {maxDomains: $maxDomains}')
+          fi
+
+          BODY=$(jq -n \
+            --arg pipeline "payment-processor-crawler" \
+            --argjson input "${INPUT_JSON}" \
+            '{kind: $pipeline, pipeline: $pipeline, input: $input}')
+
+          echo "Triggering pipeline with body:"
+          printf '%s\n' "${BODY}"
+
+          curl -sS -f -X POST "${ORCHESTRATOR_URL}/trigger" \
+            -H "content-type: application/json" \
+            -H "x-orchestrator-secret: ${ORCHESTRATOR_SHARED_SECRET}" \
+            -d "${BODY}"
