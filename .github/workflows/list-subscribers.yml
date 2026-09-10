@@ -4,6 +4,14 @@ name: List subscribers
 # subscription status into the run log.
 on:
   workflow_dispatch:
+  # Manual dispatch only works for workflows on the default branch, so the
+  # branch push doubles as the trigger while this lives on a feature branch.
+  push:
+    branches:
+      - claude/vigilant-dirac-gfurdl
+    paths:
+      - .github/workflows/list-subscribers.yml
+      - .github/scripts/list-subscribers.js
 
 jobs:
   list:
