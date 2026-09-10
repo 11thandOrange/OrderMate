@@ -1,18 +1,25 @@
 /**
- * Lists OrderMate merchants grouped by subscription status.
+ * Lists OrderMate merchants with subscription status and last recorded activity.
  *
- * Reads merchants/{merchantId}/subscription and merchantInfo from the
- * Realtime Database. Mirrors SubscriptionInfo.fromMap(): a merchant with no
- * subscription node defaults to plan "free", status "active".
+ * Reads merchants/{merchantId} and reports, per merchant, the most recent
+ * timestamp found across three sources, since merchantInfo.lastActiveDate is
+ * only written by the lifecycle webhook and is absent for merchants that
+ * installed before it existed:
  *
- * Auth comes from FIREBASE_SERVICE_ACCOUNT (the service-account JSON) and
- * FIREBASE_DATABASE_URL, both supplied as GitHub secrets.
+ *   merchantInfo.lastActiveDate  - webhook-recorded activity
+ *   meta.updatedAt               - last write by the app itself
+ *   events/{eventId}.timestamp   - most recent lifecycle event
+ *
+ * Auth comes from FIREBASE_SERVICE_ACCOUNT and FIREBASE_DATABASE_URL.
  */
 
 const admin = require("firebase-admin");
 
 const ACTIVE = "active";
 const PLAN_FREE = "free";
+// Clover merchant IDs are 13 characters; anything else under /merchants is a
+// stray node written to the wrong path, not a merchant.
+const MERCHANT_ID_LENGTH = 13;
 
 function required(name) {
   const value = process.env[name];
@@ -32,38 +39,61 @@ function parseServiceAccount(raw) {
   }
 }
 
-function subscriptionOf(merchant) {
-  const sub = (merchant && merchant.subscription) || {};
-  return {
-    plan: typeof sub.plan === "string" ? sub.plan : PLAN_FREE,
-    status: typeof sub.status === "string" ? sub.status : ACTIVE,
-    // Flags merchants whose status is inferred rather than stored, since those
-    // read as active without anyone having written a subscription.
-    defaulted: typeof sub.status !== "string",
-  };
+function toMillis(value) {
+  const millis = Number(value);
+  return Number.isFinite(millis) && millis > 0 ? millis : null;
 }
 
 function formatDate(millis) {
-  if (!millis) return "-";
-  return new Date(Number(millis)).toISOString().slice(0, 10);
+  return millis ? new Date(millis).toISOString().slice(0, 10) : "-";
+}
+
+/**
+ * Picks the most recent timestamp across every source that recorded one.
+ * @param {object} merchant - The merchant subtree
+ * @return {{millis: ?number, source: string}} Latest activity and its origin
+ */
+function lastActivity(merchant) {
+  const info = merchant.merchantInfo || {};
+  const meta = merchant.meta || {};
+  const events = merchant.events || {};
+
+  const candidates = [
+    {millis: toMillis(info.lastActiveDate), source: "merchantInfo"},
+    {millis: toMillis(info.uninstallDate), source: "uninstall"},
+    {millis: toMillis(info.installDate), source: "install"},
+    {millis: toMillis(meta.updatedAt), source: "meta.updatedAt"},
+    {millis: toMillis(meta.createdAt), source: "meta.createdAt"},
+    ...Object.values(events).map((e) => ({
+      millis: toMillis(e && e.timestamp),
+      source: "event",
+    })),
+  ].filter((c) => c.millis !== null);
+
+  if (candidates.length === 0) return {millis: null, source: "none"};
+  return candidates.reduce((a, b) => (b.millis > a.millis ? b : a));
 }
 
 function rowsFor(snapshot) {
-  const merchants = snapshot.val() || {};
-  return Object.entries(merchants).map(([merchantId, merchant]) => {
-    const info = (merchant && merchant.merchantInfo) || {};
-    const {plan, status, defaulted} = subscriptionOf(merchant);
-    return {
-      merchantId,
-      storeName: info.storeName || info.name || "-",
-      plan,
-      status,
-      defaulted,
-      installDate: formatDate(info.installDate),
-      uninstallDate: formatDate(info.uninstallDate),
-      lastActiveDate: formatDate(info.lastActiveDate),
-    };
-  });
+  return Object.entries(snapshot.val() || {})
+    .filter(([key]) => key.length === MERCHANT_ID_LENGTH)
+    .map(([merchantId, merchant]) => {
+      const m = merchant || {};
+      const sub = m.subscription || {};
+      const info = m.merchantInfo || {};
+      const activity = lastActivity(m);
+      return {
+        merchantId,
+        plan: typeof sub.plan === "string" ? sub.plan : PLAN_FREE,
+        status: typeof sub.status === "string" ? sub.status : ACTIVE,
+        hasRecord: typeof sub.status === "string",
+        installed: formatDate(toMillis(info.installDate)),
+        lastActivityMillis: activity.millis,
+        lastActivity: formatDate(activity.millis),
+        source: activity.source,
+      };
+    })
+    .sort((a, b) => (b.lastActivityMillis || 0) - (a.lastActivityMillis || 0));
 }
 
 function printTable(title, rows) {
@@ -75,22 +105,18 @@ function printTable(title, rows) {
   }
   console.table(rows.map((r) => ({
     merchantId: r.merchantId,
-    store: r.storeName,
     plan: r.plan,
-    status: r.status + (r.defaulted ? " (no record)" : ""),
-    installed: r.installDate,
-    uninstalled: r.uninstallDate,
-    lastActive: r.lastActiveDate,
+    status: r.status + (r.hasRecord ? "" : " (no record)"),
+    installed: r.installed,
+    lastActivity: r.lastActivity,
+    source: r.source,
   })));
 }
 
 async function main() {
-  const serviceAccount = parseServiceAccount(required("FIREBASE_SERVICE_ACCOUNT"));
-  const databaseURL = required("FIREBASE_DATABASE_URL");
-
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL,
+    credential: admin.credential.cert(parseServiceAccount(required("FIREBASE_SERVICE_ACCOUNT"))),
+    databaseURL: required("FIREBASE_DATABASE_URL"),
   });
 
   const snapshot = await admin.database().ref("merchants").once("value");
@@ -98,39 +124,20 @@ async function main() {
 
   if (rows.length === 0) {
     console.log("No merchants found under /merchants.");
-    console.log("Check that FIREBASE_DATABASE_URL points at the right instance.");
     return;
   }
 
-  const active = rows.filter((r) => r.status === ACTIVE);
-  const inactive = rows.filter((r) => r.status !== ACTIVE);
+  printTable("ACTIVE", rows.filter((r) => r.status === ACTIVE));
+  printTable("NOT ACTIVE", rows.filter((r) => r.status !== ACTIVE));
 
-  printTable("ACTIVE", active);
-  printTable("NOT ACTIVE", inactive);
-
-  const paying = active.filter((r) => r.plan !== PLAN_FREE);
-  const byStatus = rows.reduce((acc, r) => {
-    acc[r.status] = (acc[r.status] || 0) + 1;
-    return acc;
-  }, {});
-  const byPlan = rows.reduce((acc, r) => {
-    acc[r.plan] = (acc[r.plan] || 0) + 1;
-    return acc;
-  }, {});
-
+  const noActivity = rows.filter((r) => r.lastActivityMillis === null);
   console.log("\nSUMMARY");
   console.log("-------");
-  console.log(`Total merchants : ${rows.length}`);
-  console.log(`Active          : ${active.length}`);
-  console.log(`Not active      : ${inactive.length}`);
-  console.log(`Paying (active, plan != free) : ${paying.length}`);
-  console.log(`By status : ${JSON.stringify(byStatus)}`);
-  console.log(`By plan   : ${JSON.stringify(byPlan)}`);
-
-  const defaulted = rows.filter((r) => r.defaulted).length;
-  if (defaulted > 0) {
-    console.log(`\nNote: ${defaulted} merchant(s) have no subscription record and are counted as active/free, matching SubscriptionInfo.fromMap() defaults.`);
-  }
+  console.log(`Merchants          : ${rows.length}`);
+  console.log(`Active             : ${rows.filter((r) => r.status === ACTIVE).length}`);
+  console.log(`Not active         : ${rows.filter((r) => r.status !== ACTIVE).length}`);
+  console.log(`Paying (plan != free) : ${rows.filter((r) => r.plan !== PLAN_FREE).length}`);
+  console.log(`No timestamp anywhere : ${noActivity.length}`);
 }
 
 main()
