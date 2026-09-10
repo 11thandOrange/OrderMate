@@ -1,0 +1,25 @@
+name: List subscribers
+
+# Manual only - reads the Realtime Database and prints merchants grouped by
+# subscription status into the run log.
+on:
+  workflow_dispatch:
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install firebase-admin
+        run: npm install --no-save firebase-admin@^12.0.0
+
+      - name: List subscribers
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+        run: node .github/scripts/list-subscribers.js
